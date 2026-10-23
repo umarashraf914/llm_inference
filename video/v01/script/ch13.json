@@ -102,8 +102,8 @@
         },
         {
           "id": "b4",
-          "say": "Two shapes worth recognising. Linear: flat work per token. Quadratic: each token costs more than the last. Barely different at ten tokens, at ten thousand quadratic is about a thousand times worse.",
-          "show": "As the beat opens, the header, the two boxes, the equation, its tag and both counters fade, leaving the left half's amber block columns with no text; the chart title 'Two ways to grow' takes the header's place. Right half: the chart draws with its shared axes and grey 'schematic' tag. On 'Linear', equal teal bars fill the strip under the axis and the teal total climbs as a straight line, label 'Linear'. On 'Quadratic', the amber block columns from the left slide across into the strip as rising bars and the amber total bends upward, label 'Quadratic'. On 'ten tokens', both curves are marked at x = 10, 'about equal'. On 'ten thousand', 'about equal' fades, the x axis stretches to 10,000 and the y axis visibly rescales: its tick labels jump, the teal line flattens toward the floor while the amber curve climbs. Tags: teal '× 1,000', amber '× 1,000,000', and an amber readout '≈ 1,000× worse'."
+          "say": "Two shapes worth recognising. Linear: flat work per token. Quadratic: each token costs more than the last. At ten tokens, under five times apart. At ten thousand, quadratic is five thousand times worse.",
+          "show": "As the beat opens, the header, the two boxes, the equation, its tag and both counters fade, leaving the left half's amber block columns with no text; the chart title 'Two ways to grow' takes the header's place. Right half: the chart draws with its shared axes and grey 'schematic' tag. On 'Linear', equal teal bars fill the strip under the axis and the teal total climbs as a straight line, label 'Linear'. On 'Quadratic', the amber block columns from the left slide across into the strip as rising bars and the amber total bends upward, label 'Quadratic'. On 'ten tokens', both curves are marked at x = 10, '4.5× apart'. On 'ten thousand', '4.5× apart' fades, the x axis stretches to 10,000 and the y axis visibly rescales: its tick labels jump, the teal line flattens toward the floor while the amber curve climbs. Tags: teal '× 1,000', amber '× 1,000,000', and an amber readout '≈ 5,000× worse'."
         },
         {
           "id": "b5",
@@ -357,9 +357,9 @@
       "result": "499500.0"
     },
     {
-      "claim": "fig 134: if linear and quadratic totals are about equal at 10 tokens, going to 10,000 grows linear x1,000 and quadratic about x1,000,000, so quadratic ends about 1,000 times worse. Atlas wording 'a thousand times worse' is read as this ratio; with n(n-1)/2 the exact figure is 1,111, hence 'about'",
-      "python": "print(10000/10, (10000*9999/2)/(10*9/2), ((10000*9999/2)/(10*9/2))/(10000/10))",
-      "result": "1000.0 1111000.0 1111.0"
+      "claim": "fig 134 (CORRECTED for consistency with s03.b3's n(n−1)/2 against n): at 10 tokens 45 vs 10 = 4.5× apart; at 10,000 tokens 49,995,000 vs 10,000 ≈ 5,000×, matching 499.5× at 1,000 one beat earlier. The atlas's 'a thousand times worse' is the growth of the gap (4.5× → 5,000×, ×1,111) under its 'about equal at 10' idealisation; the on-screen growth tags '× 1,000' (linear) and '× 1,000,000' (quadratic) keep that",
+      "python": "print((10*9/2)/10, (10000*9999/2)/10000, 10000/10, (10000*9999/2)/(10*9/2))",
+      "result": "4.5 4999.5 1000.0 1111000.0"
     },
     {
       "claim": "fig 136 (on screen): with the cache each token's key and value is computed once, 1,000 key-and-value computations instead of 499,500 recomputations, about 500 times fewer: 'K and V work: quadratic → linear'",

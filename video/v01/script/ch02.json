@@ -26,12 +26,12 @@
         {
           "id": "b2",
           "say": "That is about thirty-three tokens a second, words arriving at least as fast as you read.",
-          "show": "The '.' pill rides the return arrow and appends to the row. The panel scales to 55% and slides into the top band at 40% opacity, still turning slowly; the stopwatch keeps reading '30 ms'. In the centre band a ruler draws from x 260 to x 1660, '0' to '1 s', ticks every 0.1 s, so 1,400 px is one second. Blue pills drop onto it one every 42 px, which is every 30 ms, slowed 4× so the second fills in about four seconds; grey tag under the ruler's left end: 'slowed 4×'. On 'thirty-three tokens', a counter above the ruler's right end (1560, 480) starts, and it reaches 33 as the last pill lands, label 'tokens in 1 s'. In the bottom band ch00's chat window returns with 'Why is the sky blue?', its answer streaming on the same 4× clock as the ruler, each token landing as a blue pill and relaxing into text. On 'as fast as you read', the newest words glow softly as they land. Add no eye icon or reading-pace marker: real reading is far slower than this stream, and a marker would make 33 look far above the slowest acceptable pace."
+          "show": "The '.' pill rides the return arrow and appends to the row. The panel scales to 55% and slides into the top band at 40% opacity, still turning slowly; the stopwatch keeps reading '30 ms'. In the centre band a ruler draws from x 260 to x 1660, '0' to '1 s', ticks every 0.1 s, so 1,400 px is one second. Blue pills drop onto it one every 42 px, which is every 30 ms, slowed 4× so the second fills in about four seconds; grey tag under the ruler's left end: 'slowed 4×'. On 'thirty-three tokens', a counter above the ruler's right end (1560, 480) starts, and it reaches 33 as the last pill lands, label 'tokens in 1 s'. In the bottom band ch00's chat window returns with 'Why is the sky blue?', its answer streaming on the same 4× clock as the ruler, each token landing as a blue pill and relaxing into text. On 'as fast as you read', the newest words glow softly as they land."
         },
         {
           "id": "b3",
-          "say": "That is the target, and not an arbitrary one: roughly the slowest pace that still reads smoothly.",
-          "show": "The 'slowed 4×' tag fades and the chat window fades out, its job done. On 'the target', a white check-circle icon and the label 'the target' land just right of the counter, left edge at (1640, 480). On 'not an arbitrary one', a grey label writes in the bottom band, centred at (960, 760): 'not arbitrary'. On 'roughly the slowest pace', a white label lands beneath it, centred at (960, 830): 'rule of thumb: slowest that still reads smoothly'. The ruler keeps its 30 ms beat throughout; the counter's '33' glows once on 'smoothly'."
+          "say": "That is the target, and not an arbitrary one: comfortably faster than anyone reads.",
+          "show": "The 'slowed 4×' tag fades and the chat window fades out, its job done. On 'the target', a white check-circle icon and the label 'the target' land just right of the counter, left edge at (1640, 480). On 'not an arbitrary one', a grey label writes in the bottom band, centred at (960, 760): 'not arbitrary'. On 'comfortably faster', a grey eye icon appears under the ruler's left end and a slow grey tick steps along the ruler once every 224 px (a token every ≈ 160 ms, a typical reader), tag 'a reader: ≈ 6 tokens/s'; the blue pills outpace it more than five to one. A white label lands centred at (960, 830): 'rule of thumb: comfortably faster than reading'. The ruler keeps its 30 ms beat throughout; the counter's '33' glows once on 'anyone reads'."
         },
         {
           "id": "b4",
@@ -203,9 +203,9 @@
       "result": "33.333333333333336"
     },
     {
-      "claim": "'at least as fast as you read': at a common estimate of 250 words a minute and ~1.5 tokens per word (ch01), reading is ≈ 6 tokens/s, ≈ 160 ms per token; 33 tokens/s is ≈ 5× that, so the claim holds with room to spare. Because real reading is that much slower, s01 shows no eye icon or reading-pace marker, which would make 33 look far above 'the slowest pace that still reads smoothly' (a rule of thumb, kept on screen as one; fig 11's 'responsive to a reader', worded as reading pace so 'responsive' stays with the first-token pause, as in ch17 and fig 143). Estimate, not from the atlas",
-      "python": "250/60*1.5, 1000/(250/60*1.5), (1000/30)/(250/60*1.5)",
-      "result": "6.25 160.0 5.333333333333334"
+      "claim": "'at least as fast as you read' / 'comfortably faster than anyone reads' (CORRECTED from the atlas caption 'roughly the slowest... still feeling responsive to a reader', which the film's own 1.2–1.6 tokens per word contradicts): at a common 250 words a minute and ~1.5 tokens per word, a reader takes ≈ 6 tokens/s, ≈ 160 ms per token, 224 px on the 1,400 px-per-second ruler; 33 tokens/s is ≈ 5× that",
+      "python": "250/60*1.5, 1/(250/60*1.5), 1400/(250/60*1.5), (1000/30)/(250/60*1.5)",
+      "result": "6.25 0.16 224.0 5.333333333333334"
     },
     {
       "claim": "s01 ruler: 1,400 px per second puts one pill every 42 px (30 ms); 33 pills in the second",

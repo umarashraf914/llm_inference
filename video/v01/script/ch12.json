@@ -108,8 +108,8 @@
         },
         {
           "id": "b2",
-          "say": "Or amortise each read: ten batched requests make about two hundred and forty a second, counting the weights alone, each still at twenty-four. A later trick amortises within one answer: several tokens per read.",
-          "show": "Card 2's example dims and card 3 fills. On 'ten batched requests', one coral read arrow fans out to ten blue pills in slightly different shades, one per request, and the line '140 GB ÷ 10 = 14 GB per token' writes on. On 'two hundred and forty', a bracket round all ten reads '≈ 240 tokens/s'; on 'counting the weights alone', the small grey tag 'weights only' attaches to it. On 'each still at twenty-four', every pill gets a tiny '24/s'. On 'A later trick', a separate blue pill appears at the card's right edge with the tag 'several at once · later'; on 'several tokens per read', it splits into three pills of one answer, all fed by a single coral arrow."
+          "say": "Or amortise each read: ten batched requests make about two hundred and forty a second, counting the weights alone, each still at twenty-four. A later trick amortises within one answer: guess ahead, then check several tokens in one read.",
+          "show": "Card 2's example dims and card 3 fills. On 'ten batched requests', one coral read arrow fans out to ten blue pills in slightly different shades, one per request, and the line '140 GB ÷ 10 = 14 GB per token' writes on. On 'two hundred and forty', a bracket round all ten reads '≈ 240 tokens/s'; on 'counting the weights alone', the small grey tag 'weights only' attaches to it. On 'each still at twenty-four', every pill gets a tiny '24/s'. On 'A later trick', a separate blue pill appears at the card's right edge with the tag 'several at once · later'; on 'guess ahead', three faint dashed pills appear after it, tag 'guesses'; on 'check several tokens', they firm up into three pills of one answer, all fed by a single coral arrow."
         },
         {
           "id": "b3",
