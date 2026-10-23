@@ -21,7 +21,7 @@
       "figs": [
         47
       ],
-      "visual": "One continuous shot in two tiers. Upper tier: two to-scale bars of the same 1,032-token prompt, each 1,400 px wide, stacked at y≈260 and y≈400, row labels at the left 'a minute later' and 'a day later'. A cloud-and-sun icon sits top-left throughout; its label 'the weather conversation' shows during b1 only. In b3 the camera tilts down to the lower tier while the bars stay in view, dimmed, in the top band, and the G P U package draws at the right (compute die, H B M stacks outlined coral). In b4 a database cylinder icon draws at the left and an amber gear 'prefill' between them. The idea: warm and cold are two lengths of amber, and the difference is whether your blocks are still in the G P U's memory. Colour code for the whole chapter: keys and values themselves are coral tiles marked 'K V', exactly as in the previous chapter; teal = already held, a cache hit (a teal fill on token bars and pills, a teal outline and glow on K V tiles); amber = tokens that must be prefilled; blue = arriving tokens and neutral structure; coral = the G P U's memory and the K V tiles in it; grey dashed outline = nothing held, or evicted; solid grey = other people's blocks.",
+      "visual": "One continuous shot in two tiers. Upper tier: two to-scale bars of the same 1,032-token prompt, each 1,400 px wide, stacked at y≈260 and y≈400, row labels at the left 'a minute later' and 'a day later'. A cloud-and-sun icon sits top-left throughout; its label 'the weather conversation' shows during b1 only. In b3 the camera tilts down to the lower tier while the bars stay in view, dimmed, in the top band, and the G P U package draws at the right (compute die, H B M stacks outlined coral). In b4 a database cylinder icon draws at the left and an amber gear 'prefill' between them. The idea: warm and cold are two lengths of amber, and the difference is whether your blocks are still in the G P U's memory. Colour code for the whole chapter: keys and values are the previous chapter's small coral per-token tiles, each a stacked pair marked K and V; a block is a rounded coral frame holding four of them; teal = already held, a cache hit (a teal fill on token bars and pills, a teal outline and glow on blocks and K V tiles); amber = tokens that must be prefilled; blue = arriving tokens and neutral structure; coral = the G P U's memory and the blocks and K V tiles in it; grey dashed outline = nothing held, or evicted; solid grey = other people's blocks.",
       "beats": [
         {
           "id": "b1",
@@ -36,12 +36,12 @@
         {
           "id": "b3",
           "say": "The only difference is the cache, stored in fixed-size blocks, each holding keys and values for a few tokens. Warm, yours are still resident in the G P U's memory. Cold, they were evicted for someone else.",
-          "show": "On 'only difference', the grey tag 'same question, model, hardware' flashes once and fades. Camera tilts down; the bars and the plate shrink into the top band, and the bars' own labels fade, leaving the two row labels. The G P U package draws at the right. On 'fixed-size blocks', the teal part of the upper bar drops and breaks into six equal rounded coral tiles, each with a tiny 'K V' mark and a teal outline, label 'blocks', grey note 'schematic: a real chat fills many'. On 'resident', the tiles glide into the coral H B M stacks and their teal outlines glow, tag 'warm: still resident'. On 'evicted', solid grey blocks with tiny user icons slide in from the right and push yours out of the stacks; yours turn into grey dashed outlines, tag 'cold: evicted'."
+          "show": "On 'only difference', the grey tag 'same question, model, hardware' flashes once and fades. Camera tilts down; the bars and the plate shrink into the top band, and the bars' own labels fade, leaving the two row labels. The G P U package draws at the right. On 'fixed-size blocks', the teal part of the upper bar drops and breaks into six equal rounded coral blocks, each a frame of four small K/V tiles, teal-outlined, label 'blocks: a few tokens each', grey note 'schematic: a real chat fills many'. On 'resident', the blocks glide into the coral H B M stacks and their teal outlines glow, tag 'warm: still resident'. On 'evicted', solid grey blocks with tiny user icons slide in from the right and push yours out of the stacks; yours turn into grey dashed outlines, tag 'cold: evicted'."
         },
         {
           "id": "b4",
-          "say": "Only the small text survives, in a database. Your keys and values, the model's processed form of it, stopped existing. Rebuilding them from text is exactly what prefill does.",
-          "show": "On 'small text', the database cylinder draws at the left with a small blue document inside, tag 'text: small, kept'. On 'stopped existing', the dashed outlines in the H B M vanish. On 'Rebuilding', an arrow draws from the database through the amber 'prefill' gear into free slots in the H B M; the gear spins and coral K V tiles are rebuilt there one by one, each gaining a teal outline. Tag under the gear: 'text in, keys and values out'."
+          "say": "Only the small text survives, in the database away from the model's server. Your keys and values stopped existing, and prefill must rebuild every one from that text.",
+          "show": "On 'small text', the database cylinder draws at the left with a small blue document inside, tag 'text: small, kept'. On 'stopped existing', the dashed outlines in the H B M vanish. On 'prefill must rebuild', an arrow draws from the database through the amber 'prefill' gear into free slots in the H B M; the gear spins and small coral K/V tiles are rebuilt there one by one, filling block frames, each finished block gaining a teal outline. Tag under the gear: 'text in, keys and values out'."
         },
         {
           "id": "b5",
@@ -91,7 +91,7 @@
         {
           "id": "b2",
           "say": "That answer was cached as it was written, so everything before your new words matches. Hit, seven hundred and eighty-four. Prefill, four.",
-          "show": "Cache row builds: 'system', 'tools', 'question 1' in teal; on 'cached as it was written', the answer pills drop in one at a time, each clicking a small 'K | V' slab onto itself, tag 'cached as it was written'. On 'everything before', the scan cursor sweeps from the left; each arriving segment turns teal with a check as it passes; the cursor stops where the cache row ends, before 'new', marker 'first difference'. On 'Hit', the four new pills fill amber; plate 'hit 784 · prefill 4 tokens'; scoreboard row 'A | 784 | 4'."
+          "show": "Cache row builds: 'system', 'tools', 'question 1' in teal; on 'cached as it was written', the answer pills drop in one at a time, each clicking a small coral K/V tile onto itself, tag 'cached as it was written'. On 'everything before', the scan cursor sweeps from the left; each arriving segment turns teal with a check as it passes; the cursor stops where the cache row ends, before 'new', marker 'first difference'. On 'Hit', the four new pills fill amber; plate 'hit 784 · prefill 4 tokens'; scoreboard row 'A | 784 | 4'."
         },
         {
           "id": "b3",
@@ -165,8 +165,8 @@
         },
         {
           "id": "b2",
-          "say": "Count only your seven tokens. In case A, all seven matched, plus the whole history. Only four new words were fresh. B, five of seven. C, none.",
-          "show": "Column header 'your 7 tokens' appears. On 'In case A', A's cell: seven teal mini-pills and '7 / 7 · 100%'; on 'plus the whole history', a small teal tag inside the cell, 'plus the whole history'; on 'four new words', a second small tag inside the cell with four amber mini-pills, '+4 new, prefilled'. On 'five of seven', B's cell: five teal and two amber, '5 / 7 · 71%'. On 'none', C's cell: seven amber, '0 / 7 · 0%'."
+          "say": "Count only your seven tokens. In case A, all seven matched, plus the whole history. Only four new tokens were fresh. B, five of seven. C, none.",
+          "show": "Column header 'your 7 tokens' appears. On 'In case A', A's cell: seven teal mini-pills and '7 / 7 · 100%'; on 'plus the whole history', a small teal tag inside the cell, 'plus the whole history'; on 'four new tokens', a second small tag inside the cell with four amber mini-pills, '+4 new, prefilled'. On 'five of seven', B's cell: five teal and two amber, '5 / 7 · 71%'. On 'none', C's cell: seven amber, '0 / 7 · 0%'."
         },
         {
           "id": "b3",
@@ -181,7 +181,7 @@
       "figs": [
         54
       ],
-      "visual": "Centre: a wide coral-outlined panel, 'one machine's cache memory', filled with a schematic grid of equal blocks, about 6 rows by 14 columns (corner note 'schematic'). Blocks are coral K V tiles as in s01, with a teal outline while held. Your blocks are the three at the far left of the top row, with a small 'you' tag; they hold only your own conversation's history. A teal-outlined cluster at the left of the second row carries the tag 'shared preamble'. Every other block is solid grey with a tiny user icon: other people's. Each block shows a tiny clock dial for when it was last used. New requests arrive from the right as blue strips that need blocks. Evicted blocks turn grey dashed and drop out. In b3 the panel splits into a quiet and a busy machine, then merges; in b4 the camera pans right to a small schematic chart. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory and K V tiles, grey dashed nothing held or evicted.",
+      "visual": "Centre: a wide coral-outlined panel, 'one machine's cache memory', filled with a schematic grid of equal blocks, about 6 rows by 14 columns (corner note 'schematic'). Blocks are the rounded coral block frames from s01, each holding four small K/V tiles, with a teal outline while held. Your blocks are the three at the far left of the top row, with a small 'you' tag; they hold only your own conversation's history. A teal-outlined cluster at the left of the second row carries the tag 'shared preamble'. Every other block is solid grey with a tiny user icon: other people's. Each block shows a tiny clock dial for when it was last used. New requests arrive from the right as blue strips that need blocks. Evicted blocks turn grey dashed and drop out. In b3 the panel splits into a quiet and a busy machine, then merges; in b4 the camera pans right to a small schematic chart. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory and K V tiles, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
@@ -272,7 +272,7 @@
       "figs": [
         56
       ],
-      "visual": "One long prompt row across the upper third: the first five token slots shown individually and numbered 1 to 5, then long blue segments 'rest of the system prompt', 'tools', 'everything after'. A white vertical marker 'the match ends here'. Mid-scene the camera pulls out to show this row as the top of a stack of conversation rows on one machine, all sharing the same front. At the end, a horizontal band from 'most stable' to 'most variable'. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory and K V tiles, grey dashed nothing held or evicted.",
+      "visual": "One long prompt row across the upper third: the first five token slots shown individually and numbered 1 to 5, then long blue segments 'rest of the system prompt', 'tools', 'everything after'. A white vertical marker 'the match ends here'. Mid-scene the camera pulls out to show this row as the top of a stack of conversation rows on one machine, all sharing the same front. At the end, a horizontal band from 'most stable' to 'most variable', carrying the same four-segment prompt strip the viewer met in ch15_s06 and ch03_s07. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory and K V tiles, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
@@ -291,8 +291,8 @@
         },
         {
           "id": "b4",
-          "say": "Most stable text first, most variable last: the ordering you met earlier. Now you know what it protects.",
-          "show": "The stack fades. A horizontal band appears, deep teal at the left fading to amber at the right, labelled 'front: most stable' and 'back: most variable'. On 'Most stable text first', segments slot onto it in order: 'system prompt', 'tools', 'your conversation', 'newest message'. On 'what it protects', the teal front of the band glows and a line writes on beneath: 'order matters: stable first, variable last'."
+          "say": "Most stable text first, most variable last: the ordering you met earlier. It keeps everyday changes away from the front everyone shares.",
+          "show": "The stack fades. A horizontal band appears, deep teal at the left fading to amber at the right, with one grey arrow beneath it, 'most stable → most variable'. On 'Most stable text first', the four segments of ch15_s06's strip slot onto it in order, with the same labels: 'provider's system prompt', 'your instructions', 'conversation so far', 'newest message'. On 'everyday changes', small amber edit ticks flicker on 'conversation so far' and 'newest message' only, never on the front. On 'the front everyone shares', faint ghost strips of other users' prompts stack behind the band, all sharing its teal front, which glows; the arrow label fades and a line writes on beneath: 'order matters: stable first, variable last'."
         }
       ]
     }

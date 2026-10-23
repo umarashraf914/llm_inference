@@ -90,7 +90,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Inside attention, each token's vector is multiplied by three weight matrices: W Q, W K and W V, for query, key and value. Out come three vectors, with position worked into the query and key.",
+          "say": "Inside attention, each token's vector is multiplied by three weight matrices: W Q, W K and W V, for query, key and value. Out come three vectors, with position worked into query and key.",
           "show": "The 'cat' bar sits left. On 'three weight matrices', three tiles slide in. Their labels type on exactly as spoken: 'W_Q', 'W_K', 'W_V'; on 'for query, key and value', a small grey word appears under each: 'query', 'key', 'value'. On 'Out come', the bar is copied three times and each copy passes through one tile, emerging on the right: a full-height bar from W_Q, two short bars from W_K and W_V. On 'position', a small grey tag 'position worked in here' with a tiny rotation glyph touches the Query and Key outputs only, never the Value, then fades. Grey caption: 'one vector, three projections'."
         },
         {
@@ -135,12 +135,12 @@
         },
         {
           "id": "b3",
-          "say": "Softmax, from the very start, turns these into shares: point oh five, point six two, point two eight, point oh five. Together, one.",
+          "say": "Softmax, from earlier, turns these into shares: point oh five, point six two, point two eight, point oh five. Together, one.",
           "show": "A small 'softmax' label sweeps down the column. Each score morphs into its share as spoken while its amber bar grows to scale: '0.05' short, '0.62' long, '0.28' medium, '0.05' short. Under the bars: 'how much each counts'. On 'Together, one', a sum ticks up to '= 1.00'."
         },
         {
           "id": "b4",
-          "say": "They blend the four values: sixty-two percent cat, just five percent the word the. The new word now carries mostly cat.",
+          "say": "They blend the four values: sixty-two percent cat, five percent the word the. The new word now carries mostly cat.",
           "show": "A blue value bar appears beside each pill, opacity set by its weight. They slide down and merge into 'the blended result'; '62%' flashes on cat's bar and '5%' on the's. The merged bar is mostly cat's colour. On 'carries mostly cat', the merged bar rises into the 'it' pill, which gains a wide stripe in cat's colour."
         },
         {
@@ -165,7 +165,7 @@
         },
         {
           "id": "b2",
-          "say": "Context, met earlier, is everything the model can see right now: the whole prompt so far plus the newest token. Each new token looks at all of it.",
+          "say": "Context, met earlier, is everything the model can see: the whole prompt so far plus the newest token. Each new token looks at all of it.",
           "show": "The rows drift up and fade. Bottom half: a short strip of 12 pills builds; over it a blue bracket 'the prompt so far'; the rightmost pill glows, labelled 'newest token'. Two-line header: 'Context:' / 'everything the model can see'. The dashed 'context length' outline sits much wider than the strip, mostly empty. On 'looks at all of it', thin amber threads fan from the newest pill back to every pill; a counter beside it reads 'looks at: 12'. Two more pills arrive; each time the fan redraws and the counter steps to 13, then 14."
         },
         {
@@ -328,8 +328,8 @@
         },
         {
           "id": "b2",
-          "say": "Add the two vocabulary tables: the embedding, one point oh five billion weights, and a separate, same-sized output projection, or output head. Two point one billion weights in all.",
-          "show": "On 'the embedding', a tall thin blue table slides in at the ledger's left, 'embedding 128,256 × 8,192', amber '1.05 B', with a grey note under it that belongs to this one table only: '= 2.1 GB at 2 bytes'. On 'separate', a second identical table 'output projection', '1.05 B', slides in beside it, tag 'separate here'. On 'output head', a grey second line appears under its name: 'output head'. On 'Two point one billion weights', the GB note fades and both tables merge into the ledger row 'embedding + output head 2.10 B'."
+          "say": "Add the two vocabulary tables: the embedding, one point oh five billion weights, and a separate, same-sized output projection, or output head. Two point one billion in all.",
+          "show": "On 'the embedding', a tall thin blue table slides in at the ledger's left, 'embedding 128,256 × 8,192', amber '1.05 B', with a grey note under it that belongs to this one table only: '= 2.1 GB at 2 bytes'. On 'separate', a second identical table 'output projection', '1.05 B', slides in beside it, tag 'separate here'. On 'output head', a grey second line appears under its name: 'output head'. On 'Two point one billion in all', the GB note fades and both tables merge into the ledger row 'embedding + output head 2.10 B'."
         },
         {
           "id": "b3",
@@ -358,12 +358,12 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Depth is expensive, then. What does it buy? After one layer, a token knows its neighbours. After ten, its phrase. After forty, its sentence. After eighty, the whole passage.",
+          "say": "So what does depth buy? After one layer, a token knows its neighbours. After ten, its phrase. After forty, its sentence. After eighty, the whole passage.",
           "show": "Header draws on; the ladder builds upward quickly; the passage fades in with its highlighted token. Markers light in turn as spoken, each with a short label: 'after 1: its neighbours', 'after 10: its phrase', 'after 40: its sentence', 'after 80: the whole passage'. On each, the reach-bracket widens: two neighbours, a phrase, the sentence, all three lines."
         },
         {
           "id": "b2",
-          "say": "That is intuition, not measurement. What is certain is that each layer builds only on the one below.",
+          "say": "That is intuition, not measurement. What is certain: each layer builds only on the one below.",
           "show": "The four labels turn grey italic and one tag appears beside them: 'intuition, not measurement'; the header fades to make room. A pointer hovers over slab 40 with a grey question mark and the grey text 'nobody can read off what layer 40 knows'; the four marker labels dim as it lands. On 'builds only on the one below', the pointer and its text fade, the four labels dim further, and small upward arrows draw between consecutive slabs, with one label: 'builds on the one below'."
         },
         {
