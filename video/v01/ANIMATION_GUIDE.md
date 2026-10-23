@@ -183,6 +183,12 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
 - Do not fill large areas with an SVG `<pattern>` under a zoomed camera: Chromium drops pattern fills
   at deep zoom-out. Draw repeated tiles as one `<path>` (ch01_s01's field: 20,000 tiles, one path).
 - Do not animate `S.camera` or any scaled group with raw GSAP `x/y/scale`: use `fx.cam` / `fx.xform`.
+- GSAP's `autoAlpha` writes the CSS `opacity` style, which overrides the SVG `opacity` attribute. If
+  an element is faded both by an fx tween and by something that sets the attribute, nest it in two
+  groups and fade one each.
+- In a `fromTo`, put every animated property in both the from-vars and the to-vars; a property set
+  only in from-vars makes a frame depend on whether it was reached by playing or by seeking.
+- The shared components in `lib/` (see `lib/README.md`) follow these rules already; prefer them.
 - The scene's duration is fixed by the narration. Plan the visual rhythm to the beats; the final
   ~0.5 s is the automatic fade out.
 

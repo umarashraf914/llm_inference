@@ -6,8 +6,8 @@
  *   libMatVec(S, o, parent)          matrix × vector: row-by-row multiply-adds in amber that fill the output
  *   libLayerStack(S, o, parent)      N transformer layers as thin slabs (perspective or flat); a token climbs
  *                                    through them; one layer opens into 'attention' + 'feed-forward'
- *   libAttention(S, o, parent)       tokens in a row: the query's arcs back to the keys, weights, values
- *                                    blended into the query, a causal mask
+ *   libAttention(S, o, parent)       tokens in a row (or column): the query's arcs back to the keys, weights,
+ *                                    values blended into the query, a causal mask
  *   libAttentionGrid(S, o, parent)   the score grid (a row per token asking, a column per token asked) and
  *                                    its causal triangle
  *
@@ -143,11 +143,13 @@ var _libModel = (function () {
   function flash(S, cells, o = {}) {
     const tl = gsap.timeline();
     const d = o.d ?? 0.5, hold = o.hold ?? 0.1, st = o.stagger ?? 0;
+    const pk = o.peak ?? 1, T = d + hold, up = d * 0.3 / T, dn = (d * 0.3 + hold) / T;
     cells.forEach((c, i) => {
       const ov = overlay(S, c, o.tone || 'compute');
-      const t = i * st;
-      tl.fromTo(ov, { opacity: 0 }, { opacity: o.peak ?? 1, duration: d * 0.3, ease: 'power2.out', immediateRender: false }, t);
-      tl.fromTo(ov, { opacity: o.peak ?? 1 }, { opacity: 0, duration: d * 0.7, ease: 'power2.in', immediateRender: false }, t + d * 0.3 + hold);
+      tl.add(drive(T, p => {
+        const v = p <= 0 || p >= 1 ? 0 : p < up ? pk * (1 - Math.pow(1 - p / up, 2)) : p < dn ? pk : pk * (1 - Math.pow((p - dn) / (1 - dn), 2));
+        ov.style.opacity = v;
+      }), i * st);
     });
     return tl;
   }
@@ -181,8 +183,9 @@ var _libModel = (function () {
     hide(t);
     c.label = t;
     const d = o.d ?? 0.4, tl = gsap.timeline();
-    if (old) tl.fromTo(old, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.5, ease: 'power1.in', immediateRender: false }, 0);
-    tl.fromTo(t, { autoAlpha: 0, y: o.dy ?? 10 }, { autoAlpha: 1, y: 0, duration: d * 0.75, ease: 'power2.out', immediateRender: false }, old ? d * 0.25 : 0);
+    if (old) tl.add(fade(old, 1, 0, d * 0.5, 'power1.in'), 0);
+    tl.add(fade(t, 0, 1, d * 0.75, 'power2.out'), old ? d * 0.25 : 0);
+    tl.fromTo(t, { y: o.dy ?? 10 }, { y: 0, duration: d * 0.75, ease: 'power2.out', immediateRender: false }, old ? d * 0.25 : 0);
     if (old) tl.add(inFlight([old, t], d), 0);
     return tl;
   }
@@ -197,9 +200,15 @@ var _libModel = (function () {
   }
   /** scale e by s about (cx, cy), written straight to its transform attribute (no bbox lookups, so a frame is
    *  identical however it is reached). Only for elements nothing else transforms. */
-  function scaleTo(e, cx, cy, s) {
-    if (Math.abs(s - 1) < 1e-4) e.removeAttribute('transform');
-    else e.setAttribute('transform', `matrix(${s.toFixed(5)},0,0,${s.toFixed(5)},${(cx * (1 - s)).toFixed(3)},${(cy * (1 - s)).toFixed(3)})`);
+  // Each source (pop, pulse, scale) keeps its own factor and the element shows their product, so two
+  // overlapping helpers compose instead of racing (the result does not depend on render order).
+  function scaleTo(e, cx, cy, s, key = 'scale') {
+    e.__sf = e.__sf || {};
+    e.__sf[key] = s;
+    let k = 1;
+    for (const f in e.__sf) k *= e.__sf[f];
+    if (Math.abs(k - 1) < 1e-4) e.removeAttribute('transform');
+    else e.setAttribute('transform', `matrix(${k.toFixed(5)},0,0,${k.toFixed(5)},${(cx * (1 - k)).toFixed(3)},${(cy * (1 - k)).toFixed(3)})`);
   }
   const centre = e => [e.__scx ?? e.cx, e.__scy ?? e.cy];
   /** pop els in: fade up while scaling from `from` to 1 about each one's centre (.cx .cy). Hidden until it runs
@@ -210,8 +219,9 @@ var _libModel = (function () {
     const from = o.from ?? 0.5, d = o.d ?? 0.45, st = o.stagger ?? 0, ease = gsap.parseEase(o.ease || 'back.out(2)');
     list.forEach((e, i) => {
       const [cx, cy] = centre(e), at = (o.order ? o.order[i] : i) * st;
-      tl.fromTo(e, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.55, ease: 'power1.out', immediateRender: o.immediate !== false }, at);
-      tl.add(drive(d, p => scaleTo(e, cx, cy, from + (1 - from) * ease(p))), at);
+      if (o.immediate !== false) hide(e);
+      tl.add(fade(e, 0, 1, d * 0.55, 'power1.out'), at);
+      tl.add(drive(d, p => scaleTo(e, cx, cy, from + (1 - from) * ease(p), 'pop')), at);
     });
     return tl;
   }
@@ -223,7 +233,34 @@ var _libModel = (function () {
   /** a brief scale pulse about the centre (seek-safe) */
   function pulse(els, amp = 1.1, d = 0.45) {
     const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
-    return drive(d, p => list.forEach(e => { const [cx, cy] = centre(e); scaleTo(e, cx, cy, 1 + (amp - 1) * Math.sin(Math.PI * p)); }));
+    return drive(d, p => list.forEach(e => { const [cx, cy] = centre(e); scaleTo(e, cx, cy, 1 + (amp - 1) * Math.sin(Math.PI * p), 'pulse'); }));
+  }
+  /** fade els from opacity a to b over d (s), written from the tween's progress, so the state is a pure
+   *  function of time whichever way the playhead arrives (GSAP's own autoAlpha fromTo can keep a stale end
+   *  state when a short tween nested in timelines is jumped over and then reversed). Hidden at 0. */
+  function fade(els, a, b, d, easeName, stagger = 0, vis = true) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean), ease = gsap.parseEase(easeName || 'power1.inOut');
+    const one = e => drive(d, p => {
+      const v = a + (b - a) * ease(p);
+      e.style.opacity = v;
+      if (vis) e.style.visibility = v > 0.001 ? 'inherit' : 'hidden';
+    });
+    if (!stagger || list.length < 2) return drive(d, p => {
+      const v = a + (b - a) * ease(p);
+      list.forEach(e => { e.style.opacity = v; if (vis) e.style.visibility = v > 0.001 ? 'inherit' : 'hidden'; });
+    });
+    const tl = gsap.timeline();
+    list.forEach((e, i) => tl.add(one(e), i * stagger));
+    return tl;
+  }
+  /** els are visible only while this tween runs (d s): for things in transit (dots, drops) */
+  function during(els, d) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
+    return drive(d, p => list.forEach(e => { const on = p > 0 && p < 1; e.style.opacity = on ? 1 : 0; e.style.visibility = on ? 'inherit' : 'hidden'; }));
+  }
+  /** set an attribute at one instant (seek-safe): before -> after */
+  function attrAt(el, name, before, after) {
+    return drive(0.001, p => el.setAttribute(name, p > 0 ? after : before));
   }
   /** while this tween runs (d s), els carry data-audit="ignore": copies in flight overlap on purpose (seek-safe) */
   function inFlight(els, d) {
@@ -282,7 +319,7 @@ var _libModel = (function () {
     hide(outer);
     return outer;
   }
-  return { BASE, GRAD, MINUS, clamp, f2, isEll, num, parse, hide, mix, idx, textTone, skin, cell, cellText, overlay, flash, paint, relabel, drive, inFlight, ignoreFrom, tick, plan, fadeTo, rr, hatch, chip, scaleTo, pop, scaleBy, pulse };
+  return { BASE, GRAD, MINUS, clamp, f2, isEll, num, parse, hide, mix, idx, textTone, skin, cell, cellText, overlay, flash, paint, relabel, drive, fade, during, attrAt, inFlight, ignoreFrom, tick, plan, fadeTo, rr, hatch, chip, scaleTo, pop, scaleBy, pulse };
 })();
 
 /* ------------------------------------------------------------------ libNum */
@@ -313,7 +350,8 @@ function libNum(v, o = {}) { return _libModel.num(v, o); }
  *       `tail` (1) values, and those count from the end. Put '…' in values yourself for other layouts
  *       (e.g. a one-hot [0, 0, '…', 1, '…', 0] with indices [0, 1, null, 4271, null, 128255]).
  *    indices: the true index of every entry (null for ellipses). Default: inferred from length.
- *    cw (fits the widest number; heat: row 20 / col 46), ch 60 (heat: row 46 / col 20), gap 8 (heat 3),
+ *    cw (fits the widest number; only slots: ch × 1.6; heat: row 20 / col 46), ch 60 (heat: row 46 /
+ *       col 20), gap 8 (heat 3),
  *    r 9 (heat 3), size 28 (mono), dp / fmt / comma (number format, see libNum),
  *    tone 'struct' | any tone | (k, v) => tone (k = true index), negTone 'violet' (text colour of negatives;
  *       heat: the cell colour of negatives; null = no special colour), textColor (str | v => str),
@@ -329,8 +367,10 @@ function libNum(v, o = {}) { return _libModel.num(v, o); }
  *    geometry .x .y .w .h .cx .cy), .ells[] (ellipsis groups), .body, .decor, .labelEl, .lengthEl,
  *    .idxEls[], and geometry .x .y .w .h .l .r .t .b .cx .cy, .cw .ch .gap .dir .length.
  * Helpers (return tweens/timelines; call in time order):
- *    .pop({stagger 0.06, d 0.45, from 'start' | 'end' | 'center'})  cells pop in in order (hidden until then)
- *    .in({d 0.7, from 'up'})               the whole vector slides/fades in (hidden until then)
+ *    .pop({stagger 0.06, d 0.45, scale 0.5, from 'start' | 'end' | 'center'})  cells pop in, in order
+ *        (hidden until then); labels and brackets fade in with them
+ *    .in({d 0.7, from 'up' | 'down' | 'left' | 'right' | 'fade', dist 36})   the whole vector slides and
+ *        fades in (hidden until then)
  *    .set(range, value | values[], {d 0.4, stagger 0, tone})  new value(s); an empty slot fills blue
  *    .flash(range, {tone 'compute', d 0.5, stagger 0.05, hold 0.1})   cells flash and return
  *    .sweep({d 0.45, stagger 0.05})        a soft white highlight runs through the cells in order
@@ -472,10 +512,17 @@ function libVector(S, o = {}, parent) {
     const st = po.stagger ?? 0.06;
     tl.add(M.pop(items, { from: po.scale ?? 0.5, d: po.d ?? 0.45, ease: po.ease || 'back.out(2)', stagger: st }), 0);
     tl.add(M.inFlight(items, (po.d ?? 0.45) + st * (items.length - 1)), 0);
-    if (decor.childNodes.length) tl.fromTo(decor, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: 'power1.out' }, Math.min(0.3, st * items.length * 0.5));
+    if (decor.childNodes.length) { M.hide(decor); tl.add(M.fade(decor, 0, 1, 0.45, 'power1.out'), Math.min(0.3, st * items.length * 0.5)); }
     return tl;
   };
-  g.in = (io = {}) => S.fx.in([body, decor], { from: io.from || 'up', d: io.d ?? 0.7, stagger: io.stagger ?? 0.1, dist: io.dist });
+  g.in = (io = {}) => {
+    const tl = gsap.timeline(), d = io.d ?? 0.7, dist = io.dist ?? 36, st = io.stagger ?? 0.1;
+    const off = { up: { y: dist }, down: { y: -dist }, left: { x: dist }, right: { x: -dist } }[io.from || 'up'] || {};
+    [body, decor].forEach(M.hide);
+    tl.add(M.fade([body, decor], 0, 1, d, 'power2.out', st), 0);
+    if (off.x || off.y) tl.fromTo([body, decor], { x: off.x || 0, y: off.y || 0 }, { x: 0, y: 0, duration: d, ease: 'power3.out', stagger: st }, 0);
+    return tl;
+  };
   g.set = (range, values, so = {}) => {
     const cells = pick(range);
     const vs = Array.isArray(values) ? values : cells.map(() => values);
@@ -514,43 +561,54 @@ function libVector(S, o = {}, parent) {
  * (along the top edge, one number per column, or as a column at the left), and the output vector (a column
  * of empty slots at the right, one per row). A row pass lays the input along a row: each pair lights amber
  * and drops its product into a lane under the matrix; the products are carried one by one into an amber
- * running-total box, whose total flies up into that row's output cell. Fast passes run rows in parallel.
+ * running-total box, and the total flies up into that row's output cell. Fast passes flash each row's tiles
+ * left to right and hop the result into the output; parallel rows run together. It is also the film's plain
+ * matrix (inputAt / outputAt 'none'): a grid of weights to flash, recolour or count.
  * o: x 560, y 360 (top-left of the matrix tiles),
- *    W [[...], ...] weights (rows × cols; null = blank tile); rows / cols (default from W, else 4 × 5),
- *    input [...] the input vector (cols values; default blank), inputAt 'top' | 'left',
- *    output: values shown when a row's result lands (default W·input, rounded); showOut true | false |
- *       [i, ...] (rows whose result shows its number; the others fill blue without one),
- *    cw 104, ch 60, gap 10, r 9, size 26, dp / fmt (numbers, see libNum),
+ *    W [[...], ...] weights, rows × cols (numbers, or strings to keep digits: '1.0'; null = blank tile);
+ *       rows / cols (default from W, else 4 × 5),
+ *    input [...] the input vector (cols values; default blank), inputAt 'top' | 'left' | 'none',
+ *    outputAt 'right' | 'none', output: the values shown when a row's result lands (default W·input,
+ *       rounded), showOut true | false | [i, ...] (rows whose result shows its number; others fill blue),
+ *    cw 104, ch 60, gap 10, r 9, size 26, dp / fmt (number format, see libNum),
  *    tone 'struct' | (r, c) => tone (weight tiles; 'neutral' = grey decimals),
- *    products true (build the products lane and the running-total box; needed by .multiply/.accumulate),
+ *    products true: reserve the products lane and the running-total box under the matrix (needed by
+ *       .multiply / .accumulate / .row; false gives a tighter layout for .pulse-only scenes),
  *    laneGap 66 (matrix bottom to lane), inGap 20 (top) / 60 (left), outGap 56,
- *    labels {W: '4 × 5 matrix', input: 'in', output: 'out'} (any omitted = none; W sits left of the
- *       matrix with inputAt 'top', else below), labelSize 28,
+ *    labels {W: '4 × 5 matrix', input: 'in', output: 'out'} (omit any for none); the W label sits left of
+ *       the matrix unless inputAt is 'left' or wLabelBelow is true; labelSize 28,
  *    counters false | true (multiplications + additions) | [{label, kind: 'mul' | 'add' | 'mac' | 'ops'}]
- *       ('mac' counts multiply-accumulates, 'ops' counts 2 per weight), counterAt {x, y} (first line's left
- *       end; default under the lane), counterSize 30.
- * Returns <g> with .cells[] (row-major tiles: .skin .label .v .r .c, geometry), .at(r, c), .rowsG[], .input
- *    (libVector), .ghost (libVector row in the top lane, inputAt 'left' only), .lane (whichever vector sits in
- *    the top lane), .output (libVector column), .acc (running-total box), .frame (the amber row frame),
- *    .counterEls[] ({label, num}), .WLabel, and geometry .x .y .w .h .colCx(j) .rowCy(i) .laneY .outX.
- * Helpers (return timelines; call in time order; speed multiplies every rate, so speed 2 = twice as fast):
- *    .in({d 0.8, stagger 0.03})            input, tiles (cascade) and output slots appear (hidden until then)
- *    .layInput({d 1.0})                    inputAt 'left': a copy of the input column swings up into the top lane
- *    .focus(i, {dim 0.3, d 0.4})           amber frame on row i, the other rows dim  · .unfocus({d})
- *    .multiply(i, {speed, stagger 0.28})   each pair in row i lights amber, its product drops into the lane
- *    .accumulate(i, {speed, stagger 0.5})  the products are carried one by one into the running-total box
- *    .emit(i, {speed})                     the total flies up into output cell i, which fills blue
- *    .row(i, {speed})                      multiply + accumulate + emit, in one timeline
- *    .pulse(rows, {speed, parallel true, stagger 0.16})   compact passes: each tile of the rows flashes amber
- *        left to right, the result hops into the output (no products drawn); parallel rows run together
- *    .run({speed 1, detail 1, fast 3, rows 'all', d})    the whole product: the first `detail` rows in full,
- *        the rest in parallel at `fast` × speed. d (s) fits the whole run to that duration.
- *    .flashAll({stagger 0.07, d 0.45})     every tile flashes amber once, in reading order
- *   const mv = libMatVec(S, { x: 620, y: 360, W, input: [0.4, -1.2, 0, 0.9, 0.3], labels: { input: 'in', output: 'out' }, counters: true, showOut: [0] });
+ *       ('mac' counts multiply-accumulates, 'ops' counts 2 per weight), counterAt {x, y} (first line's
+ *       left end; default under the lane), counterSize 30.
+ * Returns <g> with .cells[] (row-major tiles: .skin .label .v .r .c and geometry), .at(r, c), .rowsG[],
+ *    .input (libVector, or null), .ghost (the copy in the top lane, inputAt 'left'), .lane (the vector in the
+ *    top lane), .output (libVector column, or null), .acc (running-total box), .frame (amber row frame),
+ *    .counterEls[] ({g, label, num, kind}), .WLabel, and geometry .x .y .w .h .colCx(j) .rowCy(i) .laneY .outX.
+ * Helpers (return timelines; call in time order; speed multiplies every rate: speed 2 = twice as fast):
+ *    .in({d 0.55, stagger 0.03})          input, tiles (a diagonal cascade) and output slots appear (hidden
+ *        until then)
+ *    .layInput({d 1.0, stagger 0.06})     inputAt 'left': a copy of the input column swings up into the top lane
+ *    .focus(i, {dim 0.3, d 0.4}) / .unfocus({d})   amber frame on row i, the other rows dim
+ *    .multiply(i, {speed, stagger 0.28, products})   each pair in row i lights amber; its product pops on the
+ *        tile and drops into the lane, '+' signs between (products: override the shown products)
+ *    .accumulate(i, {speed, stagger 0.5}) the products are carried one by one into the running-total box,
+ *        which steps through the partial sums
+ *    .emit(i, {speed, keepAcc})           the total flies up into output cell i, which fills blue
+ *    .row(i, {speed})                     multiply + accumulate + emit, in one timeline
+ *    .pulse(rows, {speed, parallel true, stagger 0.16, drops true, mark, dimAfter})   compact passes: blue
+ *        drops fall from the inputs, each tile flashes amber left to right, the result hops into the output.
+ *        parallel rows run together (counters as one run); mark: text each used tile takes (e.g. '1');
+ *        dimAfter: the opacity a row settles to once done (e.g. 0.45)
+ *    .run({speed 1, detail 1, fast 3, rows 'all', d})   the whole product: the first `detail` rows in full,
+ *        the rest in parallel at `fast` × speed; d (s) fits the whole run to that duration
+ *    .flashAll({stagger 0.07, d 0.45, tone})   every tile flashes once, in reading order
+ *    .flashCells(which, {tone 'compute', stagger, d}) · .paint(which, tone, {d, stagger})   which: 'all' |
+ *        {row: i} | {col: j} | [[r, c], ...]; paint recolours for good ('neutral' = faint grey decimals)
+ *   const mv = libMatVec(S, { x: 700, y: 330, W, input: ['0.4', '-1.2', '0.0', '0.9', '0.3'], inputAt: 'left',
+ *     labels: { input: 'in', output: 'out', W: '4 × 5 matrix' }, counters: true, showOut: [0] });
  *   S.add(mv.in(), 'b1');
- *   S.add(mv.multiply(0), 'b1~multiply each');
- *   S.add(mv.accumulate(0), 'b2~Add');
- *   S.add(mv.emit(0), 'b2~zero point');
+ *   S.add(mv.layInput(), 'b1~first row');
+ *   S.add(mv.multiply(0), 'b1~multiply each');  S.add(mv.accumulate(0), 'b2~Add');  S.add(mv.emit(0), 'b2~zero point');
  *   S.add(mv.pulse([1, 2, 3], { speed: 3 }), 'b3~Every row');
  */
 function libMatVec(S, o = {}, parent) {
@@ -567,7 +625,7 @@ function libMatVec(S, o = {}, parent) {
   const inAt = o.inputAt || 'top';
   const labels = o.labels || {};
   const lsz = o.labelSize ?? 28;
-  const products = o.products !== false;
+  const products = o.products !== false && o.inputAt !== 'none' && o.outputAt !== 'none';
   const sumRow = i => {
     if (!Wv) return null;
     let s = 0;
@@ -598,7 +656,9 @@ function libMatVec(S, o = {}, parent) {
   // ---------------------------------------------------------------- input, output
   const laneTop = Y0 - (o.inGap ?? 20) - ch;
   const vecO = { cw, ch, gap, r, size, dp: o.dp, fmt: o.fmt, anchor: 'start' };
-  if (inAt === 'left') {
+  g.input = null; g.lane = null; g.ghost = null;
+  if (inAt === 'none') { /* a plain matrix: no input vector */ }
+  else if (inAt === 'left') {
     const inH = cols * (ch + gap) - gap;
     g.input = libVector(S, { ...vecO, values: xin, dir: 'col', x: X0 - (o.inGap ?? 60) - cw, y: Y0 + Wh / 2 - inH / 2, label: labels.input, labelPos: 'above', labelSize: lsz }, back);
     g.ghost = libVector(S, { ...vecO, values: xin, dir: 'row', x: X0, y: laneTop, hidden: true }, mid);
@@ -608,8 +668,9 @@ function libMatVec(S, o = {}, parent) {
     g.lane = g.input;
   }
   const outX = X0 + Ww + (o.outGap ?? 56);
-  g.output = libVector(S, { ...vecO, values: Array(rows).fill(null), dir: 'col', x: outX, y: Y0, label: inAt === 'top' ? undefined : labels.output, labelPos: 'above', labelSize: lsz }, back);
-  if (inAt === 'top' && labels.output) {
+  const noOut = o.outputAt === 'none';
+  g.output = noOut ? null : libVector(S, { ...vecO, values: Array(rows).fill(null), dir: 'col', x: outX, y: Y0, label: inAt === 'top' ? undefined : labels.output, labelPos: 'above', labelSize: lsz }, back);
+  if (!noOut && inAt === 'top' && labels.output) {
     g.output.labelEl = S.text(labels.output, { x: outX + cw / 2, y: laneTop + ch / 2, size: lsz, anchor: 'middle', color: 'muted', weight: 600 }, g.output.decor);
   }
   // ---------------------------------------------------------------- products lane, running total, frame
@@ -628,7 +689,7 @@ function libMatVec(S, o = {}, parent) {
   // ---------------------------------------------------------------- labels and counters
   let below = (products ? laneY + pch / 2 : Y0 + Wh) + 46;
   if (labels.W) {
-    if (inAt === 'top' && !o.wLabelBelow) g.WLabel = S.text(labels.W, { x: X0 - 26, y: Y0 + Wh / 2, size: lsz, anchor: 'end', color: 'muted', weight: 600 }, back);
+    if (inAt !== 'left' && !o.wLabelBelow) g.WLabel = S.text(labels.W, { x: X0 - 26, y: Y0 + Wh / 2, size: lsz, anchor: 'end', color: 'muted', weight: 600 }, back);
     else { g.WLabel = S.text(labels.W, { x: X0 + Ww / 2, y: below, size: lsz, anchor: 'middle', color: 'muted', weight: 600 }, back); below += 52; }
   }
   const kinds = o.counters === true ? [{ label: 'multiplications', kind: 'mul' }, { label: 'additions', kind: 'add' }] : (o.counters || []);
@@ -677,8 +738,9 @@ function libMatVec(S, o = {}, parent) {
     const prev = P.accText;
     const t = S.text(text, { x: accX, y: laneY + 1, size: size + 2, family: 'mono', weight: 650, anchor: 'middle', color: M.parse(text) < 0 ? 'violet' : 'ink' }, g.acc);
     M.hide(t);
-    if (prev) tl.fromTo(prev, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.5, immediateRender: false }, at);
-    tl.fromTo(t, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: d, ease: 'power2.out', immediateRender: false }, at + (prev ? d * 0.25 : 0));
+    if (prev) tl.add(M.fade(prev, 1, 0, d * 0.5), at);
+    tl.add(M.fade(t, 0, 1, d, 'power2.out'), at + (prev ? d * 0.25 : 0));
+    tl.fromTo(t, { y: 8 }, { y: 0, duration: d, ease: 'power2.out', immediateRender: false }, at + (prev ? d * 0.25 : 0));
     if (prev) tl.add(M.inFlight([prev, t], d * 1.3), at);
     P.accText = t;
   };
@@ -687,12 +749,12 @@ function libMatVec(S, o = {}, parent) {
   g.in = (io = {}) => {
     const tl = gsap.timeline();
     const st = io.stagger ?? 0.03;
-    tl.add(g.input.pop({ stagger: 0.06 }), 0);
+    if (g.input) tl.add(g.input.pop({ stagger: 0.06 }), 0);
     tl.add(M.pop(g.cells, { from: 0.6, d: io.d ?? 0.55, ease: 'back.out(1.8)', stagger: st, order: g.cells.map(c => c.r + c.c) }), 0.15);
     tl.add(M.inFlight(g.cells, (io.d ?? 0.55) + st * (rows + cols)), 0.15);
-    tl.add(g.output.pop({ stagger: 0.05 }), 0.35);
+    if (g.output) tl.add(g.output.pop({ stagger: 0.05 }), 0.35);
     const extra = [g.WLabel, ...g.counterEls.map(c => c.g)].filter(Boolean);
-    if (extra.length) tl.fromTo(extra, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, stagger: 0.08 }, 0.5);
+    if (extra.length) { extra.forEach(M.hide); tl.add(M.fade(extra, 0, 1, 0.5, 'power1.out', 0.08), 0.5); }
     return tl;
   };
   g.layInput = (lo = {}) => {
@@ -703,7 +765,7 @@ function libMatVec(S, o = {}, parent) {
       const src = g.input.cells[j];
       const dx = src.cx - c.cx, dy = src.cy - c.cy;
       const t = j * (lo.stagger ?? 0.06);
-      tl.fromTo(c, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, immediateRender: false }, t);
+      tl.add(M.fade(c, 0, 1, 0.2), t);
       tl.fromTo(c, { x: dx }, { x: 0, duration: d, ease: 'power2.inOut', immediateRender: false }, t);
       tl.fromTo(c, { y: dy }, { y: 0, duration: d, ease: 'power3.inOut', immediateRender: false }, t);
     });
@@ -716,7 +778,8 @@ function libMatVec(S, o = {}, parent) {
     const tl = gsap.timeline();
     const d = fo.d ?? 0.4;
     if (!P.frameOn) {
-      tl.fromTo(g.frame, { autoAlpha: 0, attr: { y: rowY(i) - 8 } }, { autoAlpha: 1, duration: d, ease: 'power2.out', immediateRender: false }, 0);
+      tl.add(M.attrAt(g.frame, 'y', M.plan(g.frame, 'y', undefined, rowY(0) - 8), rowY(i) - 8), 0);
+      tl.add(M.fade(g.frame, 0, 1, d, 'power2.out'), 0);
       M.plan(g.frame, 'y', rowY(i) - 8);
     } else if (P.focus !== i) {
       const fy = M.plan(g.frame, 'y', rowY(i) - 8);
@@ -729,7 +792,7 @@ function libMatVec(S, o = {}, parent) {
   g.unfocus = (uo = {}) => {
     const tl = gsap.timeline();
     const d = uo.d ?? 0.4;
-    if (P.frameOn) tl.fromTo(g.frame, { autoAlpha: 1 }, { autoAlpha: 0, duration: d, immediateRender: false }, 0);
+    if (P.frameOn) tl.add(M.fade(g.frame, 1, 0, d), 0);
     tl.add(rowOps(() => 1, d), 0);
     P.frameOn = false; P.focus = null;
     return tl;
@@ -740,13 +803,14 @@ function libMatVec(S, o = {}, parent) {
     const pre = P.focus === i && P.frameOn ? 0 : 0.4 / sp;
     if (pre) tl.add(g.focus(i, { d: 0.4 / sp }), 0);
     const chips = [], plus = [];
+    if (!g.lane) return tl;
     for (let j = 0; j < cols; j++) {
       const t = pre + j * st;
       const xc = g.lane.cells[j], wc = g.at(i, j);
       const dot = S.circle({ x: xc.cx, y: xc.cy + ch / 2, r: 6.5, fill: 'struct' }, front);
       M.hide(dot);
-      tl.fromTo(dot, { autoAlpha: 1, attr: { cy: xc.cy + ch / 2 } }, { attr: { cy: wc.cy }, duration: 0.24 / sp, ease: 'power2.in', immediateRender: false }, t);
-      tl.fromTo(dot, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.08 / sp, immediateRender: false }, t + 0.24 / sp);
+      tl.fromTo(dot, { attr: { cy: xc.cy + ch / 2 } }, { attr: { cy: wc.cy }, duration: 0.24 / sp, ease: 'power2.in', immediateRender: false }, t);
+      tl.add(M.during(dot, 0.3 / sp), t);
       tl.add(M.flash(S, [xc], { tone: 'white', d: 0.45 / sp, peak: 0.85 }), t);
       tl.add(M.flash(S, [wc], { tone: 'compute', d: 0.7 / sp, hold: 0.12 / sp }), t + 0.2 / sp);
       const a = M.parse(wc.v), b = M.parse(xc.v);
@@ -756,7 +820,7 @@ function libMatVec(S, o = {}, parent) {
       const dy = wc.cy - laneY;
       tl.set(cp, { y: dy }, t + 0.26 / sp);
       tl.add(M.pop(cp.inner, { from: 0.4, d: 0.3 / sp, ease: 'back.out(2.4)', immediate: false }), t + 0.26 / sp);
-      tl.fromTo(cp, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15 / sp, immediateRender: false }, t + 0.26 / sp);
+      tl.add(M.fade(cp, 0, 1, 0.15 / sp), t + 0.26 / sp);
       tl.fromTo(cp, { y: dy }, { y: 0, duration: 0.45 / sp, ease: 'power2.inOut', immediateRender: false }, t + 0.5 / sp);
       tl.add(M.inFlight(cp, 0.72 / sp), t + 0.25 / sp);
       bump(tl, t + 0.26 / sp, { mul: 1, mac: 1, ops: 1 });
@@ -764,7 +828,7 @@ function libMatVec(S, o = {}, parent) {
         const px = (colX(j) - gap / 2);
         const pl = S.text('+', { x: px, y: laneY + 1, size: 28, anchor: 'middle', color: 'muted', weight: 500 }, front);
         M.hide(pl);
-        tl.fromTo(pl, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 / sp, immediateRender: false }, t + 0.8 / sp);
+        tl.add(M.fade(pl, 0, 1, 0.25 / sp), t + 0.8 / sp);
         plus.push(pl);
       }
       chips.push(cp);
@@ -776,7 +840,7 @@ function libMatVec(S, o = {}, parent) {
     const sp = ao.speed ?? 1, st = (ao.stagger ?? 0.5) / sp;
     const tl = gsap.timeline();
     const C = P.chips && P.chips.row === i ? P.chips : null;
-    if (!C || !g.acc) return tl;
+    if (!C || !g.acc || !g.output) return tl;
     if (!P.accOn) {
       tl.add(M.pop(g.acc, { from: 0.8, d: 0.3 / sp, immediate: false }), 0);
       P.accOn = true;
@@ -790,10 +854,10 @@ function libMatVec(S, o = {}, parent) {
       tl.fromTo(cp, { y: 0 }, { y: -lift, duration: d * 0.32, ease: 'power2.out', immediateRender: false }, t);
       tl.fromTo(cp, { x: 0 }, { x: dx, duration: d * 0.6, ease: 'power2.inOut', immediateRender: false }, t + d * 0.18);
       tl.fromTo(cp, { y: -lift }, { y: 0, duration: d * 0.25, ease: 'power2.in', immediateRender: false }, t + d * 0.75);
-      tl.fromTo(cp, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.12, immediateRender: false }, t + d * 0.92);
+      tl.add(M.fade(cp, 1, 0, d * 0.12), t + d * 0.92);
       tl.add(M.scaleBy(cp.inner, 1, 0.7, d * 0.12), t + d * 0.92);
       tl.add(M.inFlight(cp, d * 1.05), t);
-      if (k < C.plus.length && C.plus[k]) tl.fromTo(C.plus[k], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 / sp, immediateRender: false }, t);
+      if (k < C.plus.length && C.plus[k]) tl.add(M.fade(C.plus[k], 1, 0, 0.2 / sp), t);
       sum = Math.round((sum + (M.parse(cp.v) || 0)) * 1e6) / 1e6;
       accLabel(M.num(sum, nf), tl, t + d * 0.95, 0.22 / sp);
       tl.add(M.flash(S, [g.acc], { tone: 'compute', d: 0.35 / sp, hold: 0, peak: 0.7 }), t + d * 0.95);
@@ -805,19 +869,20 @@ function libMatVec(S, o = {}, parent) {
   g.emit = (i, eo = {}) => {
     const sp = eo.speed ?? 1;
     const tl = gsap.timeline();
+    if (!g.output || !g.acc) return tl;
     const val = outVals[i];
     const shown = showOut(i) && val !== null && val !== undefined;
     const cp = M.chip(S, shown ? M.num(val, nf) : '', { x: accX, y: laneY, h: ch - 8, size, tone: 'struct', minW: cw - 10, color: M.textTone(val, 'struct', o) }, front);
     const oc = g.output.cells[i];
     const dy = oc.cy - laneY, d = 0.55 / sp;
     tl.add(M.pop(cp.inner, { from: 0.8, d: 0.18 / sp, immediate: false }), 0);
-    tl.fromTo(cp, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12 / sp, immediateRender: false }, 0);
+    tl.add(M.fade(cp, 0, 1, 0.12 / sp), 0);
     tl.fromTo(cp, { y: 0 }, { y: dy, duration: d, ease: 'power3.inOut', immediateRender: false }, 0.05 / sp);
-    tl.fromTo(cp, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.15 / sp, immediateRender: false }, 0.05 / sp + d);
+    tl.add(M.fade(cp, 1, 0, 0.15 / sp), 0.05 / sp + d);
     tl.add(M.inFlight(cp, 0.25 / sp + d), 0);
     tl.add(g.output.set(i, shown ? val : null, { d: 0.3 / sp, tone: 'struct' }), 0.05 / sp + d * 0.85);
-    if (P.accText) { tl.fromTo(P.accText, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 / sp, immediateRender: false }, 0); P.accText = null; }
-    if (P.accOn && eo.keepAcc !== true) { tl.fromTo(g.acc, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3 / sp, immediateRender: false }, 0.2 / sp + d); P.accOn = false; }
+    if (P.accText) { tl.add(M.fade(P.accText, 1, 0, 0.2 / sp), 0); P.accText = null; }
+    if (P.accOn && eo.keepAcc !== true) { tl.add(M.fade(g.acc, 1, 0, 0.3 / sp), 0.2 / sp + d); P.accOn = false; }
     return tl;
   };
   g.row = (i, ro = {}) => {
@@ -831,19 +896,33 @@ function libMatVec(S, o = {}, parent) {
     const list = rs === 'all' ? [...Array(rows).keys()] : Array.isArray(rs) ? rs : [rs];
     const sp = po.speed ?? 1, st = (po.stagger ?? 0.16) / sp, parallel = po.parallel !== false;
     const tl = gsap.timeline();
-    if (P.frameOn) { tl.fromTo(g.frame, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, 0); P.frameOn = false; P.focus = null; }
+    if (P.frameOn) { tl.add(M.fade(g.frame, 1, 0, 0.25), 0); P.frameOn = false; P.focus = null; }
     tl.add(rowOps(k => (list.includes(k) ? 1 : M.plan(g.rowsG[k], 'op', undefined, 1)), 0.3), 0);
     const rowDur = cols * st + 0.3 / sp;
+    const drops = po.drops ?? !!g.lane;
+    const dropD = 0.2 / sp;
     list.forEach((ri, n) => {
-      const t0 = 0.15 + (parallel ? 0 : n * (rowDur + 0.12 / sp));
-      if (n === 0 || !parallel) tl.add(M.flash(S, g.lane.cells, { tone: 'white', d: 0.35 / sp, stagger: st, peak: 0.8 }), t0);
-      tl.add(M.flash(S, g.cells.slice(ri * cols, ri * cols + cols), { tone: 'compute', d: 0.45 / sp, stagger: st, hold: 0.04 / sp }), t0);
+      const t0 = 0.15 + (drops ? dropD : 0) + (parallel ? 0 : n * (rowDur + dropD + 0.12 / sp));
+      const tiles = g.cells.slice(ri * cols, ri * cols + cols);
+      if (g.lane && (n === 0 || !parallel)) tl.add(M.flash(S, g.lane.cells, { tone: 'white', d: 0.35 / sp, stagger: st, peak: 0.8 }), t0 - (drops ? dropD : 0));
+      if (drops && g.lane) tiles.forEach((wc, j) => {
+        const xc = g.lane.cells[j];
+        const dot = S.circle({ x: xc.cx, y: xc.cy + ch / 2, r: 6, fill: 'struct' }, front);
+        M.hide(dot);
+        const at = t0 + j * st - dropD;
+        tl.fromTo(dot, { attr: { cy: xc.cy + ch / 2 } }, { attr: { cy: wc.cy }, duration: dropD, ease: 'power2.in', immediateRender: false }, at);
+        tl.add(M.during(dot, dropD + 0.06 / sp), at);
+      });
+      tl.add(M.flash(S, tiles, { tone: 'compute', d: 0.45 / sp, stagger: st, hold: 0.04 / sp }), t0);
+      if (po.mark !== undefined) tiles.forEach((wc, j) => tl.add(M.relabel(S, wc, String(po.mark), { size, color: 'compute', d: 0.3 / sp }), t0 + j * st + 0.12 / sp));
+      const ta = t0 + cols * st;
+      if (po.dimAfter !== undefined) tl.add(M.fadeTo(g.rowsG[ri], po.dimAfter, 0.4 / sp), ta + 0.25 / sp);
+      if (!g.output) return;
       const oc = g.output.cells[ri];
       const dot = S.circle({ x: colX(cols - 1) + cw, y: rowCy(ri), r: 7, fill: 'compute' }, front);
       M.hide(dot);
-      const ta = t0 + cols * st;
-      tl.fromTo(dot, { autoAlpha: 1, attr: { cx: colX(cols - 1) + cw - 4 } }, { attr: { cx: oc.x + 8 }, duration: 0.2 / sp, ease: 'power1.in', immediateRender: false }, ta - 0.1 / sp);
-      tl.fromTo(dot, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.08 / sp, immediateRender: false }, ta + 0.1 / sp);
+      tl.fromTo(dot, { attr: { cx: colX(cols - 1) + cw - 4 } }, { attr: { cx: oc.x + 8 }, duration: 0.2 / sp, ease: 'power1.in', immediateRender: false }, ta - 0.1 / sp);
+      tl.add(M.during(dot, 0.28 / sp), ta - 0.1 / sp);
       const val = outVals[ri];
       const shown = showOut(ri) && val !== null && val !== undefined;
       tl.add(g.output.set(ri, shown ? val : null, { d: 0.3 / sp, tone: 'struct' }), ta + 0.08 / sp);
@@ -851,7 +930,7 @@ function libMatVec(S, o = {}, parent) {
       // parallel rows share one counter run (several tweens writing one text would race when seeking)
       if (!parallel) runCounters(tl, t0, { mul: cols, add: cols, mac: cols, ops: 2 * cols }, cols * st);
     });
-    if (parallel) { const k = list.length * cols; runCounters(tl, 0.15, { mul: k, add: k, mac: k, ops: 2 * k }, cols * st); }
+    if (parallel) { const k = list.length * cols; runCounters(tl, 0.15 + (drops ? dropD : 0), { mul: k, add: k, mac: k, ops: 2 * k }, cols * st); }
     return tl;
   };
   g.run = (ro = {}) => {
@@ -863,7 +942,16 @@ function libMatVec(S, o = {}, parent) {
     if (ro.d) tl.timeScale(tl.duration() / ro.d);
     return tl;
   };
-  g.flashAll = (fo = {}) => M.flash(S, g.cells, { tone: 'compute', d: fo.d ?? 0.45, stagger: fo.stagger ?? 0.07, hold: 0.04 });
+  g.flashAll = (fo = {}) => M.flash(S, g.cells, { tone: fo.tone || 'compute', d: fo.d ?? 0.45, stagger: fo.stagger ?? 0.07, hold: 0.04 });
+  const pickCells = which => {
+    if (which === undefined || which === 'all') return g.cells;
+    if (Array.isArray(which)) return which.map(([r, c]) => g.at(r, c));
+    if (which.row !== undefined) return g.cells.slice(which.row * cols, which.row * cols + cols);
+    if (which.col !== undefined) return g.cells.filter(c => c.c === which.col);
+    return [];
+  };
+  g.paint = (which, tone, po = {}) => M.paint(S, pickCells(which), tone, { ...po, textOpts: o });
+  g.flashCells = (which, fo = {}) => M.flash(S, pickCells(which), { tone: 'compute', ...fo });
   return g;
 }
 
@@ -1086,9 +1174,11 @@ function libLayerStack(S, o = {}, parent) {
     const list = g.slabs.slice(0, P.shown).map(s => s.outer);
     const d = bo.d ?? 1.0;
     const st = Math.min(0.12, d * 0.6 / Math.max(1, list.length));
-    tl.fromTo(list, { autoAlpha: 0, y: -26 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out', stagger: st }, 0);
+    list.forEach(M.hide);
+    tl.add(M.fade(list, 0, 1, 0.45, 'power2.out', st), 0);
+    tl.fromTo(list, { y: -26 }, { y: 0, duration: 0.45, ease: 'power3.out', stagger: st }, 0);
     const extra = [...g.numEls.filter(t => t.layer <= P.shown), g.labelEl].filter(Boolean);
-    if (extra.length) tl.fromTo(extra, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, Math.min(d * 0.6, st * list.length));
+    if (extra.length) { extra.forEach(M.hide); tl.add(M.fade(extra, 0, 1, 0.5), Math.min(d * 0.6, st * list.length)); }
     return tl;
   };
   g.grow = (to, go = {}) => {
@@ -1137,7 +1227,7 @@ function libLayerStack(S, o = {}, parent) {
       const xs = g.slabX(a + 1) - (co.enter ?? 70), xe = g.slabX(b + 1) + (co.exit ?? 70), yy = co.y ?? Y;
       S.xset(holder, { x: xs, y: yy, s: 1 });
       M.hide(holder);
-      tl.fromTo(holder, { autoAlpha: 0 }, { autoAlpha: 1, duration: Math.min(0.25, d * 0.12), immediateRender: false }, 0);
+      tl.add(M.fade(holder, 0, 1, Math.min(0.25, d * 0.12)), 0);
       tl.add(S.fx.xform(holder, { x: xe }, { d, ease: 'none' }), 0);
       tl.add(M.inFlight(holder, d), 0);
       if (co.flash !== false) for (let i = a; i <= b; i++) flashSlab(tl, i, (g.slabX(i + 1) - xs) / (xe - xs) * d - fd * 0.15, tone, fd);
@@ -1150,7 +1240,7 @@ function libLayerStack(S, o = {}, parent) {
       const ys = Y + (co.enter ?? 60), ye = g.top() - (co.exit ?? 50);
       S.xset(holder, { x: xx, y: ys, s: 1 });
       M.hide(holder);
-      tl.fromTo(holder, { autoAlpha: 0 }, { autoAlpha: 1, duration: Math.min(0.25, d * 0.12), immediateRender: false }, 0);
+      tl.add(M.fade(holder, 0, 1, Math.min(0.25, d * 0.12)), 0);
       tl.add(S.fx.xform(holder, { y: ye }, { d, ease: 'none' }), 0);
       tl.add(M.inFlight(holder, d), 0);
       if (co.flash !== false) for (let i = a; i <= b; i++) flashSlab(tl, i, Math.max(0, (ys - g.slabY(i + 1)) / (ys - ye) * d - fd * 0.15), tone, fd);
@@ -1263,19 +1353,23 @@ function libLayerStack(S, o = {}, parent) {
     const l1 = S.line({ x1: a1[0], y1: a1[1], x2: D.x, y2: D.y + 12, stroke: 'muted', sw: 1.5, strokeOpacity: 0.6 }, lg);
     const l2 = S.line({ x1: a2[0], y1: a2[1], x2: D.x, y2: D.y + D.h - 12, stroke: 'muted', sw: 1.5, strokeOpacity: 0.6 }, lg);
     M.hide(wedge); M.hide(l1); M.hide(l2);
-    if (DT.leaders) tl.fromTo(DT.leaders, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, 0);
+    if (DT.leaders) tl.add(M.fade(DT.leaders, 1, 0, 0.25), 0);
     DT.leaders = lg;
-    tl.fromTo([l1, l2], { drawSVG: '0%', autoAlpha: 1 }, { drawSVG: '100%', autoAlpha: 1, duration: d * 0.45, ease: 'power2.inOut', immediateRender: false }, d * 0.5);
-    tl.fromTo(wedge, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.45, immediateRender: false }, d * 0.6);
+    tl.add(M.fade([l1, l2], 0, 1, 0.001), d * 0.5);
+    tl.fromTo([l1, l2], { drawSVG: '0%' }, { drawSVG: '100%', duration: d * 0.45, ease: 'power2.inOut', immediateRender: false }, d * 0.5);
+    tl.add(M.fade(wedge, 0, 1, d * 0.45), d * 0.6);
     const title = S.text(oo.title ?? (o.detailTitle ? o.detailTitle(L) : `layer ${L}`), { x: D.x + 24, y: D.y + 34, size: 28, weight: 650, color: 'ink' }, D);
     M.hide(title);
-    if (DT.title) tl.fromTo(DT.title, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2, immediateRender: false }, 0);
+    if (DT.title) tl.add(M.fade(DT.title, 1, 0, 0.2), 0);
     DT.title = title;
     if (!DT.open) {
-      tl.fromTo(D, { autoAlpha: 0, x: -24 }, { autoAlpha: 1, x: 0, duration: d * 0.5, ease: 'power3.out', immediateRender: false }, d * 0.55);
-      tl.fromTo([D.attn, D.arrow, D.ffn], { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: d * 0.4, stagger: d * 0.1, ease: 'power3.out', immediateRender: false }, d * 0.65);
+      tl.add(M.fade(D, 0, 1, d * 0.5, 'power2.out'), d * 0.55);
+      tl.fromTo(D, { x: -24 }, { x: 0, duration: d * 0.5, ease: 'power3.out', immediateRender: false }, d * 0.55);
+      [D.attn, D.arrow, D.ffn].forEach(M.hide);
+      tl.add(M.fade([D.attn, D.arrow, D.ffn], 0, 1, d * 0.4, 'power2.out', d * 0.1), d * 0.65);
+      tl.fromTo([D.attn, D.arrow, D.ffn], { y: 14 }, { y: 0, duration: d * 0.4, stagger: d * 0.1, ease: 'power3.out', immediateRender: false }, d * 0.65);
     }
-    tl.fromTo(title, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.35, immediateRender: false }, d * 0.6);
+    tl.add(M.fade(title, 0, 1, d * 0.35), d * 0.6);
     DT.open = true;
     return tl;
   };
@@ -1283,7 +1377,7 @@ function libLayerStack(S, o = {}, parent) {
     const tl = gsap.timeline();
     const d = co.d ?? 0.6;
     if (DT.open) {
-      tl.fromTo([g.detail, DT.leaders], { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.6, immediateRender: false }, 0);
+      tl.add(M.fade([g.detail, DT.leaders], 1, 0, d * 0.6), 0);
       DT.open = false; DT.leaders = null;
     }
     if (P.lift) tl.add(liftTo(n, 0, d), d * 0.2);
@@ -1331,82 +1425,98 @@ function libLayerStack(S, o = {}, parent) {
 
 /* ------------------------------------------------------------------ libAttention */
 /**
- * libAttention — attention, drawn on the tokens themselves: a row of token chips; the asking token's query
- * reaches back to every earlier token's key along amber arcs; the arcs thicken with the weights (labels and
- * optional bars under each key, to scale); the values flow back along the arcs, in proportion, and blend
- * into the asking token. With causal on, tokens after the query sit behind a mask wall and no arc reaches
- * them (.probe shows one trying).
- * o: x 960, y 600 (centre of the token row), tokens ['the', 'cat', 'sat', 'down', 'it'], query (index,
- *    default the last), weights [] (per token; null/undefined = none, e.g. [0.05, 0.62, 0.28, 0.05, null]),
- *    causal true (keys = tokens before the query; false = every other token), self false (an arc from the
- *    query to itself, weight weights[query]),
- *    size 30, gap 26 (between chips), w (fixed chip width), state 'token' (libToken state),
- *    arcMax 230 (tallest arc), tone 'compute' (arcs), valueTone 'struct' (blended values),
- *    wfmt 'pct' ('62%') | 'dec' ('0.62') | (w) => str, labels true (weight labels under the keys),
- *    bars false | true: amber bars under each key, to scale (barMax 110 px, barW 26),
- *    queryLabel ('asks', under the query), maskLabel 'mask' (the wall's label),
- *    qkv false | true: small Q / K / V badges under the chips (Q on the query, K and V on the keys).
- * Returns <g> with .tokens[] (libToken chips; .cx .l .r .t .b), .arcs[] (per token index; .path, .len),
- *    .selfArc, .labels[] (weight texts), .bars[], .wall, .wallLabel, .queryLabelEl, .badges[], and
- *    .x .y .w .l .r .chipH .arcTop (y of the tallest arc).
+ * libAttention — attention drawn on the tokens themselves. Token chips in a row (or a column); the asking
+ * token's query reaches back to each earlier token's key along amber arcs; the arcs thicken with the weights
+ * (labels, and optional bars to scale, beside each key); the values run back along the arcs, each in
+ * proportion to its weight, and blend into the asking token. With causal on, tokens after the query sit
+ * behind a mask wall that no arc crosses (.probe shows one trying).
+ * o: x 960, y 600 (centre of the row or column), tokens ['the', 'cat', 'sat', 'down', 'it'], query (index;
+ *    default the last), weights [] (per token index, e.g. [0.05, 0.62, 0.28, 0.05]; missing = no label),
+ *    dir 'row' (arcs above, labels below) | 'col' (tokens stacked top to bottom, arcs on the left, labels and
+ *    bars to the right),
+ *    causal true (keys = the tokens before the query, the rest masked; false = every other token is a key),
+ *    self false (an arc from the query to itself, weight weights[query]), maskGap 56 (extra room around
+ *    the mask wall), maskLabel 'mask',
+ *    size 30 (chip text), gap 26 (row) / 16 (col) between chips, w (fixed chip width; col: the widest),
+ *    state 'token' (libToken state of the chips), arcMax 230 (tallest arc), arcScale 0.42 (row) / 0.6 (col),
+ *    tone 'compute' (arcs, weights), valueTone 'struct' (the blended values),
+ *    wfmt 'pct' ('62%') | 'dec' ('.62') | (w) => string, labels true (weight labels beside the keys),
+ *    labelSize 26, bars false | true (amber bars to scale beside each key; barMax 110, barW 26, barScale:
+ *    the weight a full bar means, default the largest weight), queryLabel (e.g. 'asks', beside the query
+ *    where its weight would be), qkv false | true (small Q / K / V badges: Q on the query, K and V on keys).
+ * Returns <g> with .tokens[] (libToken chips, with .cx .cy .l .r .t .b .i), .arcs[] (by token index: <path>
+ *    with .len .j), .selfArc, .labels[] (by token index), .bars[] (by token index, each with .track),
+ *    .badges[], .queryLabelEl, .wall .wallLabel (causal with later tokens), .keys (indices), .query, and
+ *    geometry .x .y .w .h .l .r .t .b, .chipH, .arcTop (row: the y the tallest arc reaches; col: the x).
  * Helpers (return timelines; call in time order):
- *    .in({stagger 0.08})             the chips pop in (hidden until then)
+ *    .in({stagger 0.08, d 0.5})      the chips pop in (hidden until then), then badges and the query label
  *    .ask({d 0.7, stagger 0.08})     faint arcs draw from the query back to each key, nearest first
- *    .weigh(weights?, {d 0.7})       arcs thicken/brighten with the weights; labels (and bars) appear;
- *        call again with new weights to re-weigh
- *    .blend({d 1.1, into 'new'})     a blue drop per key, sized by its weight, runs back along its arc into
- *        the query, which pulses (and takes libToken state `into`, if given)
- *    .mask({d 0.6})                  tokens after the query dim, the mask wall draws between them
- *    .probe(j, {d 1.2})              a grey arc from the query towards future token j stops at the wall
- *    .clear({d 0.4})                 arcs, labels and bars fade out
- *   const at = libAttention(S, { tokens: ['the', 'cat', 'sat', 'down', 'it'], weights: [0.05, 0.62, 0.28, 0.05], bars: true, y: 640 });
+ *    .weigh(weights?, {d 0.7})       arcs thicken and brighten with the weights; labels and bars appear;
+ *        call again with new weights to re-weigh (labels cross-fade, bars resize)
+ *    .blend({d 1.1, into, weights})  a blue drop per key, sized by its weight, runs back along its arc into
+ *        the query, which pulses (and takes libToken state `into`, e.g. 'new', if given)
+ *    .mask({d 0.6})                  the later tokens dim and the mask wall draws between them and the query
+ *    .probe(j, {d 1.2})              a grey arc from the query towards later token j stops dead at the wall
+ *    .pulse(i, {scale 1.1, d 0.45})  token i pulses (use this, not GSAP scale, on these chips)
+ *    .clear({d 0.4})                 arcs, labels and bars fade out (ask/weigh can run again)
+ *   const at = libAttention(S, { tokens: ['the', 'cat', 'sat', 'down', 'it'], weights: [0.05, 0.62, 0.28, 0.05], bars: true, queryLabel: 'asks' });
  *   S.add(at.in(), 'b1~cat');
  *   S.add(at.ask(), 'b1~meets');
  *   S.add(at.weigh(), 'b3~Softmax');
- *   S.add(at.blend(), 'b4~blend');
+ *   S.add(at.blend({ into: 'new' }), 'b4~blend');
  */
 function libAttention(S, o = {}, parent) {
   const M = _libModel;
+  const f2 = M.f2;
   const toks = o.tokens || ['the', 'cat', 'sat', 'down', 'it'];
   const n = toks.length, q = o.query ?? n - 1;
-  const size = o.size ?? 30, gap = o.gap ?? 26;
+  const col = o.dir === 'col';
+  const size = o.size ?? 30, gap = o.gap ?? (col ? 16 : 26);
   const chH = Math.round(size * 1.85), padX = Math.round(size * 0.62);
-  const widths = toks.map(t => o.w || Math.max(chH * 1.25, S.measure(String(t).trim(), { size, weight: 600 }) + 2 * padX));
+  const natural = toks.map(t => Math.max(chH * 1.25, S.measure(String(t).trim(), { size, weight: 600 }) + 2 * padX));
+  const widths = toks.map((t, i) => o.w || (col ? Math.max(...natural) : natural[i]));
+  const ext = i => (col ? chH : widths[i]);                  // a chip's extent along the token axis
+  const half = col ? widths[0] / 2 : chH / 2;               // a chip's half extent across it
   const causal = o.causal !== false;
   const wallGap = causal && q < n - 1 ? (o.maskGap ?? 56) : 0;
-  const total = widths.reduce((a, b) => a + b, 0) + gap * (n - 1) + wallGap;
-  const cx0 = o.x ?? 960, y = o.y ?? 600;
+  const total = toks.reduce((a, t, i) => a + ext(i), 0) + gap * (n - 1) + wallGap;
+  const X = o.x ?? 960, Y = o.y ?? 600;
+  const U0 = col ? Y : X, W0 = col ? X : Y;                 // along the axis / across it
+  const P = (u, w) => (col ? [w, u] : [u, w]);              // (along, across) -> (x, y)
+  const pt = (u, w) => P(u, w).map(f2).join(',');
   const g = S.g(null, parent);
   const arcG = S.g(null, g), tokG = S.g(null, g), under = S.g(null, g), front = S.g(null, g);
-  let xl = cx0 - total / 2;
+  let ul = U0 - total / 2;
   g.tokens = toks.map((t, i) => {
-    const cx = xl + widths[i] / 2;
-    xl += widths[i] + gap + (i === q ? wallGap : 0);
+    const cu = ul + ext(i) / 2;
+    ul += ext(i) + gap + (i === q ? wallGap : 0);
+    const [cx, cy] = P(cu, W0);
     const tk = typeof libToken === 'function'
-      ? libToken(S, { text: t, x: cx, y, size, h: chH, w: widths[i], state: o.state || 'token' }, tokG)
-      : S.pill(String(t).trim(), { x: cx, y, h: chH, size, w: widths[i] }, tokG);
-    Object.assign(tk, { cx, l: cx - widths[i] / 2, r: cx + widths[i] / 2, t: y - chH / 2, b: y + chH / 2, i });
+      ? libToken(S, { text: t, x: cx, y: cy, size, h: chH, w: widths[i], state: o.state || 'token' }, tokG)
+      : S.pill(String(t).trim(), { x: cx, y: cy, h: chH, size, w: widths[i] }, tokG);
+    Object.assign(tk, { cx, cy, cu, l: cx - widths[i] / 2, r: cx + widths[i] / 2, t: cy - chH / 2, b: cy + chH / 2, i, ua: cu - ext(i) / 2, ub: cu + ext(i) / 2 });
     return tk;
   });
   const tone = o.tone || 'compute';
-  const arcMax = o.arcMax ?? 230;
-  const ya = y - chH / 2 - 8;
+  const arcMax = o.arcMax ?? 230, arcScale = o.arcScale ?? (col ? 0.6 : 0.42);
+  const wa = W0 - half - 8;                                // where arcs leave and land (above / left of chips)
+  const wFar = W0 + half;                                  // the other side: labels, bars, badges
   const keys = [...Array(n).keys()].filter(j => j !== q && (!causal || j < q));
-  const arcPath = (xa, xb, hh) => `M${M.f2(xa)},${M.f2(ya)} C${M.f2(xa + (xb - xa) * 0.08)},${M.f2(ya - hh)} ${M.f2(xb - (xb - xa) * 0.08)},${M.f2(ya - hh)} ${M.f2(xb)},${M.f2(ya)}`;
-  const hOf = dist => Math.min(arcMax, 46 + dist * 0.42);
-  const qx = g.tokens[q].cx, qhw = widths[q] / 2;
-  // arcs leave the query's top edge spread out: the farthest from the middle, the nearest outermost, so they never cross
-  const startX = j => {
-    const side = g.tokens[j].cx < qx ? -1 : 1;
-    const same = keys.filter(k => (g.tokens[k].cx < qx ? -1 : 1) === side).sort((a, b) => Math.abs(g.tokens[b].cx - qx) - Math.abs(g.tokens[a].cx - qx));
-    const lo = o.self ? 16 : 6, hi = Math.max(lo + 2, qhw * 0.78);
+  const arcPath = (ua, ub, hh) => `M${pt(ua, wa)} C${pt(ua + (ub - ua) * 0.08, wa - hh)} ${pt(ub - (ub - ua) * 0.08, wa - hh)} ${pt(ub, wa)}`;
+  const hOf = dist => Math.min(arcMax, 46 + dist * arcScale);
+  const qu = g.tokens[q].cu, qh = ext(q) / 2;
+  // arcs leave the query spread out: the farthest from the middle, the nearest outermost, so none cross
+  const startU = j => {
+    const side = g.tokens[j].cu < qu ? -1 : 1;
+    const same = keys.filter(k => (g.tokens[k].cu < qu ? -1 : 1) === side).sort((a, b) => Math.abs(g.tokens[b].cu - qu) - Math.abs(g.tokens[a].cu - qu));
+    const lo = o.self ? 16 : 6, hi = Math.max(lo + 2, qh * 0.78);
     const rank = same.indexOf(j);
-    return qx + side * (same.length > 1 ? lo + (hi - lo) * rank / (same.length - 1) : (lo + hi) / 2);
+    return qu + side * (same.length > 1 ? lo + (hi - lo) * rank / (same.length - 1) : (lo + hi) / 2);
   };
   g.arcs = [];
   keys.forEach(j => {
-    const xb = g.tokens[j].cx;
-    const pth = S.path({ d: arcPath(startX(j), xb, hOf(Math.abs(xb - qx))), stroke: tone, sw: 2, strokeOpacity: 1 }, arcG);
+    const ub = g.tokens[j].cu;
+    const pth = S.path({ d: arcPath(startU(j), ub, hOf(Math.abs(ub - qu))), stroke: tone, sw: 2 }, arcG);
     pth.style.opacity = 0;
     pth.len = pth.getTotalLength();
     pth.j = j;
@@ -1414,84 +1524,98 @@ function libAttention(S, o = {}, parent) {
     g.arcs[j] = pth;
   });
   if (o.self) {
-    const sp = S.path({ d: `M${M.f2(qx - 12)},${M.f2(ya)} C${M.f2(qx - 58)},${M.f2(ya - 92)} ${M.f2(qx + 58)},${M.f2(ya - 92)} ${M.f2(qx + 12)},${M.f2(ya)}`, stroke: tone, sw: 2 }, arcG);
+    const sp = S.path({ d: `M${pt(qu - 12, wa)} C${pt(qu - 58, wa - 92)} ${pt(qu + 58, wa - 92)} ${pt(qu + 12, wa)}`, stroke: tone, sw: 2 }, arcG);
     sp.style.opacity = 0; sp.len = sp.getTotalLength(); sp.j = q;
     M.plan(sp, 'sw', 2); M.plan(sp, 'op', 0.55);
     g.selfArc = sp;
     g.arcs[q] = sp;
   }
   const allArcs = () => g.arcs.filter(Boolean);
-  g.arcTop = ya - Math.max(0, ...allArcs().map(a => (a === g.selfArc ? 70 : hOf(Math.abs(g.tokens[a.j].cx - qx)) * 0.75)));
-  // under the chips: bars, weight labels, query label, badges
-  const chipB = y + chH / 2;
-  let rowY = chipB + 18;
+  g.arcTop = wa - Math.max(0, ...allArcs().map(a => (a === g.selfArc ? 70 : hOf(Math.abs(g.tokens[a.j].cu - qu)) * 0.75)));
+  // beside the chips (below a row, right of a column): badges, bars, weight labels, the query label
+  let wRow = wFar + 18;
   if (o.qkv) {
     g.badges = [];
-    const by = chipB + 30;
+    const bw = wFar + 30;
     g.tokens.forEach((tk, i) => {
-      const lets = i === q ? ['Q'] : (keys.includes(i) || !causal ? ['K', 'V'] : []);
-      lets.forEach((L, k) => {
-        const bx = tk.cx + (lets.length === 2 ? (k ? 22 : -22) : 0);
+      const lets = i === q ? ['Q'] : (keys.includes(i) ? ['K', 'V'] : []);
+      lets.forEach((Lt, k) => {
+        const [bx, by] = col ? [bw + (lets.length === 2 ? k * 44 : 0), tk.cy] : [tk.cx + (lets.length === 2 ? (k ? 22 : -22) : 0), bw];
         const bg = S.g(null, under);
         S.rect({ x: bx - 18, y: by - 18, w: 36, h: 36, r: 8, fill: M.BASE }, bg);
-        S.rect({ x: bx - 18, y: by - 18, w: 36, h: 36, r: 8, fill: L === 'Q' ? 'url(#solid-struct)' : 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.8, sw: 1.5 }, bg);
-        S.text(L, { x: bx, y: by + 1, size: 24, weight: 700, anchor: 'middle', color: L === 'Q' ? '#0a0f1e' : 'ink' }, bg);
-        bg.letter = L; bg.i = i;
+        S.rect({ x: bx - 18, y: by - 18, w: 36, h: 36, r: 8, fill: Lt === 'Q' ? 'url(#solid-struct)' : 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.8, sw: 1.5 }, bg);
+        S.text(Lt, { x: bx, y: by + 1, size: 24, weight: 700, anchor: 'middle', color: Lt === 'Q' ? '#0a0f1e' : 'ink' }, bg);
+        bg.letter = Lt; bg.i = i;
         g.badges.push(bg);
       });
     });
-    rowY = by + 34;
+    wRow = bw + (col ? 44 + 36 : 34);
   }
-  const barMax = o.barMax ?? 110, barW = o.barW ?? 26;
-  const labY = o.bars ? rowY + barMax + 28 : rowY + 16;
+  const barMax = o.barMax ?? 110, barW = Math.min(o.barW ?? 26, col ? chH * 0.6 : 999);
+  const labW = o.bars ? wRow + barMax + (col ? 22 : 28) : wRow + (col ? 4 : 16);
+  const lsz = o.labelSize ?? 26;
   const wf = typeof o.wfmt === 'function' ? o.wfmt : o.wfmt === 'dec' ? (v => M.num(Math.round(v * 100) / 100, { dp: 2 }).replace(/^0(?=\.)/, '')) : (v => `${Math.round(v * 100)}%`);
+  const labelAt = (u, text, color, fam) => {
+    const [lx, ly] = P(u, labW);
+    return S.text(text, { x: lx, y: ly + 1, size: lsz, anchor: col ? 'start' : 'middle', family: fam, weight: fam === 'mono' ? 600 : 550, color }, under);
+  };
+  /** a bar's rect attributes for a length h (rows grow up from a baseline, columns grow right) */
+  const barBox = (u, h) => (col ? { x: wRow, y: u - barW / 2, width: Math.max(0.01, h), height: barW } : { x: u - barW / 2, y: wRow + barMax - Math.max(0.01, h), width: barW, height: Math.max(0.01, h) });
   g.labels = []; g.bars = [];
   if (o.bars) {
     keys.concat(o.self ? [q] : []).forEach(j => {
-      const tk = g.tokens[j];
-      const tr = S.rect({ x: tk.cx - barW / 2, y: rowY, w: barW, h: barMax, r: 6, fill: '#ffffff', fillOpacity: 0.04, stroke: '#ffffff', strokeOpacity: 0.08, sw: 1 }, under);
-      const b = S.rect({ x: tk.cx - barW / 2, y: rowY + barMax, w: barW, h: 0.01, r: 4, fill: 'url(#solid-compute)' }, under);
+      const u = g.tokens[j].cu;
+      const tb = barBox(u, barMax), z = barBox(u, 0.01);
+      const tr = S.rect({ x: tb.x, y: tb.y, w: tb.width, h: tb.height, r: 6, fill: '#ffffff', fillOpacity: 0.04, stroke: '#ffffff', strokeOpacity: 0.08, sw: 1 }, under);
+      const b = S.rect({ x: z.x, y: z.y, w: z.width, h: z.height, r: 4, fill: col ? 'url(#bar-compute)' : 'url(#solid-compute)' }, under);
       b.style.opacity = 0; tr.style.opacity = 0;
-      b.track = tr; b.j = j;
+      b.track = tr; b.j = j; b.u = u;
       M.plan(b, 'h', 0);
       g.bars[j] = b;
     });
   }
-  if (o.queryLabel) {
-    g.queryLabelEl = S.text(o.queryLabel, { x: qx, y: labY, size: o.labelSize ?? 26, anchor: 'middle', color: 'muted', weight: 550 }, under);
-  }
-  // the mask wall
+  if (o.queryLabel) g.queryLabelEl = labelAt(qu, o.queryLabel, 'muted', 'sans');
+  // the mask wall, between the query and the tokens after it
   const fut = [...Array(n).keys()].filter(j => j > q);
   if (causal && fut.length) {
-    const wx = (g.tokens[q].r + g.tokens[q + 1].l) / 2;
-    g.wall = S.line({ x1: wx, y1: g.arcTop + 30, x2: wx, y2: chipB + 14, stroke: 'muted', sw: 2.5, dash: '7 7', strokeOpacity: 0.85 }, front);
-    g.wallLabel = S.text(o.maskLabel ?? 'mask', { x: wx, y: g.arcTop + 2, size: 26, anchor: 'middle', color: 'muted', weight: 600 }, front);
+    const wu = (g.tokens[q].ub + g.tokens[q + 1].ua) / 2;
+    const w1 = g.arcTop + 30, w2 = wFar + 14;
+    const [x1, y1] = P(wu, w1), [x2, y2] = P(wu, w2);
+    g.wall = S.line({ x1, y1, x2, y2, stroke: 'muted', sw: 2.5, dash: '7 7', strokeOpacity: 0.85 }, front);
+    // the label sits where no arc can reach it: above a row's wall, at the far (right) end of a column's
+    const [lx, ly] = col ? P(wu, w2 + 14) : P(wu, g.arcTop + 2);
+    g.wallLabel = S.text(o.maskLabel ?? 'mask', { x: lx, y: ly + (col ? 1 : 0), size: 26, anchor: col ? 'start' : 'middle', color: 'muted', weight: 600 }, front);
     M.hide(g.wall); M.hide(g.wallLabel);
-    g.wallX = wx;
+    g.wallU = wu;
   }
-  Object.assign(g, { x: cx0, y, w: total, l: cx0 - total / 2, r: cx0 + total / 2, chipH: chH, query: q, keys });
+  const [gx0, gy0] = P(U0 - total / 2, W0 - half), [gx1, gy1] = P(U0 + total / 2, W0 + half);
+  Object.assign(g, { x: X, y: Y, w: gx1 - gx0, h: gy1 - gy0, l: gx0, r: gx1, t: gy0, b: gy1, chipH: chH, query: q, keys, dir: col ? 'col' : 'row' });
 
-  const P = { weights: o.weights ? o.weights.slice() : null, labels: [] };
+  const PL = { weights: o.weights ? o.weights.slice() : null, labels: [] };
   g.in = (io = {}) => {
     const tl = gsap.timeline();
-    tl.add(M.pop(g.tokens, { from: 0.5, d: io.d ?? 0.5, ease: 'back.out(2.2)', stagger: io.stagger ?? 0.08 }), 0);
-    tl.add(M.inFlight(g.tokens, (io.d ?? 0.5) + (io.stagger ?? 0.08) * n), 0);
+    const st = io.stagger ?? 0.08;
+    tl.add(M.pop(g.tokens, { from: 0.5, d: io.d ?? 0.5, ease: 'back.out(2.2)', stagger: st }), 0);
+    tl.add(M.inFlight(g.tokens, (io.d ?? 0.5) + st * n), 0);
     const extra = [...(g.badges || []), g.queryLabelEl].filter(Boolean);
-    if (extra.length) tl.fromTo(extra, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, stagger: 0.03 }, (io.stagger ?? 0.08) * n);
+    if (extra.length) { extra.forEach(M.hide); tl.add(M.fade(extra, 0, 1, 0.4, 'power1.out', 0.03), st * n); }
     return tl;
   };
+  g.pulse = (i, po = {}) => M.pulse(g.tokens[i], po.scale ?? 1.1, po.d ?? 0.45);
   g.ask = (ao = {}) => {
     const tl = gsap.timeline();
-    const list = allArcs().slice().sort((a, b) => Math.abs(g.tokens[a.j].cx - qx) - Math.abs(g.tokens[b.j].cx - qx));
+    const list = allArcs().slice().sort((a, b) => Math.abs(g.tokens[a.j].cu - qu) - Math.abs(g.tokens[b.j].cu - qu));
     list.forEach((a, k) => {
-      tl.fromTo(a, { opacity: 0.55, drawSVG: '0%' }, { opacity: 0.55, drawSVG: '100%', duration: ao.d ?? 0.7, ease: 'power2.inOut', immediateRender: false }, k * (ao.stagger ?? 0.08));
+      // opacity is set once, at the start, so a .weigh() that starts before the drawing ends never races it
+      tl.set(a, { opacity: 0.55 }, k * (ao.stagger ?? 0.08));
+      tl.fromTo(a, { drawSVG: '0%' }, { drawSVG: '100%', duration: ao.d ?? 0.7, ease: 'power2.inOut', immediateRender: false }, k * (ao.stagger ?? 0.08));
     });
     tl.add(M.pulse(g.tokens[q], 1.06, 0.4), 0);
     return tl;
   };
   g.weigh = (ws, wo = {}) => {
-    const W = ws || P.weights || [];
-    P.weights = W.slice();
+    const W = ws || PL.weights || [];
+    PL.weights = W.slice();
     const tl = gsap.timeline();
     const d = wo.d ?? 0.7;
     const wmax = Math.max(1e-9, ...allArcs().map(a => W[a.j] || 0));
@@ -1502,19 +1626,18 @@ function libAttention(S, o = {}, parent) {
       tl.fromTo(a, { attr: { 'stroke-width': sw0 }, opacity: op0 }, { attr: { 'stroke-width': sw }, opacity: op, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
     });
     if (o.labels !== false) {
-      const old = P.labels;
-      const fresh = [];
+      const old = PL.labels, fresh = [];
       allArcs().forEach(a => {
         const wv = W[a.j];
         if (wv === null || wv === undefined) return;
-        const t = S.text(wf(wv), { x: g.tokens[a.j].cx, y: labY, size: o.labelSize ?? 26, anchor: 'middle', family: 'mono', weight: 600, color: tone }, under);
+        const t = labelAt(g.tokens[a.j].cu, wf(wv), tone, 'mono');
         M.hide(t);
         fresh.push(t);
         g.labels[a.j] = t;
       });
-      if (old.length) { tl.fromTo(old, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.4, immediateRender: false }, 0); tl.add(M.inFlight(old.concat(fresh), d * 0.9), 0); }
-      tl.fromTo(fresh, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: d * 0.6, stagger: 0.05, ease: 'power2.out', immediateRender: false }, d * 0.3);
-      P.labels = fresh;
+      if (old.length) { tl.add(M.fade(old, 1, 0, d * 0.4), 0); tl.add(M.inFlight(old.concat(fresh), d * 0.9), 0); }
+      tl.add(M.fade(fresh, 0, 1, d * 0.6, 'power2.out', 0.05), d * 0.3);
+      PL.labels = fresh;
     }
     g.bars.forEach(b => {
       if (!b) return;
@@ -1522,13 +1645,13 @@ function libAttention(S, o = {}, parent) {
       const h1 = Math.max(2, barMax * wv / Math.max(wmax, o.barScale ?? 0));
       const h0 = M.plan(b, 'h', h1);
       if (!h0) tl.fromTo([b, b.track], { opacity: 0 }, { opacity: 1, duration: 0.2, immediateRender: false }, 0);
-      tl.fromTo(b, { attr: { height: Math.max(0.01, h0), y: rowY + barMax - Math.max(0.01, h0) } }, { attr: { height: h1, y: rowY + barMax - h1 }, duration: d, ease: 'power3.out', immediateRender: false }, 0.05);
+      tl.fromTo(b, { attr: barBox(b.u, h0) }, { attr: barBox(b.u, h1), duration: d, ease: 'power3.out', immediateRender: false }, 0.05);
     });
     return tl;
   };
   g.blend = (bo = {}) => {
     const tl = gsap.timeline();
-    const W = bo.weights || P.weights || [];
+    const W = bo.weights || PL.weights || [];
     const d = bo.d ?? 1.1;
     const vt = bo.tone || o.valueTone || 'struct';
     allArcs().forEach((a, k) => {
@@ -1540,14 +1663,13 @@ function libAttention(S, o = {}, parent) {
       S.circle({ x: 0, y: 0, r: rad, fill: vt }, dot);
       M.hide(dot);
       const L = a.len;
-      const st = k * 0.05;
       tl.add(M.drive(d, p => {
-        const pt = a.getPointAtLength(L * (1 - p));
-        dot.setAttribute('transform', `translate(${M.f2(pt.x)},${M.f2(pt.y)})`);
+        const pp = a.getPointAtLength(L * (1 - p));
+        dot.setAttribute('transform', `translate(${f2(pp.x)},${f2(pp.y)})`);
         const vis = p > 0 && p < 1;
         dot.style.visibility = vis ? 'inherit' : 'hidden';
         dot.style.opacity = vis ? Math.min(1, p * 8, (1 - p) * 6) : 0;
-      }, { ease: 'power1.inOut' }), st);
+      }, { ease: 'power1.inOut' }), k * 0.05);
     });
     const tq = g.tokens[q];
     tl.add(M.pulse(tq, 1.12, 0.45), d * 0.92);
@@ -1563,20 +1685,23 @@ function libAttention(S, o = {}, parent) {
       if (tk.setState) tl.add(tk.setState('dim', { d }), k * 0.06);
       else tl.add(M.fadeTo(tk, 0.3, d), k * 0.06);
     });
-    const wy1 = +g.wall.getAttribute('y1'), wy2 = +g.wall.getAttribute('y2');
-    tl.fromTo(g.wall, { autoAlpha: 1, attr: { y1: wy2 } }, { autoAlpha: 1, attr: { y1: wy1 }, duration: d, ease: 'power3.out', immediateRender: false }, 0.1);
-    tl.fromTo(g.wallLabel, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: d * 0.8, immediateRender: false }, 0.3);
+    // the wall grows from the chips' side outwards (a dashed line: no drawSVG, which would undo the dashes)
+    const key = col ? 'x1' : 'y1', far = col ? 'x2' : 'y2';
+    const a0 = +g.wall.getAttribute(far), a1 = +g.wall.getAttribute(key);
+    tl.add(M.fade(g.wall, 0, 1, 0.001), 0.1);
+    tl.fromTo(g.wall, { attr: { [key]: a0 } }, { attr: { [key]: a1 }, duration: d, ease: 'power3.out', immediateRender: false }, 0.1);
+    tl.add(M.fade(g.wallLabel, 0, 1, d * 0.8), 0.3);
     return tl;
   };
   g.probe = (j, po = {}) => {
     const tl = gsap.timeline();
     if (!g.wall || j <= q) return tl;
-    const xb = g.tokens[j].cx;
-    const pth = S.path({ d: arcPath(qx + 10, xb, hOf(Math.abs(xb - qx))), stroke: 'muted', sw: 3, dash: undefined }, arcG);
+    const ub = g.tokens[j].cu;
+    const pth = S.path({ d: arcPath(qu + 10, ub, hOf(Math.abs(ub - qu))), stroke: 'muted', sw: 3 }, arcG);
     pth.style.opacity = 0;
     const L = pth.getTotalLength();
     let lo = 0, hi = L;
-    for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (pth.getPointAtLength(m).x < g.wallX - 6) lo = m; else hi = m; }
+    for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; const pp = pth.getPointAtLength(m); if ((col ? pp.y : pp.x) < g.wallU - 6) lo = m; else hi = m; }
     const frac = Math.max(1, Math.round(lo / L * 100));
     const d = po.d ?? 1.2;
     tl.fromTo(pth, { opacity: 0.9, drawSVG: '0%' }, { opacity: 0.9, drawSVG: `${frac}%`, duration: d * 0.5, ease: 'power2.out', immediateRender: false }, 0);
@@ -1588,12 +1713,12 @@ function libAttention(S, o = {}, parent) {
     const tl = gsap.timeline();
     const d = co.d ?? 0.4;
     allArcs().forEach(a => { const op = M.plan(a, 'op', 0.55); M.plan(a, 'sw', 2); tl.fromTo(a, { opacity: op }, { opacity: 0, duration: d, immediateRender: false }, 0); });
-    if (P.labels.length) tl.fromTo(P.labels, { autoAlpha: 1 }, { autoAlpha: 0, duration: d, immediateRender: false }, 0);
+    if (PL.labels.length) tl.add(M.fade(PL.labels, 1, 0, d), 0);
     g.bars.forEach(b => {
       if (!b) return;
       if (M.plan(b, 'h', 0)) tl.fromTo([b, b.track], { opacity: 1 }, { opacity: 0, duration: d, immediateRender: false }, 0);
     });
-    P.labels = [];
+    PL.labels = [];
     return tl;
   };
   return g;
@@ -1721,7 +1846,7 @@ function libAttentionGrid(S, o = {}, parent) {
     const from = M.plan(ov, 'op', target, 0);
     if (sized && !from) {
       tl.fromTo(ov, { opacity: 0 }, { opacity: target, duration: d * 0.8, ease: 'power1.out', immediateRender: false }, at);
-      tl.add(M.drive(d * 1.3, p => M.scaleTo(ov, cl.cx, cl.cy, 0.4 + 0.6 * gsap.parseEase('back.out(1.8)')(p))), at);
+      tl.add(M.drive(d * 1.3, p => M.scaleTo(ov, cl.cx, cl.cy, 0.4 + 0.6 * gsap.parseEase('back.out(1.8)')(p), 'pop')), at);
     }
     else tl.fromTo(ov, { opacity: from }, { opacity: target, duration: d, ease: 'power2.out', immediateRender: false }, at);
     P.lit.add(ov);
@@ -1729,7 +1854,8 @@ function libAttentionGrid(S, o = {}, parent) {
   g.in = (io = {}) => {
     const tl = gsap.timeline();
     const d = io.d ?? 0.6;
-    tl.fromTo(labG, { autoAlpha: 0 }, { autoAlpha: 1, duration: d }, 0);
+    M.hide(labG);
+    tl.add(M.fade(labG, 0, 1, d), 0);
     tl.add(M.pop(g.cells.flat(), { from: 0.7, d: d * 0.7, ease: 'back.out(1.8)', stagger: 0.02 }), 0.1);
     tl.add(M.inFlight(g.cells.flat(), d * 0.7 + 0.02 * n * n), 0.1);
     return tl;
@@ -1760,7 +1886,7 @@ function libAttentionGrid(S, o = {}, parent) {
     const tl = gsap.timeline();
     const d = mo.d ?? 0.9;
     const st = d * 0.6 / Math.max(1, n - 1);
-    g.maskBands.forEach((bg, k) => tl.fromTo(bg, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.4, ease: 'power1.out', immediateRender: false }, k * st));
+    g.maskBands.forEach((bg, k) => tl.add(M.fade(bg, 0, 1, d * 0.4, 'power1.out'), k * st));
     if (g.maskLabel) tl.add(M.pop(g.maskLabel, { from: 0.9, d: 0.4, immediate: false }), d * 0.7);
     // the masked cells sit under the hatching (and the label's plate) from here on: not layout any more
     const under = [];
@@ -1773,14 +1899,14 @@ function libAttentionGrid(S, o = {}, parent) {
     const tl = gsap.timeline();
     const yy = y0 + r * (ch + gap) - 6;
     if (fo.tone) g.rowFrame.setAttribute('stroke', S.tone(fo.tone));
-    if (P.frame === null) tl.fromTo(g.rowFrame, { autoAlpha: 0, attr: { y: yy } }, { autoAlpha: 1, duration: 0.35, immediateRender: false }, 0);
+    if (P.frame === null) { tl.add(M.attrAt(g.rowFrame, 'y', y0 - 6, yy), 0); tl.add(M.fade(g.rowFrame, 0, 1, 0.35), 0); }
     else tl.fromTo(g.rowFrame, { attr: { y: P.frame } }, { attr: { y: yy }, duration: 0.4, ease: 'power3.inOut', immediateRender: false }, 0);
     P.frame = yy;
     return tl;
   };
   g.unfocus = () => {
     const tl = gsap.timeline();
-    if (P.frame !== null) tl.fromTo(g.rowFrame, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3, immediateRender: false }, 0);
+    if (P.frame !== null) tl.add(M.fade(g.rowFrame, 1, 0, 0.3), 0);
     P.frame = null;
     return tl;
   };

@@ -1,6 +1,6 @@
 /* demo_charts · the charts family (lib/charts.js) in its main states.
    b1-b2  libRoofline: axes, the two ceilings, the ridge, regions; decode and prefill drop on; a bracket;
-          decode slides up the slope and round the corner, readout counting; a probe at 10 ops/byte.
+          decode slides up the slope and round the corner (coral → amber), readout counting; a probe at 50.
    b3     libScaleCompare: 140 GB vs 0.12 GB as rows, with a round lens; 30 ms vs 0.1 ms inline, tiled ×300.
    b4     libGrowthCurve: linear vs quadratic with the per-token strip, 'about equal' at 10, rescale to 10,000. */
 V.scene('demo_charts', S => {

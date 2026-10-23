@@ -159,74 +159,89 @@ var _libChart = (function () {
  * libRoofline — the roofline chart: arithmetic intensity (operations per byte, log) across, attainable
  * speed (operations per second, log) up. Memory sets a slanted ceiling, bandwidth × intensity (coral);
  * arithmetic sets a flat one, the peak (amber); their corner is the ridge (peak ÷ bandwidth, 295 on an
- * H100). Below the roof a workload's point sits; left of the ridge it is memory bound, right compute bound.
+ * H100). A workload is a point on (or under) the roof: left of the ridge memory bound, right compute bound.
  *
  * The defaults reproduce the ch11/ch12 storyboard geometry exactly: 250 px per decade on both axes,
- * intensity 1 at x 320, 1 trillion ops/s at y 900, the axes at x 260 / y 900, so the H100's ridge (295)
- * sits at (938, 151), decode (1 op/byte, 3.35) at (320, 769) and prefill (≈ 2,000) at (1145, 151).
+ * intensity 1 at x 320, 1 trillion ops/s at y 900, axes at x 260 / y 900, so the H100's ridge (295) is
+ * at (938, 151), decode (1 op/byte, 3.35) at (320, 769) and prefill (≈ 2,000) at (1145, 151). For the
+ * toy chips (ch11_s06) or a small inset roofline (ch11_s08, ch17_s02) pass your own box and domain;
+ * labels stay 24 px+, so give a small chart ≥ 120 px per decade and shorter titles.
  *
  * o: {x = 260, y = 110, w = 1100, h = 790      the plot box (axes along its left and bottom edges),
  *     xmin = 10^-0.24 (≈ 0.575), xmax = 10^4.16, ymin = 1, ymax = 10^3.16   the log domain,
- *     peak = 989                 flat ceiling, in the y unit (here trillion ops/s),
- *     bw = 3.35                  slope: y units per x unit (trillion bytes/s), so attainable = min(peak, bw × I),
+ *     peak = 989                 the flat ceiling, in the y unit (here trillion ops/s),
+ *     bw = 3.35                  the slope, y units per x unit (trillion bytes/s): attainable = min(peak, bw × I),
  *     xticks, yticks             tick values; default every decade in the domain ([] for none),
  *     xfmt, yfmt                 tick label formats; default comma integers ('1,000'),
- *     minor = true               small 2..9 ticks on both axes, grid = true faint decade gridlines,
+ *     minor = true               small 2..9 ticks on both axes; grid = true faint decade gridlines,
  *     xtitle = 'operations per byte (log)', ytitle = 'trillion operations per second (log)'   ('' for none),
- *     titleTones = ['muted', 'muted'], titleSize = 26, tickSize = 24,
- *     sw = 5                     roof stroke width,
+ *     titleTones = ['muted', 'muted'], titleSize = 26, tickSize = 24, sw = 5 (roof stroke),
  *     show = {roof: true, ceilings: false, regions: false, ridge: false, peakTag: false, slopeLabel: false}
- *                                which hidden-by-default parts start visible,
+ *                                which parts start visible (all but the roof are hidden until their helper),
  *     regionLabels = ['memory bound', 'compute bound'], regionSize = 30,
- *     ridgeLabel = 'the ridge', ridgeTag = '295' (sig(peak ÷ bw)), peakTag = ['peak arithmetic', '989 trillion/s'],
- *     slopeLabel = 'bandwidth × intensity'}
+ *     ridgeLabel = 'the ridge', ridgeLabelAt = [18, 104] (offset from the corner, beside the dashed drop),
+ *     ridgeTag = '295' (sig(peak ÷ bw); the white axis tag), peakTag = ['peak arithmetic', '989 trillion/s'],
+ *     slopeLabel = 'bandwidth × intensity' (set parallel to the slope, just above it)}
  * Returns <g> with
  *   .axes .xticks[] .yticks[] .xtitle .ytitle .grid
- *   .flatL .flatR (the amber ceiling left / right of the ridge) .slopeL .slopeR (coral, right part dashed)
- *   .roof [slopeL, flatR] .glow {slope, flat} .tints {memory, compute} .regionLabels {memory, compute}
- *   .ridgeEl (.dot .ring .drop .label .tag) .peakTagEl .slopeLabelEl .marks (layer for points)
- *   and X(I) Y(P) I(x) P(y) attain(I) roofY(I), .ridgeI .ridgeX .ridgeY .peak .bw, .x .y .w .h .l .r .t .b
+ *   .flatL .flatR (the amber ceiling left / right of the ridge) .slopeL .slopeR (coral; past the ridge, dashed)
+ *   .slopeHead .roof [slopeL, flatR] .glow {slope, flat} .tints {memory, compute} .regionLabels {memory, compute}
+ *   .ridgeEl (.dot .ring .drop .label .tag .tagBg) .peakTagEl .slopeLabelEl .marks (the layer points go in)
+ *   and X(I) Y(P) I(x) P(y) attain(I) roofY(I), .ridgeI .ridgeX .ridgeY .peak .bw .decX .decY (px per decade),
+ *   .x .y .w .h .l .r .t .b
  * Helpers (return tweens/timelines):
  *   .in({d = 1.8})            axes, ticks and titles, then the roof (slope, then flat)
  *   .drawAxes({d = 0.8})      axes draw, ticks and titles fade in
  *   .drawFlat({d = 0.9})      the full-width flat ceiling, left to right
- *   .drawSlope({d = 0.8, to: 'ridge'|'top'})   the slope up to the corner (or on, dashed, to the clipped top)
+ *   .drawSlope({d = 0.8, to: 'ridge'|'top'})   the slope up to the corner (or on, dashed, out of the top)
  *   .drawRoof({d = 1.2})      slope then flat: the roof alone
- *   .extendSlope({d = 0.6})   the dashed slope past the corner, out of the clipped top (arrowhead)
+ *   .extendSlope({d = 0.6})   the dashed slope past the corner, out of the clipped top, arrowhead
  *   .traceRoof({d = 1.6, dim = 0.25})   a white tracer runs along the lower line; the roof brightens and
- *                             the parts that are not roof (flat left of the ridge, dashed slope) dim
- *   .glowRoof({d = 0.9, hold = false}) the roof thickens and glows (a pulse, or stays with hold)
+ *                             what is not roof (flat left of the ridge, dashed slope) dims to `dim`
+ *   .glowRoof({d = 0.9, hold = false})  the roof thickens and glows: a pulse, or it stays with hold
  *   .showRegions({d = 0.6, which: 'both'|'memory'|'compute', labels = true})   tints and their labels
+ *   .tint(which, k, {d = 0.6})   tint strength, 1 = default (≈ 10%), 2.5 ≈ 25% ("the tint deepens")
  *   .showRidge({d = 0.7, label = true, tag = true})   marker pops, dashed drop to the axis, label, axis tag
+ *                             (x tick labels the tag would crowd step aside)
+ *   .ridgeTagTo(text, {d})    the axis tag changes ('?' → '295'), its pill resizing
  *   .tagPeak({d}) .tagSlope({d})   the flat ceiling's two-line tag; the slope's parallel label
- *   .ghostSlope({factor = 2, dy, d = 0.6, hold = 0.5})   a ghost slope lifts parallel and settles back
- *   .point(I, po) → point handle (see below)        .probe(I, pr) → probe handle (see below)
- *   .bracket(I1, I2, {y, label, tone = 'ink', size = 28, tick = 12})  → <g> (.in() .out()): a bracket
- *                             between two intensities with its label above ('× 2,000')
- *   .addRoof({peak, bw, sw = 3, opacity = 1, label})  → <g> (.draw({d})): a second chip's roof
- *   .scatter({n = 10, seed = 7, tone = 'neutral', r = 8, onRoof = 0.25}) → <g> (.dots[], .in()): real
- *                             workloads, on the roof or below it, never above
- *   .arrowAlong(I1, I2, {tone = 'helps', off = 26, sw = 5}) → <g> (.draw({d})): an arrow riding just above
- *                             the roof from I1 to I2 ("move the decode point right")
- * Point handle  pt = R.point(I, {tone = 'auto' (coral left of the ridge, amber right), label, labelSide:
- *   'auto'|'right'|'left'|'above'|'below', readout = false | true | fmt, unit = '', r = 11, P (fixed y value:
- *   a point off the roof)})  → <g> with .dot .labelEl .readoutEl .x .y, and
- *     .in({d = 0.7, from: 'drop'|'pop'})   drops onto the roof (a ripple where it lands), label fades
- *     .moveTo(I2, {d = 1.6, ease})        slides along the roof (round the corner), the readout counting
- *     .guide('x'|'y', {tag, tone = 'ink'}) → <g> (.in()): a dotted line to that axis, tag beside the axis
+ *   .ghostSlope({factor = 2, dy, d = 0.6, hold = 0.5})   a dashed ghost slope lifts parallel (by a bandwidth
+ *                             factor, or dy px), holds and settles back ("faster memory only lifts it")
+ *   .point(I, po) → point handle        .probe(I, pr) → probe handle        (both below)
+ *   .bracket(I1, I2, {y = axis − 30, label, style: 'bracket'|'arrow', tone = 'ink', size = 28, tick = 12})
+ *                             → <g> (.in() .out()): a bracket between two intensities, label above ('× 2,000');
+ *                             'arrow' runs from I1 to I2 ("the corner moves × 4.7 right")
+ *   .span(I, P1, P2, {label, side = 'right', dx = 0, tone = 'ink'}) → <g> (.in() .out()): a vertical double
+ *                             arrow at intensity I between two speeds (the toy chips' '× 2')
+ *   .addRoof({peak, bw, sw = 3, opacity = 1}) → <g> (.slope .flat .ridgeX .roofY(I), .draw({d})): another chip
+ *   .scatter({n = 10, seed = 7, tone = 'neutral', r = 8, onRoof = 0.25}) → <g> (.dots[], .in() .out()):
+ *                             real workloads, on the roof or under it, never above (S.rand(seed))
+ *   .arrowAlong(I1, I2, {tone = 'helps', off = 26, sw = 5}) → <g> (.draw({d}) .out()): an arrow riding just
+ *                             above the roof from I1 to I2 ("move the decode point right")
+ * Point  pt = R.point(I, {label, tone = 'auto' (coral left of the ridge, amber right, blending as it moves
+ *   round the corner; or any tone, e.g. 'ink' for a neutral workload), labelSide = 'auto' (below-right of the
+ *   dot, under the roof) | 'right'|'left'|'above'|'below', readout = false | true | fmt (a live value under the
+ *   label: 3.35 → 33.5 → 989), unit = '', r = 11, P (a fixed y value: a point under the roof)})
+ *   → <g> with .dot .labelEl .readoutEl .x .y .I, and
+ *     .in({d = 0.7, from: 'drop'|'pop'})   drops onto the roof (a ripple where it lands); the label fades in
+ *     .moveTo(I2, {d = 1.6, ease})        slides along the roof (round the corner), the readout counting;
+ *                                         a label passing the ridge's dashed drop fades the drop under it
+ *     .guide('x'|'y', {tag, tone = 'ink', tagTone}) → <g> (.in() .out()): a dotted line to that axis with a
+ *                                         tag beside the axis ('3.35 trillion/s')
  *     .out({d})
- * Probe handle  pb = R.probe(I, {tags = true, fmt = sig})  → <g> with .line .slopeMark .flatMark .slopeTag
- *   .flatTag .dot: a dashed vertical at intensity I meeting both ceilings (an arrow at the top when the
- *   slope's value is off the chart), each tagged with its value.
- *     .in({d = 0.9})   the line rises from the axis, each meeting marked as it passes
+ * Probe  pb = R.probe(I, {tags = true, fmt = sig})  → <g> with .line .slopeMark .flatMark .slopeTag .flatTag
+ *   .dot .lower ('slope'|'flat'): a dashed vertical at intensity I meeting both ceilings, each meeting tagged
+ *   with its value (an arrow at the top, tag beside it, when the slope's value is off the chart: '3,350').
+ *     .in({d = 0.9})      the line rises from the axis, each meeting marked as it passes
  *     .settle({d = 0.5})  a white dot settles on the lower ceiling, its tag glows, the other dims
  *     .out({d})
+ *   A probe crosses everything above the axis at I: fade region labels it would cross first.
  * Example:
  *   const R = libRoofline(S);                                    // H100, storyboard geometry
- *   S.add(R.drawAxes(), 'b1'); S.add(R.drawFlat(), 'b1~flat'); S.add(R.drawSlope(), 'b2~slanted');
- *   S.add(R.showRidge(), 'b3~ridge'); S.add(R.showRegions(), 'b3~memory');
+ *   S.add(R.drawAxes(), 'b1'); S.add(R.drawFlat(), 'b3~flat'); S.add(R.drawSlope(), 'b4~slanted');
+ *   S.add(R.showRidge(), 'b5~ridge'); S.add(R.showRegions(), 'b5~memory');
  *   const dec = R.point(1, { label: 'decode', readout: true });
- *   S.add(dec.in(), 'b4~Decode'); S.add(dec.moveTo(2000, { d: 2 }), 'b4~rightward');
+ *   S.add(dec.in(), 'b6~Decode'); S.add(dec.moveTo(2000, { d: 2 }), 'b6~rightward');
  */
 function libRoofline(S, o = {}, parent) {
   const C = _libChart, { L10 } = C;
@@ -294,7 +309,7 @@ function libRoofline(S, o = {}, parent) {
   const sI0 = Math.max(xmin, ymin / bw), sI1 = Math.min(xmax, ymax / bw);
   const pS0 = [X(sI0), Y(bw * sI0)], pS1 = [X(sI1), Y(bw * sI1)];
   const P = (x, y) => `${C.r2(x)},${C.r2(y)}`;
-  g.flatL = S.path({ d: `M${P(x0, ry)} L${P(rx, ry)}`, stroke: 'compute', sw: sw - 1 }, plot);
+  g.flatL = S.path({ d: `M${P(x0, ry)} L${P(rx, ry)}`, stroke: 'compute', sw }, plot);
   g.flatR = S.path({ d: `M${P(rx, ry)} L${P(xr, ry)}`, stroke: 'compute', sw }, plot);
   g.slopeL = S.path({ d: `M${P(...pS0)} L${P(rx, ry)}`, stroke: 'bytes', sw }, plot);
   g.slopeR = S.line({ x1: rx, y1: ry, x2: pS1[0], y2: pS1[1], stroke: 'bytes', sw: sw - 1, dash: '10 9', cap: 'butt' }, plot);
@@ -543,6 +558,7 @@ function libRoofline(S, o = {}, parent) {
         const k = C.smooth((L10(I) - L10(ridgeI)) / 0.12 + 0.5);
         const c = mixHex(S.tone('bytes'), S.tone('compute'), k);
         dot.setAttribute('fill', c); ripple.setAttribute('stroke', c);
+        halo.setAttribute('fill', `url(#pglow-${k > 0.5 ? 'compute' : 'bytes'})`);
         if (labelEl && !po.labelColor) labelEl.setAttribute('fill', c);
       }
       if (labelEl) { labelEl.setAttribute('x', C.r2(lx)); labelEl.setAttribute('y', C.r2(ly)); }
@@ -763,55 +779,65 @@ function libRoofline(S, o = {}, parent) {
 /**
  * libScaleCompare — quantities drawn to ONE scale when they differ enormously: the big one fills the
  * width, the tiny one is a sliver or a hairline at its true size (never inflated), so the gap is seen,
- * not just stated. Rows (140 GB of weights over 0.12 GB on the chip), or 'inline': the whole as a track
- * with its parts laid in from the left end (30 ms per token, 0.1 ms of it arithmetic). A magnifier
- * (round lens or rectangular inset) shows the tiny one enlarged; copies of the tiny one can tile the
- * whole ("300 tokens' worth"); bars can morph to a log scale. Anything under `hairline` px is drawn
- * at the hairline width (the true width would not render) and flagged .hair on its row.
+ * not just stated. Rows (140 GB of weights over 0.12 GB on the chip; 1,032 vs 1 token per step), or
+ * 'inline': the whole as a bar with its parts laid in from the left end (30 ms per token, 0.1 ms of it
+ * arithmetic). A magnifier (round lens or rectangular inset) shows the tiny one enlarged; copies of the
+ * tiny one can tile the whole ("300 tokens' worth"); bars can morph to a log scale (count the zeros).
+ * Anything under `hairline` px is drawn at the hairline width (the true width would not render; pass
+ * hairline: 0 for "too small to draw") and flagged .hair on its row.
  *
  * o: {x = 210, y = 420 (top-left of the first bar), w = 1500 (px for `max`),
  *     max                     value drawn at w; default the largest item value,
- *     items = [{value, label, text, tone = 'struct', style = 'solid'|'outline'|'grey'|'ghost', px, off, fmt}]
- *                             label: name above the bar (or left of it); text: value text at the bar's end
- *                             (default none); px: force a drawn length (a schematic stand-in); off: tag at
- *                             the frame edge when the bar runs off it ('≈ 3,200 km →'); fmt: number format
- *                             for .grow to count text with,
+ *     items = [{value, label, text, tone = 'struct', style, track, px, off, fmt, labelColor, textColor}]
+ *                             label: name above the bar (or left of it); text: value text at the bar's end;
+ *                             style: 'solid' (default; inline whole: 'outline') | 'outline' | 'grey' | 'ghost';
+ *                             track: true draws the full scale behind the bar (a 200,000-token window);
+ *                             px: a forced drawn length (a schematic stand-in, scales with .grow);
+ *                             off: a tag at the frame edge when the bar runs off it ('≈ 3,200 km →');
+ *                             fmt: number format, so .grow counts the text,
  *     layout = 'rows' | 'inline'   inline: items[0] is the whole, the rest are parts from its left end,
  *     h = 56 (bar thickness), gap = 76 (between rows), labelPos = 'above' | 'left', labelW = 320 (for left),
  *     size = 28 (labels), textSize = 28 (value texts), hairline = 1.5, edge = 1990 (x a bar may run to)}
  * Returns <g> with .rows[] each {g, value, len (drawn px), hair, x, y, cy, h, r (right end), solid, outline,
- *   grey, base, labelEl, textEl, offEl}, .X(v) (x for a value from the left end), .L(v) (length for a value),
- *   .whole (inline: rows[0]) and .x .y .w
- * Helpers (return tweens/timelines unless noted; call in time order):
- *   .in({d = 1.0, stagger = 0.3})      bars sweep in from the left end, labels and texts fade in
- *   .grow(i, value, {d = 0.9, text})   resize a bar to scale (text counts with item.fmt, or swaps to `text`)
- *   .restyle(i, style, {d = 0.5})      crossfade a bar to 'solid'|'outline'|'grey'|'ghost'
- *   .toLog({min, d = 1.4}) / .toLinear({d})   morph every bar between the linear and a log scale
- *                                     (log: length ∝ log(value / min); default min = smallest value / 10)
- *   .tag(i, text, {side: 'end'|'above'|'below'|'inside', tone = 'muted', size = 26, dx, dy}) → <g> (.in() .out())
- *   .pointer(i, text, {tone = 'ink', len = 64, side = 'above', size = 26, at}) → <g> (.in() .out()): a short line
- *                                     dropping onto the bar (its middle, or at value `at`) from a tag
- *   .dimension(i, label, {gap = 34, tone = 'muted', size = 28}) → <g> (.in() .out()): a dimension line
- *                                     under the bar, end ticks, label in a gap at its centre
- *   .bracket(v1, v2, {row = 0, side = 'above', label, tone = 'ink', size = 28}) → <g> (.in() .out())
- *   .magnify(mo) → lens handle with .open({d = 0.9}) .close({d = 0.7}) .content (a <g> to draw into)
- *        .M {zoom, X(x), Y(y)} (frame → lens coordinates), .ring .leader .disc (round) | .panel .guides
- *        .window (inset) and .tagEl. mo: {i (default the smallest item), shape = 'circle' | 'inset',
- *        round: x, y (lens centre; default up-right of the bar), r = 120, ring = 22, zoom (default: the bar
- *        spans half the lens), at (value on the bar to centre on);
- *        inset: x, y, w = 1000, h = 170 (panel), window = [v0, v1] (the stretch of the bar to enlarge),
- *        barH = 60; both: tag (default '× zoom'; false for none), content(g, M) to draw your own picture
- *        instead of the enlarged bars (e.g. the chip's working areas)}
- *   .tile({i = 1, into = 0, n, d = 3.5, ease = 'power2.in', counter: {x, y, size = 48, tone, fmt}}) → timeline
- *        (with .group .counter): copies of bar i stamp end to end along bar `into` from its left end,
- *        accelerating; inline, the copies start right after the original. n copies in all (inline counts
- *        the original). The counter, if any, runs 1 → n in step.
+ *   grey, base, trackEl, labelEl, textEl, offEl}, .X(v) (x of a value from the left end), .L(v) (its length),
+ *   .whole (inline: rows[0]), .tiles .tileCounter (after .tile) and .x .y .w .max
+ * Helpers (return tweens/timelines; call in time order):
+ *   .in({d = 1.0, stagger = 0.3, from: 'left'|'center'})   bars sweep in (tiny ones just appear), labels fade
+ *   .grow(i, value, {d = 0.9, text})   resize a bar to scale (text counts with item.fmt, or swaps to `text`);
+ *                                      inline parts after it ride along; annotations follow
+ *   .restyle(i, style, {d = 0.5})      crossfade a bar to 'solid'|'outline'|'grey'|'ghost' ("fills grey")
+ *   .toLog({min, d = 1.4}) / .toLinear({d})   morph every bar between the linear and a log scale (length ∝
+ *                                      log(value / min); min = 1 makes lengths count zeros; default smallest / 10)
+ * Annotations (each → <g> with .in() .out(); visible as built; they follow their bar through grow / toLog):
+ *   .tag(i, text, {side: 'end'|'above'|'below'|'inside'|'center', tone, size = 26, mono, dx, dy})
+ *                                      'end' sits after the bar (after its value text if any); 'center' is
+ *                                      centred on the bar ('something else: over 99%')
+ *   .pointer(i, text, {tone = 'ink', len = 64, side = 'above', size = 26, at, dx}) a short arrow dropping onto
+ *                                      the bar (its middle, or value `at`) from a tag; swap its text with
+ *                                      fx.swap(p.label, 'arithmetic: under 1%')
+ *   .dimension(i, label, {gap = 34, tone = 'muted', labelTone = 'ink', size = 28}) a dimension line under
+ *                                      the bar: end ticks, label in a gap at its centre; draws outward
+ *   .bracket(v1, v2, {row = 0, side = 'above', gap = 20, label, tone = 'ink', size = 28}) between two values
+ * Magnifier  m = sc.magnify(mo) → <g>, closed until .open(); .open({d = 0.9}) .close({d = 0.7}), .content (a <g>
+ *   to draw into, clipped), .M (frame → lens mapping: zoom, X(x), Y(y), cx cy r | px py pw ph barY barH),
+ *   .ring .leader .disc (round) | .panel .guides .window .rulerEl (inset), .tagEl.
+ *   mo: {i (default the smallest item), shape = 'circle' | 'inset',
+ *        round: x, y (lens centre; default up-right of the bar), r = 120, ring = h/2 + 8, zoom (default: the
+ *               bar spans half the lens), at (value on the bar to centre on);
+ *        inset: x, y, w = 1000, h = 170 (panel), window = [v0, v1] (values from the scale's left end; default
+ *               [0, 10 × the item]), pad = 28, barH = 60, ruler ('1 ms': a dimension line spanning the window);
+ *        both: tag (default '× zoom'; false for none), content(g, M) to draw your own picture instead of the
+ *               enlarged bars (e.g. the chip's working areas)}
+ * Tiles  sc.tile({i = 1, into = 0, n, d = 3.5, ease = 'power2.in', counter: {x, y, size = 48, tone, anchor,
+ *   fmt, prefix, suffix}}) → timeline (.group .counter): n copies of bar i stamp end to end along bar `into`
+ *   from its left end, accelerating, with faint seams between them; inline, they start right after the
+ *   original (n counts it). The counter runs 1 → n in step. Fade them later with fx.out(sc.tiles).
  * Example:
  *   const sc = libScaleCompare(S, { y: 380, items: [
  *     { value: 140, label: 'the model', text: '140 GB', tone: 'bytes' },
  *     { value: 0.12, label: 'on the chip', text: '0.12 GB', tone: 'compute' }] });
- *   S.add(sc.in(), 'b1');
- *   const lens = sc.magnify({ x: 1300, y: 760 });  S.add(lens.open(), 'b2~tiny');
+ *   S.add(sc.in(), 'b1~gigabytes');
+ *   const lens = sc.magnify({ x: 1300, y: 760 }); S.add(lens.open(), 'b2~tenth');
  */
 function libScaleCompare(S, o = {}, parent) {
   const C = _libChart;
@@ -1212,45 +1238,50 @@ function libScaleCompare(S, o = {}, parent) {
  * libGrowthCurve — curves on axes that rescale live. By default the film's two shapes of growth:
  * Linear (teal, flat work per token) and Quadratic (amber, each token costs more), drawn schematic so
  * they meet at x = cross (10): at 10 tokens "about equal", at 10,000 the quadratic is 1,000× worse.
- * Any f(x) works (exponential lines on a log axis, falling curves, a step), so one chart serves
- * "two ways to grow", "compute ×80 vs bandwidth ×17" and "how fast a cache cools".
- * Ticks are live: when the domain changes, tick labels slide with it and fade in/out so they never
- * crowd, and curves, labels, marks and gap arrows all follow.
+ * Any f(x) works, so one chart serves "two ways to grow" (ch13_s03), "compute ×80 vs bandwidth ×17" on a
+ * log axis (ch06_s11) and "how fast a cache cools" (ch16_s07). Ticks are live: when the domain changes,
+ * tick labels slide with it and fade in/out so they never crowd; curves, labels, marks and gaps follow.
  *
  * o: {x = 1000, y = 260, w = 720, h = 500       the plot box (axes along its left and bottom edges),
- *     xmin = 0 (1 when xlog), xmax = 10, ymin = 0 (1 when ylog), ymax = 'auto' (8% above the highest curve)
- *     xlog = false, ylog = false,
- *     cross = 10                 default series meet here: linear n, quadratic n² / cross,
+ *     xmin = 0 (1 when xlog), xmax = 10, ymin = 0 (1 when ylog), ymax = 'auto' (8% above the highest curve;
+ *     ×1.6 on a log axis), xlog = false, ylog = false,
+ *     cross = 10                 the default curves meet here: linear n, quadratic n² / cross,
  *     series = [{id: 'linear', f: n => n, tone: 'helps', label: 'Linear'},
  *               {id: 'quadratic', f: n => n * n / cross, tone: 'compute', label: 'Quadratic'}]
- *                                each {id, f, tone, label, sw = 5, dash, from = xmin, to = Infinity (end of
- *                                the curve; past it .extend draws a dashed continuation), auto = true (counts
- *                                for ymax 'auto'), labelSize = 30},
- *     xticks, yticks = 'auto'    live nice ticks; or [v | {v, label}] fixed; or false,
- *     xfmt = num, yfmt = compact ('2,500', '250k', '2.5M'), tickSize = 24, minPx = [110, 54] (label spacing),
- *     xlabel = '', ylabel = '', title = '' (above the plot, left), tag = '' (above the plot, right: 'schematic'),
- *     grid = true (faint lines at y ticks),
+ *                                each {id, f, tone, label, sw = 5, dash, from = xmin, to = ∞ (where the solid
+ *                                curve ends; .extend continues it dashed), auto = true (counts for 'auto' ymax),
+ *                                labelSize = 30, labelPos = 'end' (right of the tip) | 'above' (above-left of
+ *                                it) | 'below' (below-right)},
+ *     xticks, yticks = 'auto'    live nice ticks; or fixed [v | {v, label}] (all-year ticks print as '2012'); or false,
+ *     xfmt = num ('2,500'), yfmt = compact ('2,500', '250k', '2.5M'), tickSize = 24, minPx = [110, 54],
+ *     xlabel = '', ylabel = '' (rotated; ylabelGap = 126), title = '' (above the plot, left), tag = '' (above
+ *     the plot, right: 'schematic'), grid = true (faint lines at y ticks), overTop = -40,
  *     strip = false | {h = 76, label = ''}   a band under the x axis for per-step bars (.steps)}
- * Returns <g> with .axes .title .tagEl .xlabelEl .ylabelEl .curves{id: <path>} .labels{id: <g> (.text)}
- *   .series{id}, and .X(v) .Y(v) (at the current domain), .x .y .w .h
+ * Returns <g> with .axes .title .tagEl .xlabelEl .ylabelEl .stripLabel, .curves{id: <path>}, .labels{id: <g>
+ *   (.text: the label <text>, swap it with fx.swap)}, .series{id}, and .X(v) .Y(v) (at the current domain)
+ *   .x .y .w .h
  * Helpers (return tweens/timelines; call in time order):
- *   .drawAxes({d = 0.8})          axes draw on, ticks/titles fade in
- *   .draw(id, {d = 1.4, to, ease}) draw a curve on from where it stands to x = to (default its end); its
- *                                 label rides at the tip; until it plays the curve is hidden
+ *   .drawAxes({d = 0.8})          axes draw on; ticks, strip, titles fade in
+ *   .draw(id, {d = 1.4, to, ease}) draw a curve on to x = to (default: its end, after which it stays whole
+ *                                 through later rescales); its label rides the tip; hidden until it plays
  *   .rescale({xmax, ymax = 'auto', xmin, ymin, d = 1.6})   the axes stretch (geometrically for big ratios)
- *   .extend(id, x2, {d = 1})      a dashed continuation past the series' end to x = x2
- *   .overshoot(id, {d = 1.2, top = -30})   the curve runs on, off the top of the frame
- *   .mark(x, {ids, label, tone = 'ink', guide = true, size = 26}) → <g> (.in() .out()): dots where the
- *                                 curves cross x, a dashed guide, a label above ('about equal')
- *   .gap(x, idA, idB, {label, sub, side = 'right', tone = 'ink'}) → <g> (.in() .out()): a double-headed
- *                                 arrow between two curves at x, labelled ('80 ÷ 17 ≈ 4.7×')
- *   .tag(id, text, {tone, size = 26}) → <text> (.in() .out()): a line under the series label ('× 1,000')
+ *   .extend(id, x2, {d = 1})      a dashed continuation past the series' `to`, to x = x2
+ *   .overshoot(id, {d = 1.2})     the box stops clipping the curve: it runs on, off the top of the frame
+ *                                 (its label moves above-left of the box's last point)
+ * Annotations (each → element with .in() .out(); visible as built; they follow the domain):
+ *   .mark(x, {ids = all, label, side = 'left'|'right'|'above', tone = 'ink', guide = true, size = 26})
+ *                                 dots where the curves cross x, a dashed guide up from the axis, a label
+ *                                 beside the top dot ('about equal'; 'left' is clear of rising curves)
+ *   .gap(x, idA, idB, {label, sub, side = 'right', dx, dy, tone = 'ink', size = 28})   a double-headed
+ *                                 arrow between two curves at x ('80 ÷ 17 ≈ 4.7×')
+ *   .tag(id, text, {tone, size = 26, mono = true})   a line under the series label ('× 1,000')
  *   .steps(id, {n = 10}) → <g>    per-step bars f(k) − f(k−1) in the strip, growing as the curve is drawn
+ *                                 (and fading as a rescale squeezes them)
  * Example:
- *   const gc = libGrowthCurve(S, { title: 'Two ways to grow', tag: 'schematic', xlabel: 'tokens', ylabel: 'total work' });
+ *   const gc = libGrowthCurve(S, { title: 'Two ways to grow', tag: 'schematic', xmax: 12, xlabel: 'tokens' });
  *   S.add(gc.drawAxes(), 'b4'); S.add(gc.draw('linear'), 'b4~Linear'); S.add(gc.draw('quadratic'), 'b4~Quadratic');
  *   const eq = gc.mark(10, { label: 'about equal' }); S.add(eq.in(), 'b4~ten tokens');
- *   S.add(eq.out(), 'b4~ten thousand-0.3'); S.add(gc.rescale({ xmax: 10000 }), 'b4~ten thousand');
+ *   S.add(eq.out(), 'b4~ten thousand-0.4'); S.add(gc.rescale({ xmax: 10000 }), 'b4~ten thousand');
  */
 function libGrowthCurve(S, o = {}, parent) {
   const C = _libChart, { L10 } = C;
@@ -1426,7 +1457,11 @@ function libGrowthCurve(S, o = {}, parent) {
       const frac = visEnd > a ? (Math.min(st.reveal[s.id], visEnd) - a) / (visEnd - a) : 1;
       const op = C.smooth((frac - 0.12) / 0.2);
       let lx = null, ly = null, anchor = 'start';
-      const pos = ov > 0 ? 'above' : (s.labelPos || 'end');
+      let pos = ov > 0 ? 'above' : (s.labelPos || 'end');
+      if (pos === 'end' && s.labelText && tr.tip) {      // no room on the right of the frame: hang it above-left
+        const lw = S.measure(s.labelText.textContent, { size: s.labelSize, weight: 650 });
+        if (Math.min(tr.tip[0], x0 + w) + 16 + lw > 1824) pos = 'above';
+      }
       const exitIn = tr.exit != null && X(tr.exit) <= x0 + w + 0.5;
       // the point the label hangs on: where the curve leaves the box's top, else its last point inside the box
       let tip = null;
