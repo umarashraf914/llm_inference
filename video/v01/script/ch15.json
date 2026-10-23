@@ -18,27 +18,27 @@
       "figs": [
         33
       ],
-      "visual": "1920×1080, dark background, one continuous shot. Layout (y in px): top band y 40–90, header 'The same cache, two different jobs'. Two job cards, upper-left (x 120–860) and upper-right (x 1060–1800), both at y 130–330, empty until their beats. Left edge, y 440–540: a small amber rounded box 'model'. Prompt-bar lane at y 400 (x 360–1800), empty until b2. Cache row at y 470–540 (x 360–1700): a blue-outlined container, labelled beneath at y 560 'KV cache · on the GPU', holding small coral tiles, one per token, each a stacked pair marked K and V. Bottom band y 820–900: a timeline, left to right: 'turn 1' (a short blue 'read prompt in' block, then a long run of small 'answer' ticks), a gap with a clock icon, then 'turn 2'; a white playhead rides it. Colour: tokens and prompt bars blue, cache tiles coral, matched part teal, unmatched part amber. Idea: one cache, two jobs at two moments. Appending happens on every token inside an answer; the search happens once, when a request arrives, and only the search can hit or miss. Readability: when a new label arrives, labels from earlier beats dim to about 40%, so at most five text items are bright at once; each card's three lines count as one item.",
+      "visual": "1920×1080, dark background, one continuous shot. Layout (y in px): title band y 120–170, header 'The same cache, two different jobs'. Two job cards, upper-left (x 120–860) and upper-right (x 1060–1800), both at y 190–360, empty until their beats. Prompt-bar lane centred on y 440 (bar y 420–460, x 360–1800), empty until b2. Cache row at y 500–570 (x 360–1700): a blue-outlined container, labelled beneath at y 600 'KV cache · on the GPU', holding small coral tiles, one per token, each a stacked pair marked K and V. Left edge, x 110–300, y 490–580: a small amber rounded box 'model'. Bottom band y 820–900: a timeline, left to right: 'turn 1' (a short blue 'read prompt in' block, then a long run of small 'answer' ticks), a gap with a clock icon, then 'turn 2'; a white playhead rides it. Colour: tokens and prompt bars blue, cache tiles coral, matched part teal, unmatched part amber. Idea: one cache, two jobs at two moments. Appending happens on every token inside an answer; the search happens once, when a request arrives, and only the search can hit or miss. Readability: when a new label arrives, labels from earlier beats dim to about 40%, so at most five text items are bright at once; each card's three lines count as one item. All text stays inside x 96–1824, y 110–1000.",
       "beats": [
         {
           "id": "b1",
-          "say": "The K V cache has two jobs. While an answer is written, it only grows: each new token appends its keys and values, and nothing is looked up.",
-          "show": "Header writes on with 'two jobs'. The cache row starts with twelve coral tiles. On 'an answer is written', the playhead runs through turn 1's answer ticks. On 'appends', at each tick a blue token pill pops out of the model box and a coral tile slides onto the right-hand end of the row, which lengthens to twenty tiles. On 'nothing is looked up', the upper-left card draws: 'During a turn' / 'it grows.' / 'One new entry per token, no lookup.'"
+          "say": "The K V cache has two jobs. During an answer, it grows: each new token appends its keys and values, and nothing is searched for.",
+          "show": "Header writes on with 'two jobs'. The cache row starts with twelve coral tiles. On 'During an answer', the playhead runs through turn 1's answer ticks. On 'appends', at each tick a blue token pill pops out of the model box and a coral tile slides onto the right-hand end of the row, which lengthens to twenty tiles. On 'nothing is searched for', the upper-left card draws: 'During a turn' / 'it grows.' / 'One new entry per token, no lookup.'"
         },
         {
           "id": "b2",
-          "say": "When your next message arrives, the cache is searched, once. Do I already hold keys and values for the beginning of this prompt?",
-          "show": "On 'next message arrives', the clock in the timeline gap spins once and the playhead jumps to the start of turn 2. At the same moment a long blue bar, 'turn 2: whole conversation + new words', flies in from the left and parks in the y 400 lane, left-aligned with the cache row; its right end sticks out a short way past the last tile. On 'searched, once', one teal tick lights at the start of turn 2 on the timeline, label 'lookup, once', and the upper-right card draws: 'At the start of a turn' / 'it is searched.' / 'Either the prompt matches, or it does not.' On 'the beginning of this prompt', a magnifier icon sets off from the left end of the bar, sweeping slowly along it and the row beneath."
+          "say": "When your next message arrives, the cache is searched, once. The server asks: do I already hold keys and values for the beginning of this prompt?",
+          "show": "On 'next message arrives', the clock in the timeline gap spins once and the playhead jumps to the start of turn 2; with it, a long blue bar, 'turn 2: whole conversation + new words', flies in from the left and parks in the y 440 lane, left-aligned with the cache row; its right end sticks out a short way past the last tile. On 'searched, once', one teal tick lights at the start of turn 2 on the timeline, label 'search, once'. On 'The server asks', the upper-right card draws: 'At the start of a turn' / 'it is searched.' / 'Either the prompt matches, or it does not.' On 'do I already hold', a small speech-bubble icon holding only a '?' pops just above the model box, left of the bar lane. On 'the beginning of this prompt', a magnifier icon sets off from the left end of the bar, sweeping slowly along it and the row beneath."
         },
         {
           "id": "b3",
-          "say": "Where it does, those tokens skip prefill: a cache hit, what people call a warm cache. This reuse is called prompt caching.",
-          "show": "The magnifier reaches the last cache tile and stops. On 'skip prefill', the part of the prompt bar above the cache turns teal, label 'hit: skip prefill', and the tiles beneath glow teal. On 'warm cache', the word 'warm' appears in teal at the right end of the container. On 'prompt caching', a small grey tag appears under the container label: 'prompt caching: reuse across requests'."
+          "say": "Where it does, those tokens skip prefill: a cache hit, what people call a warm cache. This reuse is prompt caching.",
+          "show": "The magnifier reaches the last cache tile and stops; the speech bubble fades. On 'skip prefill', the part of the prompt bar above the cache turns teal, label 'hit: skip prefill', and the tiles beneath glow teal. On 'warm cache', the word 'warm' appears in teal at the right end of the container. On 'prompt caching', a small grey tag appears under the container label, at y 640: 'prompt caching: reuse across requests'."
         },
         {
           "id": "b4",
           "say": "Where it holds no match, it is a miss, and those tokens are prefilled. Only the search can hit or miss.",
-          "show": "On 'a miss', the short tail of the bar beyond the last tile turns amber, label 'miss: prefill'. On 'Only the search', the bar and the cache row dim to 30%, the two cards slide together to the centre, side by side, and a thin teal ring circles only the right card, with 'only this can hit or miss' beneath it. On 'hit or miss', the turn-1 answer ticks on the timeline flash coral once, tagged 'append only', and the header changes to 'one word, two jobs: keep them apart'."
+          "show": "On 'a miss', the short tail of the bar beyond the last tile turns amber, label 'miss: prefill'. On 'prefilled', as the sentence ends, the bar and the cache row dim to 30% and the two cards slide together to the centre, side by side, still at y 190–360. On 'Only the search', a thin teal ring circles only the right card, with 'only this can hit or miss' in the gap beneath it, above the dimmed bar. On 'hit or miss', the turn-1 answer ticks on the timeline flash coral once, tagged 'append, no search'. Only after the last word, in the beat's closing hold, does the header swap to 'one word, two jobs: keep them apart'."
         }
       ]
     },
@@ -48,7 +48,7 @@
       "figs": [
         34
       ],
-      "visual": "Dark background, one continuous shot. Top band heading: 'The cache holds no text, and no answers'. Left half: a laptop icon at the far left edge (x 60–200, y 420–520); beside it a building outline (x 280–760, y 280–640) labelled 'the service', with a database cylinder inside it tagged 'the service's database'. Right half (x 960–1840, y 260–660): the GPU package illustration, an amber compute die flanked by coral HBM stacks, with a dashed blue outline drawn round the HBM stacks only, labelled 'cache'. Label cards at y 720: left 'the words: kept in a database' (blue), right 'the keys and values: kept on the GPU' (coral). In b3 both halves shrink to icons in the top corners to make room for a size comparison drawn to scale by area; in b4 they return. Colour: text blue, keys and values coral, prefill amber, the saving teal. Idea: text and keys-and-values are different objects, kept in different places, at wildly different cost; the cache exists for the expensive one. The sizes are a callback to the KV-cache chapter, so they appear quickly and without a build-up.",
+      "visual": "Dark background, one continuous shot. Title band (y 120–170) heading: 'The cache holds no text, and no answers'. Left half: a laptop icon at the far left edge (x 100–220, y 420–520); beside it a building outline (x 280–760, y 280–640) labelled 'the service', with a database cylinder inside it tagged 'the service's database'. Right half (x 960–1820, y 260–660): the GPU package illustration, an amber compute die flanked by coral HBM stacks, with a dashed blue outline drawn round the HBM stacks only, labelled 'cache'. Label cards at y 720: left 'the words: kept in a database' (blue), right 'the keys and values: kept on the GPU' (coral). In b3 both halves shrink to unlabelled icons in the top corners to make room for a size comparison drawn to scale by area, on a common baseline at y 960; in b4 they return. Colour: text blue, keys and values coral, prefill amber, the saving teal. Idea: text and keys-and-values are different objects, kept in different places, at wildly different cost; the cache exists for the expensive one. Both sizes are callbacks, so they appear quickly and without a build-up: the weather chat's four kilobytes came in the streaming chapter, and about a third of a gigabyte for a thousand tokens in the KV-cache chapter.",
       "beats": [
         {
           "id": "b1",
@@ -62,8 +62,8 @@
         },
         {
           "id": "b3",
-          "say": "You saw the sizes earlier: four kilobytes of text, a third of a gigabyte of keys and values. Making them is exactly what prefill does.",
-          "show": "Building and GPU shrink to icons, top-left and top-right; label cards and pill rows fade. Lower centre, on a common baseline at y 1000: on 'four kilobytes', a tiny blue square, 2 px a side, with a pointer arrow and the label 'text: ≈ 4 KB'. On 'a third of a gigabyte', a coral square grows from the same baseline to 581 px a side, label 'keys and values: ≈ 1/3 GB'; between the two, '> 80,000 ×'; small grey note 'to scale by area'. On 'exactly what prefill does', an amber arrow labelled 'prefill' draws from the blue square to the coral one, and an amber counter beside it runs to '≈ 140 billion operations per token'."
+          "say": "Take the weather chat: four kilobytes of text, but a third of a gigabyte of keys and values, over eighty thousand times more. Making them is exactly what prefill does.",
+          "show": "Building and GPU shrink to icons, top-left and top-right; label cards and pill rows fade, and the heading dims to 30%. On 'the weather chat', a small grey tag draws at upper left (x 300–800, y 400–470), two lines: 'weather chat, 1,032 tokens' / 'to scale by area'. Then, on the common baseline at y 960: on 'four kilobytes', a tiny blue square, 2 px a side, at x 760, with a short pointer arrow from the label 'text: ≈ 4 KB' at its left (x 300–700, y 930). On 'a third of a gigabyte', a coral square grows up from the same baseline to 581 px a side (x 1100–1681, y 379–960), label inside its top-left corner 'keys and values: ≈ 1/3 GB'. On 'eighty thousand times', '> 80,000 ×' appears between the two squares (centred x 930, y 760). On 'exactly what prefill does', an amber arrow labelled 'prefill' arcs from the blue square to the left edge of the coral one (top of the arc near y 560), and an amber counter at left (x 300–800, y 600) runs to '≈ 140 billion operations per token'."
         },
         {
           "id": "b4",
@@ -79,12 +79,12 @@
         35,
         36
       ],
-      "visual": "Dark background, one continuous shot. Top band: a heading that changes in b4 and b5. Upper row at y 300: seven blue token pills 't1' to 't7', evenly spaced (x 300–1500). Directly under it, y 380–440, a long coral-outlined tray labelled 'cache' at its left end, one slot under each pill. Lower row at y 620, drawn in b4: the arriving prompt, columns aligned with the upper row. Right margin (x 1600–1840): an amber counter, drawn in b4. Bottom band y 860–940, used only in b3: three small icons in a row. Colour: pills blue, kept tiles coral with a padlock, valid teal, invalid grey with a crack, tokens to recompute outlined amber, later tokens grey. Idea: attention only looks back, so a token's keys and values are fixed once made, which makes keeping them safe; the same fact says a kept tile is valid only while its own token and everything before it are unchanged, so one early change spoils every later tile. Readability: only the current beat's labels are bright; earlier ones dim to 40%.",
+      "visual": "Dark background, one continuous shot. Title band (y 120–200): a heading set on two lines, which changes in b4 and b5. Upper row at y 300: seven blue token pills 't1' to 't7', evenly spaced (x 300–1500). Directly under it, y 380–440, a long coral-outlined tray labelled 'cache' at its left end, one slot under each pill. Lower row at y 620, drawn in b4: the arriving prompt, columns aligned with the upper row. Right margin (x 1600–1820): an amber counter, drawn in b4. Bottom band y 860–940, used only in b3: three small icons in a row. Colour: pills blue, kept tiles coral with a padlock, valid teal, invalid grey with a crack, tokens to recompute outlined amber, later tokens grey. Idea: attention only looks back, so a token's keys and values are fixed once made, which makes keeping them safe; the same fact says a kept tile is valid only while its own token and everything before it are unchanged, so one early change spoils every later tile. Readability: only the current beat's labels are bright; earlier ones dim to 40%.",
       "beats": [
         {
           "id": "b1",
-          "say": "You have heard keys and values are settled once made. Token five's keys and values come from tokens one to four, and itself. Attention is causal, so nothing later can reach back.",
-          "show": "Heading draws: 'A token's keys and values depend only on what came before it'. The seven pills draw left to right and the empty tray draws under them. On 'Token five's keys and values', t5 lifts slightly and brightens. On 'tokens one to four, and itself', arcs curve from t1, t2, t3 and t4 into t5, a small loop arc sits on t5 itself, and a bracket draws under the tray from t1 to t5, label 'token 5: from these five'; t6 and t7 dim grey. On 'nothing later', a thin wall rises just right of t5 with a left-pointing one-way arrow on top; arcs from t6 and t7 reach towards t5, hit the wall and fade."
+          "say": "Earlier you saw keys and values are settled once made. Here is why. Token five's keys and values come from tokens one to four, and itself. Attention is causal, so nothing later can reach back.",
+          "show": "On 'Earlier you saw', the seven pills draw left to right and the empty tray draws under them. On 'Here is why', the heading draws on two lines: 'A token's keys and values' / 'depend only on what came before it'. On 'Token five's keys and values', t5 lifts slightly and brightens. On 'tokens one to four, and itself', arcs curve from t1, t2, t3 and t4 into t5, a small loop arc sits on t5 itself, and a bracket draws under the tray from t1 to t5, label 'token 5: from these five'; t6 and t7 dim grey. On 'nothing later', a thin wall rises just right of t5 with a left-pointing one-way arrow on top; arcs from t6 and t7 reach towards t5, hit the wall and fade."
         },
         {
           "id": "b2",
@@ -93,18 +93,18 @@
         },
         {
           "id": "b3",
-          "say": "And a kept value stays valid while its token, and every token before it, is unchanged. Causality's third job: after one-at-a-time decode and the halved score grid, it makes caching safe.",
-          "show": "Wall and arcs fade. On 'every token before it', the b1 bracket under t1 to t5 turns teal, a small '=' flashes under each of those five pills, and the bracket label becomes 'valid while these are unchanged'. On 'third job', the bottom band fills, one icon per phrase: on 'one-at-a-time decode', a single-file arrow 'decode: one at a time'; on 'halved score grid', a small grid with its lower-left triangle shaded, 'scores: a triangle'; on 'makes caching safe', a padlocked tile outlined in teal, 'caching: safe'."
+          "say": "A kept value stays valid while its token, and every one before it, is unchanged. Causality again, on a third job: it made decode one at a time, halved the score grid, and here makes caching safe.",
+          "show": "Wall and arcs fade. On 'every one before it', the b1 bracket under t1 to t5 turns teal, a small '=' flashes under each of those five pills, and the bracket label becomes 'valid while these are unchanged'. On 'third job', the bottom band fills, one icon per phrase: on 'one at a time', a single-file arrow 'decode: one at a time'; on 'halved the score grid', a small grid with its lower-left triangle shaded, 'scores: a triangle'; on 'makes caching safe', a padlocked tile outlined in teal, 'caching: safe'."
         },
         {
           "id": "b4",
-          "say": "Change token two. Token three is unchanged, but its keys and values were made in a context holding the old token two. They are now wrong, as are those of four to seven.",
-          "show": "Bottom icons and the bracket fade. The heading changes to 'Change one token early, everything after is wrong', and the upper row gains the label 'cached' at its left. On 'Change token two', the lower row draws, label 'arriving': 't1', 'XX', 't3' to 't7'; 'XX' flashes and a vertical white line drops between columns 1 and 2, label 'differs here'. At once the cached t1 tile turns teal with a tick, the cached t2 tile swaps from coral to grey with a small tag 'old t2', and the amber counter appears: 'recompute: 1'. On 'Token three is unchanged', both t3 pills brighten with '=' between them. On 'holding the old token two', one thread draws from the cached t3 tile back to the cached t2 pill, and a stripe in t2's shade shows inside the t3 tile. On 'now wrong', the t3 tile cracks and turns grey with a dashed outline; counter 'recompute: 2'. On 'four to seven', the t4, t5, t6 and t7 tiles crack one after another, each lighting only its own thread back to t2 while the previous thread fades; the counter ticks 3, 4, 5, 6 and ends 'recompute: 6 of 7'."
+          "say": "Now a prompt arrives with token two changed. Token three is unchanged, but its keys and values were made in a context holding the old token two. They are now wrong, as are those of four to seven.",
+          "show": "Bottom icons and the bracket fade. The heading changes to 'Change one token early,' / 'everything after is wrong', and the upper row gains the label 'cached' at its left. On 'a prompt arrives', the lower row draws left to right, label 'arriving': 't1', 'XX', 't3' to 't7'. On 'token two changed', 'XX' flashes and a vertical white line drops between columns 1 and 2, label 'differs here'; the cached t1 tile, left of the line, gains a small teal tick. As that sentence ends, the cached t2 tile swaps from coral to grey with a small tag 'old t2', and the amber counter appears: 'recompute: 1'. On 'Token three is unchanged', both t3 pills brighten with '=' between them. On 'holding the old token two', one thread draws from the cached t3 tile back to the cached t2 pill, and a stripe in t2's shade shows inside the t3 tile. On 'They are now wrong', the t3 tile cracks and turns grey with a dashed outline, counter 'recompute: 2', and the cracks run straight on through the t4, t5, t6 and t7 tiles, about 0.35 s apart, each lighting only its own thread back to t2 while the previous thread fades; the counter ticks 3, 4, 5, 6 and reaches 'recompute: 6 of 7' before the beat's last word. Hold the cracked row for 1 s before b5."
         },
         {
           "id": "b5",
           "say": "The match cannot skip a difference and resume. Everything from the first mismatch is recomputed, identical or not. A prefix rule, not a search for pieces. Not a design choice: it follows from what keys and values are.",
-          "show": "On 'skip a difference', a dotted teal arrow tries to hop from column 1 over the white line to column 3, label 'skip and resume?', and is crossed out in grey. On 'identical or not', arriving pills t2 to t7 take amber outlines, label 'prefill again', and a small grey footnote appears bottom right: 'layer 1 alone would survive: 1.25% of the work'. On 'A prefix rule', the heading becomes 'a prefix rule, not a search for pieces', and the columns settle into two blocks: column 1 a short teal block, columns 2 to 7 a longer amber block. On 'Not a design choice', a grey line appears under the heading: 'why the rule is unforgiving'."
+          "show": "On 'skip a difference', a dotted teal arrow tries to hop from column 1 over the white line to column 3, label 'skip and resume?', and is crossed out in grey. On 'identical or not', arriving pills t2 to t7 take amber outlines, label 'prefill again', and a small grey footnote appears bottom right (inside y 1000): 'layer 1 alone would survive: 1.25% of the work'. On 'A prefix rule', the heading becomes 'a prefix rule,' / 'not a search for pieces', and the columns settle into two blocks: column 1 a short teal block, columns 2 to 7 a longer amber block. On 'Not a design choice', a grey line appears under the heading: 'why the rule is unforgiving'."
         }
       ]
     },
@@ -114,17 +114,17 @@
       "figs": [
         44
       ],
-      "visual": "Dark background, one continuous shot. Top band heading: 'The prompt that arrives, and what the server holds'. Two long horizontal bars, left-aligned at x 260 and ending at x 1700: 'arriving' at y 420 (label at its left), four blue segments in different shades, 'system', 'tools', a long 'history', and a short 'new' at the right end; 'cached' at y 520, the same three segments filled with a faint coral K/V texture, then an empty dashed slot under 'new'. A white vertical line marks the first difference. Counters sit in a row at y 640; a large result figure at the right (x 1500–1840, y 620–720). Colour: segments blue, matched teal, prefilled amber, provenance tags grey. Readability rule: when the counters arrive (b2) the heading and segment labels dim to about 30%; when the provenance tags arrive (b3) the counters dim too, except '99.5%'. No skip-and-resume arrow here: that point was made in the previous scene. Idea: a real cache hit is the prefix rule applied to a whole request, and a follow-up is almost entirely hit, mostly on text you never wrote.",
+      "visual": "Dark background, one continuous shot. Title band (y 120–200) heading on two lines: 'The prompt that arrives,' / 'and what the server holds'. Two long horizontal bars, left-aligned at x 260 and ending at x 1700 (1,440 px): 'arriving' at y 420 (label at its left), four blue segments in different shades, 'system', 'tools', a long 'history', and a short 'new' at the right end; 'cached' at y 520, the same three segments filled with a faint coral K/V texture, then an empty dashed slot under 'new'. The bars are schematic, not to scale: 'new' is drawn about a tenth of the bar so it can carry its label and counter, where 5 of 1,032 tokens would be about 7 px; a small grey note says so on screen in b2. A white vertical line marks the first difference. Counters sit in a row at y 640; a large result figure at the right (x 1480–1820, y 620–720). Colour: segments blue, matched teal, prefilled amber, provenance tags grey. Readability rule: when the counters arrive (b2) the heading, segment labels and b1's result labels dim to about 30%; when the provenance tags arrive (b3) the counters dim too, except '99.5%'. No skip-and-resume arrow here: that point was made in the previous scene. Idea: a real cache hit is the prefix rule applied to a whole request, and a follow-up is almost entirely hit, mostly on text you never wrote.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now a real request: system prompt, tools, history, your new message. Below, what the server holds. The match runs from the front, and stops at the first token that differs.",
+          "say": "Now a real request: system prompt, tools, history, your new message. Below, what the server holds. The match runs from the front, and stops at the first difference.",
           "show": "Heading draws. The arriving bar builds one segment per spoken name: 'system', 'tools', 'history', 'new'. On 'what the server holds', the cached bar draws, with the dashed slot under 'new'. On 'from the front', a teal sweep runs left to right along both bars, with a small tick at each segment boundary. On 'stops', it halts at the start of 'new' and the white line drops there, label 'the first difference'. Everything left of the line fills teal, label 'hit: reused'; 'new' fills amber, label 'prefill'."
         },
         {
           "id": "b2",
           "say": "In the weather conversation's follow-up, one thousand and twenty-seven of one thousand and thirty-two tokens match. Only your five new ones are prefilled: a hit rate of ninety-nine point five percent.",
-          "show": "Heading and segment labels dim to 30%. On 'weather conversation's follow-up', a small grey tag at the left end: 'weather chat, a minute later'. On 'one thousand and twenty-seven', a teal counter runs 0 → 1,027 under the teal part, label 'matched'; on 'one thousand and thirty-two', a grey counter at the left reads 'arriving: 1,032'. On 'five new ones', an amber counter under 'new': 'prefill: 5'. On 'ninety-nine point five', the large teal figure '99.5%' appears at right, with '1,027 ÷ 1,032' small beneath it."
+          "show": "Heading, segment labels and b1's 'hit: reused', 'prefill' and 'the first difference' labels dim to 30%. On 'weather conversation's follow-up', a small grey tag at the left end: 'weather chat, a minute later'. On 'one thousand and twenty-seven', a teal counter runs 0 → 1,027 under the teal part, label 'matched'; on 'one thousand and thirty-two', a grey counter at the left reads 'arriving: 1,032'. On 'five new ones', an amber counter under 'new': 'prefill: 5'; on 'prefilled', a small grey note under the right end of the bars: 'bars schematic, not to scale'. On 'ninety-nine point five', the large teal figure '99.5%' appears at right with 'hit rate = 1,027 ÷ 1,032' small beneath it, both at the same moment, so the share that matched is what the number visibly means."
         },
         {
           "id": "b3",
@@ -133,8 +133,8 @@
         },
         {
           "id": "b4",
-          "say": "That front-to-back rule explains every case to come: warm while your beginning is still held, cold once it is not.",
-          "show": "Tags fade. On 'front-to-back rule', the teal sweep replays once, quickly, from the left to the white line and stops; caption under the bars: 'front to back, stop at the first difference'. On 'warm', a small teal chip appears under the caption, left: 'warm: beginning still held'. On 'cold', a grey chip beside it: 'cold: not held'."
+          "say": "That front-to-back rule explains every warm and cold case to come.",
+          "show": "Tags and the schematic note fade. On 'front-to-back rule', the teal sweep replays once, quickly, from the left to the white line and stops; caption under the bars: 'front to back, stop at the first difference'. On 'warm', a small teal chip appears under the caption, left: 'warm: beginning still held'. On 'cold', a grey chip beside it: 'cold: beginning not held'."
         }
       ]
     },
@@ -144,17 +144,17 @@
       "figs": [
         45
       ],
-      "visual": "Dark background, one continuous shot. Two rows of seven word pills, columns aligned, centre: 'cached' at y 380 with 'What', 'is', 'the', 'capital', 'of', 'France', '?'; 'arriving' at y 520 with 'Tell', 'me', 'the', 'capital', 'of', 'France', 'please'. Small position numbers 1 to 7 above the columns at y 300. A wide result box below the rows at y 660. The top band stays empty until b3, when the heading 'Four words in common, and not one of them helps' draws, so it does not give the answer away. Colour: pills blue, shared-word links blue, the result white, tokens to prefill amber, the true condition teal. Idea: shared words, even in the same places, are worth nothing; only an identical beginning counts.",
+      "visual": "Dark background, one continuous shot. Two rows of seven word pills, columns aligned, centre: 'cached' at y 400 with 'What', 'is', 'the', 'capital', 'of', 'France', '?'; 'arriving' at y 540 with 'Tell', 'me', 'the', 'capital', 'of', 'France', 'please'. Small position numbers 1 to 7 above the columns at y 330. A small grey note under the rows at right, y 610: 'here, one word = one token'. A wide result box below at y 690. The title band stays empty until b3, when the heading draws on two lines (y 120–200): 'Four words in common,' / 'and not one of them helps', so it does not give the answer away; two short lines go under it at y 230 and 270. Colour: pills blue, shared-word links blue, the result white, tokens to prefill amber, the true condition teal. Idea: shared words, even in the same places, are worth nothing; only an identical beginning counts.",
       "beats": [
         {
           "id": "b1",
-          "say": "The server holds the question \"What is the capital of France?\". The new prompt says \"Tell me the capital of France please\".",
-          "show": "On 'the server holds', the top row's pills appear one per word as the cached question is spoken, label 'cached'. On 'the new prompt says', the bottom row's pills appear one per word, label 'arriving'. The position numbers 1 to 7 fade in above the columns."
+          "say": "The server holds the question, What is the capital of France? The new prompt says, Tell me the capital of France please.",
+          "show": "On 'The server holds', the top row's pills appear one per word as the cached question is spoken, label 'cached'. On 'The new prompt says', the bottom row's pills appear one per word, label 'arriving'. The position numbers 1 to 7 fade in above the columns, and the grey note 'here, one word = one token' fades in under the rows."
         },
         {
           "id": "b2",
-          "say": "Four words are shared, the, capital, of, France, even in the same positions. But compare from the front: What against Tell. The match never begins.",
-          "show": "On each shared word as spoken, the matching pills in both rows glow and a short vertical link draws between them; counter at right: 'words in common: 4'. On 'same positions', the numbers 3, 4, 5, 6 brighten. On 'compare from the front', a small caret moves to column 1; on 'What against Tell', both pills flash with '≠' between them. On 'never begins', a white line drops at the left edge of column 1 and the result box fills: 'tokens matched from the front: 0'."
+          "say": "Four words are shared: capital, of, France, and the little word the, even in the same positions. But compare from the front: What against Tell. The match never begins.",
+          "show": "In spoken order: on 'capital', then 'of', then 'France', the matching pills in columns 4, 5 and 6 glow in both rows and a short vertical link draws between each pair; on 'little word the', the two 'the' pills in column 3 do the same. A counter at right ticks with each link and ends 'words in common: 4'. On 'same positions', the numbers 3, 4, 5, 6 brighten. On 'compare from the front', a small caret moves to column 1; on 'What against Tell', both pills flash with '≠' between them. On 'never begins', a white line drops at the left edge of column 1 and the result box fills: 'tokens matched from the front: 0'."
         },
         {
           "id": "b3",
@@ -163,7 +163,7 @@
         },
         {
           "id": "b4",
-          "say": "If you take one thing from this part, take this. Shared vocabulary counts for nothing. Only a shared beginning counts.",
+          "say": "If you take one thing from this chapter, take this. Shared vocabulary counts for nothing. Only a shared beginning counts.",
           "show": "Rows, heading and lines dim to 30%. Centre, on 'Shared vocabulary', 'shared vocabulary: nothing' in grey; on 'a shared beginning', 'shared beginning: everything' in teal beneath it."
         }
       ]
@@ -174,7 +174,7 @@
       "figs": [
         46
       ],
-      "visual": "Dark background, one continuous shot. Top centre (y 80–200): a wide card with a teal border holding the rule on two lines, 'compare from token 1,' / 'stop at the first difference'. Below it, a workspace (y 280–900) for prompt bars, each a thin row of many tiny blue token cells. In b2 the workspace holds two pairs of bars, each pair a faint 'cached' bar above a bright 'arriving' bar. In b3 they merge and morph into a four-segment assembled-prompt strip with a grey arrow beneath. Colour: hits teal, misses amber, the differing token a white notch. Idea: the rule asks how identical and from where, never how similar, which is why prompts put their stable parts first.",
+      "visual": "Dark background, one continuous shot. Top centre (y 120–240): a wide card with a teal border holding the rule on two lines, 'compare from token 1,' / 'stop at the first difference'. Below it, a workspace (y 290–900) for prompt bars, each a thin row of many tiny blue token cells. In b2 the workspace holds two pairs of bars, each pair a faint 'cached' bar above a bright 'arriving' bar, explained by one legend rather than per-bar labels. In b3 they merge and morph into a four-segment assembled-prompt strip with a grey arrow beneath. Colour: hits teal, misses amber, the differing token a white notch. Idea: the rule asks how identical and from where, never how similar, which is why prompts put their stable parts first.",
       "beats": [
         {
           "id": "b1",
@@ -184,12 +184,12 @@
         {
           "id": "b2",
           "say": "The useful question is never how similar, but how identical, and from where. Diverge only at the very end, and almost everything hits. Differ in the first word, and nothing does.",
-          "show": "The bar fades. On 'how similar', 'how similar?' appears centre and is struck through; on 'how identical, and from where', 'how identical, and from where?' writes on beneath it in teal. Both lines dim to 40% as two pairs of bars draw, every bar '1,032 tokens', each pair a faint 'cached' bar above a bright 'arriving' bar. On 'the very end', the upper pair's arriving bar gets its notch at the far right end and a teal sweep fills it up to the notch; label 'last token differs: 1,031 hit · 99.9%'. On 'the first word', the lower pair's notch appears at the far left; the sweep stops at once and the whole arriving bar fills amber; label 'first token differs: 0 hit · 1,032 prefilled'. A small grey bracket between the pairs: '1,031 tokens in common, both times'."
+          "show": "The bar fades. On 'how similar', 'how similar?' appears centre and is struck through; on 'how identical, and from where', 'how identical, and from where?' writes on beneath it in teal. Both lines dim to 30% as two pairs of bars draw, each pair a faint bar above a bright one, with no per-bar labels; a single small grey legend at the top right of the workspace explains all four: 'every bar: 1,032 tokens' / 'faint = cached, bright = arriving'. On 'the very end', the upper pair's arriving bar gets its notch at the far right end and a teal sweep fills it up to the notch; label 'last token differs: 1,031 hit · 99.9%'. On 'the first word', the lower pair's notch appears at the far left; the sweep stops at once and the whole arriving bar fills amber; label 'first token differs: 0 hit · 1,032 prefilled'. A small grey bracket between the pairs: '1,031 tokens in common, both times'. Bright text at the end: the rule card, the legend, the two result labels and the bracket."
         },
         {
           "id": "b3",
-          "say": "Order matters as much as content. Remember how a prompt is assembled: most shared text first, then anything specific to you, then the conversation, then your newest message. This rule is why.",
-          "show": "On 'Order matters', the bar pairs merge into one strip. On 'most shared text first', the strip splits into four segments, each labelled on its phrase: 'provider's system prompt', 'specific to you', 'conversation', 'newest message'; a grey arrow beneath reads 'most stable → most variable'. On 'This rule is why', a teal sweep runs across the first three segments and stops at 'newest message', which turns amber."
+          "say": "Order matters as much as content. Remember how a prompt is ordered: most shared first, then yours, the conversation, your newest message. This rule is why.",
+          "show": "On 'Order matters', the bar pairs and legend merge into one strip. On 'most shared first', the strip splits into four segments, each labelled on its phrase: 'provider's system prompt'; on 'then yours', 'specific to you'; on 'the conversation', 'conversation'; on 'your newest message', 'newest message'. A grey arrow beneath reads 'most stable → most variable'. On 'This rule is why', a teal sweep runs across the first three segments and stops at 'newest message', which turns amber."
         },
         {
           "id": "b4",
@@ -216,12 +216,12 @@
       "result": "327680"
     },
     {
-      "claim": "Keys and values for the 1,032-token weather conversation: 1,032 x 327,680 = 338,165,760 bytes = 0.338 GB; said 'a third of a gigabyte' and shown '≈ 1/3 GB', matching ch13_s11 and ch16_s02 (1/3 GB = 0.333 GB). The draft's '338 MB' / 'three hundred and forty megabytes' is dropped.",
-      "python": "print(1032*327680, 1032*327680/1e9, 1/3)",
-      "result": "338165760 0.33816576 0.3333333333333333"
+      "claim": "Keys and values for the 1,032-token weather chat (ch04's 4 KB conversation, now named in s02.b3 and on screen as 'weather chat, 1,032 tokens'): 1,032 x 327,680 = 338,165,760 bytes = 0.338 GB; said 'a third of a gigabyte' and shown '≈ 1/3 GB' (1/3 GB = 0.333 GB; the true value is 1.45% above a third). Consistent with ch13_s10 (1,000 tokens -> 0.33 GB, 'a third of a gigabyte'). The draft's '338 MB' / 'three hundred and forty megabytes' is dropped.",
+      "python": "print(1032*327680, 1032*327680/1e9, 1000*327680/1e9, 1/3, round((1032*327680/1e9)/(1/3)*100-100, 2))",
+      "result": "338165760 0.33816576 0.32768 0.3333333333333333 1.45"
     },
     {
-      "claim": "Keys and values vs text: 338,165,760 / 4,000 bytes = 84,541 times; per token 327,680 / 4 bytes = 81,920 times; shown '> 80,000 ×'",
+      "claim": "Keys and values vs text for the weather chat: 338,165,760 / 4,000 bytes = 84,541 times; per token 327,680 / 4 bytes = 81,920 times; said 'over eighty thousand times more', shown '> 80,000 ×'",
       "python": "print(1032*327680/4000, 327680/4)",
       "result": "84541.44 81920.0"
     },
@@ -264,6 +264,11 @@
       "claim": "Fig 46 thought experiment (on screen): 1,032-token prompts differing in one token; last token differs: 1,031 hit = 99.9%; first token differs: 0 hit, 1,032 prefilled; 1,031 tokens in common both times",
       "python": "print(1031/1032*100, 1032-1031, 1032-1)",
       "result": "99.90310077519379 1 1031"
+    },
+    {
+      "claim": "s04 bars are schematic, not to scale (stated on screen): to scale, 'new' (5 of 1,032 tokens) would be 0.48% of the 1,440 px bar, about 7 px",
+      "python": "print(5/1032*100, 5/1032*1440)",
+      "result": "0.4844961240310077 6.976744186046512"
     }
   ]
 }

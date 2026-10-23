@@ -21,21 +21,21 @@
         28,
         57
       ],
-      "visual": "One continuous shot, no cut. Wide composition for b1 to b4. Left third: a laptop icon labelled 'your device', a small chat window floating above it. Right third: a data-centre outline holding a server-rack icon, labelled 'the server'. Between them, a single horizontal cable runs over a strip of stylised ocean waves. The band above the cable is the Up lane (motion left to right); the band below is the Down lane (motion right to left). Colour: blue for the prompt and the tokens, teal for the held connection, grey for the two ghosted wrong guesses. Text discipline: the parcel's tags and the byte legend leave with the parcel at the end of b2; from b3 on, only the two lane headers, 'open connection' and one lane tag are on screen. For b5 to b7 the camera pushes in, still without a cut, until the laptop's chat window fills the centre-left and the server sits at the right edge on the teal cable, a small circular arrow spinning on it while it generates. Two check-cards stack down the left edge. The answer being written throughout reads 'Sunny tomorrow with light winds and a warm evening.'",
+      "visual": "One continuous shot, no cut. Wide composition for b1 to b4. Left third: a laptop icon labelled 'your device', a small chat window floating above it. Right third: a data-centre outline holding a server-rack icon, labelled 'the server'. Between them, a single horizontal cable runs over a strip of stylised ocean waves. The band above the cable is the Up lane (motion left to right); the band below is the Down lane (motion right to left). Colour: blue for the prompt and the tokens, teal for the held connection, grey for the two ghosted wrong guesses. Text discipline: the parcel's tags and the byte legend leave with the parcel at the end of b2; from b3 on, only the two lane headers, 'open connection' and one lane tag are on screen. For b5 to b7 the camera pushes in, still without a cut, until the laptop's chat window fills the centre-left and the server sits at the right edge on the teal cable, a small circular arrow spinning on it while it generates. Two check-cards stack down the left edge; in b6 they dim to faint so the toggle and timelines are the only bright text, and in b7 they return to full brightness. The answer being written throughout reads 'Sunny tomorrow with light winds and a warm evening.'",
       "beats": [
         {
           "id": "b1",
-          "say": "Press send, and your words cross to a server, maybe an ocean away. Is the text sent again per token? Or the whole answer shipped once finished? Neither.",
-          "show": "Laptop and data centre fade in with their labels. On 'press send', a send-arrow pulses on the chat window. On 'an ocean away', the wave strip and the cable draw on from left to right. On 'sent again', a ghosted grey thumbnail plays top-left, tag 'guess 1: resend per token': a grey parcel goes up, one pill comes back, a slightly longer parcel goes up, three quick cycles. On 'shipped once finished', a second thumbnail beside it, tag 'guess 2: finish, then send': a page fills inside a tiny server, then one block slides down. On 'Neither', both thumbnails take a grey cross and fade."
+          "say": "Press send, and your words cross to a server, maybe an ocean away. The model runs once per token. Is your text re-sent each time, or the answer shipped once finished? Neither.",
+          "show": "Laptop and data centre fade in with their labels. On 'press send', a send-arrow pulses on the chat window. On 'an ocean away', the wave strip and the cable draw on from left to right. On 'once per token', the server's circular arrow ticks round once with a small grey tag 'one run per token'; the tag fades as the first thumbnail appears. On 're-sent', a ghosted grey thumbnail plays top-left, tag 'guess 1: resend per token': a grey parcel goes up, one pill comes back, a slightly longer parcel goes up, three quick cycles. On 'shipped once finished', a second thumbnail beside it, tag 'guess 2: finish, then send': a page fills inside a tiny server, then one block slides down. On 'Neither', both thumbnails take a grey cross and fade."
         },
         {
           "id": "b2",
-          "say": "One request goes up, once, carrying whatever the server does not already store. Here, a short weather chat, smaller than the last example: one thousand and thirty-two tokens.",
-          "show": "Header above the cable: 'Up: once, at the start'. A blue parcel leaves the laptop along the Up lane. On 'does not already store', a small grey tag flashes on the server, 'stored here stays here', and fades. On 'one thousand and thirty-two', a counter on the parcel runs to '1,032 tokens', then a second tag appears under it, '≈ 4 KB', with a small legend under the lane: '1 byte ≈ 1 letter · ≈ 4 per token'. At the end of the beat the parcel is absorbed into the server; its tags and the legend fade with it."
+          "say": "One request goes up, once, carrying the prompt. Here, a new example: a weather chat whose whole prompt is one thousand and thirty-two tokens.",
+          "show": "Header above the cable: 'Up: once, at the start'. On 'carrying the prompt', a blue parcel leaves the laptop along the Up lane, labelled 'the whole prompt'. On 'one thousand and thirty-two', a counter on the parcel runs to '1,032 tokens', then a second tag appears under it, '≈ 4 KB', with a small legend under the lane: '1 byte ≈ 1 letter · ≈ 4 per token'. At the end of the beat the parcel is absorbed into the server; its label, tags and the legend fade with it."
         },
         {
           "id": "b3",
-          "say": "Then the line stays open, and the answer comes down it one token at a time, each in a small frame, as it is made.",
+          "say": "The line stays open, and the answer comes down one token at a time, each in a small frame, as it is made.",
           "show": "On 'stays open', the cable fills teal and gains the label 'open connection'. Header below the cable: 'Down: as each token is made'. On 'one token at a time', small blue pills, each in a thin rectangular frame, leave the server at an even rhythm and slide right to left; each arrival adds one word to the chat window: 'Sunny', 'tomorrow', 'with', 'light'. Tag under the lane: 'one small frame per token'."
         },
         {
@@ -45,18 +45,18 @@
         },
         {
           "id": "b5",
-          "say": "You can check this. Text arrives steadily, not in one lump. And stop works halfway: the server stops, and the rest is never computed.",
-          "show": "The summary labels fade and the camera pushes in on the chat window; the server stays at the right edge, its circular arrow spinning. Words arrive at an even tick while tick marks grow along the window's bottom edge. On 'steadily', card 1 slides in at left: 'Text appears steadily' / 'not all at once'. On 'stop works', a cursor clicks the square stop button mid-sentence: the words stop, the teal cable breaks, the server's arrow halts, and to its right the tokens that would have come turn to dashed outlines with a teal tag 'never computed: work saved'. Card 2 slides in: 'Stopping mid-answer works' / 'the server stops'."
+          "say": "You can check this. Text arrives steadily, not in one lump. And pressing stop halfway works: the rest is never computed.",
+          "show": "The summary labels fade and the camera pushes in on the chat window; the server stays at the right edge, its circular arrow spinning. Words arrive at an even tick while tick marks grow along the window's bottom edge. On 'steadily', card 1 slides in at left: 'Text appears steadily' / 'not all at once'. On 'pressing stop', a cursor clicks the square stop button mid-sentence: the words stop, the teal cable breaks and the server's arrow halts. On 'never computed', the tokens that would have come turn to dashed outlines to its right with a teal tag 'never computed: work saved'. Card 2 slides in: 'Stopping mid-answer works' / 'the server stops'."
         },
         {
           "id": "b6",
-          "say": "A non-streaming mode exists, where a program gets the whole answer at once: same generation, different delivery. Chat windows stream so the first word shows in under a second.",
-          "show": "The cable re-forms. On 'non-streaming', a toggle above the window, 'streaming | non-streaming', flips to 'non-streaming': the server's arrow spins at the same rhythm, but the tokens pile into a box beside it, and at the end the box slides down the cable in one piece. Tag: 'same generation, different delivery'. On 'under a second', the toggle flips back and two short timelines appear under the window: 'streaming: first word < 1 s', a word landing near its left end, and 'non-streaming: first word at the end', one block landing at its far right."
+          "say": "A non-streaming mode, for programs, sends the whole answer at once: same generation, different delivery. Chat windows stream so the first word shows in under a second.",
+          "show": "The cable re-forms and the two check-cards dim to faint. On 'non-streaming', a toggle above the window, 'streaming | non-streaming', flips to 'non-streaming': the server's arrow spins at the same rhythm, but the tokens pile into a box beside it, and at the end the box slides down the cable in one piece. On 'same generation', tag: 'same generation, different delivery'. On 'Chat windows stream', that tag fades and the toggle flips back; on 'under a second', two short timelines appear under the window: 'streaming: first word < 1 s', a word landing near its left end, and 'non-streaming: first word at the end', one block landing at its far right."
         },
         {
           "id": "b7",
           "say": "Neither check would work if the answer were assembled first and sent afterwards. Tokens leave as they are made.",
-          "show": "The toggle and the timelines fade. On 'Neither check', both check-cards pulse and take a teal tick, one after the other. On 'as they are made', a line appears between them: 'tokens leave as they are made'."
+          "show": "The toggle and the timelines fade and the check-cards return to full brightness. On 'Neither check', both cards pulse and take a teal tick, one after the other. On 'as they are made', a line appears between them: 'tokens leave as they are made'."
         }
       ]
     },
@@ -70,8 +70,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Why not ask for each token? Each ask is a round trip, out and back. A token takes thirty milliseconds to make; a round trip across one city, five milliseconds. Seoul to Tokyo, thirty-five.",
-          "show": "Map strip draws on with its pins. On 'round trip', a dot leaves the Seoul pin, arcs to the US west coast pin and back; label 'round trip = there and back'. Bars grow on their spoken numbers: 'Making one token, 30 ms' in blue, and the dashed guide drops from its end; 'Same city, there and back, 5 ms' in grey; 'Seoul to Tokyo, 35 ms' in grey, visibly crossing the guide."
+          "say": "Why not a round trip per token, out and back? Making a token takes thirty milliseconds; a round trip across one city, five. Seoul to Tokyo, thirty-five.",
+          "show": "Map strip draws on with its pins. On 'round trip', a dot leaves the Seoul pin, arcs to the US west coast pin and back; label 'round trip = there and back'. Bars grow on their spoken numbers: on 'thirty milliseconds', 'Making one token, 30 ms' in blue, and the dashed guide drops from its end; on 'five', 'Same city, there and back, 5 ms' in grey; on 'thirty-five', 'Seoul to Tokyo, 35 ms' in grey, visibly crossing the guide."
         },
         {
           "id": "b2",
@@ -80,12 +80,12 @@
         },
         {
           "id": "b3",
-          "say": "Over that route, a five-hundred-token answer streams in fifteen seconds. A round trip per token makes each one a hundred and sixty milliseconds: eighty seconds, sixty-five of them waiting.",
+          "say": "Over that route, a five-hundred-token answer streams in fifteen seconds. A round trip per token makes each a hundred and sixty milliseconds: eighty seconds, sixty-five of them waiting.",
           "show": "The first chart shrinks and slides up; header below: 'A 500-token answer, either way'. On 'streams', bar 1, 'Streamed, one connection': the inset shows its first few 30 ms blue segments, then the bar fills while a counter runs '0 → 500 tokens' and the time reads '15 s'; a small teal cable icon sits at its left end. On 'A round trip per token', bar 2 builds the same way, its inset showing short blue and long grey segments alternating; beside it '30 + 130 = 160 ms', then '× 500 = 80 s'. On 'sixty-five', bar 2's grey gathers into one block '65 s waiting' and its blue into '15 s making'."
         },
         {
           "id": "b4",
-          "say": "Making the token is the quick part; asking for it across an ocean is not. Nearer routes suffer less, but no route is free, so the line is opened once, and held.",
+          "say": "Making the token is the quick part; asking for it across an ocean is not. Nearer routes suffer less, but none is free, so the line is opened once, and held.",
           "show": "Ratio tag between the two bars: '80 / 15 ≈ 5.3 ×'. On 'Nearer routes', two faint ghost bars slide in under bar 2: 'Tokyo: 32.5 s' and 'same city: 17.5 s', both ending past the 15 s mark. On 'opened once', bar 2 and the ghosts grey out under a cross, and the teal cable icon on bar 1 brightens with the label 'opened once, held'."
         }
       ]
@@ -97,17 +97,17 @@
         58,
         59
       ],
-      "visual": "New composition. Two long horizontal lanes share a time axis along the bottom. Top lane 'made', with a small server icon at its left end; bottom lane 'seen', with a laptop-screen icon at its left end. A token is a blue pill; its trip down the open connection is a slanted teal arrow from the top lane to the bottom lane. Every arrow has the same slant and length. The axis starts in milliseconds; in b4 the camera pulls back to show the start of the request, and in b5 the axis rescales to seconds and a ghost third lane appears.",
+      "visual": "New composition. Two long horizontal lanes share a time axis along the bottom. Top lane 'made', with a small server icon at its left end; bottom lane 'seen', with a laptop-screen icon at its left end. A token is a blue pill; its trip down the open connection is a slanted teal arrow from the top lane to the bottom lane. Every arrow has the same slant and length. The axis starts in milliseconds. In b4 the camera pulls back and the axis extends left to show the start of the request; in b5 the axis rescales to seconds and a ghost third lane appears; in b6 the view returns to the millisecond close-up of parallel arrows.",
       "beats": [
         {
           "id": "b1",
-          "say": "Follow one token. The instant it is made, it goes onto the open line, and a single one-way trip later, sixty-five milliseconds, it is on your screen.",
-          "show": "On 'made', a blue pill 'Sunny' pops onto the top lane; tick below it: 't'. On 'onto the open line', with no pause, an arrow draws from it down toward the bottom lane; tag on the arrow 'in flight, not held back'. On 'sixty-five', the pill lands on the bottom lane; tick 't + 65 ms'; small note beside the arrow '130 ÷ 2 = 65 ms, west coast to Seoul'."
+          "say": "Follow one token. The instant it is made, it goes onto the open line. Sixty-five milliseconds later, half that west-coast round trip, it is on your screen.",
+          "show": "On 'made', a blue pill 'Sunny' pops onto the top lane; tick below it: 't'. On 'onto the open line', with no pause, an arrow draws from it down toward the bottom lane; tag on the arrow 'in flight, not held back'. On 'sixty-five', the pill lands on the bottom lane; tick 't + 65 ms'. On 'half that west-coast round trip', a small note beside the arrow: 'one one-way trip: 130 ÷ 2 = 65 ms'."
         },
         {
           "id": "b2",
-          "say": "To any human, that is one moment. Nothing waits for the answer to finish, except in non-streaming mode.",
-          "show": "The 't' and 't + 65 ms' ticks pulse together; label 'made and shown: one event'. A ghosted state flashes and is crossed out: 'answer complete' on the top lane above an empty bottom lane, tag 'never happens'. On 'non-streaming', a small grey corner tag 'exception: non-streaming' shows briefly and fades."
+          "say": "To any human, that is one moment. Nothing waits for the answer to finish.",
+          "show": "The 't' and 't + 65 ms' ticks pulse together; label 'made and shown: one event'. On 'Nothing waits', a ghosted state flashes and is crossed out: 'answer complete' on the top lane above an empty bottom lane, tag 'never happens'. As it fades, a small grey corner tag 'exception: non-streaming' shows briefly and fades."
         },
         {
           "id": "b3",
@@ -116,13 +116,18 @@
         },
         {
           "id": "b4",
-          "say": "So the trip only adds tens of milliseconds to the wait for the first word. Reading your prompt in takes hundreds.",
-          "show": "On 'tens of milliseconds', the first arrow highlights; bracket on the bottom lane: 'one-time offset'. On 'Reading your prompt in', the camera pulls back: the axis origin is relabelled 'request arrives', the old 't' tick becomes 'first token made', and between them on the top lane a long blue block appears, 'reading the prompt in: hundreds of ms'. Beside the first arrow, a short bracket 'trip: tens of ms'. Small note: 'schematic lengths'."
+          "say": "So the trip only delays the first word, by tens of milliseconds. Reading your prompt in takes hundreds.",
+          "show": "On 'first word', the first arrow highlights, with a short bracket beside it: 'trip: tens of ms, once'. On 'Reading your prompt in', the lane labels 'made' and 'seen' fade (the icons still mark the lanes) and the camera pulls back: the axis extends to the left by a schematic few hundred milliseconds, the new left end is labelled 'request arrives', the old 't' tick is relabelled 'first token made', and between them on the top lane a long amber block appears (amber: this is arithmetic), 'reading the prompt in: hundreds of ms'. Small grey corner note: 'schematic lengths'."
         },
         {
           "id": "b5",
-          "say": "Buffered instead, the answer would show nothing for fifteen seconds. A constant delay shifts a stream without stretching it, so it feels smooth from across the world.",
-          "show": "On 'Buffered', a ghost third lane appears below, 'seen, if buffered', and the axis rescales to 0 to 16 s. Pills keep arriving on the 'seen' lane while the ghost lane stays empty and a stopwatch counts to '15 s'; then all 500 pills drop into the ghost lane at once. On 'shifts', the ghost lane fades and the view returns to the close-up of parallel arrows: the bottom row of pills is a copy of the top row, slid right by one arrow's offset, same spacing. Caption: 'shifted, not stretched'."
+          "say": "Held back until finished, the answer would show nothing for fifteen seconds, then all at once. That, you would notice.",
+          "show": "On 'Held back', the amber block, its labels and the corner note fade, the lane labels return, a ghost third lane appears below, 'seen, if held back', and the axis rescales to 0 to 16 s. Pills keep arriving on the 'seen' lane while the ghost lane stays empty and a stopwatch beside it counts to '15 s'. On 'all at once', all 500 pills drop into the ghost lane together. On 'you would notice', the ghost lane's empty 15-second stretch flashes grey, tag '15 s of nothing'."
+        },
+        {
+          "id": "b6",
+          "say": "A constant delay shifts a stream without stretching it, so it feels smooth from across the world.",
+          "show": "On 'shifts', the ghost lane, stopwatch and tag fade and the view returns to the close-up of parallel arrows: the bottom row of pills is a copy of the top row, slid right by one arrow's offset, same spacing. On 'without stretching', matching '30 ms' brackets flash on both rows. Caption: 'shifted, not stretched'."
         }
       ]
     },
@@ -132,27 +137,27 @@
       "figs": [
         31
       ],
-      "visual": "New composition. Left half: a ledger titled 'Bytes on the wire, one full turn' with three rows, each with a tiny grey bar. Right half: the GPU package illustration, compute die in the middle and memory stacks around it, labelled '140 GB of weights', with coral particles flowing from the memory into the die. Network bytes are grey because they are not the expensive thing; memory traffic is coral. Bottom band, from b4: a grey dot against a coral line that cannot be drawn to scale. Before the final tags land, the dot and ratio tags fade so no more than five text items are up at once.",
+      "visual": "New composition. Left half: a ledger titled 'Bytes on the wire, one full turn' with three rows, each with a tiny grey bar. Right half: the GPU package illustration, compute die in the middle and memory stacks around it, labelled '140 GB of weights', with coral particles flowing from the memory into the die. Network bytes are grey because they are not the expensive thing; memory traffic is coral. Bottom band, from b4: a grey dot against a coral line that cannot be drawn to scale. At the start of b4 the ledger and the 15 s bar fade out and the GPU illustration dims, labels and equation with it; before the final tags land, the dot, ratio and line tags fade too, so no more than five text items are up at once.",
       "beats": [
         {
           "id": "b1",
-          "say": "Is the network at least busy? One turn sends four kilobytes up, then nothing, and twenty-two kilobytes down, each frame a few letters in a few dozen bytes of packaging.",
-          "show": "Ledger title draws on. Rows build on their words: 'Up, once', tiny grey bar, '≈ 4 KB of prompt'; 'Up, during the answer', empty bar, 'nothing at all'; 'Down, 500 frames', slightly longer bar, '≈ 22 KB in total'. On 'each frame', sub-tag '≈ 44 bytes each'. Ledger total underneath: '≈ 26 KB per turn'."
+          "say": "Is the network at least busy? Count bytes, about a letter each. One turn sends four kilobytes up, then nothing, and twenty-two kilobytes down.",
+          "show": "Ledger title draws on. On 'Count bytes', a small grey legend appears under it: '1 byte ≈ 1 letter · 1 KB = 1,000 bytes'. Rows build on their words: on 'four kilobytes up', row 'Up, once', tiny grey bar, '≈ 4 KB of prompt'; on 'then nothing', row 'Up, during the answer', empty bar, 'nothing at all'; on 'twenty-two kilobytes down', row 'Down, 500 frames', slightly longer bar, '≈ 22 KB in total', with a sub-tag '≈ 44 bytes each, mostly packaging'. Ledger total underneath: '≈ 26 KB per turn'."
         },
         {
           "id": "b2",
-          "say": "Inside the machine, every token reads all a hundred and forty gigabytes of weights. Five hundred of them, with the machine to yourself, come to seventy terabytes of memory traffic.",
-          "show": "The ledger dims slightly. Right half: the GPU package draws on; coral particles stream from the memory stacks into the die; counter 'per token: 140 GB'. On 'machine to yourself', small tag 'one answer, running alone'. On 'seventy terabytes', '500 × 140 GB = 70 TB' builds term by term in coral beneath the chip."
+          "say": "Inside the machine, every token reads all a hundred and forty gigabytes of weights. Five hundred tokens, with the machine to yourself, read seventy terabytes from memory.",
+          "show": "The ledger dims slightly. Right half: on 'Inside the machine', the GPU package draws on; coral particles stream from the memory stacks into the die; on 'a hundred and forty gigabytes', counter 'per token: 140 GB'. On 'machine to yourself', small tag 'one answer, running alone'. On 'seventy terabytes', '500 × 140 GB = 70 TB' builds term by term in coral beneath the chip."
         },
         {
           "id": "b3",
-          "say": "At four point eight terabytes per second, on an H two hundred, that takes about fifteen seconds, the same fifteen you watched.",
-          "show": "The equation continues: '70 TB ÷ 4.8 TB/s ≈ 14.6 s'. The blue bar '15 s, streamed' from the round-trip chart slides in under the ledger; a connector line joins it to '≈ 14.6 s' and both pulse together."
+          "say": "On an H two hundred, at four point eight terabytes per second, that is about fifteen seconds, the fifteen you watched.",
+          "show": "On 'H two hundred', a small grey chip tag 'H200' appears on the package. On 'four point eight', the equation continues: '70 TB ÷ 4.8 TB/s ≈ 14.6 s'. On 'the fifteen you watched', the blue bar '15 s, streamed' from the round-trip chart slides in under the ledger; a connector line joins it to '≈ 14.6 s' and both pulse together."
         },
         {
           "id": "b4",
-          "say": "Twenty-two kilobytes against seventy terabytes is about three billion to one, a millimetre against three thousand kilometres. Blaming the network for a slow answer is almost always wrong.",
-          "show": "Bottom band: a grey dot tagged '22 KB = 1 mm'. On 'three billion', ratio '≈ 3,000,000,000 ×'. On 'three thousand kilometres', a coral line shoots out past the right edge of the frame, tag '≈ 3,200 km', note 'not to scale'. On 'Blaming the network', the dot and ratio tags fade and two final tags land side by side: grey 'network: kilobytes', coral 'inside the machine: terabytes'; beneath them, 'the network was never the constraint'."
+          "say": "Twenty-two kilobytes against seventy terabytes is over three billion to one, a millimetre against over three thousand kilometres. Blaming the network for a slow answer is almost always wrong.",
+          "show": "As the beat opens, the ledger and the 15 s bar fade out and the GPU illustration dims to faint, its labels and equation with it. Bottom band: a grey dot tagged '22 KB = 1 mm'. On 'three billion', ratio '≈ 3.2 billion ×'. On 'three thousand kilometres', a coral line shoots out past the right edge of the frame, tag '≈ 3,200 km', note 'not to scale'. On 'Blaming the network', the dot, ratio, line tags and note fade, and two final tags land side by side: grey 'network: kilobytes', coral 'inside the machine: terabytes'; beneath them, 'the network was never the constraint'."
         }
       ]
     },
@@ -162,27 +167,32 @@
       "figs": [
         29
       ],
-      "visual": "New composition, inside the server. Centre: a block 'run the whole model' with a blue outline. Above it, the spot where each new token pops out. Three arrows leave that spot: arrow 1 left to a laptop icon at the left edge, 'to you'; arrow 2 right to a vertical stack of thin coral slabs, the cache (coral, matching the K V cache drawings later in the film); arrow 3 curving back down into the model block, 'next input'. Under the loop, a strip of ten numbered slots fills one slot per token from b1 on. The tokens, in order: 'Sunny', 'tomorrow', 'with', 'light', 'winds', 'and', 'a', 'warm', 'evening', and 'stop' in slot 10. The loop really runs, at a steady rhythm: token 1 in b1, tokens 2 to 5 in b2, tokens 6 to 9 in b3, 'stop' in b4. Each turn the pill flies to the laptop, drops one coral slab onto the stack, and rides arrow 3 back into the model.",
+      "visual": "New composition, inside the server. Centre: a block 'run the whole model' with a blue outline. Above it, the spot where each new token pops out. Three arrows leave that spot: arrow 1 left to a laptop icon at the left edge, 'to you'; arrow 2 right to a vertical stack of thin coral slabs, the cache (coral, matching the K V cache drawings later in the film); arrow 3 curving back down into the model block, 'next input'. Under the loop, a strip of ten numbered slots fills one slot per token. The tokens, in order: 'Sunny', 'tomorrow', 'with', 'light', 'winds', 'and', 'a', 'warm', 'evening', and 'stop' in slot 10. The loop really runs, at a steady rhythm: token 1 in b1 (its slab lands in b2), tokens 2 to 5 in b3, tokens 6 to 9 in b4, 'stop' in b5. Each turn the pill flies to the laptop, drops one coral slab onto the stack, and rides arrow 3 back into the model. Labels from one beat fade as the next beat's labels land, so no more than five text items are up at once.",
       "beats": [
         {
           "id": "b1",
-          "say": "On the server, each new token goes three places. First, down the line to you. Second, into the cache, the running record you met earlier.",
-          "show": "The model block draws on; pill 'Sunny' rises to the top spot and fills slot 1. On 'three places', three arrow stubs grow from it, numbered 1, 2 and 3. On 'to you', arrow 1 extends left and a copy of 'Sunny' slides into the laptop. On 'into the cache', arrow 2 extends right to the stack; label 'cache: a running record'."
+          "say": "On the server, each new token goes three places. First, down the line to you. That is all the stream showed.",
+          "show": "The model block draws on; pill 'Sunny' rises to the top spot and fills slot 1. On 'three places', three arrow stubs grow from it, numbered 1, 2 and 3. On 'to you', arrow 1 extends left and a copy of 'Sunny' slides into the laptop. On 'all the stream showed', arrow 1 glows while stubs 2 and 3 pulse, grey tag by arrow 1: 'the stream: 1 of 3'."
         },
         {
           "id": "b2",
-          "say": "The server adds two bundles of numbers, the token's keys and values, explained later. Think of them as notes, kept so they need not be redone during this answer.",
-          "show": "A coral slab split into halves 'K' and 'V' slides onto the stack; sub-label 'keys and values, appended'. On 'notes', a small notepad icon appears beside the stack, tag 'notes, kept for this answer'. The loop turns four more times, 'tomorrow' to 'winds', a '+1' popping by the stack each turn."
+          "say": "Second, into the cache: a running record the server keeps of everything it has already processed, the kept work promised earlier.",
+          "show": "The 'the stream: 1 of 3' tag fades. On 'into the cache', arrow 2 extends right to the stack and Sunny's slab drops onto it; label 'cache: a running record', sub-label 'of everything processed so far'. On 'kept work', the stack gives one slow pulse."
         },
         {
           "id": "b3",
-          "say": "Third, the token becomes the next input, which is what autoregressive means. So making the answer, a step called decode, cannot run in parallel. Other answers run beside yours, but your token nine needs token eight.",
-          "show": "Arrow 3 brightens; 'autoregressive' writes on under the loop, sub-label 'output becomes input'. On 'decode', strip label at left: 'decode: one token at a time'. Slots 6 and 7 fill with 'and', 'a'. On 'Other answers', two faint grey loops for other people's answers tick beside this one. Slot 9 carries a lock, tag 'needs token 8'; on 'token nine needs token eight', 'warm' fills slot 8, the lock opens and 'evening' fills slot 9."
+          "say": "Each token adds two bundles of numbers, its keys and values, explained later. Think of them as notes, kept so they need not be redone during this answer.",
+          "show": "The sub-label fades. On 'two bundles of numbers', Sunny's slab splits into halves 'K' and 'V'; sub-label 'keys and values, appended'. On 'notes', a small notepad icon appears beside the stack, tag 'notes, kept for this answer'. The loop turns four more times, 'tomorrow' to 'winds', a '+1' popping by the stack each turn."
         },
         {
           "id": "b4",
-          "say": "The loop runs until a stop token, meaning done, or a length limit, the cache one entry longer each turn. The server feeds itself while it feeds you.",
-          "show": "Slot 10 fills with a pill of distinct outline, 'stop', and the arrows halt. A small gauge labelled 'length limit' shows the other way out. The grown stack gets a tag 'one entry per turn'. On 'feeds itself', arrows 1 and 3 brighten together. Caption centre-bottom: 'feeding itself while feeding you'."
+          "say": "Third, the token becomes the next input, which is what autoregressive means. So making the answer, called decode, cannot produce several of your tokens at once. Your token nine needs token eight.",
+          "show": "The cache sub-label and notepad tag fade. Arrow 3 brightens; 'autoregressive' writes on under the loop, sub-label 'output becomes input'. On 'decode', strip label at left: 'decode: one token at a time'. Slots 6 and 7 fill with 'and', 'a'. On 'several of your tokens at once', three ghost pills try to fill slots 8 to 10 together and bounce off, greyed. Slot 9 carries a lock, tag 'needs token 8'; on 'token nine needs token eight', 'warm' fills slot 8, the lock opens and 'evening' fills slot 9."
+        },
+        {
+          "id": "b5",
+          "say": "The loop runs until a stop token, meaning done, or a length limit. Each turn, the cache grows by one entry. The server feeds itself while it feeds you.",
+          "show": "The 'autoregressive' and 'decode' labels fade. On 'stop token', slot 10 fills with a pill of distinct outline, 'stop', tag 'done', and the arrows halt. On 'length limit', a small gauge labelled 'length limit' shows the other way out. On 'Each turn', the grown stack gets a tag '+1 entry per turn'. On 'feeds itself', arrows 1 and 3 brighten together. Caption centre-bottom: 'feeding itself while feeding you'."
         }
       ]
     },
@@ -192,17 +202,17 @@
       "figs": [
         32
       ],
-      "visual": "New composition: split screen, two miniature wire scenes side by side, each with a laptop at its left, a server at its right holding a small coral cache stack, and a cable between. Left header 'Within one answer'; right header 'Between two turns'. A two-line verdict appears under each panel. The motion contrasts an empty Up lane on the left with a large parcel travelling up on the right. Teal appears only once, for 'notes may still be there'.",
+      "visual": "New composition: split screen, two miniature wire scenes side by side, each with a laptop at its left, a server at its right and a cable between. The left server holds a coral cache stack that grows one slab per frame; the right server starts empty. Left header 'Within one answer'; right header 'Between two turns'. A two-line verdict appears under each panel. The motion contrasts an empty Up lane on the left with a large parcel travelling up on the right. Teal appears only once, for 'notes may still be there'.",
       "beats": [
         {
           "id": "b1",
-          "say": "That record untangles two things called re-sending. Within one answer, nothing is re-sent. The server holds the state.",
-          "show": "Title at the top: 'Two things called re-sending'. Both panels draw on. Left panel: blue frames stream down; the Up lane stays empty, tag '0 up'; the cache stack grows one slab per frame. Verdict: 'nothing is re-sent' / 'the server holds the state'."
+          "say": "That record untangles two things called re-sending. Within one answer, nothing is re-sent. The server holds the state, the conversation so far, in its cache.",
+          "show": "Title at the top: 'Two things called re-sending'. Both panels draw on, the right server empty. Left panel: blue frames stream down; the Up lane stays empty, tag '0 up'. On 'in its cache', the left server's coral stack grows one slab per frame. Verdict: 'nothing is re-sent' / 'the server holds the state'."
         },
         {
           "id": "b2",
-          "say": "Between turns, everything is. Your next message is a new request carrying the whole conversation, since the server is given nothing else. Officially, it holds nothing for you.",
-          "show": "Right panel: a parcel built from three blue blocks, 'question 1', 'answer 1', 'new', snapping together on 'the whole conversation', slides up the cable. Verdict: 'everything is re-sent'. On 'holds nothing', a dotted empty outline appears in its server, and a second verdict line: 'the server holds nothing'."
+          "say": "Between turns, everything is. Your next message is a new request carrying the whole conversation, because the request is all the server gets. Officially, it keeps none of the conversation.",
+          "show": "Right panel: a parcel built from three blue blocks, 'question 1', 'answer 1', 'new', snapping together on 'the whole conversation', slides up the cable. Verdict: 'everything is re-sent'. On 'keeps none of the conversation', a dotted empty outline appears in its server, and a second verdict line: 'the server holds nothing'."
         },
         {
           "id": "b3",
@@ -211,8 +221,8 @@
         },
         {
           "id": "b4",
-          "say": "Per token, nothing repeats. Per turn, the whole conversation does. Almost every misunderstanding here comes from mixing the two.",
-          "show": "The verdict lines dim. Under the left panel: 'per token: nothing repeats'. Under the right: 'per turn: everything does'. The panel borders pulse in turn on 'Per token' and 'Per turn'."
+          "say": "Per token, nothing repeats, and it costs nothing. Per turn, everything does, and that costs everything. Almost every misunderstanding here comes from mixing the two.",
+          "show": "The title and the four verdict lines fade. Under the left panel: 'per token: nothing repeats, costs nothing' in grey. Under the right: 'per turn: everything does, costs everything', with 'costs everything' in coral. The panel borders pulse in turn on 'Per token' and 'Per turn'."
         }
       ]
     },
@@ -222,27 +232,27 @@
       "figs": [
         60
       ],
-      "visual": "New composition. A horizontal route of six station cards joined by a path, each with an icon and a short sub-label: 'router' (signpost icon, 'which machine'), 'scheduler' (queue icon, 'batch with others'), 'prefill' (document icon, 'read the prompt in'), 'KV transfer' (hand-off arrows icon, 'hand the notes over'), 'decode' (loop icon, 'one token at a time'), 'screen' (laptop icon, 'streamed to you'). Header: 'One token, end to end'. A single blue token pill travels the path, lighting each card as it is named. At the end the route dims and the camera tilts down to a large '30 ms' with a stopwatch, the hand-off to the next chapter.",
+      "visual": "New composition. A horizontal route of six station cards joined by a path, each with an icon and a short sub-label: 'router' (signpost icon, 'which machine'), 'scheduler' (queue icon, 'batch with others'), 'prefill' (document icon, 'read the prompt in'), 'KV transfer' (hand-off arrows icon, 'hand the notes over'), 'decode' (loop icon, 'one token at a time'), 'screen' (laptop icon, 'streamed to you'). Header: 'One token, end to end'. A single blue token pill travels the path, lighting each card as it is named; a card's sub-label appears as the pill arrives and fades when it moves on, so only one sub-label is ever up. At the end the route dims and the camera tilts down to a large '30 ms' with a stopwatch, the hand-off to the next chapter.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now one token, end to end. A router picks the machine, a scheduler batches your request with others, and prefill reads your prompt in and makes its notes.",
-          "show": "Header, then the six cards draw on left to right, names only. On 'router', the pill enters the first card and its sub-label appears; on 'scheduler', it moves on and a few grey pills from other users join it; on 'prefill', the third card lights and a mini coral stack of K/V slabs builds inside it."
+          "say": "Now one token, end to end: the router and scheduler you met earlier, then prefill, reading your prompt in and making its notes.",
+          "show": "Header, then the six cards draw on left to right, names only. On 'router', the pill enters the first card and 'which machine' appears; on 'scheduler', it moves on, that sub-label fades, 'batch with others' appears and a few grey pills from other users join it; on 'prefill', the third card lights with 'read the prompt in' and a mini coral stack of K/V slabs builds inside it."
         },
         {
           "id": "b2",
-          "say": "In large systems, a K V transfer hands those notes to another machine. Decode runs the loop you just saw, streaming each token to your screen.",
-          "show": "On 'K V transfer', the fourth card lights and the mini stack slides from one small machine icon to a second one beside it. On 'Decode', the fifth card lights with a mini loop spinning inside. On 'your screen', the last card lights, a teal cable running into its laptop."
+          "say": "In large systems, another machine writes the answer, so a K V transfer hands it those notes, the keys and values. Decode runs that loop, streaming each token to your screen.",
+          "show": "On 'another machine', two small machine icons appear beneath the third and fourth cards. On 'K V transfer', the fourth card lights with 'hand the notes over', and the mini stack slides from the first machine icon to the second; on 'keys and values', the stack's slabs flash 'K' and 'V'. On 'Decode', the fifth card lights with 'one token at a time' and a mini loop spinning inside. On 'your screen', the last card lights with 'streamed to you', a teal cable running into its laptop."
         },
         {
           "id": "b3",
-          "say": "Each box has its own problem and fix; later videos in this series mostly improve one box. A map worth returning to.",
-          "show": "All six cards glow together. Text beneath the route, two lines: 'each box: its own problem, its own fix' / 'every term made precise as we go'. On 'later videos', a bracket over all six cards, tag 'the rest of the series'. On 'A map', a pin icon drops onto the header."
+          "say": "Each box has its own problem and fix; most later videos in this series improve one of these boxes. A map worth returning to.",
+          "show": "The last sub-label fades and all six cards glow together. Text beneath the route, two lines: 'each box: its own problem, its own fix' / 'every term made precise as we go'. On 'later videos', a bracket over all six cards, tag 'later videos: one box each'. On 'A map', a pin icon drops onto the header."
         },
         {
           "id": "b4",
-          "say": "Underneath all six sits one question, and the rest of this film answers it. A token takes about thirty milliseconds. Where, exactly, do they go?",
-          "show": "On 'Underneath', the route dims and slides up, and a band labelled 'this film: the ground underneath' appears beneath the cards. On 'thirty milliseconds', the camera tilts down to a large '30 ms' with a stopwatch icon beside it, and a question mark draws on slowly."
+          "say": "Underneath all six sits one question, which the rest of this film answers. A token takes about thirty milliseconds. Where, exactly, does that time go?",
+          "show": "On 'Underneath', the route dims and slides up, the two text lines and the bracket fade, and a band labelled 'this film: the ground underneath' appears beneath the cards. On 'thirty milliseconds', the camera tilts down to a large '30 ms' with a stopwatch icon beside it, and on 'that time go' a question mark draws on slowly."
         }
       ]
     }
@@ -289,7 +299,7 @@
       "result": "[(17.5, 1.17), (32.5, 2.17), (80.0, 5.33)]"
     },
     {
-      "claim": "One-way trip Seoul to US west coast = half the 130 ms round trip = 65 ms (fig 58's t + 65 ms)",
+      "claim": "One-way trip Seoul to US west coast = half the 130 ms round trip = 65 ms (said 'sixty-five milliseconds later, half that west-coast round trip'; shown 't + 65 ms' and '130 ÷ 2 = 65 ms')",
       "python": "130/2",
       "result": "65.0"
     },
@@ -299,12 +309,12 @@
       "result": "2.1666666666666665"
     },
     {
-      "claim": "Buffered 500-token reply shows nothing for about 15 s (500 x 30 ms)",
+      "claim": "Held-back (buffered) 500-token reply shows nothing for about 15 s (500 x 30 ms), then all at once",
       "python": "500*30e-3",
       "result": "15.0"
     },
     {
-      "claim": "22 KB over 500 frames = 44 bytes per frame; at about 4 bytes of text per token, about 40 of the 44 bytes are packaging ('a few letters of text in a few dozen bytes of packaging')",
+      "claim": "22 KB over 500 frames = 44 bytes per frame; at about 4 bytes of text per token, about 40 of the 44 bytes are packaging (shown '≈ 44 bytes each, mostly packaging')",
       "python": "print(22e3/500, 22e3/500-4000/1032)",
       "result": "44.0 40.12403100775194"
     },
@@ -324,12 +334,12 @@
       "result": "14.583333333333334"
     },
     {
-      "claim": "CORRECTION (fig 31): 70 TB / 22 KB = 3.2e9, about nine and a half orders of magnitude, not 'seven orders of magnitude' as the atlas caption says. Film says 'about three billion to one' and shows '≈ 3,000,000,000 ×'.",
+      "claim": "CORRECTION (fig 31): 70 TB / 22 KB = 3.2e9, about nine and a half orders of magnitude, not 'seven orders of magnitude' as the atlas caption says. Film says 'over three billion to one' and shows '≈ 3.2 billion ×', rounded the same way as the '≈ 3,200 km' tag.",
       "python": "import math; r=70e12/22e3; print(r, math.log10(r))",
       "result": "3181818181.818182 9.50267535919205"
     },
     {
-      "claim": "If 22 KB were 1 mm, 70 TB would be 3,182 km ('three thousand kilometres', shown '≈ 3,200 km')",
+      "claim": "If 22 KB were 1 mm, 70 TB would be 3,182 km (said 'over three thousand kilometres', shown '≈ 3,200 km')",
       "python": "70e12/22e3*1e-3/1e3",
       "result": "3181.818181818182"
     }
