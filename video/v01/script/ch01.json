@@ -2,410 +2,397 @@
   "chapter": "ch01",
   "title": "What a model is",
   "kicker": "01 · What a model is",
-  "figs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "figs": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
   "scenes": [
     {
       "id": "ch01_s01",
-      "name": "a model is a file of numbers",
-      "figs": [1],
-      "visual": "Dark canvas, one continuous shot that starts on a single object and then pulls back to show its scale. Centre: a file icon (Phosphor 'file', blue outline) that opens into a grid of forty blue rounded number tiles, 10 columns by 4 rows. The top row begins 0.13, −0.7, 0.02, 1.44, −0.3; the other 35 tiles hold varied values between about −1 and +1.5 (for example 0.41, −0.05, 0.88, −0.92, 0.27), never a visible repeating pattern. These five first-row values are reused in scenes 4 and 5, so keep them exact. The grid is the anchor of the scene; a number line below it and a counter in the top-right come and go around it. Colour: blue for stored numbers, white and grey for text. No amber or coral yet, because nothing is computed or moved in this scene.",
+      "name": "a file of numbers, and its two lives",
+      "figs": [
+        1,
+        2
+      ],
+      "visual": "Opening frame: empty navy stage. One continuous shot in two movements. Movement 1 (b1–b2): at centre a blue file icon (~220 px) opens into a grid of 40 blue rounded number tiles, 10 columns × 4 rows, about 1,100 px wide, centred at y≈470. The top row begins 0.13, −0.7, 0.02, 1.44, −0.3; keep these five exact, they return in s02 and s03. The other 35 tiles hold varied values between about −1 and +1.5 (0.41, −0.05, 0.88, −0.92, 0.27 …) with no visible repeat. Negative values are drawn as violet text on their blue tile: violet means a negative value everywhere in this film. Movement 2 (b3–b5): the grid shrinks to a ~300 px block at centre, between two tall panels: left 'Training' (grey-blue outline, x≈120–720, y≈260–820), right 'Inference' (blue, x≈1200–1800, same height). An arrow runs from the left panel to the right one beneath the grid. Each panel takes three facts, each an icon plus 1–3 words. No amber and no coral in this scene: nothing is computed or moved yet. It ends with the training panel dimmed, the inference panel lit, the fact labels reduced to icons and the takeaway in the bottom band.",
       "beats": [
         {
           "id": "b1",
-          "say": "Let's start from absolute zero. When people say a company has trained a model, what they actually have at the end of it is a file.",
-          "show": "Centre: the file icon fades up alone on the dark canvas, label beneath it 'a trained model'. It holds still on 'a file'."
+          "say": "A trained model is a file. Open it, and there are no rules, no instructions, no text. Just numbers.",
+          "show": "The file icon fades up alone at centre with the label 'a trained model' beneath it, and holds still on 'file'. On 'Open it', the icon unfolds and the 40 tiles cascade out row by row. On 'rules', 'instructions' and 'text', three grey words appear stacked at the left edge (x≈120–360): 'rules', 'instructions', 'text'. Each is struck through as it is spoken. On 'Just numbers', the three words fade and the first five tiles of the top row pulse in turn: 0.13, −0.7, 0.02, 1.44, −0.3."
         },
         {
           "id": "b2",
-          "say": "Open it, and here is everything inside. No rules. No instructions. No text. Just numbers. Point one three. Minus point seven. Point zero two. One point four four. Minus point three.",
-          "show": "On 'open it', the file icon unfolds and the 40-tile grid cascades out row by row to fill the centre. On 'no rules', 'no instructions', 'no text', three grey words appear in a column at the left, 'rules', 'instructions', 'text', and a strike-through line draws across each as it is spoken. On the five spoken numbers, the first five tiles of the top row pulse in turn: 0.13, −0.7, 0.02, 1.44, −0.3."
+          "say": "Each sits between about minus one and plus one. A large model has seventy billion of them, each called a parameter or, equally, a weight.",
+          "show": "On 'minus one', a number line from −1 to +1 draws under the grid (y≈740) and each tile drops a dot onto it. The dots cluster inside the range, with 1.44 landing just past the right end, which is why the narration says 'about'. A grey label '40 shown' sits at the grid's right edge. On 'seventy billion', the number line and the label fade and the camera pulls back fast: the grid shrinks to a speck in a field of tiles that fills the frame, and a counter top-right (x≈1560, y≈170) runs from 40 to 70,000,000,000, labelled 'numbers'. The camera stays wide. On 'parameter', the field dims to 0.3 and the 1.44 tile lifts out of it toward the camera, enlarging at centre, with 'parameter' sliding in on its left. On 'weight', 'weight' slides in on its right with '=' between them, and the counter's label swaps to 'weights'."
         },
         {
           "id": "b3",
-          "say": "Each number sits somewhere between about minus one and plus one. Forty are drawn here. A large model has seventy billion of them, one after another in a single, very long list.",
-          "show": "A short number line from −1 to +1 draws under the grid; each tile drops a dot onto it and the dots cluster inside that range (1.44 lands just past the right end, which is why the narration says 'about'). On 'forty', a small label '40 shown' appears beside the grid. On 'seventy billion', the camera pulls back fast: the grid shrinks to a speck inside a field of tiles that fills the frame, and a counter in the top-right runs from 40 to 70,000,000,000, labelled 'numbers in one model'."
+          "say": "Everything that follows is arithmetic on this list. Training produced it, once, over months, on thousands of chips.",
+          "show": "On 'Everything', the enlarged tile and 'parameter = weight' sink back into the field, the camera returns to the 40-tile grid, the grid gives one soft pulse, and the counter fades. On 'Training', the grid shrinks to a ~300 px block at centre and the left panel draws on with the title 'Training'. A stack of document icons streams into the grid from the left and the tile values flicker. Three facts land in the left panel, one per phrase: a stamp '1×' with 'done once' on 'once', a calendar icon with 'months' on 'months', and a dense block of tiny chip icons with 'thousands of chips' on 'thousands'."
         },
         {
           "id": "b4",
-          "say": "How many is seventy billion? If you read one number aloud every second, day and night, without ever stopping, you would finish in about two thousand two hundred years.",
-          "show": "The tile field dims. Left third: a stopwatch icon ticking once per second. Right third: a year counter running up to '≈ 2,218 years' as the sentence ends, with a small grey line under it, '1 number per second, non-stop'. The '70,000,000,000' counter stays top-right."
+          "say": "Inference is using the list, which never changes again. Every answer comes from it, each token in milliseconds, on one chip or a few, every time anyone asks.",
+          "show": "On 'Inference', the training panel's three fact labels dim to 0.3 (icons stay), the right panel draws on with the title 'Inference', and the arrow draws from the left panel to the right one. The grid rides along it to the top of the right panel. On 'never changes', a padlock icon snaps shut on the grid, the flicker stops, and a small grey tag 'fixed' appears. Three facts land in the right panel: a stopwatch icon with 'milliseconds per token' on 'milliseconds', one or two chip icons with 'one chip or a few' on 'one chip', and three user icons that each pop a small chat bubble in turn, with 'every time anyone asks', on 'every time'. The bubbles keep popping on a slow loop."
         },
         {
           "id": "b5",
-          "say": "Each of these numbers is called a parameter, or a weight. The two words mean exactly the same thing, and you will hear both.",
-          "show": "The camera pushes back in to the 40-tile grid. The tile holding 1.44 lifts out and enlarges at centre. On 'parameter', the word 'parameter' slides in to its left; on 'weight', the word 'weight' slides in to its right, with an '=' sign between the two words."
-        },
-        {
-          "id": "b6",
-          "say": "It is worth starting here, because everything that follows is arithmetic on this list. Training produced the numbers. Inference is the business of using them, and inference is what this whole film is about.",
-          "show": "The 1.44 tile drops back into the grid. Under the grid, two short labels appear side by side: left 'training: produced them' in grey, right 'inference: uses them' in blue. The right one brightens with a soft glow on 'what this whole film is about'. Bottom band: 'everything later is arithmetic on this list'."
+          "say": "This film is about the second box. Almost every confusing claim about cost or speed turns out to be about the wrong box.",
+          "show": "On 'second box', the inference panel brightens and scales up about 4%. The training panel dims to 0.25 and takes a grey tag 'finished before we begin'. The 'fixed' tag fades. On 'confusing claim', the fact labels in both panels fade, leaving only their icons. The text left on screen is 'Training', 'finished before we begin', 'Inference' and the takeaway. Bottom band takeaway: 'cost or speed? check which phase'."
         }
       ]
     },
     {
       "id": "ch01_s02",
-      "name": "the two lives of a model",
-      "figs": [2],
-      "visual": "Two tall panels side by side, left 'Training' and right 'Inference', with an arrow running from left to right between them. The 40-tile grid from scene 1, shrunk small, rides along that arrow: what training outputs is exactly what inference uses. Each panel fills with three facts, each an icon plus two or three words, landing as they are spoken. By the end the training panel is greyed out as finished and the inference panel is lit in blue, as the one the film lives in.",
+      "name": "how the numbers were found",
+      "figs": [
+        3
+      ],
+      "visual": "Opening frame: the 40-tile grid, small (~360 px wide), alone at centre with no panels and no padlock. Its top row reads 0.129, −0.701, 0.021, 1.439, −0.299, one nudge short of the file values; we are back inside training. A circle (radius ≈300 px) draws round the grid with three stations, joined by clockwise arrows: top 'guess the next word', lower right 'compare with the real one', lower left 'nudge every weight'. Only the active station's label is at full brightness; the others sit at 0.4. Top band (y≈170, from x≈480 rightward, clear of the top-left corner): a sample sentence as blue token pills with a dashed blank slot. A grey tag 'training, briefly' sits top-right (x≈1580, y≈150) for the whole scene. Colours: blue tiles and pills; amber for the nudge, which is an operation on the numbers; a teal tick for the right word and a grey cross for the wrong one. The scene ends by folding back into the file icon.",
       "beats": [
         {
           "id": "b1",
-          "say": "A model lives two very different lives. The first is training. Training is the search for those seventy billion numbers. It reads an enormous amount of text, and keeps adjusting the numbers until the model predicts well.",
-          "show": "The left panel draws on, title 'Training'. Inside it, a stack of document icons streams into the small tile grid, and the tile values flicker and change as the text flows in."
+          "say": "How were the numbers found? Briefly, since we never train anything here, but trained should not stay a black box. Hide the next word of some real text, and let the model guess.",
+          "show": "The tag 'training, briefly' fades in top-right. On 'black box', a dark box with the label 'trained' drops over the grid, then lifts away as the circle and its three station markers draw on. On 'real text', the top band fills: pills 'the cat sat on the', then a dashed blank slot. On 'guess', station 1 lights up with 'guess the next word' and a pill 'sofa' pops into the blank."
         },
         {
           "id": "b2",
-          "say": "Training takes months. It runs on thousands of chips at once. And it is done once.",
-          "show": "Three facts land in the left panel, one per phrase: a calendar icon with 'months', a dense block of small chip icons with 'thousands of chips', and a stamp '1×' with 'done once'."
+          "say": "It guessed sofa. The real word was mat. So nudge every weight a tiny amount, in whichever direction makes that guess better.",
+          "show": "Station 2 lights up: 'compare with the real one'. On 'mat', a 'mat' pill appears under the blank with a teal tick. 'sofa' gets a grey cross and a small grey tag 'wrong guess'. On 'nudge', station 3 lights up: 'nudge every weight'. An amber shimmer passes across the grid, and every tile's last digit changes at the same moment, some up and some down, landing on the file values: 0.129 → 0.13, −0.701 → −0.7, 0.021 → 0.02, 1.439 → 1.44, −0.299 → −0.3."
         },
         {
           "id": "b3",
-          "say": "The second life is inference, which simply means using the numbers. Once training ends, they never change again. Every answer the model will ever give comes from the same fixed list.",
-          "show": "The arrow draws from the left panel to the right, carrying the small tile grid across. On 'never change again', a padlock icon snaps shut on the grid and the tiles stop flickering; small tag 'fixed'. The right panel draws on, title 'Inference', with the locked grid at its top."
+          "say": "Repeat over an enormous amount of text, trillions of tiny nudges. Nobody sets a value by hand, or can say what any one weight is for.",
+          "show": "On 'Repeat', a dot runs clockwise round the three stations. The top-band sentence swaps to a new one on each lap, and the tile digits flicker at station 3. The laps speed up until the ring blurs, and the station labels, the sentence and 'wrong guess' fade, leaving the blurred ring and the grid. On 'trillions', the label 'trillions of nudges' fades in under the ring. On 'Nobody', the ring slows. One tile is plucked out to the right of the circle and enlarged, with a large grey '?' beside it and 'what is it for?' beneath."
         },
         {
           "id": "b4",
-          "say": "Inference takes milliseconds. It runs on one chip, or a few. And it happens every single time anyone, anywhere, asks the model anything.",
-          "show": "Three facts land in the right panel: a stopwatch icon with 'milliseconds', one or two chip icons with 'one chip or a few', and a short row of user icons, each popping a small chat bubble in turn, with 'every time anyone asks'. The user icons keep popping bubbles on a loop."
-        },
-        {
-          "id": "b5",
-          "say": "Everything in this film is about the second box. The first is finished before we begin. Keep the two apart, because almost every confusing claim about the cost or speed of these models turns out to be about the wrong one.",
-          "show": "The training panel dims to grey and gets a small tag 'finished'; the inference panel brightens blue and scales up slightly. Bottom band: 'cost or speed? check which phase'."
+          "say": "Out comes a file of numbers that happens to predict text well. That is all a trained model is.",
+          "show": "The ring and 'trillions of nudges' fade. The plucked tile drops back. The grid, now showing exactly the file values (top row 0.13, −0.7, 0.02, 1.44, −0.3), compacts and folds into the file icon, labelled 'a trained model'. The 'training, briefly' tag fades last."
         }
       ]
     },
     {
       "id": "ch01_s03",
-      "name": "how the numbers were found",
-      "figs": [3],
-      "visual": "A three-station cycle at centre, drawn as a circle that really runs: station 1 at the top 'guess the next word', station 2 at lower right 'compare with the real one', station 3 at lower left 'nudge every weight', with arrows running clockwise round the circle. The small tile grid sits in the middle of the circle. Top band: a sample sentence with its last word hidden. A grey corner tag 'training, briefly' stays all scene, because the film never trains anything. The cycle speeds up until it blurs, then collapses back into the file icon from scene 1.",
+      "name": "a dial, then multiply and add",
+      "figs": [
+        4,
+        5
+      ],
+      "visual": "Opening frame: empty stage. Part 1 (b1–b3): an equation row across the upper centre (y≈330, about 1,100 px wide): a blue 'input' box, an amber '×', the weight as a blue tile, an amber '=', and an amber-outlined 'contribution' box. The weight tile then becomes a rotary dial with its scale marked −1 to +1.5 and 0 at the top. Below it (y≈560) is a horizontal contribution axis with a '0' tick at its centre. A positive contribution grows a bar to the right in amber; a negative one grows to the left in violet. The input stays at 2 throughout so that only the dial changes. Part 2 (b4–b6): the equation row shrinks into row 1 of a five-row multiply-and-add diagram filling the left 60% of the frame. Each row is a blue input box, an amber '×' and a blue weight tile (negative weights in violet text). Arrows converge from the rows into an amber 'add them up' box at centre-right, which feeds a blue 'one output' box at the right edge. The diagram later shrinks into a cell that tiles into a sheet and stacks into a tower of layers, then returns. Amber here because this is arithmetic.",
       "beats": [
         {
           "id": "b1",
-          "say": "So where did the numbers come from? We will keep this brief, because nothing in this film ever trains anything. But the word trained should not stay a black box. It comes down to three steps.",
-          "show": "Centre: the small tile grid. Around it a circle draws on with three empty station markers. Top-left corner tag: 'training, briefly'."
+          "say": "What does one weight do? One multiplication. Input times weight gives that input's contribution. The weight is a dial on how much that input counts.",
+          "show": "The equation builds term by term: the 'input' box on 'Input', amber '×' on 'times', the weight tile on 'weight', amber '=' on 'gives', and the 'contribution' box on 'contribution'. On 'dial', the weight tile morphs into the rotary dial, and the contribution axis draws on beneath with its '0' tick."
         },
         {
           "id": "b2",
-          "say": "Step one. Take some real text, hide the word that comes next, and let the model guess it.",
-          "show": "Top band: blue pills 'the cat sat on the' followed by a dashed blank slot. Station 1 lights up: 'guess the next word'. A guess pill 'sofa' pops into the blank."
+          "say": "Feed in a two. At zero, the input is ignored. At one point four four, it dominates. At minus point seven, it pushes the other way. That is all a weight does.",
+          "show": "'2' fills the input box on 'two'. On 'zero', the dial swings to 0, the contribution box reads '0', the bar stays a dot at zero, the input box greys out, and the tag 'ignored' appears beside the axis. On 'one point four four', the dial swings to 1.44, the contribution counts up to '2.88', an amber bar grows long to the right, the input box brightens, and the tag swaps to 'dominates'. On 'minus point seven', the dial swings back past 0 to −0.7, the contribution reads '−1.4', the bar sweeps through zero and grows to the left in violet, and the tag swaps to 'pushes the other way'. On 'all a weight does', the dial and the equation give one soft pulse together."
         },
         {
           "id": "b3",
-          "say": "Step two. Compare the guess with the word that really came next. Here the model said sofa, and the real word was mat.",
-          "show": "Station 2 lights up: 'compare with the real one'. The true word 'mat' appears under the blank; 'sofa' and 'mat' sit side by side and a small grey gap marker draws between them, labelled 'off by this much'."
+          "say": "Training searched for seventy billion settings that make the output useful. The intelligence is in no single dial, but in how they combine.",
+          "show": "The tag fades. On 'seventy billion', the single dial multiplies into a faint wall of thousands of tiny dials behind the equation, each at a different angle, and a small counter top-right reads '70,000,000,000 dials'. On 'no single dial', one dial in the wall turns on its own and nothing else changes. On 'combine', a wave of turning sweeps across the whole wall."
         },
         {
           "id": "b4",
-          "say": "Step three. Nudge every single weight by a tiny amount, in whichever direction would have made that guess a little better. Then repeat, over an enormous amount of text.",
-          "show": "Station 3 lights up: 'nudge every weight'. Every tile in the centre grid changes in its last digit at the same moment, for example 0.13 becomes 0.131 and −0.7 becomes −0.699. On 'repeat', the cycle starts running: a dot travels round the three stations, the top-band sentence swaps to a new sentence on each lap, and the laps speed up. Label under the circle: 'repeat, over an enormous amount of text'."
+          "say": "Five made-up inputs, each multiplied by its own weight. Add the five results, and out comes one value, point eight.",
+          "show": "The wall, the counter and the axis fade. The equation row shrinks and slides left to become row 1; its dial settles on 0.13 and turns back into a tile, with input 2. On 'five', rows 2–5 build beneath it: inputs 1, 5, 1, 1 with weights −0.7, 0.02, 1.44, −0.3, so the weight column is the file's first five numbers. A grey tag 'made-up inputs' sits above the input column. On 'multiplied', each row flashes amber in turn and drops a product chip at its right end: 0.26, −0.7, 0.1, 1.44, −0.3. On 'Add', the chips slide along the converging arrows into the amber 'add them up' box, and its running total ticks 0.26, −0.44, −0.34, 1.10, 0.80. On 'point eight', '0.8' moves into the 'one output' box at the right edge."
         },
         {
           "id": "b5",
-          "say": "Each nudge is tiny, and there are trillions of them. Nobody chooses the values by hand. And nobody can look at one weight and say what it is for.",
-          "show": "The cycle blurs into a spinning ring. A counter labelled 'nudges' runs up into the trillions. Then the ring slows, one tile is plucked out of the grid and enlarged, and a large grey question mark appears beside it with 'what is it for?' underneath."
+          "say": "Multiply, then add. That is nearly all the arithmetic a model does. You will meet one of the few small extra steps shortly.",
+          "show": "Bottom band takeaway (amber): 'multiply, then add'. The whole diagram pulses once, left to right, following the flow from inputs to output. On 'extra steps', a small grey tag appears beside the output box: '+ a few small extra steps'."
         },
         {
           "id": "b6",
-          "say": "What comes out is a file of numbers that happens to predict text very well. That is the whole of what a trained model is.",
-          "show": "The cycle stops and fades. The plucked tile drops back, and the grid compacts and folds back into the file icon from scene 1, label 'a trained model'."
+          "say": "A large language model, the kind behind a chatbot, is a stack of stages called layers, each this pattern at enormous scale. Later, we count exactly this.",
+          "show": "The tag fades. On 'large language model', the five-row diagram shrinks into one small cell, which tiles into a wide sheet of hundreds of identical cells. On 'stack', the sheet stacks upward into a tower of thin slabs labelled 'layers', with a grey tag 'opened up later'. On 'Later', the tower collapses back into the five-row diagram, and a small amber pair '× +' ticks on beside each weight tile, top to bottom. The bottom band changes to: 'each weight: one multiply, one add'."
         }
       ]
     },
     {
       "id": "ch01_s04",
-      "name": "one weight is a dial",
-      "figs": [4],
-      "visual": "An equation row across the upper centre: a blue box 'input', an amber '×', the weight as a blue tile, an amber '=', and an amber-outlined box 'contribution'. The weight tile then becomes a rotary dial with a pointer, its scale marked from −1 to +1.5 with 0 at the top. Below the equation, a horizontal axis with a zero tick at its centre shows the contribution: an amber bar grows right for positive, left for negative. The input stays at 2 for all three dial settings so that only the dial changes. The settings 1.44 and −0.7 are numbers from the file in scene 1; 0 is the 'off' position. Amber here because this is arithmetic.",
+      "name": "text becomes tokens",
+      "figs": [
+        6
+      ],
+      "visual": "Opening frame: a chat-bubble icon at the left edge (x≈160, y≈260) on an otherwise empty stage. Top band (y≈260, x≈320–1500): a long blue-outlined sentence bar 'the quick brown fox jumps', which is cut into five blue token pills. Right third (x≈1250–1750, y≈470): a rarer word splitting into pieces. Lower band (y≈640–780): two horizontal bars on one scale comparing words with tokens (500 words = 600 px, so 600 tokens = 720 px and 800 tokens = 960 px). At the end, three unit cards stack at the right. Blue throughout: tokens are the film's basic unit of structure.",
       "beats": [
         {
           "id": "b1",
-          "say": "So what does a single weight actually do? It takes part in one multiplication. A number comes in, it is multiplied by the weight, and the result is that number's contribution.",
-          "show": "The equation builds term by term as the words land: the blue 'input' box on 'a number comes in', amber '×', the weight tile on 'multiplied by the weight', amber '=', and the amber 'contribution' box on 'contribution'."
+          "say": "Remember the tokens from the very start? Before anything else, text is cut into these pieces. Here, five words make five tokens.",
+          "show": "On 'Remember', a faint echo of the cold open: a few small pills stream across the top band and fade. On 'text', the chat bubble's text flies out into the sentence bar 'the quick brown fox jumps'. On 'cut', scissor marks snip between the words and the bar breaks into five blue pills: 'the', 'quick', 'brown', 'fox', 'jumps'. On 'five tokens', the pills pulse one after another while a small counter runs 1 to 5, and the label 'five tokens' appears beneath them."
         },
         {
           "id": "b2",
-          "say": "Think of the weight as a dial. It decides how much one number gets to influence the next one.",
-          "show": "The weight tile morphs into the rotary dial with its scale. Under the equation, the horizontal contribution axis draws on with a '0' tick at its centre."
+          "say": "Common words are one token. Rarer ones split into two or three. Five hundred words of English make about six to eight hundred tokens.",
+          "show": "On 'Rarer', in the right third, the word 'unbelievably' appears in a bar and splits into three pills: 'un', 'believ', 'ably'. A grey tag beneath reads 'illustrative split'. On 'Five hundred', the lower band draws two bars on the same scale: a blue bar '500 words' (600 px), and under it a token bar whose end is a shaded range from 720 px to 960 px, labelled 'about 600–800 tokens'. A small grey note at the right reads '1.2–1.6 tokens per word'."
         },
         {
           "id": "b3",
-          "say": "Let's turn it. Say the input is two. Set the dial to zero, and two times zero is zero. The input is ignored entirely.",
-          "show": "'2' fills the input box. The dial swings to 0. The contribution box reads '0', the bar stays a dot at zero, and the input box greys out. Tag beside the bar: 'ignored'."
+          "say": "The model never sees letters. It works only in these pieces, and it produces them one at a time.",
+          "show": "The 'unbelievably' example and the two bars dim to 0.3. On 'never sees letters', the letters inside the five top pills blur away, leaving plain blue pills: the model's view. On 'one at a time', a sixth plain pill pops in on its own at the right end of the row."
         },
         {
           "id": "b4",
-          "say": "Now turn it up to one point four four, one of the numbers from our file. Two times one point four four is two point eight eight. This input now dominates.",
-          "show": "The dial swings to 1.44. The contribution box counts up to '2.88' and the amber bar grows long to the right. The input box brightens. Tag: 'dominates'."
-        },
-        {
-          "id": "b5",
-          "say": "Turn it negative, to minus point seven. Two times minus point seven is minus one point four. Now the input pushes the other way.",
-          "show": "The dial swings back past zero to −0.7. The contribution box reads '−1.4' and the amber bar sweeps through zero and grows to the left. Tag: 'pushes the other way'."
-        },
-        {
-          "id": "b6",
-          "say": "That is the whole of what one weight does. Training was the search for seventy billion settings of these dials that make the output text useful.",
-          "show": "The equation holds in front. Behind it, the single dial duplicates, then multiplies into a faint wall of thousands of tiny dials filling the background, each at a different angle. Top-right counter: '70,000,000,000 dials'."
-        },
-        {
-          "id": "b7",
-          "say": "So the intelligence is not in any one dial. It lives in how seventy billion of them combine.",
-          "show": "One dial in the wall turns on its own and nothing else visibly changes; then a wave of turning sweeps across the whole wall at once. Bottom band: 'not one dial: how they combine'."
+          "say": "Tokens are the unit everything is counted in. Tokens per second. Cost per token. Milliseconds per token.",
+          "show": "The dimmed example, the bars and the 'five tokens' label fade out, and the letters return to the five pills. Three cards stack at the right, one per spoken phrase, each with a small token-pill icon: 'tokens per second', 'cost per token', 'milliseconds per token'."
         }
       ]
     },
     {
       "id": "ch01_s05",
-      "name": "multiply, then add",
-      "figs": [5],
-      "visual": "Left half: five rows stacked top to bottom, each a blue input box, an amber '×', and a blue weight tile. Inputs are 2, 1, 5, 1, 1 (made up for the example); weights are the first five numbers from the file, 0.13, −0.7, 0.02, 1.44, −0.3. From each row an arrow converges on one amber box at centre-right, 'add them up', which feeds a final box at the right edge, 'one output'. Products travel as small amber chips along the arrows. Later the whole diagram shrinks into a cell that tiles into a sheet and stacks into a tower, then returns.",
+      "name": "the generate loop",
+      "figs": [
+        7
+      ],
+      "visual": "Opening frame: the five blue pills 'the quick brown fox jumps' in the top band, letters showing, exactly as the previous scene left them (no cards). A large rounded panel fills the centre (x≈200–1720, y≈300–800), titled 'One turn of the loop'. Inside, left to right: a blue box 'text so far' that holds the pill row, an arrow, a coral box 'run the whole model' with the small 40-tile grid inside it, an arrow, and a blue box 'one new token'. A return arrow runs from 'one new token' down and back along the bottom of the panel to 'text so far', labelled 'append, go round again'. Coral marks the expensive step and means one thing for the rest of the film: every tile lighting coral is a weight being read. Why that is expensive is the next chapter's subject; here the tiles only light. The loop really runs: on each turn the pills pass into the coral box and every tile lights, top to bottom. A counter top-right (x≈1600, y≈200) is labelled 'model runs'.",
       "beats": [
         {
           "id": "b1",
-          "say": "Here is how they combine. Take five inputs. Give each one its own weight, here the first five numbers from our file. Then multiply each pair.",
-          "show": "The five rows build top to bottom: input boxes 2, 1, 5, 1, 1, each followed by '×' and its weight tile 0.13, −0.7, 0.02, 1.44, −0.3. On 'multiply each pair', each row flashes amber in turn and produces a product chip at its right end: 0.26, −0.7, 0.1, 1.44, −0.3."
+          "say": "A model does not write a sentence. The text so far goes in, the whole model runs, and one new token comes out.",
+          "show": "The panel draws on with its title, and the five pills drop from the top band into 'text so far'. On 'whole model runs', copies of the pills flow into the coral box and its grid lights coral from top to bottom, every tile. On 'one new token', a blue pill 'over' pops into the third box. The counter reads '1'."
         },
         {
           "id": "b2",
-          "say": "Now add the five results together. Point two six, minus point seven, point one, one point four four, and minus point three. Together they make point eight. One output value.",
-          "show": "The five chips slide along the converging arrows into the 'add them up' box, one per spoken number, and a running total inside the box ticks 0.26, −0.44, −0.34, 1.10, 0.80. On 'one output value', the box emits '0.8' into the 'one output' box at the right."
+          "say": "It is appended, and the whole model runs again from the start. This is the generate loop.",
+          "show": "On 'appended', 'over' travels along the return arrow and joins the end of the pill row. On 'again', the loop turns three more times, each a little faster, appending 'the', 'lazy' and 'dog'; on every turn the whole grid lights coral, top to bottom. The counter goes 2, 3, 4. On 'generate loop', the panel title swaps to 'the generate loop'."
         },
         {
           "id": "b3",
-          "say": "Multiply each input by its own weight, then add up the results. That is the only arithmetic pattern a model performs. There is nothing else in there.",
-          "show": "Bottom band, amber: 'multiply, then add'. The whole diagram pulses once, left to right, following the flow from inputs to output."
+          "say": "So a two-hundred-word answer, about three hundred tokens, means running the whole seventy-billion-parameter model about three hundred times.",
+          "show": "On 'two-hundred-word', the panel title and the return-arrow label dim to 0.35. Below the panel (y≈860), an equation builds term by term: '200 words' on 'two-hundred-word', then '× ~1.5 tokens per word' and '= ≈ 300 tokens' on 'three hundred tokens'. On 'three hundred times', the loop speeds into a blur, the counter runs to 300, and a small label appears on the coral box: '70 billion weights, every turn'."
         },
         {
           "id": "b4",
-          "say": "A model is built as a tall stack of stages called layers. We will open one up later. For now, just know this: every layer of every large language model is this same pattern, repeated at enormous scale.",
-          "show": "The five-row diagram shrinks into one small cell. The cell tiles into a wide sheet of hundreds of identical cells, and the sheet stacks upward into a tall tower of thin slabs, labelled 'layers'. Small grey tag: 'opened up later'."
-        },
-        {
-          "id": "b5",
-          "say": "Notice the bookkeeping, too. Every weight was used exactly once: one multiplication, then one addition into the total. Hold on to this picture. When we later count how much work a model does, this is exactly what we will be counting.",
-          "show": "The tower collapses back into the five-row diagram. Beside each weight tile, a small amber pair '×' and '+' ticks on, top to bottom, five pairs in all. The bottom band changes to: 'each weight: one multiply, one add'."
+          "say": "This loop is the shape of the entire problem. Almost everything difficult about inference comes from repeating the whole model for every token.",
+          "show": "The loop slows and holds on one turn. The equation, the panel title, the return-arrow label, the counter's label and the '70 billion' label fade, leaving the three box names and the number '300'. On 'every token', the return arrow glows. Bottom band takeaway: 'the whole model, once per token'."
         }
       ]
     },
     {
       "id": "ch01_s06",
-      "name": "text becomes tokens",
-      "figs": [6],
-      "visual": "Top band: a long blue-outlined sentence bar reading 'the quick brown fox jumps', which is cut into five blue token pills. Right third: a second example, a rarer word splitting into pieces. Bottom band: two bars drawn to the same scale comparing a count of words with a count of tokens. Finally three unit cards stack at the right. Blue throughout: tokens are the film's basic unit of structure.",
+      "name": "a score for every token",
+      "figs": [
+        8
+      ],
+      "visual": "Opening frame: a redraw of the previous scene's final loop panel, centred: the three boxes with their names and the return arrow, and no other text. The camera pushes into the 'one new token' box and through it into a new, empty space. Top band (y≈190, x≈480–1700): the text so far as blue pills, 'curled up asleep on the sofa was a', then a dashed empty slot '?'. Centre (x≈360–1560, y≈340–760): a horizontal bar chart, one row per candidate. Each row has its label at the left with an icon (cat, dog and banana from Fluent Emoji Flat; 'the' as plain text), a bar whose length is drawn to scale of the score, and the score at the bar's end. Bars are blue: scores are results, neutral data, and the film keeps logits and shares blue from here to the end of the chapter. The chart then grows a long tail and re-forms as a sorted histogram. The scores are illustrative; the shape is the point.",
       "beats": [
         {
           "id": "b1",
-          "say": "So far, the inputs have just been numbers. But we talk to a model in text. So before anything else happens, the text is cut into pieces, called tokens.",
-          "show": "A chat bubble icon at the left; its text flies out into a sentence bar across the top: 'the quick brown fox jumps'. On 'cut into pieces', small scissor marks snip between the words and the bar breaks into five blue pills: 'the', 'quick', 'brown', 'fox', 'jumps'. On 'tokens', a label appears under them: 'five tokens'."
+          "say": "What comes out of one turn? Say the text reads, curled up asleep on the sofa was a, and then a blank. The model scores every token it knows.",
+          "show": "On 'What comes out', the camera pushes through the 'one new token' box and the loop panel is gone. On 'curled', the pills type in from left to right. On 'blank', the dashed '?' slot appears and blinks. On 'scores every token', a heading fades in under the top band: 'it scores every token it knows'."
         },
         {
           "id": "b2",
-          "say": "Here, each word became exactly one token. Five words, five tokens. Common words usually are a single token. Rarer words get split into two or three pieces.",
-          "show": "The five pills pulse one after another with a small counter running 1 to 5. Right third: a rarer word 'unbelievably' appears in a bar and splits into three pills, 'un', 'believ', 'ably'. Grey tag under it: 'illustrative split'."
+          "say": "Cat, eight point two. Dog, seven point one. The little word the, three point five. Banana, point four.",
+          "show": "Four blue bars grow left to right, one as each is spoken, lengths to scale: cat (cat icon) 8.2, dog (dog icon) 7.1, 'the' 3.5, banana (banana icon) 0.4. Each value appears at its bar's end as it is said."
         },
         {
           "id": "b3",
-          "say": "So a token is roughly a word, but not exactly. As a rule of thumb, five hundred words of English come to about six to eight hundred tokens.",
-          "show": "Bottom band, two horizontal bars on the same scale: a blue bar '500 words', and below it a token bar whose end is a shaded range from 600 to 800, labelled 'about 600–800 tokens'. Small grey note at the right: '1.2 to 1.6 tokens per word'."
+          "say": "And so on, for about a hundred and twenty-eight thousand tokens. Higher means a better fit. These raw scores are called logits.",
+          "show": "On 'And so on', a line 'and 128,252 more, all scored' appears under the four bars, its number counting up, and the chart extends downward as a dense column of tiny bars scrolls past fast. On 'Higher', the heading swaps to 'higher = better fit' and the cat bar glows. On 'logits', the heading swaps again, to 'logits: the raw scores'."
         },
         {
           "id": "b4",
-          "say": "The model never sees letters. It works only in these pieces, and it produces them one at a time. How a piece of text becomes numbers the model can multiply is a story for later.",
-          "show": "The letters inside the five top pills blur away, leaving plain blue pills: the model's-eye view. On 'one at a time', a sixth pill pops in at the right end on its own. Grey tag: 'text to numbers: later'."
+          "say": "The values are illustrative, but the shape is real. One or two stand out, and the rest trail off to nothing.",
+          "show": "The 'and 128,252 more' line fades. On 'shape', the chart re-forms as a vertical histogram sorted from high to low: two tall bars at the left (cat, dog), a steep drop, then a long flat tail running off the right edge. A grey tag appears: 'values illustrative, shape real'. On 'trail off', the tail draws out to the right edge."
         },
         {
           "id": "b5",
-          "say": "Tokens are the unit everything is counted in from now on. Tokens per second. Cost per token. Milliseconds per token.",
-          "show": "Three cards stack at the right, one per phrase, each with a small token-pill icon: 'tokens per second', 'cost per token', 'milliseconds per token'."
-        },
-        {
-          "id": "b6",
-          "say": "And one small refinement to earlier. When training guessed the next word, strictly speaking, it was guessing the next token.",
-          "show": "A small inset of the training sentence from scene 3, 'the cat sat on the ___', slides in at the bottom-left with its station label 'guess the next word'; the word 'word' is struck through and replaced by 'token'."
+          "say": "The most common misconception is that a model picks a word. It produces a hundred and twenty-eight thousand numbers, and something else picks.",
+          "show": "The histogram dims to 0.3. On 'misconception', the phrase 'the model picks a word' appears at centre; on 'It produces', it is struck through. Under it, '≈ 128,000 scores out' appears on 'numbers' and 'something else picks' on 'something else'. The dashed '?' slot in the top band stays empty, blinking."
         }
       ]
     },
     {
       "id": "ch01_s07",
-      "name": "the generate loop",
-      "figs": [7],
-      "visual": "A large rounded panel fills the centre, titled 'One turn of the loop'. Inside, left to right: a blue box 'text so far' holding a row of token pills, an arrow, a coral box 'run the whole model' with the small tile grid inside it, an arrow, and a box 'one new token'. A return arrow runs from 'one new token' down and back along the bottom to 'text so far', labelled 'append it, go round again'. Coral marks the expensive step. The loop physically runs: on each turn the pills pass through the coral box and every tile in it lights up. A counter in the top-right: 'runs of the whole model'.",
+      "name": "softmax: scores become shares",
+      "figs": [
+        9
+      ],
+      "visual": "Opening frame: the four horizontal blue bars exactly as at the previous scene's b2 (cat 8.2, dog 7.1, the 3.5, banana 0.4, with their icons; no tail, heading, histogram or struck text), centred. They collapse into a four-row table at centre (x≈300–1620, y≈330–700): rows cat, dog, the, banana; columns 'score', 'e to the score', 'share', and to the right of the share column a blue bar per row drawn to scale of its share (480 px = 100%: cat 358 px, dog 119 px, the and banana as slivers). Top band (y≈190): a recipe card with an amber outline, because it is an operation: 'e to each score, then divide by the total'. The table's numbers are blue (results); each operation flashes amber as it happens (raising e to a power, the divide arrows). A total line sits under the second column. Text discipline, at most five text items besides numbers at any moment: the 'e ≈ 2.718' card leaves at the end of b2, the 'always positive' note on 'Step two' in b3, and the 'four candidates only' footnote at the end of b4; after b4 the column headers dim to 0.35 and the recipe card shrinks to its title 'softmax'; the cat–dog brackets dim before the cat–'the' brackets draw.",
       "beats": [
         {
           "id": "b1",
-          "say": "One at a time is meant literally. A model does not write a sentence. Here is a single turn of what is called the generate loop. The text so far goes in. The whole model runs. One new token comes out.",
-          "show": "The panel draws on with its title. The pills 'the quick brown fox jumps' sit in 'text so far'. On 'the whole model runs', copies of the pills flow into the coral box and its tile grid lights up top to bottom, every tile. On 'one new token', a blue pill 'over' pops into the third box. Counter top-right: '1'."
+          "say": "Is eight point two a lot? Better to have shares of one whole. The scores were made up, but this arithmetic is real.",
+          "show": "On 'eight point two', the cat bar pulses. On 'shares', the four bars slide left and collapse into the 'score' column (8.2, 7.1, 3.5, 0.4) as the three column headers draw on. On 'made up', a small grey tag 'illustrative' appears over the score column. On 'arithmetic is real', a white tag with a small check icon appears over the other two columns: 'real arithmetic'."
         },
         {
           "id": "b2",
-          "say": "That token is added to the end of the text. Then the entire model runs again, from the start, to predict the next one. And again. And again.",
-          "show": "'over' travels along the return arrow and appends to the pill row. The loop turns three more times, each a little faster, appending 'the', 'lazy', 'dog'. On every turn the coral box lights up fully, every tile, top to bottom. Counter: 2, 3, 4."
+          "say": "Step one is called the exponential. Raise the number e, about two point seven one eight, to the power of each score. Eight point two becomes about three thousand six hundred and forty-one.",
+          "show": "Both tags fade. On 'Step one', the recipe card appears in the top band with its first half lit: 'e to each score'. On 'the number e', a small card 'e ≈ 2.718' pops up beside the recipe. On 'power of each score', all four scores lift into superscripts over an amber 'e'. On 'three thousand', the cat cell resolves to '3,641', and right after, the other three resolve in quick succession: dog '1,212', the '33', banana '1.5'. The 'e ≈ 2.718' card fades at the end of the beat."
         },
         {
           "id": "b3",
-          "say": "So how many runs does a whole answer take? A two-hundred-word answer, at roughly one and a half tokens per word, is about three hundred tokens.",
-          "show": "Bottom band, an equation builds term by term: '200 words' × '~1.5 tokens per word' = '≈ 300 tokens'. Small grey note beneath: 'at 1.2–1.6 per word: 240–320'."
+          "say": "Every result is positive. Step two. Divide each by the total, about four thousand eight hundred and eighty-eight. Cat gets seventy-four point five percent, dog twenty-four point eight, the other two under one percent.",
+          "show": "On 'positive', the four values glow and a small side note at the right reads 'always positive', with 'e⁻¹ ≈ 0.37' beneath it (superscript via S.fmt.sup('-1'), never a caret). On 'Step two', the note fades and the recipe card's second half lights: 'then divide by the total'. On 'total', a sum line draws under the second column: 'total ≈ 4,888'. On 'Divide', four amber arrows run from the values into the 'share' column. The shares land as they are spoken, each row's blue bar growing to scale: 74.5% on 'seventy-four', 24.8% on 'twenty-four', then 0.68% and 0.03% together on 'other two'."
         },
         {
           "id": "b4",
-          "say": "That means running the entire seventy-billion-parameter model about three hundred times. Once per token.",
-          "show": "The loop speeds into a blur and the counter runs to 300. A label on the coral box adds: '70 billion weights, every turn'."
+          "say": "With just these four, the shares add to exactly one. This recipe is softmax, and it is why a model's output is called a probability.",
+          "show": "On 'just these four', a grey footnote appears at the bottom of the table: 'four candidates only, for clarity'. On 'exactly one', copies of the four share bars slide down and join end to end into one full-width bar beneath the table (y≈800) with '= 1.00' at its right; the originals stay in their rows. On 'softmax', the recipe card takes the title 'softmax'. On 'probability', the 'share' column header swaps to 'probability'. At the end of the beat the footnote, the stacked '= 1.00' bar and the total line fade, the column headers dim to 0.35, and the recipe card shrinks to its title 'softmax'."
         },
         {
           "id": "b5",
-          "say": "This loop is the shape of the entire problem. Almost everything difficult about inference follows from one fact: the whole model has to be repeated for every single token.",
-          "show": "The loop slows and holds on one turn; the return arrow glows. The bottom band replaces the equation with: 'the whole model, once per token'."
+          "say": "Each point of score gap multiplies the odds by about two point seven. Cat leads dog by one point one, so it is three times as likely.",
+          "show": "On 'Each point', a small amber tag appears beside the score column: 'each point of gap: × 2.7'. On 'one point one', a bracket joins the cat and dog score cells, labelled 'gap 1.1'. On 'three times', a second bracket joins their share cells, labelled '× 3.0'. The cat and dog share bars brighten."
+        },
+        {
+          "id": "b6",
+          "say": "The little word the, four point seven behind, is a hundred and ten times less likely. The exponential exaggerates every gap.",
+          "show": "The cat–dog brackets and the '× 2.7' tag dim to 0.25. On 'four point seven', a bracket joins the cat and 'the' score cells, labelled 'gap 4.7'. On 'a hundred and ten', a second bracket joins their share cells, labelled '× 110'. On 'exaggerates', the bottom band takeaway enters: 'the exponential exaggerates every gap'."
         }
       ]
     },
     {
       "id": "ch01_s08",
-      "name": "a score for every token",
-      "figs": [8],
-      "visual": "Top band: the text so far as blue pills, 'curled up asleep on the sofa was a', then a dashed empty slot '?'. Below: a horizontal bar chart in amber, one row per candidate, label at the left with an icon (cat, dog and banana from Fluent Emoji Flat; 'the' as plain text), bar length drawn to scale of the score, the score value at the bar's end. The chart then extends into a long tail of tiny bars and re-forms as a sorted histogram. The scores are illustrative; the shape of the distribution is the point.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Let's zoom into the end of one turn. What exactly comes out of the model? Not a word. Suppose the text so far reads, curled up asleep on the sofa was a. What comes next?",
-          "show": "The camera pushes into the 'one new token' box of the loop and through it into a new space. Top band: pills 'curled up asleep on the sofa was a' and a dashed slot '?' that blinks."
-        },
-        {
-          "id": "b2",
-          "say": "The model scores every token it knows. Cat, eight point two. Dog, seven point one. The little word the, three point five. And banana, a poor fit, point four.",
-          "show": "Heading fades in: 'It scores every token it knows'. Four amber bars grow left to right, one as each is spoken, lengths to scale: cat (cat icon) 8.2, dog (dog icon) 7.1, 'the' 3.5, banana (banana icon) 0.4. Values appear at the bar ends."
-        },
-        {
-          "id": "b3",
-          "say": "And it does not stop at four. The model's vocabulary, its full list of tokens, is about a hundred and twenty-eight thousand long, and every single one gets a score. Higher means a better fit.",
-          "show": "Under the four bars, a line 'and 128,252 more, all scored' appears with its number counting up; the chart extends downward and a dense column of tiny bars scrolls past fast. Small grey label in the corner: 'vocabulary: 128,256 tokens'."
-        },
-        {
-          "id": "b4",
-          "say": "These raw numbers are called scores, or logits. The exact values here are illustrative, but the shape is real. One or two candidates stand out, and the rest trail off to nothing.",
-          "show": "The chart re-forms as a vertical histogram sorted from high to low: two tall bars at the left (cat, dog), a steep drop, then a long flat tail running off the right edge. Label: 'logits: the raw scores'. Grey tag: 'values illustrative, shape real'."
-        },
-        {
-          "id": "b5",
-          "say": "Which clears up the most common misconception about language models: that they pick a word. They do not. They produce about a hundred and twenty-eight thousand numbers, and something else does the picking.",
-          "show": "Centre: the phrase 'the model picks a word' appears and is struck through. Under it, two lines: '128,000 scores out' and 'something else picks'. The dashed '?' slot in the top band stays empty."
-        }
-      ]
-    },
-    {
-      "id": "ch01_s09",
-      "name": "softmax: scores become shares",
-      "figs": [9],
-      "visual": "A four-row table at centre: rows cat, dog, the, banana; columns 'score', 'e to the score', 'share', and to the right of the share column an amber bar per row drawn to scale of its share (cat about three quarters of the full width, dog about a quarter, the and banana as slivers). Top band: a recipe card, 'e to each score, then divide by the total'. A total line sits under the second column. The input scores are illustrative but every number computed from them is real arithmetic. Only these four candidates are used, for clarity.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Raw scores are awkward. Is eight point two a lot? What we want are shares of one whole, like slices of a pie that add up to a hundred percent. There is a standard two-step recipe for that.",
-          "show": "The four bars from the previous scene slide left and collapse into the 'score' column: 8.2, 7.1, 3.5, 0.4. On 'two-step recipe', the top-band card appears: 'e to each score, then divide by the total'."
-        },
-        {
-          "id": "b2",
-          "say": "Step one. Take the number e, which is about two point seven one eight, and raise it to the power of each score. E to the eight point two is about three thousand six hundred and forty-one.",
-          "show": "A small card 'e ≈ 2.718' pops up beside the recipe. In the cat row, the 8.2 lifts up into a superscript over an 'e' and the cell resolves to '3,641'."
-        },
-        {
-          "id": "b3",
-          "say": "E to the seven point one is about one thousand two hundred and twelve. For the word the, about thirty-three. And for banana, about one and a half.",
-          "show": "The same lift-and-resolve happens in each row as it is spoken: dog '1,212', the '33', banana '1.5'."
-        },
-        {
-          "id": "b4",
-          "say": "Notice that every result is positive. E raised to any power is positive, so even a negative score would still give a positive value, just a small one.",
-          "show": "A small side note at the right: 'always positive', with an example 'e^−1 ≈ 0.37' that fades in and out. The four values in the column glow briefly."
-        },
-        {
-          "id": "b5",
-          "say": "Step two. Add the four values up. That gives about four thousand eight hundred and eighty-eight. Then divide each value by that total.",
-          "show": "A sum line draws under the second column: 'total ≈ 4,888'. On 'divide', four short arrows run from the values into the empty 'share' column."
-        },
-        {
-          "id": "b6",
-          "say": "Cat gets seventy-four point five percent. Dog, twenty-four point eight. The word the, zero point six eight percent. Banana, zero point zero three percent. To keep the arithmetic visible, we have treated these four as the only candidates.",
-          "show": "The share column fills row by row: 74.5%, 24.8%, 0.68%, 0.03%, and each row's amber share bar grows to scale as its number lands. Grey footnote at the bottom: 'four candidates only, for clarity'."
-        },
-        {
-          "id": "b7",
-          "say": "The four shares add up to exactly one whole. This step is called softmax, and it is the reason a model's output is described as a probability.",
-          "show": "The four share bars slide end to end into one full-width bar with '= 1.00' at its right. On 'softmax', the label 'softmax' appears above the recipe card, which now reads as its definition."
-        },
-        {
-          "id": "b8",
-          "say": "Now look at what the exponential did. Cat and dog differ in score by only about one, one point one to be exact. Yet cat ends up three times as likely as dog, seventy-four percent against twenty-five.",
-          "show": "A bracket joins the cat and dog score cells, labelled 'gap 1.1'. A second bracket joins their share cells, labelled '×3.0'. The cat and dog share bars brighten."
-        },
-        {
-          "id": "b9",
-          "say": "And the little word the, four point seven behind cat, ends up a hundred and ten times less likely. Small differences in score become large differences in confidence. The exponential exaggerates every gap.",
-          "show": "A bracket joins the cat and 'the' score cells, 'gap 4.7', and a second joins their share cells, '×110'. Bottom band: 'the exponential exaggerates every gap'."
-        }
-      ]
-    },
-    {
-      "id": "ch01_s10",
       "name": "the draw: sampling",
-      "figs": [10],
-      "visual": "Left third: the two leading share bars from scene 9, 'cat, 74.5%' and 'dog, 24.8%'. Centre-right: a spinner wheel with a fixed pointer at the top, its slices drawn to scale: cat 268 degrees, dog 89 degrees, the 2.4 degrees, banana 0.1 degrees (a hairline). Top band: the text 'curled up asleep on the sofa was a' with its empty slot; later it forks into two branches. Amber for the shares, blue for token pills. The scene ends on a recap strip of the whole chapter and a stopwatch with a question mark, handing over to the next chapter.",
+      "figs": [
+        10
+      ],
+      "visual": "Opening frame: the pill row 'curled up asleep on the sofa was a' with its empty dashed slot at the left of the top band (x≈480–1150, y≈190), and in the left third the two leading share bars from the previous scene, blue, labelled 'cat, 74.5%' and 'dog, 24.8%'. Centre-right (centre x≈1260, y≈580, radius ≈250): a spinner wheel with a fixed pointer at the top, slices drawn to scale: cat 268°, dog 89°, the 2.4°, banana 0.1° (a hairline). Slices are blue shades, cat brightest. Later the sentence forks into two branches running right along the top band (upper branch y≈150, lower branch y≈240), and the locked tile grid from s01 b4 returns in the left third. Blue for shares and pills; the only motion with meaning is the spin.",
       "beats": [
         {
           "id": "b1",
-          "say": "So who does the picking? Not the model. The model hands over the same list every time it sees this text. Cat, seventy-four point five percent. Dog, twenty-four point eight.",
-          "show": "Left third: the two amber bars 'cat, 74.5%' and 'dog, 24.8%' slide in, with a label above them: 'same list, every time'. Top band: the sentence with its empty slot."
+          "say": "Who picks, then? Not the model. It gives the same list every time it sees this text.",
+          "show": "The two bars sit in the left third with their labels. On 'same list', a label above them reads 'same list, every time', and the bars pulse once, then again, identically."
         },
         {
           "id": "b2",
-          "say": "The pick is a random draw, made in proportion to those shares. Picture a spinner with slices sized to match exactly. Making this draw is called sampling.",
-          "show": "The bars bend round into the spinner wheel at centre-right: the cat slice three quarters of the wheel, the dog slice a quarter, two thin slivers for the and banana. The pointer draws on at the top. Label under the wheel: 'sampling'."
+          "say": "A token is drawn at random, in proportion to those shares, like a spinner with slices sized to match. This draw is called sampling.",
+          "show": "On 'in proportion', the 'same list, every time' label fades and the bars bend round into the spinner wheel at centre-right: the cat slice three quarters of the wheel, the dog slice a quarter, and two thin slivers for the and banana. On 'spinner', the pointer draws on at the top. On 'sampling', the label under the wheel reads 'sampling'."
         },
         {
           "id": "b3",
-          "say": "Spin once, and cat is likely. Spin again, and dog can win. About one time in four, it will.",
-          "show": "Spin 1: the wheel spins and stops on cat; a 'cat' pill drops into the slot. The slot clears. Spin 2: it stops on dog; 'dog' drops in. Then a quick run of many spins, with a tally beside the wheel climbing to roughly 'cat 75 · dog 25' out of 100 (an illustrative tally)."
+          "say": "Spin once, and cat is likely. Spin again, and dog can win, about one time in four. Then dog is appended, and the answer takes a different turn.",
+          "show": "On 'Spin once', the wheel spins and stops on cat, and a 'cat' pill drops into the slot, then lifts back out. On 'Spin again', it stops on dog and 'dog' drops in. On 'one time in four', a quick run of spins plays, and a tally beside the wheel climbs to 'cat 745 · dog 248 · other 7', with a small grey caption 'expected, per 1,000 spins'. On 'appended', the top-band sentence forks into two branches. The upper one reads '…was a cat' and appends 'purring' and 'softly' one at a time; the lower one reads '…was a dog' and appends 'snoring' and 'loudly'."
         },
         {
           "id": "b4",
-          "say": "And once dog has been drawn, it is appended to the text, and every later token is predicted from that new starting point. The answer takes a different turn from there on.",
-          "show": "The top-band sentence forks into two branches. Upper branch: '…was a cat', then pills 'purring' and 'softly' append one at a time. Lower branch: '…was a dog', then 'snoring' and 'loudly'. Each branch grows token by token, as if the loop is turning on each."
-        },
-        {
-          "id": "b5",
-          "say": "That is why the same question can give different answers, and why nothing about the model itself has changed when it does. The difference lives entirely in that last step, the draw, not in the model.",
-          "show": "The locked file icon from scene 2 appears centred above both branches, unchanged, padlock closed. A highlight ring circles the spinner. Bottom band: 'same model, same list, different draw'."
-        },
-        {
-          "id": "b6",
-          "say": "So here is the whole machine so far. A fixed file of seventy billion numbers. Text cut into tokens. The whole model run once per token, multiplying and adding, ending in scores, softmax, and a draw. Then round again.",
-          "show": "A recap strip assembles left to right across the centre, one element per phrase: the file icon '70 billion weights', a row of token pills 'tokens', the coral box 'whole model, per token', amber bars 'scores', the spinner 'draw', and an arrow curving back to the start."
-        },
-        {
-          "id": "b7",
-          "say": "Which leaves one question. How long does a single turn of that loop take?",
-          "show": "The recap strip holds; a stopwatch icon fades in over the curved return arrow, with a '?' beside it. Hold for a beat."
+          "say": "So the same question can get different answers, with nothing in the model changed. It all lies in the last step, the draw.",
+          "show": "The tally and its caption fade. On 'nothing in the model changed', the locked tile grid from the first scene appears in the left third, padlock closed and tiles unchanged, with a grey label 'same model'. On 'the draw', a highlight ring circles the spinner. Bottom band takeaway: 'same model, same list, different draw'."
         }
       ]
     }
   ],
   "checks": [
-    {"claim": "Reading seventy billion numbers at one per second takes about 2,218 years", "python": "70e9/(365.25*24*3600)", "result": "2218.1661469820265"},
-    {"claim": "Fig 4 dial example, input 2: times 0, 1.44, -0.7 gives 0, 2.88, -1.4", "python": "[2*0, round(2*1.44,4), round(2*-0.7,4)]", "result": "[0, 2.88, -1.4]"},
-    {"claim": "Fig 5 worked example (added): inputs 2,1,5,1,1 times weights 0.13,-0.7,0.02,1.44,-0.3 give products 0.26,-0.7,0.1,1.44,-0.3", "python": "[round(a*b,4) for a,b in zip([2,1,5,1,1],[0.13,-0.7,0.02,1.44,-0.3])]", "result": "[0.26, -0.7, 0.1, 1.44, -0.3]"},
-    {"claim": "Fig 5 running total of the products: 0.26, -0.44, -0.34, 1.10, 0.80; one output = 0.8", "python": "[round(v,4) for v in __import__('itertools').accumulate([0.26,-0.7,0.1,1.44,-0.3])]", "result": "[0.26, -0.44, -0.34, 1.1, 0.8]"},
-    {"claim": "500 words to 600-800 tokens is 1.2 to 1.6 tokens per word", "python": "(600/500, 800/500)", "result": "(1.2, 1.6)"},
-    {"claim": "A 200-word answer is about 300 tokens: 1.5 tokens per word gives 300, inside the 240-320 range implied by fig 6's 1.2-1.6", "python": "(200*1.2, 200*1.5, 200*1.6)", "result": "(240.0, 300.0, 320.0)"},
-    {"claim": "CORRECTION fig 8: atlas says 'and 127,996 more', which assumes a 128,000-token vocabulary; the film's model has 128,256 tokens, so 4 shown leaves 128,252 more. Narration says 'about a hundred and twenty-eight thousand'.", "python": "(128256-4, 128000-4)", "result": "(128252, 127996)"},
-    {"claim": "e is about 2.718", "python": "__import__('math').e", "result": "2.718281828459045"},
-    {"claim": "Fig 9: e^8.2, e^7.1, e^3.5, e^0.4 = 3,641; 1,212; 33; 1.5", "python": "[round(__import__('math').exp(s),3) for s in (8.2,7.1,3.5,0.4)]", "result": "[3640.95, 1211.967, 33.115, 1.492]"},
-    {"claim": "Fig 9: total of the four exponentials is about 4,888", "python": "round(sum(__import__('math').exp(s) for s in (8.2,7.1,3.5,0.4)),3)", "result": "4887.525"},
-    {"claim": "Fig 9 shares: 74.5%, 24.8%, 0.68%, 0.03%", "python": "[round(100*__import__('math').exp(s)/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),4) for s in (8.2,7.1,3.5,0.4)]", "result": "[74.4948, 24.7972, 0.6776, 0.0305]"},
-    {"claim": "Fig 9: the four shares sum to 1.00", "python": "round(sum(__import__('math').exp(s) for s in (8.2,7.1,3.5,0.4))/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),6)", "result": "1.0"},
-    {"claim": "CORRECTION fig 9: atlas calls 8.2 vs 7.1 'a gap of one'; it is 1.1, and e^1.1 = 3.0 is why cat is three times as likely as dog. Narration says 'about one, one point one to be exact'.", "python": "(round(8.2-7.1,4), round(__import__('math').exp(8.2-7.1),4))", "result": "(1.1, 3.0042)"},
-    {"claim": "Added: 'the' is 4.7 behind cat, so about 110 times less likely", "python": "(round(8.2-3.5,4), round(__import__('math').exp(8.2-3.5),2))", "result": "(4.7, 109.95)"},
-    {"claim": "On-screen side note: e^-1 is about 0.37 (a negative score still gives a positive value)", "python": "round(__import__('math').exp(-1),4)", "result": "0.3679"},
-    {"claim": "Fig 10 spinner slice angles to scale: cat 268, dog 89, the 2.4, banana 0.1 degrees", "python": "[round(360*__import__('math').exp(s)/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),2) for s in (8.2,7.1,3.5,0.4)]", "result": "[268.18, 89.27, 2.44, 0.11]"}
+    {
+      "claim": "Fig 4 dial example, input 2: times 0, 1.44, -0.7 gives 0, 2.88, -1.4 (2.88 and -1.4 are shown on screen)",
+      "python": "[2*0, round(2*1.44,4), round(2*-0.7,4)]",
+      "result": "[0, 2.88, -1.4]"
+    },
+    {
+      "claim": "s02 nudge example: tiles one nudge of 0.001 short of the file values land exactly on them: 0.129->0.13, -0.701->-0.7, 0.021->0.02, 1.439->1.44, -0.299->-0.3",
+      "python": "[round(a+b,4) for a,b in zip([0.129,-0.701,0.021,1.439,-0.299],[0.001,0.001,-0.001,0.001,-0.001])]",
+      "result": "[0.13, -0.7, 0.02, 1.44, -0.3]"
+    },
+    {
+      "claim": "Fig 5 worked example (added): inputs 2,1,5,1,1 times weights 0.13,-0.7,0.02,1.44,-0.3 give products 0.26,-0.7,0.1,1.44,-0.3",
+      "python": "[round(a*b,4) for a,b in zip([2,1,5,1,1],[0.13,-0.7,0.02,1.44,-0.3])]",
+      "result": "[0.26, -0.7, 0.1, 1.44, -0.3]"
+    },
+    {
+      "claim": "Fig 5 running total of the products: 0.26, -0.44, -0.34, 1.10, 0.80; one output = 0.8",
+      "python": "[round(v,4) for v in __import__('itertools').accumulate([0.26,-0.7,0.1,1.44,-0.3])]",
+      "result": "[0.26, -0.44, -0.34, 1.1, 0.8]"
+    },
+    {
+      "claim": "500 words to 600-800 tokens is 1.2 to 1.6 tokens per word",
+      "python": "(600/500, 800/500)",
+      "result": "(1.2, 1.6)"
+    },
+    {
+      "claim": "s04 bar scale: 500 words = 600 px, so 600 and 800 tokens are 720 and 960 px",
+      "python": "(600*600/500, 800*600/500)",
+      "result": "(720.0, 960.0)"
+    },
+    {
+      "claim": "A 200-word answer is about 300 tokens: 1.5 tokens per word gives 300, inside the 240-320 range implied by fig 6's 1.2-1.6",
+      "python": "(200*1.2, 200*1.5, 200*1.6)",
+      "result": "(240.0, 300.0, 320.0)"
+    },
+    {
+      "claim": "CORRECTION fig 8: atlas says 'and 127,996 more', which assumes a 128,000-token vocabulary; the film's model has 128,256 tokens, so 4 shown leaves 128,252 more. Narration says 'about a hundred and twenty-eight thousand'; the screen says '≈ 128,000 scores out'.",
+      "python": "(128256-4, 128000-4)",
+      "result": "(128252, 127996)"
+    },
+    {
+      "claim": "e is about 2.718",
+      "python": "__import__('math').e",
+      "result": "2.718281828459045"
+    },
+    {
+      "claim": "Fig 9: e^8.2, e^7.1, e^3.5, e^0.4 = 3,641; 1,212; 33; 1.5",
+      "python": "[round(__import__('math').exp(s),3) for s in (8.2,7.1,3.5,0.4)]",
+      "result": "[3640.95, 1211.967, 33.115, 1.492]"
+    },
+    {
+      "claim": "Fig 9: total of the four exponentials is about 4,888",
+      "python": "round(sum(__import__('math').exp(s) for s in (8.2,7.1,3.5,0.4)),3)",
+      "result": "4887.525"
+    },
+    {
+      "claim": "Fig 9 shares: 74.5%, 24.8%, 0.68%, 0.03%",
+      "python": "[round(100*__import__('math').exp(s)/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),4) for s in (8.2,7.1,3.5,0.4)]",
+      "result": "[74.4948, 24.7972, 0.6776, 0.0305]"
+    },
+    {
+      "claim": "s07 b3: 'the other two under one percent': the and banana together are 0.71%",
+      "python": "round(100*(__import__('math').exp(3.5)+__import__('math').exp(0.4))/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),4)",
+      "result": "0.7081"
+    },
+    {
+      "claim": "Fig 9: the four shares sum to 1.00",
+      "python": "round(sum(__import__('math').exp(s) for s in (8.2,7.1,3.5,0.4))/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),6)",
+      "result": "1.0"
+    },
+    {
+      "claim": "s07 share bars: 480 px = 100%, so cat 358 px and dog 119 px",
+      "python": "[round(480*__import__('math').exp(s)/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),1) for s in (8.2,7.1)]",
+      "result": "[357.6, 119.0]"
+    },
+    {
+      "claim": "CORRECTION fig 9: atlas calls 8.2 vs 7.1 'a gap of one'; it is 1.1, and e^1.1 = 3.0 is why cat is three times as likely as dog. Narration says 'one point one'.",
+      "python": "(round(8.2-7.1,4), round(__import__('math').exp(8.2-7.1),4))",
+      "result": "(1.1, 3.0042)"
+    },
+    {
+      "claim": "s07 b5 mechanism: the ratio of two shares is e to the score gap, so each point of gap multiplies the odds by e, about 2.7; cat/dog share ratio equals e^1.1",
+      "python": "(round(__import__('math').e,2), round(__import__('math').exp(8.2)/__import__('math').exp(7.1),4))",
+      "result": "(2.72, 3.0042)"
+    },
+    {
+      "claim": "Added: 'the' is 4.7 behind cat, so about 110 times less likely",
+      "python": "(round(8.2-3.5,4), round(__import__('math').exp(8.2-3.5),2))",
+      "result": "(4.7, 109.95)"
+    },
+    {
+      "claim": "On-screen side note: e^-1 is about 0.37 (a negative score still gives a positive value)",
+      "python": "round(__import__('math').exp(-1),4)",
+      "result": "0.3679"
+    },
+    {
+      "claim": "Fig 10 spinner slice angles to scale: cat 268, dog 89, the 2.4, banana 0.1 degrees",
+      "python": "[round(360*__import__('math').exp(s)/sum(__import__('math').exp(t) for t in (8.2,7.1,3.5,0.4)),2) for s in (8.2,7.1,3.5,0.4)]",
+      "result": "[268.18, 89.27, 2.44, 0.11]"
+    },
+    {
+      "claim": "s08 tally, expected counts per 1,000 spins: cat 745, dog 248, other 7 (the + banana), summing to 1,000; replaces the old 'cat 75 · dog 25' so the rounding agrees with 74.5% / 24.8%",
+      "python": "(lambda E: [round(1000*E[0]/sum(E)), round(1000*E[1]/sum(E)), round(1000*(E[2]+E[3])/sum(E))])([__import__('math').exp(s) for s in (8.2,7.1,3.5,0.4)])",
+      "result": "[745, 248, 7]"
+    }
   ]
 }

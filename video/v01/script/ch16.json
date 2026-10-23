@@ -21,267 +21,187 @@
       "figs": [
         47
       ],
-      "visual": "Two stacked horizontal rows across the centre of the frame, each a to-scale bar of the same 1,032-token prompt, spanning about 70% of the frame width. Row labels sit at the left: top 'Warm, a minute later', bottom 'Cold, a day later'. Each bar is coloured by state: teal for tokens whose keys and values are already held, amber for tokens that must be prefilled. The amber parts of the two rows are then lifted out and compared to scale in a band below. A small chat bubble with a cloud-and-sun icon, 'the weather conversation', sits in the top-left corner throughout. The idea the motion makes visible: warm and cold are not moods, they are two lengths of amber. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "One continuous shot in two tiers. Upper tier: two to-scale bars of the same 1,032-token prompt, each 1,400 px wide, stacked at y≈260 and y≈400, row labels at the left 'a minute later' and 'a day later'. A chat bubble with a cloud-and-sun icon, 'the weather conversation', sits top-left throughout. In b3 the camera tilts down to the lower tier while the bars stay in view, dimmed, in the top band: a G P U package at the right (compute die, H B M stacks outlined coral), a database cylinder icon at the left, an amber gear 'prefill' between them. The idea: warm and cold are two lengths of amber, and the difference is whether your blocks are still in the G P U's memory. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled; blue = arriving tokens and neutral structure; coral = the G P U's memory itself; grey dashed outline = nothing held, or evicted; solid grey = other people's blocks.",
       "beats": [
         {
           "id": "b1",
-          "say": "People talk about a cache being warm or cold as if it were a mood. It is not. It is a count. And you have already seen one, in the conversation about the weather.",
-          "show": "Centre: a thermometer icon with 'warm' at its top and 'cold' at its foot. On 'It is a count', the thermometer morphs into a plain numeric counter showing '?'. On 'the weather conversation', the counter shrinks away and a chat bubble with a cloud-and-sun icon, labelled 'the weather conversation', settles in the top-left corner."
+          "say": "Warm and cold are counts, not moods. A minute after the last answer, the weather conversation's follow-up brought one thousand and thirty-two tokens, all but five already cached. That is warm.",
+          "show": "Centre: a thermometer icon tagged 'warm / cold'; on 'counts, not moods', it morphs into a numeric counter and slides away. The weather bubble settles top-left. Upper bar: on 'one thousand and thirty-two tokens', an empty outline grows to 1,400 px with a counter at its right end, '1,032 tokens'. On 'all but five', it fills teal from the left for 1,027 units, label '1,027 held'; the last 5 units, a 7 px sliver, fill amber with a pointer 'prefill 5'. On 'That is warm', a row tag in teal: 'warm'."
         },
         {
           "id": "b2",
-          "say": "Its follow-up arrived a minute after the first answer, carrying one thousand and thirty-two tokens. One thousand and twenty-seven of them already had keys and values on the machine. Only five new tokens needed prefill. That is warm.",
-          "show": "Top row draws on, label 'Warm, a minute later'. On 'one thousand and thirty-two', an empty bar outline grows to full width with a counter at its right end running to '1,032 tokens'. On 'one thousand and twenty-seven', the bar fills teal from the left for 1,027 units, label below '1,027 of 1,032 already held'. On 'five new tokens', the last hairline sliver at the right end fills amber, with a pointer label 'prefill 5 tokens'. On 'That is warm', the row label glows teal."
+          "say": "A day later, in the coldest case, nothing is cached, and all one thousand and thirty-two are prefilled. Two hundred and six times the prefill work.",
+          "show": "Lower bar: a grey dashed outline labelled '0 of 1,032 held'; on 'coldest case', a row tag in grey: 'cold'. On 'all one thousand and thirty-two', it fills amber left to right at an even pace, label 'prefill 1,032'. On 'two hundred and six', a plate between the rows: '1,032 ÷ 5 ≈ 206× the prefill work'. Three small grey tags pop in at the right, one after another: 'same question', 'same model', 'same hardware'."
         },
         {
           "id": "b3",
-          "say": "Now send the very same follow-up a day later. Take the coldest version, where nothing at all is held. Zero of one thousand and thirty-two. Every token has to be prefilled.",
-          "show": "Bottom row draws on, label 'Cold, a day later'. Its bar first appears as a grey dashed empty outline, label '0 of 1,032 held'. On 'Every token', it fills amber from left to right at an even pace, label 'prefill 1,032 tokens'."
+          "say": "The cache lives in fixed-size blocks. Warm, yours are still resident in the G P U's memory. Cold, they were evicted for someone else.",
+          "show": "Camera tilts down; bars, plate and tags shrink into the top band. The G P U package draws at the right. On 'fixed-size blocks', the teal part of the upper bar drops and breaks into six equal rounded teal tiles, each with a tiny 'K V' mark, label 'blocks', grey note 'schematic: a real chat fills many'. On 'resident', the tiles glide into the coral H B M stacks and glow, tag 'warm: still resident'. On 'evicted', solid grey blocks with tiny user icons slide in from the right and push yours out of the stacks; yours turn into grey dashed outlines, tag 'cold: evicted'."
         },
         {
           "id": "b4",
-          "say": "Set the two amounts of work side by side. Five tokens against one thousand and thirty-two. About two hundred and six times the work, for exactly the same question.",
-          "show": "The amber sliver from the top row and the full amber bar from the bottom row lift out and drop into a comparison band below, left-aligned, same scale: a sliver labelled '5' above a long bar labelled '1,032'. On 'two hundred and six', a blue plate appears between them: '206 times the work', with a small equation under it: '1,032 ÷ 5 ≈ 206'."
+          "say": "Their huge keys and values stop existing. Only the small text survives, in a database, and rebuilding them from text is exactly what prefill does.",
+          "show": "On 'stop existing', the dashed outlines vanish. On 'small text', the database cylinder draws at the left with a small blue document inside, tag 'text: small, kept'. On 'rebuilding', an arrow draws from the database through the amber 'prefill' gear into free slots in the H B M; the gear spins and teal blocks are rebuilt there one by one. Tag under the gear: 'text in, keys and values out'."
         },
         {
           "id": "b5",
-          "say": "Identical question. Identical model. Identical hardware. The only thing that differs between those two rows is whether what was kept from last time is still there.",
-          "show": "Three small grey tags pop in one by one beside the rows as each is said: 'same question', 'same model', 'same hardware', each with a check mark. On 'still there', the teal part of the top row and the empty dashed part of the bottom row both pulse once."
+          "say": "So warm is a precise question. How many arriving tokens already have keys and values on this machine?",
+          "show": "Everything dims. Centre: a grey phrase 'a vague sense of readiness' writes on and is struck through; below it a plate writes on, 'how many arriving tokens are already held here?' A counter beside the plate flicks between '1,027' and '0'."
         }
       ]
     },
     {
       "id": "ch16_s02",
-      "name": "resident, evicted, and what survives",
+      "name": "time t, the first question",
       "figs": [
-        47
+        48
       ],
-      "visual": "Camera pushes into the machine. Right half: a G P U package illustration, compute die in the middle and H B M stacks around it, the H B M stacks outlined in coral. Above the package, a strip of equal-size rounded blocks, the cache, each block a teal tile with a tiny 'K V' mark. Left half: a database cylinder icon labelled 'text database'. Between them an amber gear labelled 'prefill'. Later in the scene, a size comparison of text against keys and values is drawn as two squares whose areas are to scale. The idea: the text is small and kept; the keys and values are huge, kept in scarce memory, and rebuilt from the text when lost. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "The case layout used in every case scene (s02 to s05, and again in s08): two rows in the upper middle, 'arriving' on top and 'in the cache' below, aligned token for token, row labels at the left. Segment widths are schematic, not to scale (corner note 'widths schematic'). The preamble is two segments, 'system' and 'tools', under a bracket 'shared preamble: 770'; question tokens are separate pills. Segments start blue and are coloured by state as the comparison runs. Below the rows, a result plate 'hit · prefill'. Top-right corner: a small scoreboard table with columns 'case', 'hit', 'prefill', which gains one row per case and stays through s05. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "To say exactly what that means, you need one more word. The server stores the cache in fixed-size pieces called blocks. Each block holds the keys and values for a short run of tokens.",
-          "show": "The 1,027-token teal bar from the previous scene slides in at the top and breaks into a row of equal rounded tiles, the blocks, each spanning a run of tokens. One tile enlarges briefly to show a few token slots inside it, each slot a two-part 'K | V' slab. Label: 'block: keys and values for a run of tokens'. Note in the corner: 'schematic: real conversations fill many blocks'."
+          "say": "Now count every token. A service starts every conversation with the same preamble, system prompt and tools, seven hundred and seventy tokens.",
+          "show": "Top row draws on, label 'arriving': two blue segments 'system' and 'tools'. On 'every conversation', a faint stack of three ghost rows with the same two segments flickers behind and fades. On 'seven hundred and seventy', the bracket 'shared preamble: 770 tokens' draws under them. The empty scoreboard frame appears top right."
         },
         {
           "id": "b2",
-          "say": "Warm means your blocks are still resident, still sitting in the G P U's memory, right where the last request left them.",
-          "show": "The G P U package draws on at the right. On 'resident', the row of teal blocks glides down into the coral-outlined H B M stacks and settles there, glowing softly. Tag: 'warm: blocks still resident'."
+          "say": "At time t you ask, What is the capital of France? Seven tokens. Nothing in the cache matches, so all seven hundred and seventy-seven are prefilled.",
+          "show": "A clock icon tagged 'time t' appears above the row. Seven blue pills slide in after the preamble as spoken: 'What' 'is' 'the' 'capital' 'of' 'France' '?', bracket '7 tokens', sum at the row's right '770 + 7 = 777'. On 'Nothing in the cache matches', the bottom row draws as one grey dashed outline, label 'in the cache', text inside 'nothing that matches this conversation'. On 'all seven hundred and seventy-seven', the whole arriving row fills amber left to right; plate 'hit 0 · prefill all 777 tokens'; scoreboard row 'time t | 0 | 777'."
         },
         {
           "id": "b3",
-          "say": "Cold means they were evicted, thrown out to make room for somebody else. Their keys and values simply stopped existing.",
-          "show": "Grey blocks with small user icons of other people slide into the H B M from the right. On 'evicted', your teal blocks are pushed out, turn into grey dashed outlines and fade. Tag: 'cold: evicted for someone else'."
-        },
-        {
-          "id": "b4",
-          "say": "And yet the text survived. It sits in an ordinary database, about four kilobytes of it. The keys and values for those same tokens took about a third of a gigabyte, more than eighty thousand times as much, in the G P U's own memory.",
-          "show": "Left: the database cylinder draws on with a blue document inside, label 'text: about 4 KB'. On 'a third of a gigabyte', camera pulls back to a size comparison at centre, areas drawn to scale: a blue dot for the text, 'about 4 KB', beside a large teal square for the keys and values, 'about 338 MB', its outline coral. On 'eighty thousand', a tag between them: '≈ 85,000 ×'."
-        },
-        {
-          "id": "b5",
-          "say": "That is why it is the keys and values that get thrown away. They are not text. They are the model's processed form of it, and rebuilding them from the text is exactly what prefill does.",
-          "show": "Back to the main layout. On 'rebuilding them', an arrow draws from the database cylinder through the amber gear labelled 'prefill' into the empty H B M; the gear spins and the teal blocks reappear one by one. Tag under the gear: 'text in, keys and values out'."
-        },
-        {
-          "id": "b6",
-          "say": "So warm is not a vague sense of readiness. It is a precise question with a number attached. How many of the arriving tokens already have keys and values on this machine?",
-          "show": "Everything dims except a centred plate in two lines: 'warm or cold?' and below it 'how many arriving tokens are already held here?' On 'a number attached', a counter beside the plate flicks between '1,027' and '0'."
+          "say": "The cold case, unavoidable the first time. Yet on a busy machine the preamble is probably cached already, leaving your seven tokens as the only new work.",
+          "show": "Tag beside the plate: 'the expensive case: nothing reused'. On 'on a busy machine', faint grey user icons appear above the preamble; the preamble part of the cache row fills with teal hatching, tag 'probably cached by someone else'; the arriving 'system' and 'tools' change from solid amber to amber with teal hatching. On 'only new work', the seven question pills stay solid amber and pulse once, tag 'the only genuinely new work'."
         }
       ]
     },
     {
       "id": "ch16_s03",
-      "name": "time t, the first question",
+      "name": "case A, continue the chat",
       "figs": [
-        48
+        49
       ],
-      "visual": "The layout used for every case in this chapter. Two rows stacked in the upper-middle of the frame. Top row, labelled 'arriving' at its left: the prompt as segments. Bottom row, labelled 'in the cache': what the machine already holds, aligned token for token beneath. Segment widths are schematic, not to scale (a note in the corner says so). The preamble segments are 'system' and 'tools'; the question is seven separate token pills. Below the rows, a result plate 'hit · prefill'. In the top-right corner a small scoreboard table with three columns, 'case', 'hit', 'prefill', which gains one row per case and carries over into the next scenes. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "Same case layout as s02, rebuilt. Arriving row: 'system', 'tools' and 'question 1' as compact segments, then seven pills for 'answer 1' and four pills for 'new'. A white vertical scan cursor runs along both rows for the front-to-back comparison. The scoreboard keeps its 'time t' row and gains 'A'. The idea: the cached prefix includes the model's own answer, so only the new words are new. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now a smaller example, small enough to count every token. A service puts the same preamble in front of every conversation, a system prompt and its tool definitions. Seven hundred and seventy tokens in all.",
-          "show": "Top row draws on: two blue segments 'system' and 'tools', joined under a bracket labelled 'shared preamble: 770 tokens'. Row label 'arriving' at the left. Corner note: 'widths schematic'."
+          "say": "In case A, you continue the chat. The model answered, The capital of France is Paris. A minute later you add four new tokens. And its population?",
+          "show": "Label top-left: 'case A: continue the chat'. Arriving row rebuilds: 'system', 'tools', 'question 1', in blue. On 'The capital of France is Paris', seven blue pills slide in: 'The' 'capital' 'of' 'France' 'is' 'Paris' '.', bracket 'answer 1: 7'. On 'And its population', four pills: 'And' 'its' 'population' '?', bracket 'new: 4'. Sum at the right: '770 + 7 + 7 + 4 = 788'."
         },
         {
           "id": "b2",
-          "say": "At time t, you ask your first question. What is the capital of France? Six words and a question mark, which makes seven tokens. So seven hundred and seventy-seven tokens arrive.",
-          "show": "A clock icon with the tag 'time t' appears above the row. On 'What is the capital of France', seven blue pills slide in after the preamble one by one: 'What' 'is' 'the' 'capital' 'of' 'France' '?'. On 'seven tokens', a small bracket under them: '7 tokens'. On 'seven hundred and seventy-seven', a sum at the row's right end: '770 + 7 = 777'."
+          "say": "That answer was cached as it was written, so everything before your new words matches. Hit, seven hundred and eighty-four. Prefill, four.",
+          "show": "Cache row builds: 'system', 'tools', 'question 1' in teal; on 'cached as it was written', the answer pills drop in one at a time, each clicking a small 'K | V' slab onto itself, tag 'cached as it was written'. On 'everything before', the scan cursor sweeps from the left; each arriving segment turns teal with a check as it passes; the cursor stops where the cache row ends, before 'new', marker 'first difference'. On 'Hit', the four new pills fill amber; plate 'hit 784 · prefill 4 tokens'; scoreboard row 'A | 784 | 4'."
         },
         {
           "id": "b3",
-          "say": "Below it, the cache. Does the machine already hold keys and values for this prompt, matching from the very first token? Nothing that matches this conversation.",
-          "show": "Bottom row draws on, label 'in the cache'. Beneath the full length of the arriving row, a grey dashed empty outline, with text inside: 'nothing that matches this conversation'."
-        },
-        {
-          "id": "b4",
-          "say": "So the hit is zero, and all seven hundred and seventy-seven tokens are prefilled. Nothing of yours has been seen before, so every token is processed from scratch. This is the expensive case, and the first time, it is unavoidable.",
-          "show": "On 'the hit is zero', the result plate appears below the rows: 'hit 0 · prefill all 777 tokens', the 0 in teal and the 777 in amber. On 'processed from scratch', the whole arriving row fills amber from left to right. Scoreboard top right gains its first row: 'time t | 0 | 777'."
-        },
-        {
-          "id": "b5",
-          "say": "One caveat. The system prompt and tools are identical for every user of this service. On a busy machine, somebody else's request has very likely put them in the cache already.",
-          "show": "Above the preamble, faint grey user icons of other people appear. The preamble part of the dashed cache row fills with a teal hatch, tagged 'probably cached by someone else'. The arriving 'system' and 'tools' segments shift from solid amber to amber with teal hatching, meaning 'probably'."
-        },
-        {
-          "id": "b6",
-          "say": "Hold that aside, and your seven tokens are the only genuinely new work. This is the cold case, the only one where nothing at all can be reused. And even here, the shared preamble is usually already warm.",
-          "show": "The preamble segments settle to teal hatching; only the seven question pills stay solid amber and pulse once. Tag under them: 'the only genuinely new work'. Final line centred below the result plate: 'cold, yet the preamble is usually warm'."
+          "say": "A perfect prefix, the model's own answer included. The best and most common case, and why a conversation stays quick while you keep typing.",
+          "show": "On 'own answer', the 'answer 1' pills in both rows glow teal together; line under the plate: 'a perfect prefix, answer included'. On 'keep typing', a small chat-window icon at bottom left shows short messages going back and forth; each adds only a short amber sliver to the end of a long teal bar beneath it, tag 'keep typing, stay warm'."
         }
       ]
     },
     {
       "id": "ch16_s04",
-      "name": "case A, continue the chat",
+      "name": "case B, one word changed",
       "figs": [
-        49
+        50
       ],
-      "visual": "Same two-row layout as the previous scene, re-drawn. Arriving row now has five segments: 'system', 'tools', 'question 1', 'answer 1', 'new'. The answer and the new words are shown as token pills; the preamble and question 1 as labelled segments. A white vertical scan cursor runs along both rows to show the front-to-back comparison. Scoreboard top right keeps its 'time t' row and gains 'A'. The idea: the cached prefix includes the model's own answer, so only the new words are new. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "Same case layout and orientation: 'arriving' on top, 'in the cache' below. The preamble collapses to one compact blue segment '770' in each row so the question pills can be large. In the cache: '770' then 'What' 'is' 'the' 'capital' 'of' 'France' '?'. Arriving: '770' then the new question, pill under pill. The white scan cursor returns. The scoreboard gains 'B'. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "The model answers. The capital of France is Paris. That is seven more tokens. A minute later, you continue the same conversation with four new ones. And its population?",
-          "show": "Arriving row rebuilds: 'system', 'tools', 'question 1', then seven blue pills for 'answer 1': 'The' 'capital' 'of' 'France' 'is' 'Paris' '.', then on 'four new ones' four pills for 'new': 'And' 'its' 'population' '?'. A sum at the row's right: '770 + 7 + 7 + 4 = 788'."
+          "say": "Case B, a brand new question: What is the capital of Japan? The preamble and the first five words match, identical and in the same places.",
+          "show": "Label top-left: 'case B: a minute later, one word changed', with a small grey tag 'not a follow-up'. The cache row shows the earlier question; the arriving pills slide in as spoken: 'What' 'is' 'the' 'capital' 'of' 'Japan' '?'. On 'The preamble', the cursor passes the two '770' segments and both turn teal. On 'first five words', each word pair turns teal with a check as the cursor passes it."
         },
         {
           "id": "b2",
-          "say": "Remember how that answer was made. As each of its tokens was generated, its keys and values were appended to the cache. So the cache already holds the preamble, your question, and the model's own answer.",
-          "show": "Bottom row 'in the cache' builds: 'system' and 'tools' in teal, then 'question 1' in teal. Then the answer pills drop into the cache row one at a time, each with a small 'K | V' slab clicking onto it as it lands, echoing the loop shown earlier. Tag under them: 'cached as it was written'. The cache row ends after the answer's last token."
+          "say": "Then France meets Japan, and the match ends. The question mark after it is redone too. Hit, seven hundred and seventy-five. Prefill, two.",
+          "show": "On 'France meets Japan', both pills flash and the cursor stops between 'of' and 'Japan'; marker 'diverges here'. On 'question mark', the two '?' pills glow and a thin link between them gets a small cross, tag 'same token, after the difference'. On 'Hit', 'Japan' and the arriving '?' fill amber; plate 'hit 775 · prefill 2 tokens'; scoreboard row 'B | 775 | 2'."
         },
         {
           "id": "b3",
-          "say": "Now compare from the first token. Preamble, match. Question, match. Answer, match. The first difference is your new words.",
-          "show": "The white scan cursor starts at the left edge of both rows and moves right. As it passes each segment, on each 'match', the arriving segment turns teal with a small check mark. On 'first difference', the cursor stops at the boundary before 'new', where the cache row has nothing; a marker drops: 'first difference'."
-        },
-        {
-          "id": "b4",
-          "say": "Hit, seven hundred and eighty-four. Prefill, just four tokens, the words you typed a moment ago.",
-          "show": "The four 'new' pills fill amber. Result plate below the rows: 'hit 784 · prefill 4 tokens'. Scoreboard gains row 'A | 784 | 4'."
-        },
-        {
-          "id": "b5",
-          "say": "This is the best case, and the most common one. It is why a conversation stays quick for as long as you keep typing.",
-          "show": "A small chat-window icon at bottom left shows a back-and-forth of short messages; each new message adds only a short amber sliver to the end of a long teal bar beneath it. Tag: 'keep typing, stay warm'."
-        },
-        {
-          "id": "b6",
-          "say": "A perfect prefix. And notice what made it perfect. The model's own previous answer is part of the cached prefix, because it was cached as it was written.",
-          "show": "The 'answer 1' pills in both rows glow teal together. Centred line below: 'a perfect prefix, answer included'."
+          "say": "A partial hit mid-sentence, which you could not arrange. Same-shaped questions start alike, and the rule never asks whose conversation, only whether tokens are identical from the front.",
+          "show": "On 'Same-shaped questions', faint ghost rows fan out behind from the shared start 'What is the capital of', ending in 'Spain ?', 'Peru ?', 'Kenya ?'; tag 'same shape, same start'. On 'whose conversation', the ghosts fade. On 'identical from the front', the five teal word pairs pulse once; line under the plate: 'identical from the front is all that counts'."
         }
       ]
     },
     {
       "id": "ch16_s05",
-      "name": "case B, one word changed",
+      "name": "case C, the same words rearranged",
       "figs": [
-        50
+        51
       ],
-      "visual": "Same two-row layout, but the preamble collapses to one compact teal segment 'system + tools: 770' so the question pills can be large. Top row 'in the cache': the earlier question, seven pills. Bottom row 'arriving': the new question, seven pills directly beneath, aligned position by position. The scan cursor runs left to right. Scoreboard top right gains 'B'. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "Same case layout and orientation as s04. In the cache: '770' then 'What' 'is' 'the' 'capital' 'of' 'France' '?'. Arriving: '770' then 'Tell' 'me' 'the' 'capital' 'of' 'France' 'please'. Grey arcs link the shared words between the rows. In b3 the cache row and plate fade, and case B's arriving row, compact, slides in above case C's for a side-by-side. The scoreboard gains 'C'. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "Case B. A minute later, a brand new question, not a follow-up. What is the capital of Japan?",
-          "show": "Rows draw on. Top, label 'in the cache': '770' segment then pills 'What' 'is' 'the' 'capital' 'of' 'France' '?'. Bottom, label 'arriving': '770' segment then pills 'What' 'is' 'the' 'capital' 'of' 'Japan' '?', each sliding in as it is spoken."
+          "say": "Case C. Tell me the capital of France, please. Four words in common with the original, but the very first token differs.",
+          "show": "Label top-left: 'case C: a minute later, same words reordered'. The arriving pills slide in as spoken; a small 'seen earlier' tag flickers beside them. On 'Four words in common', grey arcs draw between 'the', 'capital', 'of' and 'France' in the two rows, counter 'shared words: 4'. On 'very first token', the cursor passes the '770' segments, turning them teal, and stops dead at the first pills; 'Tell' and 'What' flash, marker 'diverges at the very first token'; the arcs snap and fade."
         },
         {
           "id": "b2",
-          "say": "Compare from the front. The preamble matches. So do the first five words, what is the capital of, because they are identical and in the same places. Then France meets Japan, and the match ends.",
-          "show": "Scan cursor sweeps. On 'preamble matches', the 770 segments in both rows go teal. Each of the five word pairs turns teal as the cursor passes it, in time with the words. On 'France meets Japan', the 'France' and 'Japan' pills flash and the cursor stops between 'of' and 'Japan'; a marker drops: 'diverges here'."
+          "say": "So only the shared preamble hits, seven hundred and seventy, and all seven of your tokens are prefilled. Your words contributed nothing.",
+          "show": "All seven arriving pills fill amber. Plate 'hit 770 · prefill 7 tokens'; tag under the teal '770': 'shared preamble, nothing of yours'. Scoreboard row 'C | 770 | 7'."
         },
         {
           "id": "b3",
-          "say": "Look at the question mark at the end. It is the same token as before, but it comes after the difference. Its key and value were worked out in a context that included France, so it has to be worked out again.",
-          "show": "The two '?' pills glow. A thin link draws between them, then a small cross appears on it. Tag: 'same token, different context'. A faint ghost of the word 'France' appears inside the cached '?' pill to show what its key was computed with."
-        },
-        {
-          "id": "b4",
-          "say": "Hit, seven hundred and seventy-five. Prefill, two tokens, Japan and the question mark.",
-          "show": "'Japan' and the arriving '?' fill amber. Result plate: 'hit 775 · prefill 2 tokens'. Scoreboard gains row 'B | 775 | 2'."
-        },
-        {
-          "id": "b5",
-          "say": "You did not plan this, and there is no way to arrange it on purpose. It happens because questions of the same shape genuinely start the same way.",
-          "show": "Behind the rows, faint ghosts of other questions fan out from the shared start 'What is the capital of', ending in 'Spain ?', 'Peru ?', 'Kenya ?'. Tag: 'same shape, same start'."
-        },
-        {
-          "id": "b6",
-          "say": "A partial hit, in the middle of your own sentence. The rule does not care that this is a different conversation. It only cares that the tokens are identical from the front.",
-          "show": "Ghosts fade. The five teal word pairs pulse once. Centred line below: 'identical from the front is all that counts'."
+          "say": "B and C are both seven tokens, like the original, both full of its words. One nearly all hits, the other none, decided by which word came first.",
+          "show": "The cache row and plate fade. Case B's arriving row slides in above C's; each gets a bracket '7 tokens'. On 'nearly all hits', B's first five pills glow teal with a badge '5 of 7'; C's pills stay amber with a badge '0 of 7'. On 'which word came first', the first pill of each row, 'What' and 'Tell', is circled. Line under the rows: 'which word came first decides'."
         }
       ]
     },
     {
       "id": "ch16_s06",
-      "name": "case C, the same words rearranged",
+      "name": "two ways to quote one hit rate",
       "figs": [
-        51
+        52
       ],
-      "visual": "Same layout as case B. Top row 'in the cache': '770' then 'What is the capital of France ?'. Bottom row 'arriving': '770' then 'Tell me the capital of France please'. Shared words are linked by thin grey arcs between the rows. In the last two beats a compact case B pair slides in above for a side-by-side comparison. Scoreboard top right gains 'C'. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "The scoreboard flies from the corner to the centre and grows into a table with three rows, 'A continue the chat', 'B France to Japan', 'C same words, reordered'; its 'time t' row folds away for now (it returns in s08). Two value columns fill in turn: 'whole prompt' and 'your 7 tokens'. In b1 a to-scale bar of the 777-token prompt appears under the table and fades at the end of that beat. In b2 each cell of the second column holds a row of seven mini-pills and its fraction, so nothing sits beside the table. Idea: the same hits over two different totals tell opposite stories. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "Case C. A minute later, the same words rearranged. Tell me the capital of France, please. You met this pair a few minutes ago.",
-          "show": "Rows draw on. Bottom row pills slide in as spoken: 'Tell' 'me' 'the' 'capital' 'of' 'France' 'please'. A small 'seen before' tag flickers beside the pair."
+          "say": "Against the whole prompt, all three hits look excellent, ninety-nine point one percent or better, because the preamble dominates and always matches.",
+          "show": "The scoreboard flies to the centre and becomes the table. Column 'whole prompt' fills in teal: 'A 784 / 788 = 99.5%', 'B 775 / 777 = 99.7%', 'C 770 / 777 = 99.1%'; on 'or better', a bracket spans the column, 'all above 99%'. On 'the preamble dominates', a to-scale bar of 777 units, 1,400 px wide, draws under the table: 770 units teal, 'preamble 770', and the last 7 units, a 13 px sliver, picked out with a pointer, 'your question: 7'. The bar fades as the beat ends."
         },
         {
           "id": "b2",
-          "say": "Four of its seven words are shared with the original, including the whole phrase, the capital of France. But the very first token is Tell, not What. The match ends before your sentence has even begun.",
-          "show": "On 'Four of its seven words', grey arcs draw between 'the', 'capital', 'of', 'France' in the two rows; a counter 'shared words: 4'. On 'Tell, not What', the scan cursor passes the 770 segments, turning them teal, and stops dead at the first pills; 'Tell' and 'What' flash and a marker drops: 'diverges at the very first token'. The grey arcs snap and fade."
+          "say": "Count only your seven-token question. In case A it is now history, all seven matched, and only the four new words were fresh. B, five of seven. C, none.",
+          "show": "Column header 'your 7 tokens' appears. On 'In case A', A's cell: seven teal mini-pills and 'question 1: 7 / 7 · 100%', plus a small tag with four amber mini-pills, '+4 new, prefilled'. On 'five of seven', B's cell: five teal and two amber, '5 / 7 · 71%'. On 'none', C's cell: seven amber, '0 / 7 · 0%'."
         },
         {
           "id": "b3",
-          "say": "So the hit is seven hundred and seventy, the system prompt and tools, identical for everyone. Prefill, all seven of your tokens. Your own words contributed nothing.",
-          "show": "All seven arriving pills fill amber. Result plate: 'hit 770 · prefill 7 tokens'. Scoreboard gains row 'C | 770 | 7'. Tag under the teal 770: 'the shared preamble, nothing of yours'."
-        },
-        {
-          "id": "b4",
-          "say": "Now set B and C side by side. Both are seven tokens long, like the original. B even asks about a different country, while C keeps the meaning exactly.",
-          "show": "Case B's arriving row, compact, slides in above case C's. Each row's left end gets a tag: 'B: different country', 'C: same meaning'. A '7 tokens' bracket appears under each."
-        },
-        {
-          "id": "b5",
-          "say": "Yet B matches five, and C matches none. The same length, a similar set of words, and the outcome is decided entirely by which word came first. One is a near-total hit, and the other is nothing.",
-          "show": "In B, the first five pills glow teal and a '5' badge appears; in C, no pill glows and a '0' badge appears. On 'which word came first', the first pill of each row, 'What' and 'Tell', is circled. Centred line below: 'which word came first decides'."
+          "say": "Same hits, opposite stories, decided by where the first divergence falls. The whole-prompt number flatters and hides the part you control, yet it is the one usually reported.",
+          "show": "On 'first divergence', a white marker slides into each pill row: after the 7th pill in A, after the 5th in B, before the 1st in C. On 'flatters', the 'whole prompt' column glows, tag 'usually reported'; the 'your 7 tokens' column gets the tag 'the part you control'. Line at the bottom: 'two ways to quote the same hits'."
         }
       ]
     },
     {
       "id": "ch16_s07",
-      "name": "two ways to quote one hit rate",
+      "name": "a fixed pool, and pure pressure",
       "figs": [
-        52
+        54
       ],
-      "visual": "A results table built from the scoreboard, which flies to the centre and grows. Three rows: 'A continue the chat', 'B France to Japan', 'C same words, reordered'. Two value columns appear in turn: 'whole prompt' and 'your 7 tokens'. To the right, a to-scale bar of the 777-token prompt shows how small the question is. The idea: the same hits, divided by two different totals, tell opposite stories. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "Centre: a wide coral-outlined panel, 'one machine's cache memory', filled with a schematic grid of equal blocks, about 6 rows by 14 columns (corner note 'schematic'). Your blocks are the three at the far left of the top row, teal with a small 'you' tag; they hold only your own conversation's history. A cluster of teal blocks at the left of the second row carries the tag 'shared preamble'. Every other block is solid grey with a tiny user icon: other people's. Each block shows a tiny clock dial for when it was last used. New requests arrive from the right as blue strips that need blocks. Evicted blocks turn grey dashed and drop out. In b3 the panel splits into a quiet and a busy machine, then merges; in b4 the camera pans right to a small schematic chart. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "So how good were those three hits? That depends on what you divide by. Measured against the whole prompt, all three look excellent.",
-          "show": "The scoreboard flies from the corner to the centre and becomes a table with three rows, 'A continue the chat', 'B France to Japan', 'C same words, reordered'. A first column header appears: 'whole prompt'."
+          "say": "Why is a minute warm and a day cold? The cache is not a private locker but a fixed pool on one machine, and everyone competes for it.",
+          "show": "A locker icon with a padlock appears centre; on 'not a private locker', it gets a grey cross and fades. On 'fixed pool', the coral panel draws, label 'one machine's cache memory', and the grid fills row by row. Your three teal blocks light up with the 'you' tag; sub-label under the panel: 'yours: the three on the left · the rest: other people'. On 'everyone competes', blue request strips queue at the right edge."
         },
         {
           "id": "b2",
-          "say": "Case A, seven hundred and eighty-four of seven hundred and eighty-eight, ninety-nine point five percent. Case B, ninety-nine point seven. Case C, ninety-nine point one. Every one of them, ninety-nine point one percent or better.",
-          "show": "Column 'whole prompt' fills row by row as spoken: 'A 784 / 788 = 99.5%', 'B 775 / 777 = 99.7%', 'C 770 / 777 = 99.1%', all in teal. On 'or better', a bracket spans the column: '≥ 99.1%'."
+          "say": "When a new request needs room, the least recently used blocks, untouched the longest, are dropped. Nothing is on a timer. It is pure pressure.",
+          "show": "Every block's clock dial becomes visible. A blue strip needing four blocks slides in from the right. On 'least recently used', the four blocks with the oldest dials turn grey dashed and drop out of the panel; the newcomer's blocks slide into their places. Tag 'least recently used goes first'. On 'Nothing is on a timer', a stopwatch icon gets a grey cross."
         },
         {
           "id": "b3",
-          "say": "Why so high? Because the seven-hundred-and-seventy-token preamble dominates, and it always matches. Draw the prompt to scale, and your question is a sliver at the very end.",
-          "show": "Right side: a horizontal bar drawn to scale for 777 tokens. On 'dominates', the first 770 units fill teal, label 'preamble 770'. On 'a sliver', the last 7 units, under one percent of the bar, are picked out with a pointer: 'your question, 7'."
+          "say": "A minute later, your blocks may survive on a quiet machine and be gone on a busy one. A day later, other people's conversations have flushed them from any machine.",
+          "show": "The panel duplicates into two side by side: left 'quiet machine', right 'busy machine', each with a '1 minute' stopwatch running. Left: an occasional strip trickles in and your three teal blocks survive. Right: a torrent of strips, the grid churns, and your blocks go grey dashed and vanish. On 'A day later', the panels merge; a day-night clock spins through 24 hours while the grid flickers through full refills, counter 'refilled ×1, ×2, ×3 …'; your blocks are nowhere. The shared-preamble cluster keeps a faint teal glow, unexplained until s08."
         },
         {
           "id": "b4",
-          "say": "Now set the preamble aside and count only your seven tokens. Case A, seven of seven, all of it, plus the whole history. Case B, five of seven. Case C, zero of seven.",
-          "show": "The preamble part of the bar dims to grey. A second column header appears: 'your 7 tokens'. Rows fill as spoken: 'A 7 / 7, plus the history', 'B 5 / 7', 'C 0 / 7'. Beside each, a row of seven small pills, filled teal for matched and amber for prefilled: A all teal, B five teal and two amber, C all amber."
-        },
-        {
-          "id": "b5",
-          "say": "Against your own words, the three cases could hardly be more different. A hundred percent, about seventy-one percent, and nothing at all. And the difference is decided by where the first divergence falls.",
-          "show": "Percentages appear under the pill rows: '100%', '71%', '0%'. On 'where the first divergence falls', a small white divergence marker slides into place on each pill row: after the 7th pill in A, after the 5th in B, before the 1st in C."
-        },
-        {
-          "id": "b6",
-          "say": "The whole-prompt number flatters everything, and it hides the part you control. Two ways of quoting the same hit rate, and the flattering one is the one usually reported. It is worth knowing what it hides.",
-          "show": "The 'whole prompt' column gets a soft glow and a tag 'usually reported'; the 'your 7 tokens' column gets a tag 'the part you control'. Centred line at the bottom: 'same hits, different denominators'."
+          "say": "Providers quote a lifetime of a few minutes: a guideline about typical load, not a guarantee. Eviction follows demand for space, not time, so warmth is likely, not certain, and fades rather than expires.",
+          "show": "Camera pans right to a small chart marked 'schematic': x axis 'time since your last message', y axis 'chance your blocks are still there'. Two smoothly falling curves, a gentle one 'quiet machine' and a steep one 'busy machine'. On 'a few minutes', a dotted vertical line, 'quoted lifetime: a guideline'. On 'not time', a ghost step line, flat then dropping to zero at once, 'a timer: not how it works', gets a grey cross and fades. On 'fades rather than expires', the two curves glow; line beneath the chart: 'demand for space, not elapsed time'."
         }
       ]
     },
@@ -289,189 +209,90 @@
       "id": "ch16_s08",
       "name": "a day later, what survives",
       "figs": [
-        53
+        53,
+        26
       ],
-      "visual": "Back to the two-row layout of case A: arriving row 'system', 'tools', 'question 1', 'answer 1', 'new'. Cache row beneath. A day-night clock icon above the rows spins forward a full day at the start. In the second half the camera pulls out to show a router icon and three server icons, one of which holds the teal preamble. Scoreboard top right gains 'a day later'. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "Back to the case layout from s02: 'arriving' row on top, 'in the cache' row below, aligned token for token, row labels at the left, widths schematic, result plate under the rows, scoreboard in the top-right corner, rebuilt as in case A. The results table from s06 reappears at centre and shrinks back into the top-right scoreboard with all four rows, 'time t', 'A', 'B', 'C', and gains 'a day later'. A small database icon sits at the far left. In b2 the camera rises to a top band: nine user icons in a row, arrows down to one shared blue block. In b3 a small inset of the pool from s07 sits at bottom right. In b4 the camera pulls out to a router and three servers, then returns. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now come back a day later and send the same follow-up as case A. The request is identical. The preamble, your question, the answer, and your four new tokens. Seven hundred and eighty-eight in all.",
-          "show": "A day-night clock above the rows spins through 24 hours, sun and moon passing. The arriving row rebuilds exactly as in case A: 'system', 'tools', 'question 1', 'answer 1', 'new'; sum at right '788'."
+          "say": "Now send case A's follow-up a day later. Your history was evicted overnight, so prefill rebuilds it from the text.",
+          "show": "A day-night clock above the rows spins through 24 hours. The results table from s06 reappears at centre and shrinks back to the top-right scoreboard with all four rows: 'time t', 'A', 'B', 'C'. The arriving row rebuilds exactly as in case A: 'system', 'tools', 'question 1', 'answer 1', 'new', sum '788'. Cache row: 'system' and 'tools' in blue for now; 'question 1' and 'answer 1' as grey dashed outlines, text 'evicted overnight'. On 'prefill rebuilds it', the arriving 'question 1' and 'answer 1' turn amber and send copies down through a small amber 'prefill' gear that fill the dashed outlines. The database icon gets a tag 'the text was kept'."
         },
         {
           "id": "b2",
-          "say": "But overnight, your conversation was evicted. Its keys and values are gone. Only the text survived, so the history has to be turned back into keys and values from that text. And that is what prefill is.",
-          "show": "The cache row draws on with 'question 1' and 'answer 1' shown as grey dashed outlines, text inside: 'evicted overnight'. On 'Only the text survived', the database cylinder icon from earlier appears at the far left and a blue document flows from it through a small amber 'prefill' gear into the arriving 'question 1' and 'answer 1' segments, which fill amber."
+          "say": "The preamble is different: the most shared text in the system. Its keys and values are computed once per machine and reused by every request.",
+          "show": "The cache row's 'system' and 'tools' turn solid teal. Camera rises to the top band: nine user icons appear one after another and arrows draw down from them to one blue block, 'the same system prompt, token for token'; header 'the most shared text in the system'. On 'computed once', an amber gear beside the block spins once, tag 'computed once per machine'. On 'reused by every request', each arrow pulses teal in turn into the teal preamble below, tag 'reused by every request'."
         },
         {
           "id": "b3",
-          "say": "The preamble, though, is probably still there. Thousands of other conversations share those exact seven hundred and seventy tokens, so on a busy machine, somebody has kept them warm for you.",
-          "show": "The 'system' and 'tools' segments of the cache row are solid teal. Above them, a crowd of small grey user icons, each with a thin line touching the preamble, keeps pinging it with brief flashes. Tag: 'kept warm by everyone else'."
+          "say": "Touched all day on a busy machine, it is never least recently used, the most reliable hit there is. Hit, seven hundred and seventy. Prefill, eighteen, against four a minute later.",
+          "show": "Camera returns to the rows. Bottom-right inset of the pool: the teal preamble blocks' clock dials keep resetting to 'just now' with each pulse while grey blocks age and drop; a grey eviction sweep passes and skips them. Tag 'kept warm by everyone else'. On 'Hit', the arriving 'system' and 'tools' turn teal; 'question 1', 'answer 1' and 'new' stay amber. Plate 'hit 770 · prefill 18 tokens', breakdown under the 18: '7 + 7 + 4'. On 'four a minute later', the scoreboard row 'a day later | 770 | 18' slides in directly under 'A | 784 | 4', and the 4 and the 18 glow."
         },
         {
           "id": "b4",
-          "say": "Hit, seven hundred and seventy. Prefill, eighteen. Your question's seven, the answer's seven, and your four new tokens. A minute after the answer, it was four.",
-          "show": "Arriving 'system' and 'tools' turn teal; 'question 1', 'answer 1' and 'new' are amber. Result plate: 'hit 770 · prefill 18 tokens' with a small breakdown under the 18: '7 + 7 + 4'. Scoreboard gains row 'a day later | 770 | 18', set directly under row A '784 | 4'."
+          "say": "That only helps on the same machine, so the router sends each request where its prefix already sits.",
+          "show": "Camera pulls out: a request parcel at the left, a router icon at centre, three server icons at the right, the middle one glowing teal with the tag 'holds this prefix'. On 'sends each request', the parcel passes through the router to the glowing server; ghost paths to the other two fade. Tag at the router: 'route by prefix'."
         },
         {
           "id": "b5",
-          "say": "Eighteen is small only because this conversation is short. In a long one, the history is most of the prompt, and all of it comes back as prefill. It also means the coldest case, with nothing at all held, is rarer than it looks.",
-          "show": "The amber history segment stretches far to the right, growing to many times its length, then snaps back. A small ghost of the earlier 'Cold, a day later' all-amber bar appears and gains a teal front section, tag 'the preamble usually survives'."
-        },
-        {
-          "id": "b6",
-          "say": "That only helps if your request lands on the same machine. Remember the router, which picks a machine for each request. Serving systems route requests by which machine already holds their prefix.",
-          "show": "Camera pulls out. Left: a request parcel. Centre: a router icon. Right: three server icons, the middle one with a teal glow and tag 'holds this prefix'. On 'route requests', the parcel goes through the router and is sent to the glowing server; ghost paths to the other two fade. Tag at the router: 'route by prefix'."
-        },
-        {
-          "id": "b7",
-          "say": "The shared preamble usually survives, because it is shared. Your own conversation does not, because nobody else was keeping it alive.",
-          "show": "Camera returns to the rows. The teal preamble pulses with the crowd of user icons above it; the dashed 'evicted' segment stays alone, with one user icon above it, greyed. Centred line below: 'shared survives, yours does not'."
+          "say": "The preamble survives because it is shared. Yours does not, because nobody else was keeping it alive.",
+          "show": "Camera returns to the rows. The teal preamble pulses with the crowd of user icons above it; the amber history segment stands alone with one greyed user icon above it. A ghost of s01's all-amber 'a day later' bar flashes beneath and gains a teal front section, tag 'the preamble usually survives'. Line under the plate: 'shared survives, yours does not'."
         }
       ]
     },
     {
       "id": "ch16_s09",
-      "name": "a fixed pool, and pure pressure",
+      "name": "cheap because warm",
       "figs": [
-        54
+        26
       ],
-      "visual": "Centre: a wide coral-outlined panel, 'one machine's cache memory', filled with a grid of equal blocks, schematic, about 6 rows by 14 columns. Your blocks are the three at the far left of the top row, blue with a small 'you' tag; every other block is grey and belongs to someone else. Each block carries a tiny clock dial showing when it was last used. New requests arrive from the right as blue strips that need blocks. In the second half the panel splits into a quiet machine and a busy machine, then the camera pans to a small schematic chart. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "Left half: the shared blue block from s08 with its nine user icons and arrows above it, small, its keys and values shown as a row of teal tiles beneath it. Right half: a price comparison drawn to scale, then an illustrative bill for case C. Idea: being shared keeps it warm, and warm is what makes it cheap. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "Why does a minute stay warm while a day goes cold? Earlier, you heard that the server might still have its notes from last time. Whether it does, and for how long, comes down to one fact. The cache is not a private locker.",
-          "show": "The coral-outlined panel draws on, label 'one machine's cache memory'. A locker icon with a lock appears, gets a grey cross, and fades."
+          "say": "Sharing also sets the price. A cached read, an input token that hits the cache, costs roughly a tenth of a fresh one. A large fixed preamble is cheap to serve.",
+          "show": "Right half: a price-tag icon. On 'a cached read', a teal token pill with the tag 'cached read: an input hit'. On 'a tenth', two bars to scale: 'fresh input token', amber, 400 px; 'cached input token', teal, 40 px, label 'about 1/10'. On 'cheap to serve', a tag on the shared block at the left: 'cheap to serve'."
         },
         {
           "id": "b2",
-          "say": "It is a fixed pool of memory on one machine, and everyone is competing for it. Your blocks are the three on the left. The rest belong to other people.",
-          "show": "The grid of blocks fills the panel row by row. On 'your blocks', three blocks at the far left of the top row light up blue with a 'you' tag. On 'other people', the rest settle in grey, some with tiny user icons. Sub-label under the panel: 'yours: the three on the left. The rest: other people.'"
+          "say": "Illustratively, case C's seven hundred and seventy-seven input tokens would then bill like about eighty-four.",
+          "show": "Below the price bars, a small bill builds line by line: '770 cached × 0.1 = 77', then '+ 7 fresh = 84'. Beside it, two bars to scale, 777 units = 1,000 px: 108 px in teal, 'billed like 84', against 1,000 px in amber, 'all fresh: 777'. Grey footnote: 'illustrative; discounts and cache-write charges vary'."
         },
         {
           "id": "b3",
-          "say": "And they are not small. Your little conversation, seven hundred and eighty-eight tokens at about three hundred and twenty kilobytes each, holds about a quarter of a gigabyte, sitting there while you think.",
-          "show": "A callout from your three blocks: '788 tokens × 320 KB ≈ 258 MB', '≈ a quarter of a gigabyte'. A small 'schematic: really many blocks' note sits beside it. On 'while you think', a thinking-face icon appears by the 'you' tag."
-        },
-        {
-          "id": "b4",
-          "say": "When a new request needs room, the server drops the least recently used blocks, the ones that have gone untouched the longest. Nothing is on a timer. It is pure pressure.",
-          "show": "Every block's tiny clock dial becomes visible. A blue strip, a new request, arrives from the right needing four blocks. On 'least recently used', the four blocks with the oldest dials flash coral and drop out of the panel; the new request's blocks slide into their places. Tag: 'least recently used goes first'. On 'Nothing is on a timer', a stopwatch icon gets a grey cross."
-        },
-        {
-          "id": "b5",
-          "say": "So a minute later, on a quiet machine, your blocks may still be there. A minute later on a very busy one, they may already be gone.",
-          "show": "The panel duplicates into two side by side: left 'quiet machine', right 'busy machine', each with a '1 minute' stopwatch running. Left: an occasional new request trickles in and your three blue blocks survive. Right: a torrent of requests arrives, the grid churns, and your three blocks are pushed out as dashed outlines."
-        },
-        {
-          "id": "b6",
-          "say": "A day later they are gone on any machine. A day of other people's conversations will have cycled through that pool many times over.",
-          "show": "Both panels merge back into one. A day-night clock spins through 24 hours while the whole grid flickers through complete refills again and again, each refill washing across in a new shade of grey; a small counter ticks 'refilled ×1, ×2, ×3 …' and blurs. Your blocks are nowhere."
-        },
-        {
-          "id": "b7",
-          "say": "Providers quote a nominal lifetime, often a few minutes. Treat it as a guideline about typical load, not a guarantee.",
-          "show": "Camera pans right to a small chart marked 'schematic'. X axis 'time since your last message', Y axis 'chance your blocks are still there'. Two smoothly falling curves: a gentle one 'quiet machine' and a steep one 'busy machine'. A dotted vertical line at a few minutes: 'quoted lifetime: a guideline'. A ghost step-shaped line, flat then dropping to zero at once, labelled 'a timer: not how it works', with a grey cross."
-        },
-        {
-          "id": "b8",
-          "say": "Eviction is driven by demand for the space, not by elapsed time. That is why warmth is likely rather than certain, and why it fades gradually instead of expiring on the dot.",
-          "show": "The two smooth curves glow; the ghost step line fades away. Centred line under the chart: 'demand for space, not elapsed time'."
+          "say": "That warmth is not luck. It comes from being shared, and it is why cached input is priced separately.",
+          "show": "The bill fades. The nine arrows pulse teal into the shared block once more; header above it: 'the one block everybody shares'. Centred line at the bottom: 'warm because shared, cheap because warm'."
         }
       ]
     },
     {
       "id": "ch16_s10",
-      "name": "the most shared text in the system",
-      "figs": [
-        26
-      ],
-      "visual": "Top band: nine user icons in a row, each with a thin arrow pointing down to one shared blue block in the centre, 'the same system prompt, token for token'. Below it, the coral-outlined cache pool from the previous scene, now with the preamble's blocks shown in teal at the front. Right third, later: a price comparison drawn as two bars to scale, then a worked bill for case C. The idea: being shared is what keeps it warm, and warm is what makes it cheap. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Now turn the question around. What is the most shared text in the whole system? The system prompt. Every user of the service gets the same one, token for token.",
-          "show": "Nine user icons appear across the top band, one after another. On 'the system prompt', nine arrows draw down from them and meet at one blue block: 'the same system prompt, token for token'. Header: 'The most shared text in the whole system'."
-        },
-        {
-          "id": "b2",
-          "say": "Because it is identical for everyone, its keys and values are computed once per machine, and then reused for every request that lands there.",
-          "show": "An amber gear spins once beside the shared block, tag 'computed once per machine'; teal blocks drop from it into the cache pool below. Then each user arrow lights teal in turn as a short pulse travels down it into those same teal blocks, tag 'reused by every request'."
-        },
-        {
-          "id": "b3",
-          "say": "Now think back to the pool. A block that new requests touch again and again, all day long, is never the least recently used. So it is never the one that gets dropped.",
-          "show": "In the pool, the teal preamble blocks' clock dials keep resetting to 'just now' with each incoming pulse, while grey blocks around them age and are swapped out. A coral eviction sweep passes over the pool and skips the teal blocks. Tag: 'always recently used'."
-        },
-        {
-          "id": "b4",
-          "say": "It stays warm precisely because so many people share it. It is the single most reliable cache hit in the system. Your own conversation is evicted overnight. This is not.",
-          "show": "A day-night clock spins once in the corner; your three blue blocks fade to dashed outlines while the teal preamble blocks stay lit throughout. Tag on the teal: 'warm all day'; tag on the dashed outlines: 'gone overnight'."
-        },
-        {
-          "id": "b5",
-          "say": "That is why providers price a cached read at roughly a tenth of a fresh one. Input tokens are billed one by one, and a token whose keys and values are already held skips prefill entirely.",
-          "show": "Right third: a price-tag icon. Two bars to scale: 'fresh input token' at length 10, amber; 'cached input token' at length 1, teal, label 'about 1/10'."
-        },
-        {
-          "id": "b6",
-          "say": "A large fixed preamble is cheap to serve, and the discount reflects that. Take case C again. Its seven hundred and seventy cached tokens, at a tenth of the price, cost about as much as seventy-seven fresh ones.",
-          "show": "Below the price bars, a small bill starts to build, first line only: '770 cached × 0.1 = 77', the 770 in teal. A tag on the preamble block above: 'cheap to serve'."
-        },
-        {
-          "id": "b7",
-          "say": "Add your seven fresh tokens, and the input is billed like about eighty-four tokens, instead of seven hundred and seventy-seven. The exact discount varies by provider.",
-          "show": "The bill's second line lands: '+ 7 fresh = 84'. Beside it a comparison to scale: a bar of 84 units in teal against a bar of 777 units in amber, labelled 'billed like 84' and 'all fresh: 777'. Footnote in grey: 'illustrative; discounts vary by provider'."
-        },
-        {
-          "id": "b8",
-          "say": "And it is why editing that preamble is expensive. One changed token invalidates the shared prefix for every user at once.",
-          "show": "The bill fades. A single token in the shared blue block flips amber. Instantly all nine user arrows turn from teal to amber and the teal preamble blocks in the pool crack and go dashed. Tag: 'one token changed, every user cold'."
-        },
-        {
-          "id": "b9",
-          "say": "This is the one block of text everybody is sharing. Its warmth is not luck. It is a consequence of being shared, and it is why cached input is priced separately.",
-          "show": "Reset to the warm state: arrows teal, blocks lit. Centred line at the bottom: 'warm because shared, cheap because warm'."
-        }
-      ]
-    },
-    {
-      "id": "ch16_s11",
-      "name": "why the front is the expensive place to edit",
+      "name": "the expensive place to edit",
       "figs": [
         56
       ],
-      "visual": "One long prompt row across the upper third, made of segments: a small amber 'edit' at the far left, then blue 'rest of the system prompt', 'tools', 'everything after'. A white vertical marker 'the match ends here' sits right after the edit. In the middle of the scene the camera pulls out to show this row as one of many conversation rows stacked on one machine, all sharing the same front. At the end, a horizontal gradient band from 'most stable' to 'most variable'. Colour code for the whole chapter: teal = keys and values already held, a cache hit; amber = tokens that must be prefilled, compute work; blue = arriving tokens and structure; coral = the G P U's memory itself; a grey dashed outline = nothing held, or evicted.",
+      "visual": "One long prompt row across the upper third: the first five token slots shown individually and numbered 1 to 5, then long blue segments 'rest of the system prompt', 'tools', 'everything after'. A white vertical marker 'the match ends here'. Mid-scene the camera pulls out to show this row as the top of a stack of conversation rows on one machine, all sharing the same front. At the end, a horizontal band from 'most stable' to 'most variable'. Colours as in s01: teal held, amber prefilled, blue arriving or not yet decided, coral the G P U's memory, grey dashed nothing held or evicted.",
       "beats": [
         {
           "id": "b1",
-          "say": "Watch that edit in slow motion. An operator changes one token of the system prompt, near the very front, at position five.",
-          "show": "The row draws on. Header: 'Change one token at the very front'. The first few token slots are shown individually, numbered 1 to 5; on 'position five', slot 5 flips from blue to amber and the segment label 'edit' appears over it. Then the long segments follow: 'rest of the system prompt', 'tools', 'everything after'."
+          "say": "That also makes the preamble expensive to edit. Change one token at position five, and the match ends there. Nothing after it is reused, however identical.",
+          "show": "Header: 'Change one token at the very front'. The row draws. On 'position five', slot 5 flips from blue to amber with the label 'edit'. The scan cursor runs from the left: slots 1 to 4 turn teal, it stops at slot 5, and the marker drops: 'the match ends here'. On 'Nothing after it', the long segments turn amber from left to right, tag 'identical, but after the difference'."
         },
         {
           "id": "b2",
-          "say": "The match runs from the front, so a difference at position five ends it at position five. Everything after that point is identical to before, and none of it can be reused.",
-          "show": "The scan cursor runs from the left: slots 1 to 4 turn teal, then the cursor stops at slot 5 and the marker drops: 'the match ends here'. On 'none of it can be reused', the long segments to the right turn amber from left to right, with a tag 'identical, but after the difference'."
+          "say": "Every conversation on the machine shares that prefix, so all go cold at once. The weather conversation's next turn prefills one thousand and twenty-eight tokens, not five.",
+          "show": "Camera pulls out: the row becomes the top of a tall stack of conversation rows with different tails and the same front, a small user icon at each row's left. On 'at once', the white marker extends down through every row and everything to its right turns amber in one sweep. On 'weather conversation', one row tagged with the cloud-and-sun icon enlarges; beneath it two amber bars to scale, 1,028 units = 1,200 px: a 6 px sliver 'before the edit: 5' and a 1,200 px bar 'after: 1,028'."
         },
         {
           "id": "b3",
-          "say": "Now remember that every conversation on the machine starts with that same system prompt. So the edit does not cost a little. It invalidates every cached conversation on the machine at once, for every user.",
-          "show": "Camera pulls out: the row becomes the top of a tall stack of conversation rows, each with a different tail but the same front, a small user icon at each row's left. On 'at once', the white marker line extends down through every row together and everything to its right turns amber in one sweep."
+          "say": "About two hundred and six times the prefill work, from one token. So operators edit a production system prompt with care.",
+          "show": "A plate under the bars: '1,028 ÷ 5 ≈ 206× the prefill work'. On 'with care', a warning-sign icon appears over the system-prompt part of the top row, tag 'edit with care'."
         },
         {
           "id": "b4",
-          "say": "Take the weather conversation. Its next turn would have prefilled five tokens. Now everything from position five onward comes back, one thousand and twenty-eight tokens. About two hundred and six times the prefill work, from a one-token change.",
-          "show": "One row in the stack is tagged with the cloud-and-sun weather icon and enlarges. Below it, two amber bars to scale: a sliver 'before the edit: 5' and a long bar 'after the edit: 1,028'. A plate: '1,028 ÷ 5 ≈ 206 times the prefill work'."
-        },
-        {
-          "id": "b5",
-          "say": "That is why serving systems put the most stable text first and the most variable text last. And it is why operators are careful about editing a system prompt in production.",
-          "show": "The stack fades. A horizontal gradient band appears, deep teal at the left fading to amber at the right, labelled 'front: most stable' and 'back: most variable'. Segments slot onto it in order: 'system prompt', 'tools', 'your conversation', 'newest message'. A small warning-sign icon appears over 'system prompt', tag 'edit with care'."
-        },
-        {
-          "id": "b6",
-          "say": "It falls straight out of the prefix rule. Order matters. Stable text at the front, variable text at the back.",
-          "show": "The band holds. Centred line beneath it: 'stable at the front, variable at the back'."
+          "say": "This is the ordering you met earlier, and now you know what it protects. Most stable text first, most variable last.",
+          "show": "The stack fades. A horizontal band appears, deep teal at the left fading to amber at the right, labelled 'front: most stable' and 'back: most variable'. On 'Most stable text first', segments slot onto it in order: 'system prompt', 'tools', 'your conversation', 'newest message'. Line beneath: 'order matters: stable first, variable last'."
         }
       ]
     }
@@ -483,24 +304,19 @@
       "result": "5 99.45115257958288 5 99.51550387596899"
     },
     {
-      "claim": "Warm follow-up: 1,032 - 1,027 = 5 tokens to prefill",
+      "claim": "Warm follow-up: 1,032 - 1,027 = 5 tokens to prefill ('all but five already held')",
       "python": "print(1032-1027)",
       "result": "5"
     },
     {
-      "claim": "Cold vs warm prefill: 1,032 / 5 = 206.4, said 'about two hundred and six times the work'",
+      "claim": "Cold vs warm prefill: 1,032 / 5 = 206.4, said 'two hundred and six times the prefill work', shown '1,032 ÷ 5 ≈ 206×'",
       "python": "print(1032/5)",
       "result": "206.4"
     },
     {
-      "claim": "Keys and values for the 1,032-token conversation: 1,032 x 327,680 bytes = 338 MB, 'about a third of a gigabyte' (matches ch13's 0.33 GB per 1,000 tokens)",
-      "python": "print(1032*327680, 1032*327680/1e9)",
-      "result": "338165760 0.33816576"
-    },
-    {
-      "claim": "Keys and values vs text: 338,165,760 bytes / about 4,000 bytes of text (ch04) = 84,541, said 'more than eighty thousand times', shown '≈ 85,000 ×'",
-      "python": "print(1032*327680/4000)",
-      "result": "84541.44"
+      "claim": "s01 bars at 1,400 px for 1,032 tokens: the warm amber sliver is 5 units = 6.8 px, the teal part 1,027 units = 1,393 px",
+      "python": "print(1400*5/1032, 1400*1027/1032)",
+      "result": "6.782945736434108 1393.2170542635658"
     },
     {
       "claim": "Time t: 770-token preamble + 7-token question = 777 tokens, hit 0, prefill 777",
@@ -523,24 +339,24 @@
       "result": "7"
     },
     {
-      "claim": "CORRECTION: fig 51 caption says cases B and C 'share the same number of words with the original'. They do not: B shares 6 tokens (What, is, the, capital, of, ?) and C shares 4 words (the, capital, of, France). Both are 7 tokens long, like the original; the film says that instead. Prefix matches: B 5, C 0.",
+      "claim": "CORRECTION: fig 51 caption says cases B and C 'share the same number of words with the original'. They do not: B shares 6 tokens (What, is, the, capital, of, ?) and C shares 4 words (the, capital, of, France). Both are 7 tokens long, like the original; the film says that instead ('both seven tokens, like the original, both full of its words'). Prefix matches: B 5, C 0.",
       "python": "o='What is the capital of France ?'.split(); b='What is the capital of Japan ?'.split(); c='Tell me the capital of France please'.split(); print(len(o),len(b),len(c),[w for w in b if w in o],[w for w in c if w in o])",
       "result": "7 7 7 ['What', 'is', 'the', 'capital', 'of', '?'] ['the', 'capital', 'of', 'France']"
     },
     {
-      "claim": "Hit rate against the whole prompt: A 784/788 = 99.5%, B 775/777 = 99.7%, C 770/777 = 99.1% (99.099, which rounds to 99.1); all 'ninety-nine point one percent or better' to one decimal place",
-      "python": "print(784/788*100, 775/777*100, 770/777*100)",
-      "result": "99.49238578680203 99.74259974259975 99.09909909909909"
+      "claim": "Hit rate against the whole prompt: A 784/788 = 99.5%, B 775/777 = 99.7%, C 770/777 = 99.1%. C is 99.099, strictly below 99.1, so 'ninety-nine point one percent or better' holds only after rounding to one decimal; the on-screen bracket therefore reads 'all above 99%', which holds exactly.",
+      "python": "print(784/788*100, 775/777*100, 770/777*100, min(784/788,775/777,770/777)>0.99)",
+      "result": "99.49238578680203 99.74259974259975 99.09909909909909 True"
     },
     {
-      "claim": "Hit rate on your own 7 tokens: A 7/7 = 100%, B 5/7 = 71% ('about seventy-one percent'), C 0/7 = 0%",
+      "claim": "Hit rate on your own 7-token question: A 7/7 = 100%, B 5/7 = 71%, C 0/7 = 0%",
       "python": "print(7/7*100, 5/7*100, 0/7*100)",
       "result": "100.0 71.42857142857143 0.0"
     },
     {
-      "claim": "The 7-token question is under one percent of a 777-token prompt drawn to scale ('a sliver')",
-      "python": "print(7/777*100)",
-      "result": "0.9009009009009009"
+      "claim": "s06 to-scale bar: the 7-token question is under one percent of a 777-token prompt, a 12.6 px sliver of a 1,400 px bar",
+      "python": "print(7/777*100, 1400*7/777)",
+      "result": "0.9009009009009009 12.612612612612613"
     },
     {
       "claim": "A day later, same follow-up as case A: prefill 788 - 770 = 18 = 7 + 7 + 4",
@@ -548,14 +364,19 @@
       "result": "18 18"
     },
     {
-      "claim": "Your 788-token conversation's keys and values: 788 x 327,680 bytes = 258 MB, 'about a quarter of a gigabyte'",
-      "python": "print(788*327680, 788*327680/1e9)",
-      "result": "258211840 0.25821184"
-    },
-    {
-      "claim": "Illustrative bill for case C at a cached price of 1/10: 770 x 0.1 + 7 = 84 fresh-token equivalents vs 777 all fresh (about 9 times less)",
+      "claim": "Illustrative bill for case C at a cached price of 1/10 (the source's 'about a tenth'; ignores cache-write surcharges): 770 x 0.1 + 7 = 84 fresh-token equivalents vs 777 all fresh (about 9 times less)",
       "python": "print(770*0.1, 770*0.1+7, 777/(770*0.1+7))",
       "result": "77.0 84.0 9.25"
+    },
+    {
+      "claim": "s09 bill bars to scale at 777 units = 1,000 px: the 'billed like 84' bar is 108 px",
+      "python": "print(1000*84/777)",
+      "result": "108.10810810810811"
+    },
+    {
+      "claim": "s10 bars to scale at 1,028 units = 1,200 px: the 'before the edit: 5' sliver is 5.8 px, drawn as 6 px",
+      "python": "print(1200*5/1028)",
+      "result": "5.836575875486381"
     },
     {
       "claim": "Fig 56: an edit at position 5 leaves 4 tokens matched, so the weather conversation's next turn prefills 1,032 - 4 = 1,028 instead of 5: 1,028 / 5 = 205.6, 'about two hundred and six times' (the atlas's 206 is 1,032 / 5 = 206.4; both round to 206)",

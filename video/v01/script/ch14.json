@@ -2,321 +2,283 @@
   "chapter": "ch14",
   "title": "Why a key depends on its context",
   "kicker": "14 · Why a key depends on its context",
-  "figs": [37, 38, 39, 40, 41, 42, 43],
+  "figs": [
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43
+  ],
   "scenes": [
     {
       "id": "ch14_s01",
       "name": "a fixed matrix, and a fair question",
-      "figs": [37],
-      "visual": "Dark stage, one continuous composition. Top band: a row of five blue token pills 't1' 't2' 't3' 't4' 't5', with 't5' slightly brighter, and two ghosted grey pills 't6' 't7' to their right. Centre: an equation that builds term by term, 'key = that token's vector × W_K', where the token's vector is a short horizontal blue bar, W_K is an amber matrix-grid tile, and the key is a blue bar. A small padlock icon will snap onto the W_K tile. Bottom right, later: a small amber 'rule machine' card labelled '× 2' with its own padlock, an input slot on its left and an output slot on its right. The idea the motion makes visible: the matrix is locked and never reacts; only the thing fed into it can vary.",
+      "figs": [
+        37
+      ],
+      "visual": "Dark stage, one continuous shot. Top band: five blue token pills 't1' to 't5', 't5' slightly brighter. Centre: an equation that builds in speech order, 'key = token's vector × W_K': a blue bar labelled 'key', a white '=', a blue bar labelled 'token's vector', an amber '×', and a grey-blue weight-grid tile 'W_K' (the matrix style used for W_Q, W_K, W_V earlier) with the grey sub-label 'key matrix'. A white padlock icon will snap onto the tile. Bottom right, in b4 only: a small amber card '× 2' with its own padlock, an input slot on its left and an output slot on its right. Colours: tokens and vectors blue, the multiply amber, the matrix grey-blue, text white or grey. No coral: nothing here is about bytes. The idea the motion makes visible: the matrix is locked and never reacts; only what is fed into it can vary.",
       "beats": [
         {
           "id": "b1",
-          "say": "A few minutes ago, the cache rested on one fact. Once a token has been processed, its keys and values are settled. Nothing that comes after it can change them. That is what makes them safe to keep.",
-          "show": "Pills 't1' to 't5' fade up in the top band; 't6' and 't7' appear ghosted to the right. Under 't5', a small teal tag: 'keys and values: settled'. On 'nothing that comes after it', thin grey arrows reach from 't6' and 't7' toward 't5' and bounce off a faint vertical barrier just to the right of 't5'."
+          "say": "Recall that a token's key depends on the tokens before it, at almost every layer. Yet a key is just the token's vector, times the key matrix, W K.",
+          "show": "Pills 't1' to 't5' fade up in the top band. On 'depends on the tokens before it', four thin blue arcs curve from 't1' to 't4' into 't5', and a small grey footnote appears under 't5': 'almost every layer'. On 'a key is just', the arcs and the footnote fade and the equation builds at centre as spoken: the blue 'key' bar and the white '=' on 'a key is', the blue 'token's vector' bar on 'the token's vector', the amber '×' on 'times', and the grey-blue 'W_K' tile with its sub-label 'key matrix' on 'the key matrix, W K'."
         },
         {
           "id": "b2",
-          "say": "Now look the other way, at the tokens before it. Here is a claim the rest of this story leans on. A token's keys depend on every token before it. Change one early word, and the keys of every later token change too.",
-          "show": "On 'look the other way', a soft spotlight swings left across 't1' to 't4'. On 'change one early word', pill 't2' flips over like a card and becomes 'XX' with a coral outline. A coral ripple runs right through 't3', 't4', 't5'; each gains a thin coral underline, and one label appears under 't5': 'keys changed'."
+          "say": "Each layer's W K is fixed once training ends, the same for every token, position, conversation and user, forever. So the projection really is independent of context.",
+          "show": "On 'each layer's', a deck of 80 faint tiles fans out behind 'W_K' with the grey label '80 layers, one each', then collapses back into one tile. On 'fixed', the white padlock snaps onto the tile. On the list, four small icon tags park around the tile in turn, one word each: a token-pill icon 'token', a map-pin icon 'position', a speech-bubble icon 'conversation', a person icon 'user'. On 'independent of context', the four tags fade together and one grey label settles under the tile: 'same for everyone, forever'."
         },
         {
           "id": "b3",
-          "say": "And that raises a fair question. How is a key actually made? By one multiplication. Take the token's vector, and multiply it by the key matrix, W K.",
-          "show": "Centre, the equation builds term by term as each part is spoken: blue bar 'that token's vector', amber '×', amber grid tile 'W_K', white '=', blue bar 'key'. Each term gets a small grey label as it lands."
+          "say": "Which makes this a fair question. If the matrix is fixed, how can the key depend on earlier tokens?",
+          "show": "The label under the tile dims. The four arcs from 't1' to 't4' into 't5' return, faint. The padlocked tile does not react at all. On 'fair question', a blue question card drops in below the equation with one line: 'fixed matrix, yet context-dependent key?'"
         },
         {
           "id": "b4",
-          "say": "Each of the eighty layers has its own W K, as you saw earlier. And every one of them is fixed the moment training ends. Layer one's W K is the same matrix for every token, every position, every conversation and every user, forever.",
-          "show": "Behind the W_K tile, a deck of 80 faint tiles fans out briefly, labelled 'one per layer: 80', then collapses back into one. On 'fixed', a padlock icon snaps onto the tile; small caption 'fixed after training'. On the list, four grey tags glide in and park around the tile one by one: 'every token', 'every position', 'every conversation', 'every user'."
-        },
-        {
-          "id": "b5",
-          "say": "So the projection really is independent of context. Nothing about the matrix changes because a different word appeared earlier. Which makes the obvious question a good one. If the matrix is fixed, how can the key depend on earlier tokens?",
-          "show": "The coral 'XX' pill in the top band pulses twice; the padlocked W_K tile does not react at all. The four tags fade. On 'the obvious question', a blue question card drops in below the equation: 'matrix fixed: how can the key depend on earlier tokens?'"
-        },
-        {
-          "id": "b6",
-          "say": "The answer is not in the matrix. It is in what gets multiplied by it. Think of a fixed rule: double it. Feed in three, and out comes six. Feed in four, and out comes eight. The rule never changed. The input did.",
-          "show": "The question card shrinks to the top-left corner. Bottom right, the amber '× 2' machine draws on with its padlock. A blue '3' slides into the input slot and a blue '6' slides out; then '4' in, '8' out. On 'the rule never changed', the padlock glows; on 'the input did', the input slot glows blue."
-        },
-        {
-          "id": "b7",
-          "say": "A fixed function of a changing input is a changing output. So everything turns on one thing: which vector is fed into the fixed matrix, at each layer. Let's go and look, starting from the bottom.",
-          "show": "The '× 2' machine shrinks and merges into the W_K tile. The 'that token's vector' slot on the left of the equation glows and its label changes to 'which vector goes in?'. Caption, bottom centre: 'fixed function, changing input'."
+          "say": "The answer is in what gets multiplied. A fixed function of a changing input is a changing output.",
+          "show": "The question card and the 'key matrix' sub-label fade. On 'what gets multiplied', the 'token's vector' bar glows blue and its label changes to 'which vector goes in?'. Bottom right, the amber '× 2' card draws on with its padlock. On 'changing input', a blue '3' slides into the input slot and a blue '6' slides out; on 'changing output', a '4' goes in and an '8' comes out. The padlock never moves; only the input slot glows. Caption, bottom centre: 'fixed function, changing input'."
         }
       ]
     },
     {
       "id": "ch14_s02",
       "name": "at layer one, the reasoning holds",
-      "figs": [38],
-      "visual": "Dark stage. Header across the top: 'At layer 1, the input is just the token itself'. Left third: the embedding table from earlier, a tall blue grid with faint row numbers down its edge. Centre: a short pipeline left to right: two blue chips 'token 5's ID' and 'position 5' joined by a white '+', an arrow into a teal box 'the vector fed to W_K', an arrow into the padlocked amber tile 'W_K, layer 1', and out of it a blue 'key' bar (later a 'value' bar beside it). Right third, later: two short sentence strips stacked, 't1 t2 t3 t4 t5' and 't1 XX t3 t4 t5' ('XX' with a coral outline). Bottom band, later: a small lookup table. The idea: at layer 1 nothing from tokens 1 to 4 can reach the input, so the key is the same in every sentence.",
+      "figs": [
+        38
+      ],
+      "visual": "Dark stage. Header, top band: 'Layer 1: just the token itself'. Left third: the embedding table from earlier, a tall blue grid with faint row numbers down its left edge, and above it a blue chip 'token 5's ID'. Centre: a pipeline running left to right: a blue input box 'token 5's row', an amber '×', the padlocked grey-blue tile 'W_K, layer 1', and an arrow out to a blue 'key' bar. On that last arrow sits a small white rotation glyph labelled 'position 5': in this model position is applied as the key is made, not added to the input, so the input box holds the embedding row alone. Right third, from b2: two short strips stacked, 'original' with pills 't1 t2 t3 t4 t5' and 'changed' with 't1 XX t3 t4 t5', where 'XX' is a violet pill. Violet marks the changed token and anything carrying it for the rest of this chapter. Bottom band, from b3: a small lookup table, then two five-word strips. Colours: tokens, rows and inputs blue; the multiply amber; 'identical' and 'reusable' teal; no coral. The idea: at layer 1 nothing from tokens 1 to 4 can reach the input, so the key is the same in every sentence.",
       "beats": [
         {
           "id": "b1",
-          "say": "Start at layer one. What goes into layer one's W K at position five? First, token five's row from the embedding table, the lookup you saw earlier. Its I D picks the row, and the row is copied out.",
-          "show": "Header fades in. Left: the embedding table grid draws on; a pointer slides down to one row, which highlights. The row lifts out as a blue bar and docks into the chip 'token 5's ID' in the centre."
+          "say": "At layer one, position five takes in token five's own row of the embedding table, with its position worked in as the key is made.",
+          "show": "Header fades in. The table draws on at left with the chip 'token 5's ID' above it. An arrow from the chip drives a pointer down the table's edge to one row, which highlights. On 'own row', a copy of that row lifts out as a blue bar and slides into the input box 'token 5's row', then flows through the amber '×' into the padlocked 'W_K, layer 1' tile. On 'its position worked in', the rotation glyph 'position 5' clicks onto the arrow leaving the tile, and the blue 'key' bar emerges on the right."
         },
         {
           "id": "b2",
-          "say": "Second, its position, five. In our model, position is worked in inside attention, right as the key is made, rather than added at the start. Either way, there are exactly two ingredients: which token, and where it sits.",
-          "show": "Chip 'position 5' appears with a white '+' beside the first chip. Both feed an arrow into the teal box 'the vector fed to W_K', which flows into the padlocked amber tile 'W_K, layer 1'; a blue 'key' bar emerges on the right. Small grey footnote under the pipeline: 'position applied inside attention in our model'."
+          "say": "Nothing there depends on tokens one to four. Change token two, and that input stays bit for bit identical. Here, the fixed-matrix reasoning is exactly right.",
+          "show": "The table and chip fade; the header and the pipeline dim to about 30%. Right third: the two strips appear, 'XX' violet. From each strip only 't5' is plucked out and dropped into its own copy of the blue input box; 't1' to 't4' stay behind, greyed. On 'bit for bit identical', the two input boxes slide together and overlay perfectly, a readout beneath them runs to '8,192 numbers', and both boxes turn teal as a teal stamp lands: '= identical'. On 'exactly right', a teal banner crosses the middle: 'at layer 1: right'."
         },
         {
           "id": "b3",
-          "say": "Nothing in that depends on tokens one to four. Change token two, and the vector going in is bit-for-bit identical: eight thousand one hundred and ninety-two numbers, a hundred and thirty-one thousand and seventy-two bits, every one the same.",
-          "show": "The embedding table fades. Right third: the two strips 't1 t2 t3 t4 t5' and 't1 XX t3 t4 t5' appear. From each strip only 't5' is plucked out and fed into its own copy of the input box; tokens 1 to 4 stay behind, greyed. The two teal input boxes slide together and overlay perfectly. A counter beneath runs to '8,192 numbers', then to '131,072 bits', and a teal stamp lands: '= identical'."
+          "say": "Token five's layer-one key and value could sit in a table, correct in any sentence. A one-layer model would need no prefix rule: same I D, same position, reusable, whatever came before.",
+          "show": "The banner fades. A teal 'key' bar and a teal 'value' bar drop into a small table in the bottom band with columns 'token', 'position', 'layer-1 K, V'; a pointer slides to the row 'token 5 | 5'. On 'a one-layer model', the table fades and two different five-word strips appear one above the other, 'we sat by the bank' and 'she paid at the bank', each with 'bank' in slot 5. A teal arc links the two 'bank' pills, labelled 'reusable'. On 'no prefix rule', a grey label 'match from the start' appears and is struck through. Grey corner tag: 'one-layer model only'."
         },
         {
           "id": "b4",
-          "say": "So at layer one, the reasoning is exactly right. Token five's key and value there depend on token five and its position alone. You could work them out in advance, store them in a table, and they would be correct in any sentence whatsoever.",
-          "show": "Teal banner across the middle: 'at layer 1, the reasoning is exactly right'. A blue 'value' bar emerges beside the key bar. On 'store them in a table', both bars drop into a small table in the bottom band with columns 'token', 'position', 'layer-1 key and value'; a pointer slides to the row 'token 5 | position 5'."
-        },
-        {
-          "id": "b5",
-          "say": "Imagine a model with only one layer. Its cache would not need the rule you heard about earlier, reuse only for a beginning that matches token for token. Any token whose I D and position matched could be reused, wherever it appeared.",
-          "show": "The table fades. Two different request strips appear one above the other, with entirely different tokens in slots 1 to 4 but the same teal pill 'bank' in slot 5 of both. A teal arc links the two 'bank' pills, labelled 'reusable'. Grey tag in the corner: 'one-layer model only'. A grey label 'match from the start' appears and is struck through."
-        },
-        {
-          "id": "b6",
-          "say": "That is worth granting fully, not glossing over. The independence is real. And it survives exactly one layer.",
-          "show": "The strips fade. The pipeline compresses into a single slab labelled 'layer 1' with a teal tick. Above it, a second slab 'layer 2' draws on with a coral question mark. Caption: 'independent for exactly one layer'."
+          "say": "So the independence is real, and worth taking seriously. It survives exactly one layer.",
+          "show": "The strips fade. The pipeline compresses into a single slab labelled 'layer 1' with a teal tick. On 'exactly one layer', a second slab 'layer 2' draws on above it with a white question mark. Caption: 'independent for exactly one layer'."
         }
       ]
     },
     {
       "id": "ch14_s03",
-      "name": "attention mixes the earlier tokens in",
-      "figs": [39],
-      "visual": "Dark stage. Bottom band: five blue token pills 't1' to 't5'. From each pill a thin vertical blue column rises: the residual stream, one lane per position, the same band idiom used for the residual stream earlier. A wide horizontal slab 'layer 1' crosses all five columns at mid-height. Inside the slab, attention for position 5 is drawn: a query icon (magnifying glass) on column 5, key icons on columns 1 to 5, amber weight bars drawn to scale above each column, and five threads converging into a blue box on column 5, 'a weighted blend of all five'. Right third: a small arithmetic panel for the illustrative numbers. Header: 'What layer 1 hands upward at position 5'. The idea: the blend is added back into position 5's lane, so everything above the slab carries strands of every earlier token.",
+      "name": "attention mixes, so the same matrix gets a different vector",
+      "figs": [
+        39,
+        40
+      ],
+      "visual": "Dark stage, one continuous shot with one camera move. Left 60%: five blue token pills 't1' to 't5' along the bottom; from each a thin vertical blue lane rises, the residual stream, one lane per position, in the band idiom used for the residual stream earlier. A wide horizontal slab 'layer 1' crosses all five lanes at one-third height, with a fainter slab 'layer 2' above it. Inside slab 1, attention for position 5: a magnifying-glass query icon on lane 5, key icons on lanes 1 to 5, amber weight bars drawn to scale above each lane, and threads converging into a blue box on lane 5, 'blend of all five'. Right 40%, b1 only: a small arithmetic panel. From b4 the right two-thirds hold a 2 × 2 comparison grid: columns 'original' and 'token 2 changed', rows 'layer 1' (bottom) and 'layer 2' (top); each cell is a blue input chip, an amber '×', a padlocked grey-blue matrix tile (unlabelled: the row label names its layer) and a key bar. The same matrix in both columns of a row is the point; the two rows hold different matrices, one per layer. In b5 the camera pulls back to show lane 5 rising through 80 thin slabs. Colours: tokens, lanes and vectors blue; the strands from 't1', 't3', 't4', 't5' four graded blues; anything carrying the changed token 'XX' violet; weights and multiplies amber; 'same' teal; '≠' white. No coral. The idea: the blend is added into position 5's lane, so everything above slab 1 carries every earlier token, and the fixed matrix at layer 2 is fed a different vector.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now follow position five up through layer one. First comes attention. Token five's query is scored against the keys of positions one to five, itself included, and softmax turns those scores into weights that add up to one.",
-          "show": "Pills, columns and the 'layer 1' slab draw on; header fades in. Inside the slab, column 5 shows a magnifying-glass query icon; dashed lines reach from it to key icons on columns 1 to 5. On 'add up to one', empty amber bar outlines appear above each column."
+          "say": "Follow position five through layer one. Attention blends the values at positions one to five into a weighted average. Change token two, and the blend changes: here, from thirty-three to forty-five.",
+          "show": "Pills, lanes and slab 1 draw on; a two-line header fades in: 'What layer 1 hands upward' / 'at position 5'. On 'blends the values', the query icon lights on lane 5, dashed lines reach the key icons on lanes 1 to 5, and the amber bars fill to scale, '0.1', '0.3', '0.1', '0.2', '0.3', with a grey tag 'illustrative'. Threads draw from lanes 1 to 5 into the blend box. Right panel: one stand-in number per value, '10', '20', '30', '40', '50', each under its weight; amber products appear in turn, '1', '6', '3', '8', '15', and add to '33'. On 'change token two', pill 't2' flips to the violet 'XX'; in the panel '20' becomes a violet '60', its product '6' becomes '18', and the total re-adds to '45' as the old '33' is struck through. Grey tag: 'weights held fixed here'."
         },
         {
           "id": "b2",
-          "say": "Those weights blend the five values into one vector, a weighted average. Here are some illustrative weights: point one, point three, point one, point two, and point three.",
-          "show": "The amber bars fill to scale with labels '0.1', '0.3', '0.1', '0.2', '0.3'; a small sum ticks to '= 1.0'. Grey corner tag: 'illustrative'. Five threads draw from columns 1 to 5 into the blue box on column 5: 'a weighted blend of all five'."
+          "say": "Through the combine step, that blend is added onto the residual stream at position five. So what layer one hands upward carries every token before it.",
+          "show": "The panel fades. On 'combine step', the blend box passes through a small grey-blue 'combine' box on lane 5, then drops into the lane at a white '+', labelled 'added at position 5'. Above the '+', lane 5 is now woven with five thin strands: four graded blues from 't1', 't3', 't4', 't5' and a violet one from 'XX'. On 'every token before it', the strands carry tiny labels 't1', 'XX', 't3', 't4', 't5' for a moment, then the labels fade."
         },
         {
           "id": "b3",
-          "say": "Shrink each value to one stand-in number: ten, twenty, thirty, forty, fifty. The blend is one, plus six, plus three, plus eight, plus fifteen. Thirty-three.",
-          "show": "Right panel: values '10', '20', '30', '40', '50' line up under their weights. The products appear one at a time in amber as spoken: '1', '6', '3', '8', '15'. They add into '33', shown inside the blend box. Grey tag: 'one number standing in for a vector'."
+          "say": "That is not a side effect. It is the purpose of a layer, to make each vector reflect its context.",
+          "show": "Every lane above slab 1 gains woven strands, each only from itself and the lanes to its left: lane 1 one strand, lane 5 five. The 'added at position 5' label fades. Caption: 'the purpose of the layer'."
         },
         {
           "id": "b4",
-          "say": "Now swap token two for a different word, and say its value becomes sixty. The blend jumps from thirty-three to forty-five. And that is only part of it. The new token two brings a new key too, so the weights shift as well.",
-          "show": "Pill 't2' flips to 'XX' with a coral outline. In the panel its value '20' turns into a coral '60', its product '6' into '18', and the total re-adds to '45'; the old '33' slides aside, struck through. On 'the weights shift as well', all five amber bars wobble to slightly different lengths and the '45' flickers, no longer exact."
+          "say": "So layer two's W K, the same for both sentences, gets a different vector and makes a different key. You cannot have context-aware vectors and context-free keys.",
+          "show": "The header fades. The lanes picture shrinks to the left third and dims, except lane 5. Right two-thirds: the 2 × 2 grid draws, column headers 'original' and 'token 2 changed', row labels 'layer 1' and 'layer 2'. The bottom row fills at once, recalling the last scene: blue chips, padlocked tiles, two teal key bars, and teal '=' signs between the two inputs, the two tiles and the two keys. On 'layer two's W K, the same', the top-row tiles appear padlocked with a teal '=' between them. On 'a different vector', input chips rise from lane 5 into the top row: the left chip has a blue 't2' strand woven in, the right chip a violet 'XX' strand, and a white '≠' lights between them. On 'a different key', the keys emerge, left blue, right violet, with a white '≠'. On 'context-free keys', the caption changes to 'context in the vector, context in the key'."
         },
         {
           "id": "b5",
-          "say": "That blend is added back onto the residual stream at position five, the running vector that carries each token up the stack. Then the feed-forward step transforms it, on its own. But what it transforms is already mixed.",
-          "show": "The arithmetic panel fades. The blend box drops into column 5 at a white '+'. Above the '+', column 5 is now woven with five thin coloured strands, one from each token, the strand from 'XX' coral. A small 'feed-forward' box on column 5 processes it; the strands pass through unchanged in colour. Label: 'added back at position 5'."
-        },
-        {
-          "id": "b6",
-          "say": "So what layer one hands upward at position five is no longer a function of token five alone. It now carries something of every token before it.",
-          "show": "Column 5 above the slab glows. The five strands briefly carry tiny labels 't1', 'XX', 't3', 't4', 't5', then the labels fade. Caption: 'no longer token 5 alone'."
-        },
-        {
-          "id": "b7",
-          "say": "That is not a side effect. It is the entire purpose of the layer: to make each position's vector reflect its context. The step that breaks the independence is the very step the model exists to perform.",
-          "show": "Every column above the slab now gains woven strands, each only from itself and the columns to its left, so column 1 has one strand and column 5 has five. Caption replaces the old one: 'the purpose of the layer'."
-        },
-        {
-          "id": "b8",
-          "say": "You cannot have vectors that reflect their context, and keys that ignore it, at the same time.",
-          "show": "Two short labels appear side by side in the top band: 'vectors that reflect context' in blue and 'keys that ignore it' in grey, with a white 'not both' between them. The grey label dims."
+          "say": "And it compounds, eighty times over. The dependence enters through the residual stream, never the weights. They learn nothing about your sentence. The vector arriving at them already knows.",
+          "show": "The grid shrinks to the top left and dims. The camera pulls back: lane 5 extends upward through a stack of 80 thin slabs, and a counter beside it runs '1 … 80' as each slab weaves one more faint strand into the lane, so its colour grows richer toward the top; label at the top: 'thoroughly contextual'. Beside the stack, a column of 80 small key slots fills from the bottom: the bottom slot teal, 'layer 1: same', the 79 above it violet; counter '1 same, 79 different'. On 'never the weights', everything dims except the lane and one padlocked 'W_K' tile beside it, and a two-line caption appears: 'fixed function, changing input' / 'through the stream, never the weights'."
         }
       ]
     },
     {
       "id": "ch14_s04",
-      "name": "the same fixed matrix, a different vector going in",
-      "figs": [40],
-      "visual": "Dark stage. Header: 'The same fixed matrix, a different vector going into it'. A 2 × 2 grid. Column headers: left 'original: t1 t2 t3 t4 t5', right 'token 2 changed: t1 XX t3 t4 t5' ('XX' coral). Row labels at the far left: 'layer 1' (bottom row) and 'layer 2' (top row). Each cell is a pipeline: an input chip, an arrow, a padlocked amber W_K tile, an arrow, a key bar. Layer 1 cells: chip 'embedding + position', tile 'W_K, layer 1'. Layer 2 cells: chip 'layer 1's output here', tile 'W_K, layer 2'. Comparison signs sit between the two columns in each row. Later the camera pulls back and a tall stack of 80 thin slabs over position 5's residual-stream lane appears to the right, with a column of 80 small key slots beside it. The idea: the matrix is identical across the two runs; only the vector going in differs, and that difference starts at layer 2 and compounds.",
+      "name": "measured, not asserted",
+      "figs": [
+        41
+      ],
+      "visual": "Dark stage. Left third: an icon of a small model, four stacked slabs, labelled 'tiny transformer: 4 layers'; above it two run strips, 'run 1: t1 t2 t3 t4 t5' and 'run 2: t1 XX t3 t4 t5', with 'XX' violet. Right two-thirds: a two-line header 'Change token 2' / 'measure token 5's key', and a table of four rows, 'layer 1' to 'layer 4', each with a monospace readout, a horizontal violet bar drawn to linear scale (20.102747 fills the full width), and a status word: teal 'identical' or white 'different'. A ruler icon marks the measurement. Colours: tokens blue; the changed token and the distance bars violet; the number-by-number differences amber, because they are arithmetic; 'identical' teal. No coral. The idea: one token changed, two runs; layer 1's key does not move at all, and every layer above it does.",
       "beats": [
         {
           "id": "b1",
-          "say": "Put two runs side by side. On the left, the original sentence. On the right, the same sentence with only token two changed. In both, watch position five's key being made, at layer one and at layer two.",
-          "show": "Header fades in. The grid frame draws; the column headers with their token strips appear left then right; row labels 'layer 1' and 'layer 2' fade in at the far left. Cells are empty outlines."
+          "say": "You need not take that on trust. A tiny four-layer transformer, with causal attention, feed-forward blocks and residual connections, was run twice, with only token two changed.",
+          "show": "The model icon draws on with its label. Three small icon tags appear under it one by one as each ingredient is named: 'causal attention', 'feed-forward', 'residual'. On 'run twice', the two run strips appear above the model and pass down through it one after the other, each leaving a faint trace; 'XX' glows violet. The three tags then fade."
         },
         {
           "id": "b2",
-          "say": "Layer one. On both sides, the same vector goes into the same fixed W K. Same input, same matrix, same key.",
-          "show": "The bottom row fills in both columns at once: chip 'embedding + position', padlocked 'W_K, layer 1', a key bar. Teal '=' signs light between the two inputs, then between the two W_K tiles, then between the two keys, keyed to 'same input', 'same matrix', 'same key'."
+          "say": "At each layer, token five's two keys were compared number by number and rolled into one distance. Zero means every number matched.",
+          "show": "Right side, above where the table will go: run 1's key for token 5 as a row of eight small blue cells, and run 2's key beneath it as eight violet cells. On 'number by number', the cells pair up column by column and a small amber difference tick grows between each pair. On 'one distance', the eight ticks slide together into one amber stack beside the ruler icon, labelled 'distance'. Grey tag: '0 = every number matched'. The demo then shrinks away, and the header and four empty rows draw on."
         },
         {
           "id": "b3",
-          "say": "Layer two has its own W K, and it is frozen too. It is the very same matrix on both sides. But what goes into it is layer one's output at position five. And you have just seen that output carries token two.",
-          "show": "Top row: the two padlocked 'W_K, layer 2' tiles appear, with an amber '=' between them and the tag 'same matrix'. On 'layer one's output', input chips 'layer 1's output here' rise from the bottom row into the top row. In the right column a coral strand labelled 'XX' is visibly woven into the chip; the left chip has a blue 't2' strand in the same place."
+          "say": "Layer one: zero, to the last bit. Layer two: about three point five. Layer three: sixteen point seven. Layer four: twenty point one, growing with depth in this run.",
+          "show": "Rows fill in turn as spoken. 'layer 1': readout '0.000000', no bar at all, teal 'identical' and a teal tick; the readout holds perfectly still. 'layer 2': '3.538930', a short violet bar, 'different'. 'layer 3': '16.746760', a long one. 'layer 4': '20.102747', full width. On 'growing with depth', a thin white arrow runs up along the bar tips, with a small grey tag 'this run'."
         },
         {
           "id": "b4",
-          "say": "So the vector going in is different, and the key coming out is different. The matrix never changed between the two runs. Only the vector it multiplies.",
-          "show": "A coral '≠' lights between the two layer-2 input chips. Keys emerge: the left key blue, the right key coral, with a coral '≠' between them. The padlocks on the two layer-2 tiles glow white and their amber '=' stays lit. Caption: 'same matrix, different vector in, different key out'."
-        },
-        {
-          "id": "b5",
-          "say": "And it compounds. Layer three's input carries layer two's mixing. Layer four's carries layer three's. Across eighty layers, position five's vector is blended with the earlier positions eighty times over. By the top, it is thoroughly contextual.",
-          "show": "The camera pulls back; the grid shrinks to the left third and dims. Right: a tall stack of 80 thin slabs over position 5's blue residual-stream lane. A counter runs '1 … 80 blends' as each slab adds another faint woven strand to the lane, so its colour grows richer toward the top. Label at the top of the stack: 'thoroughly contextual'."
-        },
-        {
-          "id": "b6",
-          "say": "So of token five's eighty keys, one is untouched by the change, and seventy-nine are different. The same goes for its eighty values.",
-          "show": "Beside the stack, a column of 80 small key slots fills from the bottom: the bottom slot teal, labelled 'layer 1: same', the 79 above it coral. Counter: '1 same, 79 different'. A parallel column of 80 value slots fills the same way beside it."
-        },
-        {
-          "id": "b7",
-          "say": "That is the precise answer to the question. Fixed function, changing input. The dependence enters through the residual stream, never through the weights. The weights never learn anything about your sentence. The vector arriving at them already knows.",
-          "show": "Everything dims except the blue residual-stream lane and one padlocked W_K tile beside it. Caption line one: 'fixed function, changing input'. Line two appears beneath on 'never through the weights': 'through the stream, never the weights'."
+          "say": "The weights were random, never trained, so the sizes mean nothing. The pattern is the point: layer one identical, every layer above it moved.",
+          "show": "Grey tag beside the table: 'random weights, never trained'. On 'the sizes mean nothing', the digits in rows 2 to 4 scramble and their bars jitter in length, as if re-run with new random weights, then settle back to the measured values; row 1's '0.000000' stays rock still throughout. On 'the pattern', the teal tick on row 1 pulses and rows 2 to 4 get small white marks. Caption across the bottom: 'measured, not asserted'."
         }
       ]
     },
     {
       "id": "ch14_s05",
-      "name": "measured, not asserted",
-      "figs": [41],
-      "visual": "Dark stage. Left third: an icon of a small model, four stacked slabs, labelled 'a tiny transformer: 4 layers', with three small tags beneath it: 'causal attention', 'feed-forward block', 'residual connections'. Above it two run strips: 'run 1: t1 t2 t3 t4 t5' and 'run 2: t1 XX t3 t4 t5' ('XX' coral). Right two thirds: a measurement table under the header 'Change token 2, then measure token 5's key at each layer'. Four rows, 'layer 1' to 'layer 4', each with a numeric readout, a horizontal coral bar drawn to linear scale (20.102747 fills the full width), and a status word, teal 'identical' or coral 'different'. A small ruler icon marks the measurement.",
+      "name": "why context-dependent keys are the point",
+      "figs": [
+        42
+      ],
+      "visual": "Dark stage. Header: 'Same word, two sentences, two keys'. Left half: two rows of blue token pills, top 'the' 'river' 'bank', bottom 'the' 'savings' 'bank', the two 'bank' pills aligned in slot 3 with white outlines. To the right of each 'bank', a small padlocked grey-blue 'W_K' glyph, then a vertical stack of eight key bars standing for its layers, layer 1 at the bottom: the river stack in blue, the savings stack in violet as the second series. A white line-art water-wave icon sits beside the top stack and a white coin icon beside the bottom one. Later, a blue pill 'a later word' with a magnifying-glass query icon enters from the right. Bottom band, last beat only: a small strip 't1 XX t3 t4 t5' with one cache cell under each token. Colours: tokens and the river side blue, the savings side violet, 'same' teal, icons white. No amber or coral: nothing here is arithmetic or bytes. The idea: identical token, position and matrix, yet different keys above layer 1, and that difference is what lets the model tell the meanings apart.",
       "beats": [
         {
           "id": "b1",
-          "say": "You do not have to take that on trust. Here is a tiny transformer, four layers, built and run just to test it. The real ingredients are all there: causal attention, a feed-forward block, and residual connections adding each layer's work back onto the stream.",
-          "show": "Left: the four-slab model icon draws on with its label. The three tags appear under it one by one as each ingredient is named."
+          "say": "The same fact, from the other side. Take bank: the river bank, and the savings bank. Same token, same position, same W K.",
+          "show": "Header fades in. The top row 'the river bank' slides in, then the bottom row 'the savings bank'; the two 'bank' pills line up. Three short tags appear between the rows as spoken: 'same token', 'same position: 3', 'same W_K'."
         },
         {
           "id": "b2",
-          "say": "Run it twice on the same five tokens, changing only token two. Then, at every layer, measure how far token five's key moved between the two runs. A distance of zero would mean the two keys are identical.",
-          "show": "The two run strips appear above the model and pass through it one after the other, each leaving a faint trace. A ruler icon appears beside token 5's position. On the right, the table header and four empty rows draw on: 'layer 1', 'layer 2', 'layer 3', 'layer 4'."
+          "say": "Their layer-one keys match. Above that, the vectors going into W K differ, one blended with river, one with savings. One key leans toward water, the other toward money.",
+          "show": "On 'layer-one keys match', the bottom bar of each stack draws teal, joined by a teal '='. The three tags fade. On 'vectors going into W K differ', a blue thread draws from 'river' into the top 'bank' and a violet thread from 'savings' into the bottom 'bank', and each 'bank' sends a glowing input arrow into its W_K glyph. On 'one key leans', the stacks grow upward: the top stack's blue bars tilt progressively toward the water icon, the bottom stack's violet bars tilt the opposite way toward the coin icon, diverging more with height. Labels: 'leans toward water', 'leans toward money'."
         },
         {
           "id": "b3",
-          "say": "Layer one. Zero point zero zero zero zero zero zero. Not small. Zero. Identical, to the last bit.",
-          "show": "Row 'layer 1': readout '0.000000', no bar at all, teal word 'identical', and a teal tick. The readout holds perfectly still."
+          "say": "That is how the model tells them apart. Keys that ignored context all the way up could never do that, and the model would be useless.",
+          "show": "The two 'leans' labels fade. The pill 'a later word' slides in at the right, with a small grey tag 'looking for water', and sends a probe line to the top bar of each stack. The line to the river key thickens and glows; the line to the savings key stays thin and faint. Grey corner tag: 'illustrative'. On 'ignored context', both stacks collapse into identical grey bars, the probe lines become equal and faint, the icons grey out, and a grey tag reads 'context-free keys: useless'. Then the coloured stacks snap back."
         },
         {
           "id": "b4",
-          "say": "Layer two: about three point five. Layer three: about sixteen point seven. Layer four: about twenty point one. Every layer above the first moved, and the gap grows with depth as the mixing compounds. By layer four, it is nearly six times layer two's.",
-          "show": "Rows fill in turn as spoken: '3.538930' with a short coral bar, '16.746760' with a long one, '20.102747' with a full-width one; each gets the coral word 'different'. On 'nearly six times', a white bracket links bar 4 to bar 2 with the label '× 5.7'."
-        },
-        {
-          "id": "b5",
-          "say": "The pattern is what matters, not the sizes, which depend on the random weights the little model happened to get. Rerun it with other random weights and those numbers change. The zero at layer one never does.",
-          "show": "Grey tag beside the table: 'sizes depend on the random weights'. On 'rerun it', the digits in rows 2 to 4 scramble and their bars jitter in length, then settle back to the measured values; row 1's '0.000000' stays rock still throughout."
-        },
-        {
-          "id": "b6",
-          "say": "So this is not an argument from authority. One token changed, two runs. Layer one's key was identical to the last bit, and every layer above it moved.",
-          "show": "Teal tick on row 1, coral marks on rows 2 to 4. Caption across the bottom: 'measured, not asserted'."
+          "say": "So the question and the capability are one phenomenon, and that dependence is exactly what makes the prefix rule necessary.",
+          "show": "The probe and its tags fade. Caption: 'question and capability: one phenomenon'. On 'prefix rule', the bottom-band strip 't1 XX t3 t4 t5' appears with 'XX' violet; a grey crack sweeps through the cache cells from 'XX' to the end of the row, and a grey tag reads 'why the prefix rule exists'."
         }
       ]
     },
     {
       "id": "ch14_s06",
-      "name": "why context-dependent keys are the point",
-      "figs": [42],
-      "visual": "Dark stage. Header: 'The same word, two sentences, two different keys'. Two rows of blue token pills on the left half: top 'the' 'river' 'bank', bottom 'the' 'savings' 'bank', the two 'bank' pills vertically aligned in slot 3 and outlined white. To the right of each 'bank', a small vertical stack of key bars, one per layer, layer 1 at the bottom. A water-wave icon sits beside the top stack and a coin icon beside the bottom stack. Later, a ghosted blue pill 'a later word' enters from the right with a magnifying-glass query icon. The idea: identical token, position and matrix, yet different keys above layer 1, and that difference is what lets the model tell meanings apart.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Now the same fact, seen from the other side. Remember bank? Here it is in two sentences. The river bank. The savings bank.",
-          "show": "Header fades in. Top row 'the river bank' slides in, then the bottom row 'the savings bank'. The two 'bank' pills line up vertically."
-        },
-        {
-          "id": "b2",
-          "say": "Same token. Same position, third in both. And at every layer, the same fixed W K. At layer one, the two keys are identical, exactly as promised.",
-          "show": "Three small tags appear between the rows, one per phrase: 'same token', 'same position: 3', 'same W_K'. Beside each 'bank', only the bottom key bar of its stack draws, both teal and identical, joined by a teal '='."
-        },
-        {
-          "id": "b3",
-          "say": "Above layer one, they part ways. River has been blended into one bank, savings into the other. So one key leans toward water, and the other leans toward money.",
-          "show": "Threads draw from 'river' into the top 'bank' and from 'savings' into the bottom 'bank'. The stacks grow upward: the top stack's bars tint toward the water-wave icon, the bottom stack's toward the coin icon, diverging more with height. Labels: 'a key that leans toward water', 'a key that leans toward money'."
-        },
-        {
-          "id": "b4",
-          "say": "That difference is how the model tells the two sentences apart. When a later word comes looking for something about water, the river bank's key answers strongly. The savings bank's barely answers at all.",
-          "show": "A pill 'a later word' with a query icon slides in at the right and sends a probe line to each top key. The line to the river bank's key thickens and glows; the line to the savings bank's key stays thin and faint. Grey corner tag: 'illustrative'."
-        },
-        {
-          "id": "b5",
-          "say": "A model whose keys really were independent of context could never tell which meaning of a word was meant. If the property behind that fair question held all the way up, the model would be useless.",
-          "show": "Both key stacks briefly collapse into identical grey bars, and the probe lines become equal and faint; the water and coin icons grey out. A grey tag: 'keys that ignore context'. Then the coloured stacks snap back."
-        },
-        {
-          "id": "b6",
-          "say": "So the question and the capability are the same phenomenon. Keys have to depend on context for the model to work. And that dependence is exactly what makes the prefix rule necessary.",
-          "show": "Caption line one: 'the question and the capability: one phenomenon'. On 'prefix rule', a small strip 't1 XX t3 t4 t5' appears at the bottom with a coral sweep running from 'XX' to the end, tagged 'coming next'."
-        }
-      ]
-    },
-    {
-      "id": "ch14_s07",
       "name": "could the cache keep layer one?",
-      "figs": [43],
-      "visual": "Dark stage. Header: 'So could the cache keep layer 1 and throw away the rest?'. Top band: the strip 't1 XX t3 t4 t5' ('XX' coral), with a small cache stack under each token. Centre: a long horizontal bar drawn to scale, split into 80 equal segments, labelled beneath 'prefill work, by layer'; segment 1 teal, segments 2 to 80 coral. Below it, later: token 5's cache shelf, 80 small compartments. Later the camera zooms into the teal segment, which opens into a row of small boxes for layer 1's steps. The idea: what layer 1 could save is a sliver of a sliver.",
+      "figs": [
+        43
+      ],
+      "visual": "Dark stage. Header: 'Keep layer 1, drop the rest?'. Top band: the strip 't1 XX t3 t4 t5' with 'XX' violet, and a small cache stack under each token, three cells tall standing for 80 layers, bottom cell = layer 1. Centre: a long horizontal bar drawn to scale and split into 80 equal segments, labelled beneath 'prefill work, by layer'. In b3 the camera zooms into segment 1, which opens into a row of small boxes for layer 1's work, then shows a to-scale bar for one layer's weights. Colours follow the next chapter's cache scheme exactly: still-valid cache cells teal; stale cache cells grey with a crack; work that must be redone amber, since it is arithmetic; cache bytes coral, used only on the bytes readout. The idea: what layer 1 could save is a sliver of a sliver.",
       "beats": [
         {
           "id": "b1",
-          "say": "One more fair question follows. If layer one survives a change, could the cache keep layer one's keys and values, and throw away only the rest? In principle, yes, for the tokens that did not change.",
-          "show": "Header fades in. Top band: the strip 't1 XX t3 t4 t5' with a small cache stack under each token; under 't3', 't4' and 't5', each stack's bottom cell glows teal and a small '?' sits beside it. On 'in principle, yes', the three '?' marks turn into small teal ticks, with one grey tag: 'in principle'."
+          "say": "So could the cache keep layer one's keys and values, and throw away the rest? In principle, yes, for the tokens that did not change.",
+          "show": "Header fades in. The strip draws with its stacks. The whole stack under 't1' is teal, since nothing before it changed. The whole stack under 'XX' is grey and cracked, since it must be built fresh. Under 't3', 't4' and 't5', the upper cells are grey and cracked and the bottom cell sits with a small '?'. On 'in principle, yes', the three '?' marks turn into teal ticks, and one grey tag appears: 'in principle'."
         },
         {
           "id": "b2",
-          "say": "In practice it buys almost nothing. One layer out of eighty is a rounding error: one point two five percent of the prefill work for those tokens. The other ninety-eight point seven five percent is recomputed anyway.",
-          "show": "The 80-segment bar draws across the centre. On 'one point two five percent', segment 1 lights teal with the label 'layer 1, still valid: 1.25%'. On 'ninety-eight point seven five', segments 2 to 80 fill coral in one sweep, labelled 'layers 2 to 80: 98.75%, all of it recomputed'."
+          "say": "In practice, layer one is a rounding error: one point two five percent of the prefill work. The other ninety-eight point seven five percent is recomputed anyway.",
+          "show": "The 80-segment bar draws across the centre. On 'one point two five percent', segment 1 lights teal with the label 'layer 1: 1.25%'. On 'ninety-eight point seven five', segments 2 to 80 fill amber in one sweep, labelled 'layers 2–80: 98.75%, recomputed'. Under the bar, a small coral readout appears: 'cache bytes: 4 KB of 320 KB'."
         },
         {
           "id": "b3",
-          "say": "Count it in bytes and it is the same story. Of token five's three hundred and twenty kilobytes in the cache, layer one holds just four. The other three hundred and sixteen are wrong, and must be rebuilt.",
-          "show": "Below the bar, token 5's cache shelf draws: 80 compartments, each tagged '4 KB'. The bottom compartment stays teal; the other 79 turn coral. Readouts: '4 KB still valid', '316 KB rebuilt', and beneath them the total '320 KB'."
+          "say": "And the saving is smaller still. Layer two needs layer one's output, so layer one's attention runs anyway. Only its key and value multiplies are skipped, about a fortieth of one percent.",
+          "show": "The coral readout fades. The camera zooms into the teal segment 1, which opens into a row of boxes: two amber boxes 'attention' and 'feed-forward' under one bracket 'runs anyway', and one teal box 'K and V multiplies' with the tag 'skipped'. On 'key and value multiplies', the amber boxes and bracket dim and the teal box expands into 'W_K 8.4 M + W_V 8.4 M' beside a to-scale bar for the whole layer, '855.6 M weights', with a thin teal sliver at its left end, '≈ 2%'. On 'a fortieth of one percent', the camera pulls back out: the sliver shrinks into segment 1, leaving a teal hairline, readout '≈ 0.025%', and a small grey tag 'weight arithmetic only'."
         },
         {
           "id": "b4",
-          "say": "And the saving is smaller still. To compute layer two, you need layer one's output. So layer one has to run anyway: the query, the scores, the blend, the combine step, and the feed-forward.",
-          "show": "The shelf fades. The camera zooms into the teal layer-1 segment, which opens into a row of small boxes: 'query', 'scores', 'blend', 'combine', 'feed-forward', plus two small teal boxes 'key multiply' and 'value multiply'. On each spoken step, its box lights amber with a tiny tag 'must run anyway'. The two teal boxes stay unlit."
-        },
-        {
-          "id": "b5",
-          "say": "All you would really skip is layer one's key and value multiplications. W K and W V hold about eight point four million weights each. Together that is about two percent of the layer's eight hundred and fifty-five point six million.",
-          "show": "The two teal boxes enlarge and are labelled 'W_K: 8.4 M' and 'W_V: 8.4 M'. Beneath them a bar drawn to scale for the whole layer, amber outline, '855.6 M weights'; a thin teal sliver at its left end, '16.8 M, about 2%'."
-        },
-        {
-          "id": "b6",
-          "say": "So the real saving is about two percent of one point two five percent. Roughly a fortieth of one percent of the arithmetic on the weights. A rounding error on a rounding error.",
-          "show": "The camera pulls back out to the 80-segment bar. The teal sliver shrinks into the layer-1 segment, leaving a hairline of teal there; readout beside it: '≈ 0.025%'. Small grey tag: 'counting weight arithmetic only'."
-        },
-        {
-          "id": "b7",
-          "say": "So serving systems treat a mismatch as invalidating everything from the first changed token onward. Correct for layers two and up, and not worth an exception for layer one. As a rule for whole prompts, that is the next chapter.",
-          "show": "Top band: starting at 'XX', every token's whole cache stack turns coral in one sweep to the right, labelled 'recompute from here'; the stack under 't1' stays teal. Grey tag at the right edge: 'next: the prefix rule'."
-        },
-        {
-          "id": "b8",
-          "say": "The observation was correct, and the engineering conclusion is unchanged. One layer in eighty is not worth the bookkeeping, keeping a separate record of which layers of which tokens are still good.",
-          "show": "Everything dims except the 80-segment bar. Caption line one: 'correct observation, same conclusion'. Line two: 'one layer in 80: not worth the bookkeeping'."
+          "say": "So serving systems invalidate everything from the first changed token on, which is correct for layers two and up. Layer one does survive, and the conclusion stands: one layer in eighty is not worth the bookkeeping.",
+          "show": "Top band: starting at 'XX', a grey crack sweeps right through every remaining cache cell, including the teal-ticked bottom cells under 't3' to 't5', and the pills 'XX' to 't5' get amber outlines, labelled 'recompute from here'; the stack under 't1' stays teal. On 'layer one does survive', the three bottom cells glow faintly teal for a moment, then fade back to grey. Everything else dims except the 80-segment bar. Caption: 'one layer in 80: not worth the bookkeeping'. Grey tag at the right edge: 'next: the prefix rule'."
         }
       ]
     }
   ],
   "checks": [
-    {"claim": "fig 37 doubling example: a fixed rule 'double it' maps 3 to 6 and 4 to 8", "python": "print(2*3, 2*4)", "result": "6 8"},
-    {"claim": "fig 38 added detail: one 8,192-number vector at 16 bits per number is 131,072 bits, all identical when token 2 changes", "python": "print(8192*16)", "result": "131072"},
-    {"claim": "fig 39 added example: illustrative weights 0.1, 0.3, 0.1, 0.2, 0.3 add to 1", "python": "print(0.1+0.3+0.1+0.2+0.3)", "result": "1.0"},
-    {"claim": "fig 39 added example: blend of stand-in values 10,20,30,40,50 = 1 + 6 + 3 + 8 + 15 = 33", "python": "print(10*0.1+20*0.3+30*0.1+40*0.2+50*0.3)", "result": "33.0"},
-    {"claim": "fig 39 added example: token 2's value 20 -> 60 moves the blend to 45 (product 6 -> 18), holding the weights fixed", "python": "print(10*0.1+60*0.3+30*0.1+40*0.2+50*0.3, 60*0.3)", "result": "45.0 18.0"},
-    {"claim": "fig 40 added detail: of token 5's 80 keys (and 80 values), 1 is unchanged (layer 1) and 79 change", "python": "print(80-1)", "result": "79"},
-    {"claim": "fig 41: layer 4's distance is nearly six times layer 2's (20.102747 / 3.538930)", "python": "print(20.102747/3.538930)", "result": "5.680459065310702"},
-    {"claim": "fig 41 reproduced independently: a four-layer transformer (causal attention, ReLU feed-forward, residual connections, no normalisation, width 16, 5 tokens) run twice with only token 2 changed, over 20 random seeds. Layer-1 key distance at position 5 is exactly 0.0 for every seed and layers 2-4 are nonzero for every seed, which supports 'the zero at layer one never does' change. Magnitudes differ from the atlas's (seed 0 gives 0, 1.676, 2.351, 6.145), as the atlas says they will.", "python": "import numpy as np\ndef run(seed):\n  r=np.random.default_rng(seed);d,T=16,5;E=r.normal(size=(50,d));P=r.normal(size=(T,d));W=[[r.normal(size=(d,d))/4 for _ in range(6)] for _ in range(4)]\n  def keys(t):\n    x=E[t]+P;ks=[]\n    for Wq,Wk,Wv,Wo,W1,W2 in W:\n      q,k,v=x@Wq,x@Wk,x@Wv;ks.append(k[4].copy());s=q@k.T/4;s[np.triu_indices(T,1)]=-np.inf;a=np.exp(s-s.max(1,keepdims=True));a/=a.sum(1,keepdims=True);x=x+(a@v)@Wo;x=x+np.maximum(x@W1,0)@W2\n    return ks\n  A,B=keys([3,7,11,13,17]),keys([3,8,11,13,17]);return [float(np.linalg.norm(a-b)) for a,b in zip(A,B)]\nR=[run(s) for s in range(20)];print([r[0] for r in R].count(0.0),'of 20 seeds: layer-1 key distance exactly 0');print(all(min(r[1:])>0 for r in R),'every seed: layers 2-4 nonzero');print([round(x,3) for x in R[0]])", "result": "20 of 20 seeds: layer-1 key distance exactly 0 / True every seed: layers 2-4 nonzero / [0.0, 1.676, 2.351, 6.145]"},
-    {"claim": "fig 43: one layer of eighty is 1.25% of the prefill work", "python": "print(1/80*100)", "result": "1.25"},
-    {"claim": "fig 43: layers 2 to 80 are 98.75%", "python": "print(79/80*100)", "result": "98.75"},
-    {"claim": "fig 43 added detail: KV cache per token 2 x 80 x 8 x 128 x 2 = 327,680 bytes = 320 KiB; one layer = 4,096 bytes = 4 KiB; layers 2-80 = 323,584 bytes = 316 KiB (film's 'kilobytes' are 1,024 bytes, matching the shared '320 KB' convention)", "python": "print(2*80*8*128*2, 2*8*128*2, 2*80*8*128*2-2*8*128*2, (2*80*8*128*2-2*8*128*2)/1024, 2*8*128*2/1024, 2*80*8*128*2/1024)", "result": "327680 4096 323584 316.0 4.0 320.0"},
-    {"claim": "fig 43 added detail: layer 1's share of a token's cache bytes is also 1.25%", "python": "print(4096/327680*100)", "result": "1.25"},
-    {"claim": "fig 43 added detail: W_K and W_V are each 8,192 x 1,024 = 8.4 M weights; together 16.8 M", "python": "print(8192*1024, 2*8192*1024)", "result": "8388608 16777216"},
-    {"claim": "one layer's weights: attention 151.0 M + feed-forward 704.6 M = 855.6 M (matches ch08 / fig 101)", "python": "a=2*8192*8192+2*8192*1024; f=3*8192*28672; print(a, f, a+f)", "result": "150994944 704643072 855638016"},
-    {"claim": "fig 43 added detail: W_K + W_V are about 2% of a layer's weights", "python": "print(2*8192*1024/(2*8192*8192+2*8192*1024+3*8192*28672)*100)", "result": "1.9607843137254901"},
-    {"claim": "fig 43 'the saving is smaller still', quantified: 2% of 1.25% = 0.0245% of the weight arithmetic, about a fortieth of one percent (1/40.8)", "python": "p=2*8192*1024/(2*8192*8192+2*8192*1024+3*8192*28672); print(p*(1/80)*100, 1/(p*(1/80)*100))", "result": "0.024509803921568627 40.8"}
+    {
+      "claim": "fig 37 on-screen analogy: a fixed rule 'double it' maps 3 to 6 and 4 to 8",
+      "python": "print(2*3, 2*4)",
+      "result": "6 8"
+    },
+    {
+      "claim": "fig 39 added example: illustrative weights 0.1, 0.3, 0.1, 0.2, 0.3 add to 1",
+      "python": "print(0.1+0.3+0.1+0.2+0.3)",
+      "result": "1.0"
+    },
+    {
+      "claim": "fig 39 added example: blend of stand-in values 10, 20, 30, 40, 50 = 1 + 6 + 3 + 8 + 15 = 33",
+      "python": "print(10*0.1+20*0.3+30*0.1+40*0.2+50*0.3)",
+      "result": "33.0"
+    },
+    {
+      "claim": "fig 39 added example: token 2's value 20 -> 60 moves the blend to 45 (product 6 -> 18), with the weights held fixed, as tagged on screen",
+      "python": "print(10*0.1+60*0.3+30*0.1+40*0.2+50*0.3, 60*0.3)",
+      "result": "45.0 18.0"
+    },
+    {
+      "claim": "fig 40 added detail: of token 5's 80 keys (and 80 values), 1 is unchanged (layer 1) and 79 change",
+      "python": "print(80-1)",
+      "result": "79"
+    },
+    {
+      "claim": "fig 40 correction: the atlas says 'W_K is the same matrix in both rows', but its rows are layer 1 and layer 2, which have different W_K matrices (one per layer, figs 97/98, ch08_s06 and ch08_s07). The film draws a 2 x 2 grid: two runs x two layers. 'Same matrix' means the same layer's W_K across the two runs; the layer-1 and layer-2 tiles are different matrices. Do not 'fix' this back to the atlas wording.",
+      "python": "print(80, 'distinct W_K matrices, one per layer')",
+      "result": "80 distinct W_K matrices, one per layer"
+    },
+    {
+      "claim": "fig 41 ratio deliberately NOT used: in the atlas run layer 4 / layer 2 = 5.68, but over 20 random seeds of the same reproduction (below) the ratio runs from 2.0 to 185.4 and L2 < L3 < L4 holds in only 18 of 20 seeds. So the film says 'growing with depth in this run' and quotes no ratio, since magnitudes depend on the random weights.",
+      "python": "import numpy as np\ndef run(seed):\n  r=np.random.default_rng(seed);d,T=16,5;E=r.normal(size=(50,d));P=r.normal(size=(T,d));W=[[r.normal(size=(d,d))/4 for _ in range(6)] for _ in range(4)]\n  def keys(t):\n    x=E[t]+P;ks=[]\n    for Wq,Wk,Wv,Wo,W1,W2 in W:\n      q,k,v=x@Wq,x@Wk,x@Wv;ks.append(k[4].copy());s=q@k.T/4;s[np.triu_indices(T,1)]=-np.inf;a=np.exp(s-s.max(1,keepdims=True));a/=a.sum(1,keepdims=True);x=x+(a@v)@Wo;x=x+np.maximum(x@W1,0)@W2\n    return ks\n  A,B=keys([3,7,11,13,17]),keys([3,8,11,13,17]);return [float(np.linalg.norm(a-b)) for a,b in zip(A,B)]\nR=[run(s) for s in range(20)];rat=[r[3]/r[1] for r in R]\nprint(round(20.102747/3.538930,2), round(min(rat),1), round(max(rat),1), sum(r[1]<r[2]<r[3] for r in R))",
+      "result": "5.68 2.0 185.4 18"
+    },
+    {
+      "claim": "fig 41 reproduced independently: a four-layer transformer (causal attention, ReLU feed-forward, residual connections, no normalisation, width 16, 5 tokens) run twice with only token 2 changed, over 20 random seeds. Layer-1 key distance at position 5 is exactly 0.0 for every seed and layers 2-4 are nonzero for every seed, which supports 'layer one identical, every layer above it moved'. Magnitudes differ from the atlas's (seed 0 gives 0, 1.676, 2.351, 6.145), as the atlas says they will.",
+      "python": "import numpy as np\ndef run(seed):\n  r=np.random.default_rng(seed);d,T=16,5;E=r.normal(size=(50,d));P=r.normal(size=(T,d));W=[[r.normal(size=(d,d))/4 for _ in range(6)] for _ in range(4)]\n  def keys(t):\n    x=E[t]+P;ks=[]\n    for Wq,Wk,Wv,Wo,W1,W2 in W:\n      q,k,v=x@Wq,x@Wk,x@Wv;ks.append(k[4].copy());s=q@k.T/4;s[np.triu_indices(T,1)]=-np.inf;a=np.exp(s-s.max(1,keepdims=True));a/=a.sum(1,keepdims=True);x=x+(a@v)@Wo;x=x+np.maximum(x@W1,0)@W2\n    return ks\n  A,B=keys([3,7,11,13,17]),keys([3,8,11,13,17]);return [float(np.linalg.norm(a-b)) for a,b in zip(A,B)]\nR=[run(s) for s in range(20)];print([r[0] for r in R].count(0.0),'of 20 seeds: layer-1 key distance exactly 0');print(all(min(r[1:])>0 for r in R),'every seed: layers 2-4 nonzero');print([round(x,3) for x in R[0]])",
+      "result": "20 of 20 seeds: layer-1 key distance exactly 0 / True every seed: layers 2-4 nonzero / [0.0, 1.676, 2.351, 6.145]"
+    },
+    {
+      "claim": "fig 43: one layer of eighty is 1.25% of the prefill work",
+      "python": "print(1/80*100)",
+      "result": "1.25"
+    },
+    {
+      "claim": "fig 43: layers 2 to 80 are 98.75%",
+      "python": "print(79/80*100)",
+      "result": "98.75"
+    },
+    {
+      "claim": "fig 43 added on-screen detail: KV cache per token 2 x 80 x 8 x 128 x 2 = 327,680 bytes = 320 KiB; one layer = 4,096 bytes = 4 KiB ('4 KB of 320 KB'); layers 2-80 = 323,584 bytes = 316 KiB (the film's 'kilobytes' are 1,024 bytes, matching the shared '320 KB' convention)",
+      "python": "print(2*80*8*128*2, 2*8*128*2, 2*80*8*128*2-2*8*128*2, (2*80*8*128*2-2*8*128*2)/1024, 2*8*128*2/1024, 2*80*8*128*2/1024)",
+      "result": "327680 4096 323584 316.0 4.0 320.0"
+    },
+    {
+      "claim": "fig 43 added detail: layer 1's share of a token's cache bytes is also 1.25%",
+      "python": "print(4096/327680*100)",
+      "result": "1.25"
+    },
+    {
+      "claim": "fig 43 added detail: W_K and W_V are each 8,192 x 1,024 = 8.4 M weights; together 16.8 M",
+      "python": "print(8192*1024, 2*8192*1024)",
+      "result": "8388608 16777216"
+    },
+    {
+      "claim": "one layer's weights: attention 151.0 M + feed-forward 704.6 M = 855.6 M (matches ch08 / fig 101)",
+      "python": "a=2*8192*8192+2*8192*1024; f=3*8192*28672; print(a, f, a+f)",
+      "result": "150994944 704643072 855638016"
+    },
+    {
+      "claim": "fig 43 added detail: W_K + W_V are about 2% of a layer's weights",
+      "python": "print(2*8192*1024/(2*8192*8192+2*8192*1024+3*8192*28672)*100)",
+      "result": "1.9607843137254901"
+    },
+    {
+      "claim": "fig 43 'the saving is smaller still', quantified: 2% of 1.25% = 0.0245% of the weight arithmetic, 'about a fortieth of one percent' (1/40.8), shown as '≈ 0.025%'",
+      "python": "p=2*8192*1024/(2*8192*8192+2*8192*1024+3*8192*28672); print(p*(1/80)*100, 1/(p*(1/80)*100))",
+      "result": "0.024509803921568627 40.8"
+    }
   ]
 }

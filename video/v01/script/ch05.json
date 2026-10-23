@@ -16,41 +16,31 @@
   "scenes": [
     {
       "id": "ch05_s01",
-      "name": "what counts as one operation",
+      "name": "one operation, deliberately tiny",
       "figs": [
         61
       ],
-      "visual": "Dark canvas, one continuous composition. Top band: a single row of blue token pills that streams in from the right, with a stopwatch icon at the top right that flashes '30 ms' each time a pill lands, a callback to the per-token time from earlier. Centre: a small 'arithmetic bench' where blue number cards meet an amber operator sign and produce an amber result card; it is reused for a multiply and then an add. Bottom right: a small tally counter labelled 'operations' that ticks up by exactly one for every operation performed on screen. The idea the motion makes visible: an operation is one tiny act on two numbers, and the chapter is about to count enormous numbers of them. Nothing clears during the scene; elements dim when they are no longer the subject.",
+      "visual": "One continuous shot on the dark canvas. Top right: a stopwatch icon reading '30 ms' beside a blue token pill 'one token', the callback to the per-token time from earlier. Centre: an 'arithmetic bench' where blue number cards meet an amber operator sign and produce an amber result card, used once for a multiply and once for an add. Bottom right: a tally counter 'operations' that ticks up by exactly one for every operation shown. The heading exists only during b2; from b3 on, only the bench, the word FLOP and the tally remain. The idea the motion makes visible: an operation is one tiny act on two numbers, and the chapter is about to count enormous numbers of them.",
       "beats": [
         {
           "id": "b1",
-          "say": "Thirty milliseconds for every token. That much you have already seen. And making a token is arithmetic on the model's numbers. So here is a fair question. How much arithmetic is in one token, and how long should it actually take? Let's count it.",
-          "show": "Top band: blue token pills 'The', 'cat', 'sat', 'on' slide in from the right one at a time; as each lands, the stopwatch at top right flashes '30 ms'. On 'arithmetic on the model's numbers', a faint grid of weights (0.13, -0.7, 0.02, 1.44, -0.3, repeating) fades in behind the centre at about 15% opacity. On 'how long should it actually take', a large white question mark appears centre, then shrinks and flies into the bottom-right tally counter, which now reads 'operations: 0'."
+          "say": "Earlier you heard that the arithmetic for one token takes about a tenth of a millisecond. Time to check.",
+          "show": "Top right: the stopwatch '30 ms' and the blue 'one token' pill fade in. On 'a tenth of a millisecond', a small amber tag drops beneath them: 'arithmetic: 0.1 ms?'. On 'Time to check', the '?' pulses and the tally counter appears bottom right: 'operations: 0'."
         },
         {
           "id": "b2",
-          "say": "First, what exactly is being counted. An operation is one piece of arithmetic. One multiplication, or one addition, on two numbers. That is all.",
-          "show": "Centre top: white heading writes on, 'One operation = one piece of arithmetic'. Below it two amber chips pop in on their spoken words: '× one multiplication' on the left, '+ one addition' on the right. On 'two numbers', two empty blue number cards appear on the bench under the chips."
+          "say": "An operation is one piece of arithmetic. One multiplication or one addition, on two numbers. Not a line of code, nor a step of reasoning.",
+          "show": "Centre top, a white heading writes on: 'one operation = one piece of arithmetic'. On 'one multiplication', blue cards 'input 0.5' and 'weight 0.13' slide together through an amber '×' and produce an amber card '0.065'; the tally ticks to 1. On 'one addition', a blue card 'total 1.2' takes in the 0.065 through an amber '+' and becomes '1.265'; the tally ticks to 2. On 'a line of code' and 'a step of reasoning', grey ghost cards with those labels (a code-brackets icon, a lightbulb icon) drift in at the left, are struck through and fade."
         },
         {
           "id": "b3",
-          "say": "Not a line of code. Not a step of reasoning. Just this. An input times a weight is one operation. Add the result into a running total, and that is a second.",
-          "show": "Two grey ghost cards drift in from the left as they are named, 'a line of code' with a code-brackets icon and 'a step of reasoning' with a lightbulb icon; each is struck through and fades. On 'an input times a weight', blue cards 'input 0.5' and 'weight 0.13' slide together through an amber '×' and produce an amber result card '0.065'; the tally ticks to 1. On 'running total', a blue card 'total 1.2' appears, the 0.065 card slides into it through an amber '+', and the total morphs to '1.265'; the tally ticks to 2."
+          "say": "Its proper name is a floating-point operation, or flop. Floating point just means numbers with a fractional part, like the weights. Counting them measures a job, the way metres measure distance.",
+          "show": "The heading fades and the bench dims to 40%. Centre: 'FLoating-point OPeration' writes on with F, L, O and P in amber; the four letters slide together into one large amber word, 'FLOP'. On 'fractional part', the bench's weight card brightens and its '.13' is underlined in amber. On 'metres', a ruler icon appears left of FLOP, with small grey labels under each: '1 metre: distance' and '1 FLOP: work'."
         },
         {
           "id": "b4",
-          "say": "The unit has a name. A floating-point operation, shortened to flop. Floating point just means the numbers can have a fractional part, like zero point one three. The model's weights certainly do.",
-          "show": "The bench dims to 40%. Centre, the phrase 'FLoating-point OPeration' writes on with the letters F, L, O and P in amber; those four letters then slide together into one large amber word, 'FLOP'. On 'fractional part', the weight card '0.13' brightens and its '.13' is underlined in amber, and the faint background grid of weights brightens for a moment so every decimal point is visible."
-        },
-        {
-          "id": "b5",
-          "say": "Counting flops is how the size of a job gets measured, in the same way that distance is measured in metres.",
-          "show": "Left of centre, a pairing builds: a ruler icon over the label '1 metre: a unit of distance', and beside it the amber 'FLOP' over '1 operation: a unit of work'. The bench stays dimmed behind."
-        },
-        {
-          "id": "b6",
-          "say": "Keep this unit deliberately small in your mind. Soon one token will cost a hundred and forty billion operations, and that means a hundred and forty billion of exactly these.",
-          "show": "The ruler pairing fades. On 'deliberately small', the camera pushes in on the tally counter reading '2'. On 'a hundred and forty billion', the counter spins up to '140,000,000,000' and holds, and a blue token pill slides in above it with the label 'one token'."
+          "say": "A flop is deliberately tiny. Soon one token will cost a hundred and forty billion of exactly these.",
+          "show": "The ruler and both labels fade; FLOP shrinks to the top left and stays. The camera pushes in on the tally reading '2'. On 'a hundred and forty billion', the tally spins up to '140,000,000,000' and the 'one token' pill slides down from the top right to sit above it."
         }
       ]
     },
@@ -60,42 +50,27 @@
       "figs": [
         62
       ],
-      "visual": "A table of powers of ten fills the screen. Each row has, on the left, a blue pill with a power of ten written with a raised exponent ('10³', '10⁶', '10⁹', '10¹²', '10¹⁵'), its word name beside it, and a bar in a horizontal lane that runs from x=300 to x=1800, so 1,500 px of usable length. This is the first log scale in the film, so the scene explains it by morphing between scales: the bars are first drawn on an ordinary linear scale, where four of the five are invisible, then morph to a logarithmic scale where length is proportional to the number of zeros, 100 px per power of ten, giving 300, 600, 900, 1,200 and 1,500 px. Bars are blue (neutral numbers) until the two that matter turn amber. At the end a sixth, amber row for 10¹¹ slides in between the billion and trillion rows and its gap to 10¹⁵ is bracketed.",
+      "visual": "A table of powers of ten. Left column (x 80 to 280): five blue pills with raised exponents, '10³', '10⁶', '10⁹', '10¹²', '10¹⁵', each with its word name in small grey beneath it ('thousand', 'million', 'billion', 'trillion', 'quadrillion'). To the right, one horizontal lane per row from x=300 to x=1800, 1,500 px. In b1 and b2 each lane holds that row's digit string, starting at x=320; the digit strings fade out at the very start of b3, before any bar grows. In b3 the lanes hold bars, first on an ordinary scale, then morphing to a true logarithmic scale at 100 px per power of ten (300, 600, 900, 1,200, 1,500 px). This is the film's first log scale, so the morph between the two scales is the explanation. Bars are blue until the two that matter turn amber. In b4 an amber sixth row for 10¹¹ slides in between the billion and trillion rows.",
       "beats": [
         {
           "id": "b1",
-          "say": "Numbers that large need a way to be read. Here is the notation. Ten to the three is a one followed by three zeros. A thousand. The small raised number, called the exponent, simply counts the zeros.",
-          "show": "Top row only. On 'ten to the three', the blue pill '10³' fades in. Beside it the digits type out: a '1', then three zeros dropping in one at a time, the raised 3 in the pill pulsing once per zero. On 'a thousand', the word 'thousand' appears to the right. On 'exponent', a thin white callout points at the raised 3 with the label 'exponent = number of zeros'."
+          "say": "Numbers that big need a shorthand. Ten to the three is a one followed by three zeros, a thousand. The small raised number, the exponent, counts the zeros.",
+          "show": "Top row only. On 'ten to the three', the pill '10³' fades in with 'thousand' under it. In its lane, from x=320, the digits type out: a '1', then three zeros dropping in one at a time while the raised 3 pulses once per zero. On 'exponent', a thin white callout points at the raised 3: 'exponent = number of zeros'."
         },
         {
           "id": "b2",
-          "say": "Ten to the six, a million. Ten to the nine, a billion. Ten to the twelve, a trillion. Ten to the fifteen, a quadrillion. Each step down adds three more zeros, so each one is a thousand times the one above.",
-          "show": "Rows two to five land in turn on their spoken names: '10⁶ million', '10⁹ billion', '10¹² trillion', '10¹⁵ quadrillion'; each row's digit string is the row above's plus three zeros, and the new zeros flash as they arrive. On 'a thousand times', small amber tags '× 1,000' appear in the left margin between each pair of neighbouring rows, top to bottom."
+          "say": "Then a million, a billion, a trillion, and ten to the fifteen, a quadrillion, a thousand million million. Each step is a thousand times the last.",
+          "show": "Rows two to five land on their spoken names: '10⁶', '10⁹', '10¹²', '10¹⁵'. Each digit string is the row above's plus three new zeros, which flash amber as they arrive. On 'a thousand million million', brackets group the 10¹⁵ string as '1 000' 'thousand', '000 000' 'million', '000 000' 'million'. On 'a thousand times the last', small amber '× 1,000' tags appear in the left margin between neighbouring rows. At the end of the beat the callout, the brackets and the margin tags fade."
         },
         {
           "id": "b3",
-          "say": "So ten to the fifteen is a one followed by fifteen zeros. Another way to say it is a thousand, times a million, times a million. A thousand million million.",
-          "show": "The bottom row's digits lift out and expand across the centre: '1 000 000 000 000 000'. On 'a thousand, times a million, times a million', brackets group them as '1 000' labelled 'thousand', then '000 000' labelled 'million', then '000 000' labelled 'million'. The string then collapses back into the '10¹⁵' pill."
+          "say": "On an ordinary scale, the quadrillion fills the width and the rest vanish. Let each bar count zeros instead, a logarithmic scale, and all five fit.",
+          "show": "The digit strings fade out first. A grey axis title appears under the lanes: 'ordinary scale'. Blue bars grow: the 10¹⁵ bar sweeps to the full 1,500 px; the 10¹² bar is a 1.5 px hairline; the three rows above stay empty, with one grey bracket spanning all three: 'too small to draw'. On 'count zeros', the bracket fades, the axis title changes to 'log scale: length = zeros', and the bars morph to 300, 600, 900, 1,200 and 1,500 px, an even staircase. Light tick marks sit every 300 px; only the first gap is labelled '× 1,000'. Each bar shows its zero count inside it in white: 3, 6, 9, 12, 15."
         },
         {
           "id": "b4",
-          "say": "Now try drawing them as bars, on an ordinary scale. Give the quadrillion the whole width. The trillion gets about one and a half pixels. The billion, the million and the thousand vanish completely.",
-          "show": "Linear-scale bars grow in the lane. The '10¹⁵' bar sweeps out to the full 1,500 px. The '10¹²' bar is a 1.5 px hairline; a magnifier icon hovers over it with the tag '1.5 px'. On 'vanish completely', the three upper lanes stay empty and each gets a grey tag, 'too small to draw'. A small grey axis title under the lane: 'ordinary scale'."
-        },
-        {
-          "id": "b5",
-          "say": "So use a different kind of scale, called logarithmic. Each bar's length counts the zeros, instead of measuring the value. Every equal step along it means multiplying by the same amount, here a thousand. Now all five fit on one screen.",
-          "show": "The axis title changes to 'log scale: length = number of zeros' and tick marks appear every 300 px, each gap labelled '× 1,000'. All five bars morph from their linear lengths to 300, 600, 900, 1,200 and 1,500 px, forming an even staircase. On 'counts the zeros', each bar shows its zero count inside it in white: '3', '6', '9', '12', '15'."
-        },
-        {
-          "id": "b6",
-          "say": "Only two of these numbers matter for the puzzle. A chip does about ten to the fifteen operations every second. One token costs about ten to the eleven, a hundred billion, which is that hundred and forty billion rounded to a power of ten.",
-          "show": "The thousand, million and billion rows dim to 30%. On 'ten to the fifteen operations every second', the '10¹⁵' bar recolours amber and gains the tag 'a chip, per second'. On 'ten to the eleven', a new amber row slides in between the billion and trillion rows: pill '10¹¹', label 'a hundred billion', bar 1,100 px long, tag 'one token'. On 'rounded', a small grey tag under it: '140 billion ≈ 10¹¹'."
-        },
-        {
-          "id": "b7",
-          "say": "The whole argument is a comparison between those two. Fifteen minus eleven is four, so they are four powers of ten apart. That is a factor of ten thousand, and it is worth holding on to.",
-          "show": "A white bracket spans from the end of the 10¹¹ bar at 1,100 px to the end of the 10¹⁵ bar at 1,500 px. On 'four powers of ten', it splits into four 100 px segments that light up one by one, each labelled '× 10'. On 'ten thousand', a label lands above the bracket: '× 10,000'."
+          "say": "The whole argument compares two of these. A chip does about ten to the fifteen operations a second, and a token needs about ten to the eleven. Four powers of ten apart, so each second, the chip could do ten thousand tokens' worth.",
+          "show": "The thousand, million and billion rows dim to 30%, and the axis title and the '× 1,000' gap label fade. On 'ten to the fifteen operations a second', the 10¹⁵ bar turns amber with the tag 'a chip, per second'. On 'ten to the eleven', a new amber row slides in between billion and trillion: pill '10¹¹', name 'hundred billion', bar 1,100 px, tag 'one token'. On 'four powers of ten', a white bracket spans from the end of the 10¹¹ bar at 1,100 px to the end of the 10¹⁵ bar at 1,500 px, labelled '4 powers of ten'. On 'ten thousand tokens' worth', the label changes to '× 10,000: tokens' worth per second'."
         }
       ]
     },
@@ -105,257 +80,164 @@
       "figs": [
         63
       ],
-      "visual": "Split screen with a thin vertical divider. Left panel titled 'A count': an amber stack of tiny operation chips with a counter, and no clock anywhere. Right panel titled 'A rate': a horizontal pipe with amber particles flowing through it past a stopwatch, with a per-second counter; flow speed is constant and stands for the rate. A bottom band holds a road-trip analogy for one beat (car icon on a road, distance marker, speedometer). The two words FLOP and FLOPS then appear under their panels. The scene ends with both panel titles flying to the centre to form one division, 'count ÷ rate = seconds', which is the takeaway.",
+      "visual": "Split screen with a thin vertical divider. Left panel 'A count': an amber stack of tiny operation chips under a counter, a blue token pill on top, and no clock anywhere. Right panel 'A rate': a horizontal pipe carrying amber particles past a stopwatch, with a per-second counter; the constant flow speed stands for the rate. Below the panels the words FLOP and FLOPS appear in b2. A grey sample-sentence card is corrected in b3. At the end the two panel titles fly to the centre and form 'count ÷ rate = seconds', the takeaway. Text discipline: once the words arrive in b2, the panels keep only their titles and counters.",
       "beats": [
         {
           "id": "b1",
-          "say": "Next, two kinds of number that look alike and are not. A count says how many operations a job needs, with no time in it at all. A token costs about a hundred billion operations whether it takes a second or a year.",
-          "show": "Left panel: title 'A count', sub-labels 'how many operations a job needs' and 'no time in it'. An amber stack of chips grows under a counter reading '10¹¹ operations', with a blue token pill on top. On 'a second or in a year', a grey stopwatch icon and then a grey calendar icon appear beside the stack and are struck through; the counter does not change."
+          "say": "Ten to the eleven is a count, how many operations a job needs, with no time in it. Ten to the fifteen a second is a rate, with time built in.",
+          "show": "The two amber rows from the table, 10¹¹ and 10¹⁵, lift out; their pills fly apart and become the panels' counters. Left: title 'A count', counter '10¹¹ operations', an amber chip stack growing beneath it with the blue 'one token' pill on top, sub-label 'no time in it'; on 'no time in it', a grey stopwatch icon beside the stack is struck through. On 'a rate', right: title 'A rate', counter '10¹⁵ operations / second', a chip icon emitting amber particles along a pipe past a stopwatch whose hand sweeps steadily, sub-label 'time is built in'."
         },
         {
           "id": "b2",
-          "say": "A rate says how many operations a chip does every second. Time is built right into it.",
-          "show": "Right panel: title 'A rate', sub-labels 'how many a chip does per second' and 'time is built in'. A chip icon at the left end of the pipe emits amber particles that stream right past a stopwatch whose hand sweeps steadily; a counter beside it reads '10¹⁵ operations / second'."
+          "say": "Yet they are written almost the same. Flop for the count, flops for the rate, and some add a small letter ess to the count just to make it plural.",
+          "show": "Both sub-labels dim to 25%, leaving titles and counters. Large white 'FLOP' appears under the left panel and 'FLOPS' under the right. On 'flops for the rate', the final S glows amber with a small caption 'S = per second'. On 'small letter ess', a grey third word, 'FLOPs' with a lower-case s, appears between them with a '?'."
         },
         {
           "id": "b3",
-          "say": "A road trip makes the difference obvious. Three hundred kilometres is a count. A hundred kilometres an hour is a rate. Divide the count by the rate, and you get a time. Three hours.",
-          "show": "Bottom band: a road with a car icon at the left and a flag at the right, '300 km' under the road with a small tag 'count'. A speedometer icon at the right reads '100 km/h' with a tag 'rate'. On 'divide', an equation builds term by term in the band: '300 km', '÷', '100 km/h', '=', '3 hours'; the car drives the road in three hops while a small clock ticks '1 h', '2 h', '3 h'."
+          "say": "Confusing the two is the single most common mistake in this subject, and checking the units catches it.",
+          "show": "On 'confusing the two', the three words slide together and blur, then snap apart. On 'checking the units', a grey sentence card slides in at the bottom centre: 'this chip does 10¹⁵ FLOP'. A teal magnifier passes over it, a gap glows where '/ second' belongs, the card corrects itself to 'this chip does 10¹⁵ FLOPS', and a teal check appears."
         },
         {
           "id": "b4",
-          "say": "Here is the trap. The count is written flop, and the rate is written flops. One letter apart. Worse, some people add the s just to make the count plural. Confusing the two is the single most common mistake in this subject.",
-          "show": "The road band fades. Large white 'FLOP' appears under the left panel and 'FLOPS' under the right. On 'one letter apart', the final S of 'FLOPS' glows amber, and captions appear beneath: 'a count' and 'a rate: per second'. On 'make the count plural', a grey third word 'FLOPs' with a lower-case s appears between them with a question mark. On 'most common mistake', all three words slide together and blur, then snap back apart."
-        },
-        {
-          "id": "b5",
-          "say": "There is a quick test that catches it. Check the units. If a sentence about performance does not survive that check, a count is being used where a rate belongs, or the other way round.",
-          "show": "A teal magnifier icon passes over 'FLOP' and 'FLOPS' in turn, revealing the units underneath: 'operations' and 'operations / second'. On 'does not survive', a grey sample sentence card slides in: 'this chip does 10¹⁵ FLOP'. The magnifier stops on it, a gap where '/ second' should be glows, the card corrects itself to 'this chip does 10¹⁵ FLOPS', and a teal check mark appears."
-        },
-        {
-          "id": "b6",
-          "say": "Hold on to the division in the middle. A count, divided by a rate, gives seconds. That one division is the entire calculation of the next few minutes.",
-          "show": "Both panel titles lift off and fly to centre, assembling the equation 'count' (amber) '÷' 'rate' (amber) '=' 'seconds' (white). The panels dim to 25%; the equation enlarges, glows softly and holds."
+          "say": "Divide a count by a rate, like distance by speed, and you get a time. That one division is the entire calculation ahead.",
+          "show": "The card and the three words fade, and the panels dim to 25%. The two panel titles lift and fly to the centre, assembling 'count' (amber) '÷' 'rate' (amber) '=' 'time' (white). On 'distance by speed', a small grey line with a car icon appears beneath: '300 km ÷ 100 km/h = 3 h'. On 'entire calculation ahead', the grey line fades, 'time' becomes 'seconds', and the equation enlarges and glows."
         }
       ]
     },
     {
       "id": "ch05_s04",
-      "name": "the arithmetic finishes almost instantly",
+      "name": "the arithmetic adds up to a tenth of a millisecond",
       "figs": [
         64
       ],
-      "visual": "Left third: a chip icon (the compute die from the GPU package illustration) with amber particles pouring through it, and a label for its rate. Right third: a blue token pill with a growing amber operation counter, showing what one token needs, built from a mini multiply-and-add picture. Bottom band: a timeline from 0 to 30 ms, 1,500 px long, with a stopwatch icon at its left end. The punchline the motion makes visible: the arithmetic for one token is a block so thin at the start of the timeline that the camera has to zoom into the first millisecond to see it, and the rest of the timeline sits empty.",
+      "visual": "Left third: a chip icon (the compute die of the GPU package) with amber particles pouring through it, labelled with its rate. Right third: a blue token pill with the operation count derived beneath it. Upper centre, in b2 only: a one-millisecond measuring strip. Bottom band from b3: a timeline from 0 to 30 ms, 1,500 px from x=210 to x=1710 (50 px per millisecond), a stopwatch icon at its left end. The idea: the arithmetic for one token is spread thinly across the whole 30 ms in tiny bursts; packed together it is a 5 px block, and the rest of the timeline is something else. The packed block is a share of the time, never a claim that the arithmetic happens first, and its 'packed together' tag travels with it into the later scenes.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now the two numbers. The rate first. A modern data-centre chip, the kind from earlier, does about ten to the fifteen operations every second. A quadrillion. Its exact specification comes in the next chapter.",
-          "show": "Left third: the chip icon fades in and amber particles stream through it left to right. On 'ten to the fifteen', a counter under the chip runs up to '1,000,000,000,000,000 per second', then condenses to 'about 10¹⁵ operations / second'. A small grey tag: 'exact spec: next chapter'."
+          "say": "First, the count. Each token uses all seventy billion weights, each multiplied once and added once. Two operations per weight make a hundred and forty billion, about ten to the eleven.",
+          "show": "Left third: the chip icon fades in with amber particles streaming through it, label '≈ 10¹⁵ operations / second', small grey tag 'exact spec: next chapter'. Right third: the blue pill 'one token'; below it, the multiply-and-add picture from earlier in miniature: five blue input cards, each with an amber '×' and a blue weight card, arrows into one amber '+'. On 'multiplied once', every '×' flashes; on 'added once', the '+' flashes. An equation builds under it, term by term: '70,000,000,000 weights' (blue) '× 2' (amber) '= 140,000,000,000' (amber). On 'about ten to the eleven', it collapses to '≈ 10¹¹ operations' with a grey tag 'really 1.4 × 10¹¹'."
         },
         {
           "id": "b2",
-          "say": "Now the count. Remember that every token runs the whole model, and the model's one move is multiply and add. Each weight is multiplied by an input once, and that result is added into a total once. Two operations per weight, per token.",
-          "show": "Right third: a blue token pill 'token' appears. Below it, a mini version of the multiply-and-add picture from earlier: five blue input cards, each with an amber '×' and a blue weight card, arrows into an amber '+' and one output card. On 'multiplied by an input once', every '×' flashes amber; on 'added into a total once', the '+' flashes amber. A label lands: '2 operations per weight'."
+          "say": "Now divide. A quadrillion a second is a trillion every millisecond. A token needs a tenth of that, so its arithmetic adds up to a tenth of a millisecond.",
+          "show": "Upper centre: a horizontal strip 1,000 px wide labelled '1 millisecond', split into ten equal ticks, with '10¹² operations' above it; on 'a trillion every millisecond', amber particles from the chip fill the whole strip. On 'a tenth of that', the particles drain away except for exactly one tick, which stays amber, labelled '10¹¹ → 0.1 ms'. The strip measures an amount of time; it is not a clock."
         },
         {
           "id": "b3",
-          "say": "Seventy billion weights, times two, is a hundred and forty billion operations. Rounded to a power of ten, that is about ten to the eleven. That two per weight comes back for a closer look later.",
-          "show": "The mini picture shrinks; an equation builds under the token term by term: '70,000,000,000 weights' (blue), '× 2' (amber), '= 140,000,000,000 operations' (amber). On 'rounded to a power of ten', the result collapses to '≈ 10¹¹ operations', with a small grey tag beneath: 'really 1.4 × 10¹¹, rounded down'."
+          "say": "Yet each token takes thirty. The arithmetic comes in tiny bursts, spread across all thirty. Squeezed together, it would fill just the first zero point one.",
+          "show": "The strip shrinks away. Bottom band: the timeline draws on from '0' to '30 ms', the stopwatch at its left. On 'tiny bursts', about twenty amber hairline ticks appear, spaced evenly across the whole 0 to 30 ms, with a grey label 'arithmetic comes in bursts' (the ticks are as thin as the renderer allows; their widths are not to scale). On 'squeezed together', the 'bursts' label fades and the ticks slide left and merge into one 5 px amber block at the start, now to scale, with a grey tag 'all the arithmetic, packed together'."
         },
         {
           "id": "b4",
-          "say": "Now divide. A quadrillion operations a second is a trillion in every millisecond. One token needs a hundred billion, which is a tenth of a trillion. So the arithmetic for one token takes a tenth of a millisecond.",
-          "show": "The bottom timeline draws on from '0' to '30 ms'. On 'a trillion in every millisecond', the camera zooms into the timeline's first millisecond, which expands to fill the band and is divided into ten ticks of 0.1 ms, with the label '10¹² operations per millisecond' above it. On 'a tenth of a millisecond', an amber block fills exactly the first tick, labelled '0.1 ms of arithmetic'."
-        },
-        {
-          "id": "b5",
-          "say": "The time each token actually takes is thirty milliseconds. The arithmetic is done in the first zero point one of them. In the twenty-nine point nine milliseconds left over, the chip could have done the arithmetic for about three hundred more tokens.",
-          "show": "The camera zooms back out to the full 0 to 30 ms timeline; the amber block becomes a 5 px sliver at the left end. The rest of the timeline is an empty grey outline, labelled '29.9 ms left over'. On 'three hundred more tokens', a counter at the right end runs from 0 to '299' with the label 'more tokens of arithmetic', and a grey tag '≈ 300' appears beside it."
-        },
-        {
-          "id": "b6",
-          "say": "Two numbers and a division. Everything from here on is an answer to one question. Why are those remaining twenty-nine point nine milliseconds not free?",
-          "show": "The chip and token cards dim. Centre, a summary line writes on: '10¹¹ ÷ 10¹⁵ = 0.1 ms'. On 'not free', the empty grey part of the timeline pulses once and a white label lands over it: 'why not free?'."
+          "say": "That leaves twenty-nine point nine milliseconds, room for three hundred more tokens' worth. Everything ahead answers one question. Why is that time not free?",
+          "show": "The rest of the timeline becomes an empty grey outline labelled '29.9 ms'. On 'three hundred more tokens' worth', a counter at its right end runs from 0 to 299 and settles as '≈ 300 more tokens' worth'. On 'one question', the chip and token cards dim and their two numbers fly to the centre to form '10¹¹ ÷ 10¹⁵ = 0.1 ms', subtitled 'two numbers, one division'. On 'not free', the counter fades, the grey part of the timeline pulses once, and a white label lands on it: 'why not free?'."
         }
       ]
     },
     {
       "id": "ch05_s05",
-      "name": "doing the division slowly",
+      "name": "doing the division slowly, units and all",
       "figs": [
-        65
+        65,
+        66
       ],
-      "visual": "Centre stage only, nothing else competing. A large fraction is built term by term: numerator '10¹¹ operations', denominator '10¹⁵ operations per second'. The powers of ten then unfold into rows of small amber '10' tiles, eleven on top and fifteen underneath, which cancel in pairs and leave four underneath; that cancellation is what 'subtract the exponents' means, made visible. Below the fraction a results ladder builds downward one line per step: '= 10⁽¹¹⁻¹⁵⁾', '= 10⁻⁴ seconds', '= 0.0001 seconds', '= 0.1 milliseconds'. Amber for the operation counts and powers, white for the units.",
+      "visual": "Centre left (x 160 to 1100): a large fraction, '10¹¹ operations' over '10¹⁵ operations per second', powers in amber, unit words in white. The powers unfold into rows of small amber '10' tiles, eleven on top and fifteen beneath, which cancel in pairs and leave four underneath: 'subtract the exponents', made visible. Right (x 1200 to 1800): a results ladder builds downward, one line per step: '= 10⁽¹¹⁻¹⁵⁾', '= 10⁻⁴ seconds', '= 0.0001 seconds', '= 0.1 milliseconds'. Then the same fraction is read for its units alone, a grey 'the wrong way' panel replaces the ladder, and everything shrinks into a row of three example cards under a teal banner. One continuous shot; the numbers part and the units part share the same fraction.",
       "beats": [
         {
           "id": "b1",
-          "say": "That division is the whole puzzle, so it is worth doing slowly. On top, ten to the eleven operations. Underneath, ten to the fifteen operations per second.",
-          "show": "Heading at top: 'Dividing powers of ten'. On 'on top', the numerator '10¹¹ operations' writes on, the power in amber and the word in white. The fraction bar draws left to right. On 'underneath', the denominator '10¹⁵ operations per second' writes on."
+          "say": "That division is the whole puzzle, so do it slowly. To divide powers of ten, subtract the exponents. Eleven tens over fifteen tens. Eleven pairs cancel, and four stay on the bottom.",
+          "show": "Heading: 'dividing powers of ten: subtract the exponents'. The numerator '10¹¹ operations' writes on, the fraction bar draws, then the denominator '10¹⁵ operations per second'. On 'eleven tens', 10¹¹ unfolds into eleven amber '10' tiles joined by '×'; on 'fifteen tens', 10¹⁵ unfolds into fifteen, left-aligned so the first eleven sit directly under the eleven above. On 'eleven pairs cancel', tile pairs strike through together and fade, left to right, with a small counter '11 pairs'. The top row becomes '1'; four amber tiles remain on the bottom, glowing, tagged '4 left, on the bottom'."
         },
         {
           "id": "b2",
-          "say": "Dividing powers of ten has a shortcut. Subtract the exponents. Here is why it works. Ten to the eleven is eleven tens, multiplied together. Ten to the fifteen is fifteen of them.",
-          "show": "A small white tag beside the heading: 'shortcut: subtract the exponents'. On 'eleven tens', '10¹¹' unfolds into a row of eleven small amber tiles, each reading '10', joined by '×'. On 'fifteen of them', '10¹⁵' unfolds into fifteen tiles in the denominator, left-aligned under the top row so the first eleven sit directly below the eleven above."
+          "say": "Eleven minus fifteen is minus four. So, ten to the minus four. A negative exponent means a fraction, here one ten-thousandth of a second, or a tenth of a millisecond.",
+          "show": "Ladder, right: '= 10⁽¹¹⁻¹⁵⁾'; on 'minus four', the exponent computes in place to '= 10⁻⁴ seconds'. On 'a fraction', a side note: '10⁻⁴ = 1 / 10,000'. On 'one ten-thousandth of a second', '= 0.0001 seconds' writes on with the 1 in the fourth decimal place highlighted. On 'a tenth of a millisecond', the decimal point hops three places right and the last line writes on, '= 0.1 milliseconds', boxed in amber."
         },
         {
           "id": "b3",
-          "say": "Each ten on top cancels a ten underneath, just as it would in any fraction. Eleven pairs cancel. Four tens are left, and they are all on the bottom.",
-          "show": "Tile pairs, one on top with the one directly below it, strike through together and fade, left to right, while a small counter reads '1 … 11 pairs cancelled'. The top row becomes a plain '1'. Four amber tiles remain in the denominator, glowing, labelled '4 tens left, on the bottom'."
+          "say": "The units cancel too. Operations, top and bottom, go. Per second means divided by a second. Divide by that, and the second flips back to the top. Seconds are left, as a duration should be.",
+          "show": "Tiles and ladder dim to 30%, except the boxed '0.1 milliseconds'. The unit words in the fraction brighten: 'operations' over 'operations per second'. On 'go', both 'operations' strike through and fade. On 'divided by a second', 'per second' rewrites as '1 / second'. On 'flips back to the top', that small fraction flips so 'second' rises to the top line, and everything resolves to one white word, 'seconds', with a teal check."
         },
         {
           "id": "b4",
-          "say": "So the answer is ten raised to eleven minus fifteen, which is ten to the minus four. A negative exponent means a fraction. One over ten to the four. One ten-thousandth.",
-          "show": "The fraction now reads '1 / (10 × 10 × 10 × 10)'. The ladder starts below: '= 10⁽¹¹⁻¹⁵⁾', then the exponent computes in place to '= 10⁻⁴'. On 'one ten-thousandth', a side note appears to the right: '10⁻⁴ = 1 / 10,000'."
+          "say": "Multiply instead, and you get operations squared per second. Not a duration, not anything, so something is wrong.",
+          "show": "The ladder slides off. Right third: a grey panel titled 'the wrong way' builds 'operations × operations per second', which merges into 'operations² per second'. On 'not a duration', a grey cross stamp lands on it; on 'something is wrong', the panel desaturates and shrinks slightly."
         },
         {
           "id": "b5",
-          "say": "Written out, that is zero point zero zero zero one. The bottom said per second, so the answer is in seconds. A millisecond is a thousandth of a second, so this is a tenth of a millisecond.",
-          "show": "Ladder line '= 0.0001 seconds' writes on, with the 1 in the fourth decimal place highlighted. On 'a thousandth of a second', a small converter appears at the right: '1 second = 1,000 milliseconds'; the decimal point visibly hops three places right and the last line writes on: '= 0.1 milliseconds', boxed in amber."
-        },
-        {
-          "id": "b6",
-          "say": "Notice that the units came out right. Operations divided by operations per second left seconds, which is what a duration should be. Had they not cancelled, something would be wrong. Checking that is the habit that catches most errors in this subject.",
-          "show": "The word 'operations' in the numerator and the word 'operations' in the denominator both glow white and a thin curved line links them. The word 'seconds' on the ladder glows. A small teal check-mark icon appears beside '0.1 milliseconds'."
+          "say": "This five-second check catches most errors in this subject. Use it on every claim from here on, including the ones made here.",
+          "show": "Everything shrinks into a row of three small cards: amber 'operations ÷ operations/s → seconds' with a teal check; grey 'operations × operations/s' with a cross; coral '140 GB ÷ 4.8 TB/s → 29.2 ms' with a teal check, the earlier memory division passing the same test. Above them a teal banner writes on: 'check the units'. On 'including the ones made here', a teal magnifier swings round to face the viewer."
         }
       ]
     },
     {
       "id": "ch05_s06",
-      "name": "checking the units",
+      "name": "the gap, as a ratio and as a percentage",
       "figs": [
-        66
+        68,
+        69
       ],
-      "visual": "The numbers are stripped away. Centre stage shows only units, set as a big white fraction, 'operations' over 'operations per second', which resolves to 'seconds' by cancellation: matching words strike through and fade, leaving what remains. The right third later holds a grey 'the wrong way' panel. The bottom band later shows the same test applied to the earlier 30 ms division, in coral because it is about bytes. The scene ends with all three examples shrunk into a row of small cards under a teal banner.",
+      "visual": "Two horizontal bars on one shared scale, both starting at x=300, where 1,500 px stands for 30 ms (50 px per millisecond). Top row, labelled 'arithmetic': an amber bar exactly 5 px long, tag '0.1 ms', with the small grey tag 'all the arithmetic, packed together' carried over from the timeline. Bottom row, labelled 'the budget': a white-outlined bar with a faint grey fill, 1,500 px, tag '30 ms'. From b4 the sliver drops into the budget bar and a percent ruler (0 to 100%, 15 px per percent) draws beneath it. A small 'ratio' card at the top left persists from b1 to the end. The idea: one gap, said first as a multiple and then as a share, drawn to scale both times.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now strip away the numbers and keep only the units. On top, operations. Underneath, operations per second.",
-          "show": "Heading: 'What the units tell you'. The 0.1 ms ladder from before slides off to the left. A clean fraction writes on in white: 'operations' over a bar over 'operations per second'."
+          "say": "Now the gap as a ratio. Thirty milliseconds over zero point one is three hundred. The budget is three hundred times the arithmetic.",
+          "show": "Left labels write on, 'arithmetic' and 'the budget', with tags '0.1 ms' (amber) and '30 ms' (white). On 'is three hundred', an equation card writes on, centred under the lane: '30 ÷ 0.1 = 300'. On 'three hundred times', a white card lands at the top left: 'ratio: 300 ×'."
         },
         {
           "id": "b2",
-          "say": "The word operations appears on top and on the bottom, so it cancels, exactly as a number would. Per second means divided by a second, and dividing by a division flips it back over. What is left is seconds.",
-          "show": "On 'cancels', both 'operations' words strike through in amber and fade, leaving '1 / per second'. On 'divided by a second', 'per second' rewrites as '1 / second', so the whole reads '1 / (1 / second)'. On 'flips it back over', the inner fraction flips vertically and everything collapses to one white word, 'seconds', with a teal check mark."
+          "say": "Drawn to one scale, the arithmetic is a barely visible sliver. On arithmetic alone, the chip could make three hundred tokens in the time it takes to make one.",
+          "show": "On 'one scale', the budget bar sweeps from x=300 to x=1800 and the amber bar appears at exactly 5 px; a thin white pointer drops onto it with the tag 'drawn to scale'. On 'three hundred tokens', the 5 px sliver copies itself into the left end of the budget bar and repeats end to end while a counter above runs '1 … 300 tokens'; at 300 the bar is exactly filled. The copies fade, leaving the budget bar empty again."
         },
         {
           "id": "b3",
-          "say": "Now get it wrong on purpose. Multiply instead of dividing, and the units become operations squared per second. That is not a duration. It is not anything at all.",
-          "show": "Right third: a grey panel titled 'the wrong way'. It builds 'operations × operations per second', which merges into 'operations² per second'. On 'not a duration', a grey cross stamp lands on it; on 'not anything at all', the panel desaturates further and shrinks slightly."
+          "say": "In words, a ratio is easy to nod along to. Drawn to scale, it is hard to shrug off.",
+          "show": "The equation card fades. Nothing else moves except the empty budget bar, which brightens slightly, so the 5 px against 1,500 px contrast is the whole frame."
         },
         {
           "id": "b4",
-          "say": "Run the same test on the division from earlier. A hundred and forty gigabytes, divided by four point eight terabytes per second. Bytes on top, bytes per second underneath. Bytes cancel, seconds remain. Twenty-nine point two milliseconds. It passes.",
-          "show": "Bottom band, in coral: '140 × 10⁹ bytes' over '4.8 × 10¹² bytes / second'. On 'bytes cancel', both 'bytes' words glow coral, strike through and fade, leaving 'seconds'. The result writes on in white: '= 0.0292 seconds = 29.2 ms', followed by a teal check mark."
+          "say": "Turn the ratio upside down. Zero point one over thirty is about zero point zero zero three three. As a percentage, a fraction out of a hundred, that is a third of one percent.",
+          "show": "The 'drawn to scale' pointer fades. The amber sliver drops from the top row into the left end of the budget bar, its 'packed together' tag riding with it; the top lane vanishes and the 'arithmetic' label stays, pointing at the sliver. Above the bar: '0.1 ÷ 30 = 0.0033'. On 'a fraction out of a hundred', the percent ruler draws beneath, ticks every 10% from '0%' to '100%', and the equation extends: '× 100 = 0.33%'. On 'a third of one percent', the camera zooms into the first 1% of the ruler, 15 px, which splits into three equal parts; the sliver fills exactly one. The camera zooms back out and the grey part gets its label: 'everything that is not arithmetic, 99.67%'."
         },
         {
           "id": "b5",
-          "say": "The test takes five seconds and catches the most common kind of error. Use it on every claim you meet from here on. Including the ones made here.",
-          "show": "All three examples shrink into a row of small cards: amber 'operations ÷ operations/second → seconds' with a teal check; grey 'operations × operations/second' with a cross; coral 'bytes ÷ bytes/second → seconds' with a teal check. Above them a teal banner writes on: 'check the units'. On 'including the ones made here', the teal magnifier icon swings round to face the viewer."
+          "say": "Unrounded, the hundred and forty billion gives nearer half a percent, and two hundred times rather than three. The exact figure depends on the model and the chip. The power of ten does not.",
+          "show": "A small grey working card at the right: '1.4 × 10¹¹ ÷ 10¹⁵ = 0.14 ms'. A dashed amber ghost extends the sliver from 5 px to 7 px, with its own small tag '≈ 0.47% unrounded', and a dashed ghost '≈ 214 ×' appears beside the 'ratio: 300 ×' card. On 'the model and the chip', a chip icon and a model-file icon flank the working card. On 'the power of ten does not', a white bracket spans 0% to 1% of the ruler, labelled 'under 1% either way'; then the ghosts, the icons, the bracket and the working card fade, leaving the solid 5 px sliver, the equation ending '0.33%', and 'ratio: 300 ×'."
+        },
+        {
+          "id": "b6",
+          "say": "Two ways of saying one thing, because a ratio and a percentage land differently on different people.",
+          "show": "The equation above the bar condenses into a card that slides in beside 'ratio: 300 ×', joined to it by an equals sign: 'percentage: 0.33%' in amber. Hold."
         }
       ]
     },
     {
       "id": "ch05_s07",
-      "name": "three hundred times, drawn to scale",
-      "figs": [
-        68
-      ],
-      "visual": "Two horizontal bars on one shared scale, both starting at a common left edge x=300, where 1,500 px stands for 30 ms, so 50 px per millisecond. Top row, labelled 'arithmetic' at the left: an amber bar exactly 5 px long, tagged '0.1 ms'. Bottom row, labelled 'the budget': a white-outlined bar with a faint grey fill, 1,500 px long, tagged '30 ms'. Below the lane, an equation card '30 ÷ 0.1 = 300'. The idea: the ratio becomes undeniable when the two quantities are drawn to the same scale, and the 5 px sliver tiled 300 times exactly fills the long bar.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Back to the gap itself. The arithmetic for one token takes zero point one milliseconds. The budget, the time each token actually takes, is thirty. Thirty divided by zero point one is three hundred.",
-          "show": "Left labels write on: 'arithmetic' on the top row and 'the budget' on the bottom row, with tags '0.1 ms' in amber and '30 ms' in white. On 'three hundred', the equation card writes on centred below the lane: '30 ÷ 0.1 = 300'."
-        },
-        {
-          "id": "b2",
-          "say": "Now draw both to the same scale. The budget stretches right across the screen. The arithmetic is that sliver at the start of the top row. You can barely see it.",
-          "show": "On 'stretches right across', the bottom bar sweeps from x=300 to x=1800. On 'that sliver', the top amber bar appears at exactly 5 px; a thin white pointer drops onto it with the tag 'to scale: 5 px'. A small grey note under the lane: 'both bars, one scale'."
-        },
-        {
-          "id": "b3",
-          "say": "Here is another way to say it. On the arithmetic alone, the chip could have produced three hundred tokens in the time it takes to produce one.",
-          "show": "The 5 px amber sliver copies itself down into the left end of the budget bar, then repeats rapidly left to right, slivers stacking end to end, while a counter above the bar runs '1, 2, 3 … 300 tokens'. At 300 the budget bar is exactly filled with amber slivers. Then the slivers fade out again, leaving the budget bar empty."
-        },
-        {
-          "id": "b4",
-          "say": "Ratios stated in words are easy to nod along to. Drawn to scale, the same claim is much harder to skim past.",
-          "show": "The words 'three hundred times' appear small in white at the top left, then shrink and fade away. The two bars stay; the long empty budget bar brightens slightly so the contrast with the 5 px sliver is the last thing on screen."
-        }
-      ]
-    },
-    {
-      "id": "ch05_s08",
-      "name": "the same gap as a percentage",
-      "figs": [
-        69
-      ],
-      "visual": "Opens on the previous scene's end state: the two bars on the same 1,500 px scale. The amber 5 px sliver drops into the left end of the budget bar, leaving one bar: 5 px of amber, then 1,495 px of grey labelled 'everything that is not arithmetic'. Above the bar a percentage equation builds; below it a thin percent ruler runs 0% to 100%, so 15 px per percent. The camera can zoom into the first percent of the ruler. The idea: the same gap, said as a share of the whole instead of as a multiple.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Now turn the ratio upside down. Zero point one divided by thirty is about zero point zero zero three three.",
-          "show": "The amber sliver drops from the top row into the left end of the budget bar; the top row's lane vanishes and the 'arithmetic' label stays, pointing at the sliver. Above the bar, the equation writes on: '0.1 ÷ 30 = 0.0033'."
-        },
-        {
-          "id": "b2",
-          "say": "A percentage is just a fraction written out of a hundred. Multiply by a hundred, and you get zero point three three percent. A third of one percent.",
-          "show": "A thin percent ruler draws under the bar, ticks every 10% from '0%' to '100%'. The equation extends: '× 100 = 0.33%'. On 'a third of one percent', the camera zooms into the left end: the first 1% of the ruler, 15 px, expands to fill the width and is split into three equal parts; the amber sliver fills exactly one of the three. The camera zooms back out."
-        },
-        {
-          "id": "b3",
-          "say": "That sliver at the left edge is the only part of the bar doing mathematics. Everything else is something that is not arithmetic.",
-          "show": "The amber sliver pulses twice. On 'everything else', the label 'everything that is not arithmetic' writes across the grey part of the bar, and a grey tag '99.67%' fades in above it."
-        },
-        {
-          "id": "b4",
-          "say": "Round it, and call it under one percent. The exact figure depends on the model and on the chip.",
-          "show": "A white tag 'under 1%' appears beside the '0.33%'. Small grey icons flank it, a chip icon and a model-file icon, with the label 'exact value depends on both'."
-        },
-        {
-          "id": "b5",
-          "say": "Keep the hundred and forty billion unrounded, and the arithmetic takes about zero point one four milliseconds. That is closer to half a percent. Either way, the order of magnitude is not in doubt.",
-          "show": "A small grey working card writes on at the right: '1.4 × 10¹¹ ÷ 10¹⁵ = 0.14 ms'. The amber sliver grows from 5 px to 7 px, and the percentage tag updates from '0.33%' to '≈ 0.5%'. On 'not in doubt', a white bracket spans the 0% to 1% segment of the ruler with both values inside it, labelled 'under 1% either way'."
-        },
-        {
-          "id": "b6",
-          "say": "A ratio and a percentage say exactly the same thing. Both are here because they land differently on different listeners.",
-          "show": "Two cards slide in side by side above the bar, joined by an equals sign: 'ratio: 300 ×' in white and 'percentage: 0.33%' in amber. Hold."
-        }
-      ]
-    },
-    {
-      "id": "ch05_s09",
       "name": "where the thirty milliseconds goes",
       "figs": [
         67
       ],
-      "visual": "The thesis frame of the chapter. Top band, title 'Where the 30 milliseconds goes', with a stopwatch icon at the top left reading '30 ms'. Centre: one big bar, 1,500 px wide from x=210 to x=1710, drawn to scale: an amber 5 px sliver at the left labelled 'arithmetic, under 1%', and the remainder labelled 'something else, 99%', which starts grey and floods coral during the scene (coral is the film's colour for bytes and memory traffic, so the colour change is the clue). Small supporting cards appear below the bar and leave. The bottom band briefly recalls the earlier 30 ms division in coral.",
+      "visual": "The thesis frame of the chapter. Top band: title 'Where the 30 milliseconds goes', with a stopwatch icon at the top left reading '30 ms'. Centre: one bar, 1,500 px from x=210 to x=1710, drawn to scale: a 5 px amber sliver at the left labelled 'arithmetic, under 1%' that keeps its small grey 'packed together' tag, and the remainder labelled 'something else, 99%', which starts grey and floods coral during the scene (coral is the film's colour for bytes and memory traffic, so the colour change is the clue). Small cards appear below the bar and leave. Nothing on screen joins the hardware numbers with an operator: the next chapter teaches that the token time is set by whichever resource runs out first, not by a sum.",
       "beats": [
         {
           "id": "b1",
-          "say": "So here is where the thirty milliseconds goes. Less than one percent of each step of making the answer, one token at a time, is spent doing mathematics. The other ninety-nine percent is something else.",
-          "show": "The title writes on. The bar from the previous scene glides up to centre and grows to full size, keeping its 5 px amber sliver. On 'less than one percent', the label 'arithmetic, under 1%' appears above the sliver with a pointer line. On 'something else', the label 'something else, 99%' writes on, centred in the grey remainder."
+          "say": "So here is where the thirty milliseconds goes. Under one percent of it is mathematics. The other ninety-nine percent is something else.",
+          "show": "The title writes on. The bar from the previous scene glides up to centre at full size, keeping its 5 px sliver and its 'packed together' tag; the ruler, the old labels and both cards fade. On 'under one percent', the label 'arithmetic, under 1%' appears above the sliver with a pointer line. On 'something else', 'something else, 99%' writes on, centred in the grey remainder."
         },
         {
           "id": "b2",
-          "say": "The chip is not slow. It could have done three hundred tokens' worth of arithmetic. And the model is not badly written. Something other than mathematics is filling the time.",
-          "show": "Below the bar, two small cards: a chip icon labelled 'not slow' with a teal check, and a model-file icon labelled 'not badly written' with a teal check. Both fade, and the grey remainder of the bar pulses once."
+          "say": "The chip is not slow, and the model is not badly written. And there is a clue. The thirty milliseconds came from dividing bytes by memory speed.",
+          "show": "Below the bar, two small cards: a chip icon 'not slow' and a model-file icon 'not badly written', each with a teal check; they fade. On 'a clue', the bottom band writes on in coral: 'bytes ÷ bytes per second', and beneath it '140 GB ÷ 4.8 TB/s = 29.2 ms'. On 'memory speed', the grey remainder floods coral from left to right."
         },
         {
           "id": "b3",
-          "say": "You have already seen a clue. The thirty milliseconds came out of a division of bytes by memory speed, not of operations by compute speed. A hundred and forty gigabytes, over four point eight terabytes per second.",
-          "show": "Bottom band: the earlier division writes on in coral, 'time per token = bytes ÷ bytes per second', then beneath it '140 GB ÷ 4.8 TB/s = 29.2 ms'. On 'bytes by memory speed', the grey remainder of the bar floods coral from left to right, so the bar is now an amber sliver and a coral remainder."
+          "say": "Next chapter, this coral part gets its name. By the film's end, you will predict it for any model on any chip, from the model's size and two numbers off the chip's specification sheet.",
+          "show": "A coral tag with an empty name box and a '?' settles on the coral part, sub-label 'named next chapter'. The bottom band clears. Three small cards slide in under the bar, evenly spaced, with nothing between them: blue 'model size', amber 'compute rate', coral 'memory speed'. A grey bracket under the last two reads 'chip spec sheet'. A thin brace over all three draws one arrow up to the stopwatch, labelled 'any model, any chip'."
         },
         {
           "id": "b4",
-          "say": "In the next chapter, this coral part gets its name. And you will see why two hardware numbers, how fast the chip computes and how fast its memory delivers, are enough to predict it for any model, on any chip.",
-          "show": "A coral tag with a blank name box and a '?' sits on the coral part, sub-label 'named in the next chapter'. The bottom band clears; two small hardware cards slide in under the bar, amber 'compute rate' and coral 'memory speed', joined by a '+' and an arrow pointing up to the stopwatch '30 ms'."
-        },
-        {
-          "id": "b5",
           "say": "This bar is the thesis of everything that follows. Every idea from here on is an attempt to shrink the coral part.",
-          "show": "Everything clears except the title and the bar. Teal arrows press in from the right end against the coral part, which compresses by a few percent and holds; a teal label above it reads 'shrink this'. Hold on this frame for two seconds."
+          "show": "Everything clears except the title and the bar. Teal arrows press in from the right end against the coral part, which compresses by a few percent and holds; a teal label above it reads 'shrink this'. Hold this frame for two seconds."
         }
       ]
     }
@@ -487,7 +369,7 @@
       "result": "0.029166666666666667 29.166666666666668"
     },
     {
-      "claim": "CAVEAT made explicit: unrounded, 1.4 x 10^11 / 10^15 = 0.14 ms of arithmetic, 0.47% of 30 ms ('closer to half a percent'); the 0.1 ms and 0.33% use 10^11 rounded down. Still under 1%.",
+      "claim": "CAVEAT made explicit: unrounded, 1.4 x 10^11 / 10^15 = 0.14 ms of arithmetic, 0.47% of 30 ms ('nearer half a percent'); the 0.1 ms and 0.33% use 10^11 rounded down. Still under 1%.",
       "python": "1.4e11/1e15*1e3, 0.14/30*100",
       "result": "0.13999999999999999 0.46666666666666673"
     },
@@ -505,6 +387,31 @@
       "claim": "CORRECTION (storyboard): the atlas's 'gap drawn to scale' bar draws arithmetic at 4 of 560 px (0.71%), not to scale; the film draws it at the true 0.33%, 5 px of 1,500",
       "python": "4/560*100, 0.1/30*1500",
       "result": "0.7142857142857143 5.0"
+    },
+    {
+      "claim": "One second of the chip holds ten thousand tokens' worth of arithmetic: 10^15 operations per second / 10^11 operations per token",
+      "python": "1e15/1e11",
+      "result": "10000.0"
+    },
+    {
+      "claim": "Timeline geometry: 1,500 px for 30 ms is 50 px per millisecond, so the packed 0.1 ms block is 5 px",
+      "python": "1500/30, 0.1*50",
+      "result": "50.0 5.0"
+    },
+    {
+      "claim": "CAVEAT made explicit (reviewer): unrounded, the ratio becomes 30 / 0.14 = 214, 'about two hundred times rather than three'",
+      "python": "30/0.14",
+      "result": "214.28571428571428"
+    },
+    {
+      "claim": "Same ratio against the exact 29.2 ms and 989 TFLOP/s (not narrated): about 206, still 'about two hundred'",
+      "python": "(140e9/4.8e12*1e3)/(1.4e11/989e12*1e3)",
+      "result": "206.04166666666666"
+    },
+    {
+      "claim": "'The power of ten does not [change]': 0.33% and 0.47% are both 10^-3 as fractions; 300 and 214 are both 10^2",
+      "python": "import math; print(math.floor(math.log10(0.1/30)), math.floor(math.log10(0.14/30)), math.floor(math.log10(30/0.1)), math.floor(math.log10(30/0.14)))",
+      "result": "-3 -3 2 2"
     }
   ]
 }

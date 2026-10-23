@@ -2,333 +2,240 @@
   "chapter": "ch17",
   "title": "What the user feels",
   "kicker": "17 · What the user feels",
-  "figs": [142, 143, 55, 144, 145],
+  "figs": [
+    142,
+    143,
+    55,
+    144,
+    145
+  ],
   "scenes": [
     {
       "id": "ch17_s01",
-      "name": "latency and throughput, at the post office",
-      "figs": [142],
-      "visual": "A calm stage on the dark background with no computers in it. Lower-middle band: a road drawn left to right across about 80% of the frame width, with an upper and a lower lane. Left end: a post-office icon (a small building with a mailbox) labelled 'post office'. Right end: three small house icons labelled 'town'. Letters are small blue envelope icons. Top band, from b2 to the end of the scene: two definition cards side by side with neutral white outlines, because this scene is about neither compute nor bytes. Left card: stopwatch icon, title 'Latency', line 'how long one letter takes to arrive'. Right card: stacked-envelopes icon, title 'Throughput', line 'letters delivered per day'. From b3 a seven-day calendar strip, boxes 'Mon' to 'Sun', hangs above the road. Each vehicle gets a two-line ledger beneath it when it is introduced. A small grey tag 'illustrative numbers' sits bottom-right from b3 to the end. The idea the motion makes visible: one service, two different questions, and no way to win both at once.",
+      "name": "the van, the courier, and a server",
+      "figs": [
+        142
+      ],
+      "visual": "Frame 1920 x 1080; keep x < 420, y < 110 clear for the chapter label. A calm stage with no computers until b4. Lower-middle band, y 640 to 780: a road drawn left to right from x 300 to x 1640, with an upper lane (courier) and a lower lane (van). Left end: a post-office icon (a small building with a mailbox). Right end: three small house icons. Neither end carries a text label; the icons say it. Letters are small blue envelope icons. Top band, y 150 to 330: two definition cards side by side with neutral white outlines, because this scene is about neither compute nor bytes. Left card: stopwatch icon, title 'Latency'. Right card: stacked-envelopes icon, title 'Throughput'. Each card shows one short line only while it is being defined ('time for one letter', 'letters per day'), then keeps its title and icon alone. Each vehicle gets a one-line ledger at the right end of its lane, white, 28 px. A grey 'illustrative' tag sits bottom-right from b2 until the morph in b4. From b3 a slider sits centred under the road, labelled 'wait before leaving', with a motorbike icon at its left end and a van icon at its right end; it stays to the end of the scene and is reused for the server. In b4 one continuous morph re-dresses the same stage for a server. Never more than five text items on screen besides numbers. The idea the motion makes visible: one service, two different questions, and a single dial that trades one for the other.",
       "beats": [
         {
           "id": "b1",
-          "say": "So far, almost every number has been the machine's. Bytes, operations, milliseconds per token. Now turn around and look from the other side, from the person waiting for an answer. And start somewhere with no computers at all. The post.",
-          "show": "Empty stage. On 'Bytes, operations, milliseconds per token', three faint grey tags drift across the centre one after another and fade: '140 GB', '295 ops per byte', '42 ms per token'. On 'turn around', a single user icon fades in at centre facing the viewer, then shrinks away. On 'The post', the road draws on from left to right, the post-office icon pops up at its left end and the house icons at its right end."
+          "say": "Take the post. Latency: how long one letter takes to arrive. Throughput: how many letters arrive per day.",
+          "show": "On 'Take the post', the road draws on from left to right and the post office and houses pop in at its ends. On 'Latency', the left card drops into the top band with its line 'time for one letter'; one blue envelope travels from the post office to the houses while the card's stopwatch runs, stopping as the envelope lands. On 'Throughput', the right card drops in with 'letters per day'; a steady stream of envelopes flows along the road and a counter on the card ticks upward. As the beat ends both description lines fade, leaving titles and icons."
         },
         {
           "id": "b2",
-          "say": "Any postal service can be judged by two quite different questions. Latency: how long does one letter take to arrive? Throughput: how many letters does the whole service deliver in a day?",
-          "show": "On 'Latency', the left card drops into the top band; one blue envelope leaves the post office and travels to the town while the stopwatch on the card runs, stopping as the envelope lands. On 'Throughput', the right card drops in beside it; a steady stream of envelopes flows along the road and a counter on the card ticks upward, labelled 'per day'."
+          "say": "A weekly van, crammed full, has enormous throughput and terrible latency. A motorbike courier with one letter is the reverse.",
+          "show": "The stream stops. On 'A weekly van', a van icon parks on the lower lane at the post office with a small grey tag 'once a week' above it; on 'crammed full', envelopes pour in and a counter on its side runs to '7,000'. On 'enormous throughput', the 'once a week' tag fades, the van drives to the houses and its ledger lands at the lane's right end: '≈ 1,000/day · up to a week'. On 'terrible latency', one envelope drops into the empty post office and waits, glowing, while a ring of seven segments around it fills one segment per day. On 'motorbike courier', a motorbike icon on the upper lane carries one envelope to the houses in about a second, returns and repeats; its ledger lands: '≈ 20/day · under an hour'. The grey 'illustrative' tag fades in bottom-right."
         },
         {
           "id": "b3",
-          "say": "Now two ways to run it. First, a van that leaves once a week, crammed full. Say it carries seven thousand letters. Spread over the week, that is a thousand a day. Enormous throughput.",
-          "show": "The stream stops. A delivery-van icon parks at the post office. On 'once a week', the calendar strip appears above the road with 'Mon' lit. On 'seven thousand', envelopes pour into the van and a counter on its side runs to '7,000'. On 'a thousand a day', a white '÷ 7' flashes beside the counter and the first ledger line appears under the van: 'throughput ≈ 1,000 a day'. The grey 'illustrative numbers' tag fades in bottom-right."
+          "say": "Neither is better. Unlike memory's latency and bandwidth, these pull against each other, through one choice: how long to wait before leaving.",
+          "show": "On 'Neither is better', a balance-scale icon between the two ledgers settles level, a grey tag 'different questions' beneath it. On 'Unlike memory's latency and bandwidth', that tag fades, both ledgers dim to 30% and a small grey inset fades in top-right: the container ship and motorbike courier from the earlier memory chapter, tagged 'independent'. On 'pull against each other', the inset and the ledgers fade out and a thin double-headed arrow pulls taut between the 'Latency' and 'Throughput' cards. On 'one choice', the slider draws on under the road. On 'how long to wait', its knob slides right: the van fills while the waiting letter's ring keeps filling, and a bar on the Throughput card grows; then the knob slides back left: the motorbike leaves at once with one envelope, the Latency card's stopwatch hand shortens and the Throughput bar shrinks."
         },
         {
           "id": "b4",
-          "say": "And terrible latency. A letter posted just after the van has gone sits waiting for a whole week before its journey even begins.",
-          "show": "The van drives off to the town. A single envelope drops into the empty post office and glows faintly. On 'a whole week', the calendar lights 'Tue' through 'Sun' and back round to 'Mon', one box at a time, while the envelope waits; only then does the van return and take it. Second ledger line under the van: 'latency: up to a week'."
+          "say": "Not a computing idea, yet a serving system faces exactly this choice: wait to gather requests and do more, or answer at once and do less.",
+          "show": "On 'Not a computing idea', the 'illustrative' tag fades. On 'a serving system', one continuous morph: the post office becomes a G P U package icon, the houses a row of user icons, the envelopes blue request pills, the van a tray on the lower lane and the motorbike a single pill on the upper lane; the cards and slider stay. On 'wait to gather requests', the knob slides right: ten pills collect in the tray and leave together, and a counter at the lower lane's right end runs to '≈ 240 tokens/s'. On 'answer at once', the knob slides left: pills leave one by one on the upper lane and its counter reads '≈ 24 tokens/s'; on 'do less' that counter pulses once. A small grey tag under the counters: 'H100, weights only'."
         },
         {
           "id": "b5",
-          "say": "A motorcycle courier carrying one letter is the reverse. Your letter is across town within the hour. But one rider, one letter at a time, might manage twenty in a day.",
-          "show": "A motorcycle icon appears on the upper lane. It picks up one envelope, zips to the town in about a second, returns and repeats, a small stopwatch beside it reading 'under an hour'. On 'twenty in a day', its ledger appears: 'latency: under an hour', 'throughput ≈ 20 a day'. The van and its ledger stay visible on the lower lane for comparison."
-        },
-        {
-          "id": "b6",
-          "say": "Neither is better. They answer different questions, and improving one often costs the other. Filling the van means waiting for letters. Leaving at once means going with whatever you have.",
-          "show": "The two ledgers slide to the centre, side by side. On 'Neither is better', a balance-scale icon between them settles level. On 'Filling the van', envelopes trickle slowly into the parked van while the calendar ticks. On 'Leaving at once', the motorcycle leaves with its single envelope while a small pile is left behind on the kerb."
-        },
-        {
-          "id": "b7",
-          "say": "If that sounds familiar, it should. Earlier, a container ship and a courier pulled bandwidth apart from latency, inside a computer's memory. Throughput is the same idea for a whole service. Not how fast one thing arrives, but how much gets done.",
-          "show": "A small grey inset fades in at top-right: a container-ship icon tagged 'bandwidth' beside a courier icon tagged 'latency', recalling the earlier picture. On 'how much gets done', the inset fades and the 'Throughput' card glows once."
+          "say": "But the first request waits for the rest. That is why this chapter ends counting only tokens that arrive in time.",
+          "show": "On 'the first request', the knob slides right again; the leftmost pill in the tray pulses and a small stopwatch beside it runs while the other nine trickle in. On 'arrive in time', a small teal clock badge flickers once over each user icon, then fades: a promise of the chapter's last number. Final hold: the two cards in the top band, the slider, the G P U and the users."
         }
       ]
     },
     {
       "id": "ch17_s02",
-      "name": "the same choice, for a server",
-      "figs": [142],
-      "visual": "The same road, lanes and top-band cards as the previous scene, re-dressed for a server by one continuous morph at the start: the post office becomes a G P U package icon (compute die with memory stacks) at the left, the houses become a row of user icons at the right, the envelopes become blue request pills. Upper lane labelled 'answer at once'; lower lane labelled 'wait and gather', with a small tray at its G P U end. A counter sits at the right end of each lane. The 'Latency' and 'Throughput' cards stay in the top band throughout. In the last beat everything morphs back to the post office. The idea: the van-or-courier choice is exactly the choice a serving system makes every moment.",
+      "name": "two waits, and the phase behind each",
+      "figs": [
+        143
+      ],
+      "visual": "Keep x < 420, y < 110 clear. Opening layout: top half, a wide chat window centred (x 480 to 1440, y 130 to 420), its prompt bubble already sent and an empty reply area with a blinking cursor. Centre band, y 540: a horizontal time axis from x 240 to x 1700, schematic, with a small 'send' marker at its left end. On it, the shape of every streamed answer: an outlined pause bar from 'send' to the first token, then nine evenly spaced blue token pills. The pause bar fills amber, because it turns out to be arithmetic; the gaps between pills are marked coral, because they turn out to be bytes. From b2 the chat window fades, the timeline rises into the top band (y 200), and its labels stay at 28 px. The lower half then splits into two phase panels: left, amber outline, title 'prefill', an 80-layer stack of thin horizontal bars with a block of blue prompt pills beneath; right, coral outline, title 'decode', an identical stack with a single blue pill beneath. In b3 the panels shrink into two dots on a small roofline at bottom-centre, drawn as in the roofline chapter: both axes logarithmic, coral slanted ceiling, amber flat ceiling, white dashed ridge labelled '295'. At most five text items besides numbers at any moment; each beat says what leaves. The idea: one stream, two waits, and each wait made by one phase.",
       "beats": [
         {
           "id": "b1",
-          "say": "A serving system faces exactly this choice. Wait to gather requests, and one read of the weights serves them all. Ten sharing a read made about two hundred and forty tokens a second, instead of twenty-four. Answer each one at once, and less gets done.",
-          "show": "On 'A serving system', the morph runs. Upper lane: single request pills leave the G P U one at a time, its counter reading '≈ 24 tokens/s'. Lower lane: pills collect in the tray; when it holds ten they leave together and its counter reads '≈ 240 tokens/s', with a small tag '10 share one read'. On 'less gets done', the upper counter dims."
+          "say": "Press send, and you feel two waits. The pause before the first word is time to first token. Each gap after it is time per output token.",
+          "show": "On 'Press send', a send-arrow icon flashes in the chat window and the 'send' marker drops onto the axis. On 'two waits', the outlined pause bar grows rightward from the marker while the cursor blinks, captioned 'a pause'. On 'the first word', the bar stops, the first blue pill lands and the reply shows 'The'. On 'time to first token', the bar fills amber from left to right, 'a pause' fades, and an amber bracket draws under it labelled 'time to first token' with 'TTFT' beneath. On 'Each gap after it', eight more pills land at even spacing, each adding a word to the reply. On 'time per output token', a coral bracket snaps into one gap, labelled 'time per output token' with 'TPOT, or inter-token latency' beneath and '≈ 42 ms on H100' at its end, then hops along two more gaps, the same width each time."
         },
         {
           "id": "b2",
-          "say": "But gathering has a price. The first request in the tray waits for all the others. That tension is why the last number in this chapter counts only the tokens that arrive in time.",
-          "show": "On 'The first request', the leftmost pill in the tray pulses and a small stopwatch beside it runs while the other nine trickle in, tag 'waiting'. On 'arrive in time', a small teal clock badge flickers once over each user icon at the right, then fades: a promise of what comes later."
+          "say": "Prefill makes the pause: the whole prompt passes through every layer before any output. Half a second for a short prompt, several seconds for a long one. Decode makes each gap: every token needs its own complete forward pass.",
+          "show": "On 'Prefill makes the pause', the chat window fades, the timeline rises into the top band, the 'send' label fades (its tick stays), and the long names shrink away, so the brackets keep only 'TTFT' and 'TPOT'. A connector draws from the TTFT bracket down to the left panel and its title 'prefill' lands. On 'the whole prompt passes through every layer', the block of prompt pills rises into the 80-layer stack all together, the layers lighting amber from bottom to top; on 'before any output', the block leaves the top of the stack and the first pill in the top band glows. On 'Half a second', the prompt block is short and a tag '≈ 0.5 s' pins to the pause bar; on 'several seconds', the block lengthens, the pause bar stretches with it and the tag changes to 'several s'. On 'Decode makes each gap', the tag fades, a connector draws from the TPOT bracket to the right panel and its title 'decode' lands. On 'its own complete forward pass', a single pill climbs the whole stack, the layers lighting coral; as it exits, the next pill lands in the top band and another single pill starts its climb."
         },
         {
           "id": "b3",
-          "say": "And notice that not one computer was needed to see any of it. The trade-off is not a computing idea. It is simply much easier to see in a delivery van.",
-          "show": "On 'not one computer', the G P U morphs back into the post office, the pills back into envelopes and the users back into houses. The van drives the length of the road once more. Final hold: the two cards in the top band, the van parked under 'Throughput' and the motorcycle under 'Latency'."
+          "say": "The pause decides whether a product feels responsive; the gaps, whether text reads comfortably or stutters and breaks concentration. Both are felt, and made at opposite ends of the roofline.",
+          "show": "The panel titles fade while the stacks keep their colours. On 'feels responsive', a short verdict 'feels responsive?' appears under TTFT; on 'reads comfortably', 'reads comfortably?' appears under TPOT. On 'stutters', the top-band pills jitter to uneven spacing; on 'breaks concentration', they settle back to even spacing. On 'Both are felt', the two verdicts fade. On 'opposite ends of the roofline', the two panels shrink into dots and fly onto the small roofline as it fades in at bottom-centre: the amber dot, labelled 'prefill', lands right of the dashed '295' ridge on the flat ceiling; the coral dot, labelled 'decode', lands far left on the slanted ceiling. Final hold text, white, under the roofline: 'opposite resource profiles'."
         }
       ]
     },
     {
       "id": "ch17_s03",
-      "name": "two waits, two names",
-      "figs": [143],
-      "visual": "Top half: a wide chat window, centred, its prompt bubble already sent and an empty reply area beneath with a blinking cursor. Centre band: a horizontal time axis from x≈160 to x≈1760 with a 'send' marker at its left end. On the axis, the shape of every streamed answer: a long bar from 'send' to the first token, captioned 'a pause', then a row of nine evenly spaced blue token pills. The pause bar fills amber, because it will turn out to be arithmetic; the gaps between pills are marked in coral, because they will turn out to be bytes. Bottom band: two bracket labels built in b2 and b3, each with its short name beneath in a smaller weight. Everything persists into the next scene. The idea: one stream, two different waits.",
+      "name": "what a cache hit saves, and what it does not",
+      "figs": [
+        55
+      ],
+      "visual": "Keep x < 420, y < 110 clear. Two time lanes stacked across the centre, sharing one millisecond axis beneath them: 0 to 500 ms, drawn to scale at 3 px per ms (x 210 to 1710), ticks every 100 ms. Lane labels at the left, 28 px: top 'cold' beside a grey dashed empty-cache outline, bottom 'warm' beside a small teal cache badge. The weather-conversation bubble with its cloud-and-sun icon, as in the earlier cache chapters, sits top-centre during b1 only. Each lane first shows its prompt as a strip of 1,032 hairline cells spanning the axis, then collapses into a prefill block starting at 0, after which blue token pills land one every 42 ms (126 px apart). Top band, right half, built during the scene: a two-row verdict, 'Prefill: skipped for matched tokens' with a teal tick (b1) and 'Decode: identical, still reads all 140 GB' in coral (b3); in b4 the rows condense and gain the two waits. A small grey tag bottom-right throughout: 'idealised: H100 at full speed, no network or queue'. Colours as in the previous chapter: teal = keys and values already held, amber = prefill arithmetic, coral = bytes, blue = tokens. The idea: a hit moves the first token earlier and leaves the rhythm after it untouched.",
       "beats": [
         {
           "id": "b1",
-          "say": "Back to a chat window. You press send. For a moment, nothing. Then the first word appears, and the rest follow, one token after another, at a steady pace.",
-          "show": "On 'press send', a send-arrow icon flashes in the chat window and a 'send' marker drops onto the left end of the time axis. On 'nothing', an empty outlined bar grows rightward from the marker while the cursor blinks; the caption 'a pause' fades in on it. On 'the first word', the bar stops growing and the first blue pill lands; the chat shows 'The'. On 'one token after another', eight more pills land at even spacing, each adding a word to the reply."
+          "say": "A cache hit skips prefill for every matched token. Warm, the weather conversation prefilled five tokens, not one thousand and thirty-two.",
+          "show": "The lanes, axis and lane labels draw on; the weather bubble settles top-centre. On 'skips prefill', the top-band row 'Prefill: skipped for matched tokens' lands with its teal tick. On 'Warm', the bottom lane's strip fills teal from the left for 1,027 cells and ends in 5 amber cells; a round magnifier callout pops up over the strip's right tip, showing the 5 amber cells enlarged with '5' beside them. On 'one thousand and thirty-two', the top lane's strip fills amber across every cell, with '1,032' at its right end."
         },
         {
           "id": "b2",
-          "say": "A user feels two different waits here. The first is the pause before anything appears. Time to first token, or T T F T. Earlier, when the stream crossed the network, this wait was promised a proper name. This is it.",
-          "show": "The pause bar fills amber from left to right. An amber bracket draws beneath it, labelled 'time to first token', and 'TTFT' types in below. A small stopwatch icon sits on the bracket and runs the length of the bar."
+          "say": "Two hundred and six times less work, yet only three and a half times less waiting: one read of the weights remains.",
+          "show": "The weather bubble, the magnifier and the strip numbers fade, and the top-band Prefill row dims to 30% for this beat. On 'Two hundred and six times less work', both strips collapse onto the axis, to scale: the cold one into an amber block from 0 to 148 ms (442 px), the warm one into a block from 0 to 42 ms (126 px); a first blue pill lands at each block's right end, with '≈ 148 ms' above the cold one and '≈ 42 ms' above the warm one, and a one-line tag lands at the left: '206× less work'. On 'three and a half times less waiting', the tag extends to '206× less work → 3.5× less wait' and a white bracket spans the two first pills, labelled '≈ 106 ms'. On 'one read of the weights', the warm block takes a coral outline, a hairline amber sliver inside it marks its arithmetic, and the label above its pill extends to '≈ 42 ms: one 140 GB read'."
         },
         {
           "id": "b3",
-          "say": "The second is the gap from one token to the next. Time per output token, or T P O T. You will also hear it called inter-token latency. Inter just means between. It is the same thing.",
-          "show": "A coral bracket snaps into the gap between the second and third pills, labelled 'time per output token', then 'TPOT' beneath it and, smaller, 'or inter-token latency'. On 'between', the bracket hops along to the next gap and the next, the same width every time."
+          "say": "Decode is untouched, warm or cold: every token still reads all a hundred and forty gigabytes. Making one never depended on how the context was assembled.",
+          "show": "The ratio tag and the bracket fade, the warm block's label shortens to '≈ 42 ms', and the Prefill row returns to full strength. On 'Decode is untouched', blue pills land in both lanes one every 42 ms, 126 px apart, and a coral bracket of identical width marks one gap in each lane, each '≈ 42 ms'. The top-band row 'Decode: identical, still reads all 140 GB' lands in coral. On 'how the context was assembled', a slim bar slides out beside each lane label: the cold one freshly made, with an amber edge; the warm one teal with a 5-cell amber tip. Both morph into the same teal bar, labelled '1,032 tokens of keys and values'; the label fades after a second."
         },
         {
           "id": "b4",
-          "say": "The two waits decide different things. Time to first token decides whether a product feels responsive at all. Time per output token decides whether the text arrives fast enough to read comfortably, or stutters in a way that breaks your concentration.",
-          "show": "Under the amber bracket a short verdict appears: 'feels responsive?'. Under the coral bracket: 'reads comfortably?'. On 'stutters', the reply in the chat window replays with uneven gaps, words lurching in, and the pills on the axis jitter to irregular spacing; on 'breaks your concentration' they settle back to even spacing."
+          "say": "So caching is purely a prefill optimisation: it shortens time to first token, never time per output token.",
+          "show": "On 'purely a prefill optimisation', the 'Prefill' row in the top band glows teal and both rows condense to their first words. On 'time to first token', amber brackets mark the pause in each lane, clearly different widths, and the Prefill row becomes 'Prefill skipped → TTFT shorter' with a teal down-arrow. On 'time per output token', the gap brackets in both lanes turn into coral brackets of exactly the same width, and the Decode row becomes 'Decode identical → TPOT unchanged'. The brackets carry no text of their own; their colours tie them to the rows."
+        },
+        {
+          "id": "b5",
+          "say": "Caching is often said to make the model faster. It makes it start sooner, then stream at the same speed.",
+          "show": "On 'make the model faster', the lanes dim to 30% and, centre, white, 'makes the model faster' appears and is struck through in grey. On 'start sooner', teal 'makes it start sooner' appears beneath. On 'the same speed', the phrases fade, the lanes brighten, and the warm lane's pills slide right until its first pill sits directly under the cold lane's first pill; every following pill lines up exactly, gap for gap. Hold."
         }
       ]
     },
     {
       "id": "ch17_s04",
-      "name": "what makes each wait",
-      "figs": [143],
-      "visual": "The timeline from the previous scene shrinks into the top band and stays: amber pause bar with its 'TTFT' bracket, blue pills with the coral 'TPOT' bracket. Below it the frame splits in two. Left half, amber: a panel titled 'prefill' with a stack of 80 thin horizontal layer bars and a block of blue prompt pills beneath it. Right half, coral: a panel titled 'decode' with an identical 80-layer stack and a single blue pill waiting beneath. A thin connector draws from the TTFT bracket down to the prefill panel, and later from the TPOT bracket down to the decode panel. Equations build under each panel; each equation fades when the next one lands, so no more than two lines show per panel. In the final beat a small roofline fades in at bottom-centre: both axes logarithmic, coral slanted ceiling, amber flat ceiling, white dashed ridge at 295, with an amber prefill dot to the right of the ridge and a coral decode dot at the far left. The idea: each wait is made by one phase, and the two phases sit at opposite ends of the roofline.",
+      "name": "two levers, and why the phases split",
+      "figs": [
+        144
+      ],
+      "visual": "Keep x < 420, y < 110 clear. Split screen across the upper two thirds. Left half, amber outline: a panel titled 'Improving TTFT' with a lever icon, one line 'compute: keep the arithmetic units fed', above a grid of small amber arithmetic-unit squares fed by a blue prompt block. Right half, coral outline: 'Improving TPOT' with a lever icon, one line 'bandwidth: move fewer bytes per token', above a coral pipe carrying byte particles. Each panel's line shows while it is spoken and then shrinks away, leaving the title. A gauge sits under each title and persists: amber, reading '0.29 s', with a grey sub-label '2,000-token prompt' and, from b1 until 'Faster memory' in b2, a grey 26 px derivation '290 trillion ops ÷ 989 trillion/s'; coral, reading '42 ms'. Lower third, y 780 to 1000: one shared strip reused per beat, a chip card in b2 and three streaming lanes in b3. In b4 the two panels themselves pull apart and become two groups of machines. The idea: two waits with two different bottlenecks, so one change can move one gauge and leave the other alone, or even push it the wrong way, until the two phases get separate hardware.",
       "beats": [
         {
           "id": "b1",
-          "say": "Each wait comes from one of the two phases. Time to first token is governed by prefill. The whole prompt must pass through every layer before any output can appear. The first word is drawn only when the last layer finishes the last prompt token.",
-          "show": "The connector draws from the TTFT bracket down to the left panel and its title 'prefill' lands. The block of blue prompt pills rises into the 80-layer stack all together, the layers lighting amber from bottom to top. On 'the first word', the block leaves the top of the stack and, in the top band, the first token pill lights."
+          "say": "Different bottlenecks, different engineering. With a long prompt to read in, time to first token is a compute problem: keep the arithmetic units fed.",
+          "show": "On 'Different bottlenecks', the two panels slide in from the left and right edges, titles only, and both gauges light. On 'a long prompt', a long blue prompt block flows into the left panel's grid and every amber square lights. On 'compute problem', the line 'compute: keep the arithmetic units fed' lands under the left title; on 'fed', a few squares flicker dark and are refilled at once by incoming work particles."
         },
         {
           "id": "b2",
-          "say": "So the pause grows with the prompt. For a short prompt, about half a second is typical. A long one can take several seconds.",
-          "show": "Above the left panel, a slider labelled 'prompt length' slides from short to long; the prompt block grows and the amber pause bar in the top band stretches with it. Two tags pin to the slider: at the short end '≈ 0.5 s', at the long end 'several s'."
+          "say": "Time per output token is a bandwidth problem: move fewer bytes per token. Faster memory shrinks the gaps, and barely moves the pause.",
+          "show": "The left line shrinks away. On 'bandwidth problem', the right line 'bandwidth: move fewer bytes per token' lands and byte particles flow along the coral pipe; on 'fewer bytes', the particles shrink to half size. On 'Faster memory', the right line and the derivation shrink away and a chip card slides into the lower strip: 'H100', with '989 trillion ops/s' and '3.35 TB/s'; it flips to 'H200': the first line stays the same and dims, the second counts up to '4.8 TB/s' and glows coral. On 'shrinks the gaps', the coral gauge swings from '42 ms' to '29 ms' with a teal tick. On 'barely moves the pause', the amber gauge holds at '0.29 s' and a grey note appears beside it: 'same arithmetic'."
         },
         {
           "id": "b3",
-          "say": "Numbers you already have show why. A two-thousand-token prompt was about two hundred and ninety trillion operations. At the H one hundred's full speed, that is about three tenths of a second. Ten times the prompt, and even at full speed it is more than three seconds.",
-          "show": "An amber equation builds under the left panel, term by term: '2,000 tokens ≈ 290 trillion ops', then '÷ 989 trillion ops/s', then '≈ 0.3 s'. On 'Ten times the prompt', a second line: '20,000 tokens → more than 3 s'. A small grey tag beside both: 'at full speed'."
+          "say": "A change can even hurt the other. Run each new prompt's prefill the moment it arrives, for a quicker first word, and every answer already streaming stalls.",
+          "show": "The chip card and the 'same arithmetic' note leave, and the coral gauge resets to '42 ms', the H100 again. The lower strip becomes three thin lanes, each led by a small user icon, with blue pills landing every 42 ms. On 'new prompt', a fourth user icon appears at the right with a long blue prompt block; on 'the moment it arrives', an amber block 'prefill ≈ 0.29 s' drops down across all three lanes. On 'stalls', every lane's pills stop at the block; when it ends, one more 42 ms step runs and the next pill lands, and the top lane's gap is bracketed '≈ 335 ms, 8× the usual gap'. The coral gauge kicks to '335 ms' and falls back to '42 ms' as the pills resume their rhythm."
         },
         {
           "id": "b4",
-          "say": "Real chips seldom run at their full speed, so the real pause is longer. Two smaller things add to it. The network trip, tens of milliseconds, and any time your request spends waiting its turn on a busy machine.",
-          "show": "The 'at full speed' tag gains a second line, 'real chips run slower'. The amber pause bar in the top band gains two thin segments at its left end: a grey sliver labelled 'network, tens of ms' and a dashed grey segment labelled 'queue, if busy'."
-        },
-        {
-          "id": "b5",
-          "say": "Time per output token is governed by decode. Every output token needs its own complete forward pass, every layer, every weight. On an H one hundred, about forty-two milliseconds. On an H two hundred, about twenty-nine. The thirty milliseconds, once again.",
-          "show": "The connector draws from the TPOT bracket down to the right panel and its title 'decode' lands. A single blue pill climbs through the 80-layer stack, the layers lighting coral; as it exits, the next pill on the top-band timeline lights and another single pill begins its climb, one at a time. A coral equation builds beneath: '140 GB ÷ 3.35 TB/s ≈ 42 ms', then '140 GB ÷ 4.8 TB/s ≈ 29 ms'."
-        },
-        {
-          "id": "b6",
-          "say": "Both waits are visible to the person in front of the screen. And they come from the two phases you placed on the roofline, at opposite ends. One is limited by arithmetic, the other by bytes.",
-          "show": "The equations fade. The small roofline fades in at bottom-centre. Lines draw from the left panel to the amber prefill dot, right of the ridge on the flat ceiling, and from the right panel to the coral decode dot, far left on the slanted ceiling. On 'limited by arithmetic', the amber dot pulses; on 'the other by bytes', the coral dot pulses. Final hold text, white, under the roofline: 'opposite resource profiles'."
+          "say": "That is why serving systems eventually split the two phases onto different hardware.",
+          "show": "The lanes clear. On 'serving systems', the two panels pull apart toward the left and right edges. On 'split the two phases', each morphs into a group of server-rack icons, amber 'prefill machines' on the left and coral 'decode machines' on the right, each still carrying its gauge. On 'different hardware', a teal block labelled 'keys and values' travels along an arrow between the groups, tagged 'KV transfer', and a small grey inset of the six-stop route from earlier flashes with its 'KV transfer' stop highlighted, then fades."
         }
       ]
     },
     {
       "id": "ch17_s05",
-      "name": "what a cache hit saves, and what it does not",
-      "figs": [55],
-      "visual": "Two time lanes stacked across the centre, sharing one time axis beneath them in milliseconds, 0 to 500 ms, drawn to scale at 3 px per ms (x≈210 to x≈1710), with 'send' at 0. Top lane labelled 'cold, a day later', bottom lane 'warm, a minute later'. The weather-conversation chat bubble with its cloud-and-sun icon, as in the previous chapters, sits top-left. Each lane first shows its prompt as a strip of 1,032 hairline cells, which then collapses into a prefill block on the time axis starting at 0; after the block, blue token pills land one every 42 ms (126 px apart). Top band, built during the scene, a two-row verdict: 'Prefill' with a teal tag 'skipped, for every matched token', and 'Decode' with a coral tag 'identical, every token still reads all 140 GB'. A small grey tag bottom-right throughout: 'idealised: H100 at full speed, network and queue left out'. Equations appear above a lane for one beat and fade. The idea: a hit moves the first token earlier and leaves the rhythm after it untouched.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Now that the two waits have names, a claim from a few minutes ago can be made exact. What does a cache hit actually save? Take the weather conversation. Cold, a day later, all one thousand and thirty-two tokens are prefilled. Warm, a minute later, only five.",
-          "show": "The weather bubble settles top-left. The two lanes and the shared millisecond axis draw on with their labels. On 'Cold', the top lane's strip of 1,032 hairline cells fills amber from the left, label '1,032 to prefill'. On 'Warm', the bottom lane's strip fills teal for 1,027 cells and amber for the last 5, label '5 to prefill'."
-        },
-        {
-          "id": "b2",
-          "say": "A hit skips prefill for every token it matches, so the pause before the first word shrinks. By how much? On an H one hundred at full speed, the cold case is about a hundred and forty-four trillion operations. About a hundred and fifty milliseconds.",
-          "show": "On 'skips prefill', the top-band row 'Prefill' appears with its teal tag 'skipped, for every matched token'. On 'By how much', the cold strip collapses into an amber block on the time axis from 0 to about 148 ms, to scale. An amber equation above it: '1,032 × 140 billion ≈ 144 trillion ops', then '÷ 989 trillion ops/s ≈ 150 ms'. The first blue pill lands at the block's right end."
-        },
-        {
-          "id": "b3",
-          "say": "Warm, five tokens is almost no arithmetic. But even five tokens need one full read of the weights, all hundred and forty gigabytes. That takes about forty-two milliseconds, and then the first word appears.",
-          "show": "The cold equation fades. The warm strip collapses into a much shorter block from 0 to about 42 ms, drawn amber with a coral outline, because it is now waiting on bytes. Equation above it: '5 × 140 billion ops ≈ 0.7 ms', then, in coral, '140 GB ÷ 3.35 TB/s ≈ 42 ms'. The first blue pill lands at its right end."
-        },
-        {
-          "id": "b4",
-          "say": "So two hundred and six times less work gives only about three and a half times less waiting, because the read of the weights is still there. Here, the first word comes about a hundred milliseconds sooner. With a long history, it comes seconds sooner.",
-          "show": "The warm equation fades. A white bracket spans the two first pills, labelled '≈ 105 ms sooner'. Two small tags at the left: '206× less work' and '≈ 3.5× less waiting'. On 'seconds sooner', a ghost of a much longer cold block stretches off the right edge of the axis, tagged '20,000-token history: ≈ 3.4 s cold', then fades."
-        },
-        {
-          "id": "b5",
-          "say": "Now the decode. Once prefill is over, warm or cold, the machine holds exactly the same thing: keys and values for all one thousand and thirty-two tokens. Some were kept from a minute ago, some were made just now. They are identical.",
-          "show": "Beside each lane label a slim cache bar appears: the cold one all freshly made, edged amber; the warm one teal with a 5-cell amber tip. On 'They are identical', both morph into the same plain blue bar labelled '1,032 tokens of keys and values'."
-        },
-        {
-          "id": "b6",
-          "say": "So every decode step does the same work in both lanes. Read all hundred and forty gigabytes of weights, plus that cache, and make one token. About forty-two milliseconds, warm or cold. Making a token never depended on how the context was assembled.",
-          "show": "Blue pills land in both lanes, one every 42 ms, 126 px apart. Coral brackets of identical width mark one gap in each lane, each labelled '≈ 42 ms'. The top-band row 'Decode' appears with its coral tag 'identical, every token still reads all 140 GB'."
-        },
-        {
-          "id": "b7",
-          "say": "Caching is entirely a prefill optimisation. It improves time to first token, and does nothing at all for time per output token. Of the two numbers a user feels, it touches only one.",
-          "show": "Amber 'TTFT' brackets mark the pause in each lane, clearly different widths, with a teal tick beside the warm one. Coral 'TPOT' brackets in both lanes, the same width, with a grey '= no change' between them."
-        },
-        {
-          "id": "b8",
-          "say": "Which matches the experience. A warm follow-up starts sooner, and then streams at exactly the same speed as a cold one.",
-          "show": "The warm lane's pills slide right until its first pill sits directly under the cold lane's first pill; every following pill lines up exactly, gap for gap. Hold a beat, then the warm lane slides back."
-        },
-        {
-          "id": "b9",
-          "say": "Worth being precise, because caching is often described as making the model faster. It does not. It makes it start sooner, and that is a different claim.",
-          "show": "The lanes dim to 30%. Centre, white: 'makes the model faster' appears and is struck through in grey; beneath it, in teal, 'makes it start sooner'. Hold."
-        }
-      ]
-    },
-    {
-      "id": "ch17_s06",
-      "name": "two waits, two different levers",
-      "figs": [144],
-      "visual": "Split screen under a thin top band. Left half, amber: a panel headed 'Improving TTFT' with a lever icon, subtitle 'a compute problem', line 'keep the arithmetic units fed'. Right half, coral: a panel headed 'Improving TPOT' with a lever icon, subtitle 'a bandwidth problem', line 'move fewer bytes per token'. Top band: two gauge readouts that persist all scene, amber 'TTFT, 2,000-token prompt: 0.29 s' and coral 'TPOT: 42 ms'. In b4 and b5 a chip card labelled 'H100' sits under both panels and is swapped for 'H200'. In b6 and b7 the lower half becomes three horizontal lanes, 'user A', 'user B', 'user C', each streaming blue pills every 42 ms, into which an amber prefill block drops across all three lanes. In b8 the lower half becomes two groups of server-rack icons, 'prefill machines' in amber on the left and 'decode machines' in coral on the right, joined by an arrow labelled 'KV transfer'. The idea: two waits with two different bottlenecks, so one change can move one gauge and leave the other alone, or even push it the wrong way.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Two waits, made by two phases at opposite ends of the roofline. So improving them takes different engineering.",
-          "show": "The two panels slide in from the left and right edges, titles only: 'Improving TTFT' in amber, 'Improving TPOT' in coral. The two gauges light in the top band, reading '0.29 s' and '42 ms'."
-        },
-        {
-          "id": "b2",
-          "say": "Time to first token is mostly prefill, and for a prompt of any real length, prefill is limited by arithmetic. So improving it is a compute problem. Keep the arithmetic units fed, never idle for want of work, and have as many of them as you can.",
-          "show": "Left panel fills in: subtitle 'a compute problem', line 'keep the arithmetic units fed'. Inside it, a grid of small amber arithmetic-unit squares, every one lit and busy; on 'never idle', a few squares flicker dark and are immediately refilled by incoming work particles."
-        },
-        {
-          "id": "b3",
-          "say": "Time per output token is decode, limited by bytes. So improving it is a bandwidth problem. Move fewer bytes per token, for instance by storing the weights in fewer bits, or move them over a faster bus.",
-          "show": "Right panel fills in: subtitle 'a bandwidth problem', line 'move fewer bytes per token'. Inside it, a coral pipe with byte particles flowing; on 'fewer bits', the particles shrink to half size; on 'a faster bus', they speed up."
-        },
-        {
-          "id": "b4",
-          "say": "Watch one change land on each. Swap the H one hundred for an H two hundred. Its arithmetic is essentially the same. Its memory runs at four point eight terabytes per second, instead of three point three five.",
-          "show": "A chip card 'H100' slides in centred under both panels, with two spec lines: '989 trillion ops/s' and '3.35 TB/s'. On 'Swap', it flips over to 'H200': the first line stays '989 trillion ops/s', unchanged and dimmed; the second line counts up to '4.8 TB/s' and glows coral."
-        },
-        {
-          "id": "b5",
-          "say": "Time per output token falls from about forty-two milliseconds to about twenty-nine. Time to first token, for that two-thousand-token prompt, barely moves, because its prefill was never waiting on bytes. One change helps one wait, and does nothing at all for the other.",
-          "show": "Coral gauge needle swings from '42 ms' to '29 ms', a teal tick beside it. Amber gauge stays on '0.29 s'; a small grey note beside it: 'arithmetic unchanged'. On 'never waiting on bytes', a tiny lane under the amber gauge shows the prompt's byte read, 44 ms then 30 ms, finishing far inside the 293 ms of arithmetic."
-        },
-        {
-          "id": "b6",
-          "say": "Sometimes a change even makes the other worse. A new two-thousand-token prompt arrives at a chip already streaming answers to other people. To get its first word out fast, the chip runs its prefill straight away.",
-          "show": "The panels shrink into the top corners. The lower half becomes three lanes, 'user A', 'user B', 'user C', each with blue pills landing every 42 ms. On 'A new two-thousand-token prompt', a new user icon appears at the right with a long blue prompt block; on 'straight away', an amber block labelled 'prefill, ≈ 0.3 s' drops down across all three lanes."
-        },
-        {
-          "id": "b7",
-          "say": "In the simplest arrangement, every stream on that chip waits while it runs. About three tenths of a second, where the next token was due in forty-two milliseconds. A gap seven times too long. One person's quick start made everyone else stutter.",
-          "show": "In all three lanes the pills stop at the amber block; the gap stretches to about seven pill-spacings wide, each lane labelled '≈ 7× the usual gap'. Then the pills resume at their 42 ms rhythm. The coral TPOT gauge in the corner kicks briefly to '≈ 0.3 s' and back."
-        },
-        {
-          "id": "b8",
-          "say": "Different bottlenecks, different engineering. That is why serving systems eventually separate the two phases onto different hardware entirely. Prefill on one set of machines, decode on another, with the keys and values handed across. That is the K V transfer on the route map from earlier.",
-          "show": "The lanes clear. Left: a group of server-rack icons labelled 'prefill machines' in amber. Right: a group labelled 'decode machines' in coral. On 'handed across', a teal block labelled 'keys and values' travels along an arrow between them tagged 'KV transfer'. On 'the route map', a small grey inset of the six-stop route from earlier flashes with its 'KV transfer' stop highlighted, then fades."
-        }
-      ]
-    },
-    {
-      "id": "ch17_s07",
       "name": "throughput against goodput",
-      "figs": [145],
-      "visual": "Top band: a long blue bar labelled 'Throughput' with the line 'all tokens generated per second' and a counter at its right end. Second band: a dashed grey outline of the same length labelled 'Goodput' with the line 'only the ones in time'; it fills teal only with tokens that arrive in time. Centre-left, between the two bars: a gate drawn as a narrow doorway with a stopwatch icon above it, standing for the latency targets. Tokens are blue particles flowing from a G P U icon at the far left along a pipe into the gate; tokens that pass in time turn teal and flow into the goodput bar, late ones turn grey and drop into a bin below the gate labelled 'missed target'. Bottom band: a crowd of small user icons, each with a little screen. Top-right corner from b3: a targets card. The idea: goodput is not a second machine, it is a filter on the first one's output.",
+      "figs": [
+        145
+      ],
+      "visual": "Keep x < 420, y < 110 clear. Far left, at mid-height, a G P U package icon emits blue token particles along a pipe running right. Top band: a long blue bar labelled 'Throughput · all tokens per second' with a counter at its right end. Below it, a dashed grey outline of the same length labelled 'Goodput · only the ones in time', which fills teal only with tokens that arrive in time. On the pipe at centre-left, a gate drawn as a narrow doorway with a stopwatch icon above it: tokens that pass in time turn teal and rise into the goodput bar; late ones turn grey and drop into a bin below the gate labelled 'missed target'. Top-right from b1: a one-line targets card, 'first token ≤ 1 s · next ≤ 50 ms', with a grey 'illustrative' tag. Bottom band from b2: a crowd of small user icons, each with a little screen. The idea: goodput is not a second machine, it is a filter on the first one's output.",
       "beats": [
         {
           "id": "b1",
-          "say": "Two waits the user feels. Now two counts the operator keeps. The first is throughput: every token the system generates, per second, across all of its users.",
-          "show": "The G P U icon appears at the far left with blue token particles streaming out along the pipe. On 'throughput', the blue bar draws on in the top band with its label and line; its counter starts running."
+          "say": "Operators count tokens. Throughput is every token generated per second. Goodput filters it down to tokens delivered inside the promised latency targets.",
+          "show": "On 'Operators count tokens', the G P U appears and blue particles stream along the pipe. On 'Throughput', the blue bar draws on with its label and its counter starts running. On 'Goodput filters it', the dashed outline draws on beneath with its label and the gate drops onto the pipe; most particles pass, turn teal and fill the goodput bar, a few turn grey and fall into the 'missed target' bin. On 'promised latency targets', the targets card slides in top-right with its 'illustrative' tag, and the gate's stopwatch shows the same two marks."
         },
         {
           "id": "b2",
-          "say": "The second is goodput. It is not really a separate measurement. It is a filter on throughput. Count only the tokens delivered inside the system's promised latency targets.",
-          "show": "The dashed outline draws on beneath the throughput bar with its label 'Goodput' and line 'only the ones in time'. On 'a filter', the gate with its stopwatch drops into the pipe; particles now pass through it, most turning teal and filling the goodput bar, a few turning grey and falling into the 'missed target' bin."
+          "say": "Pack thousands of requests into huge, slow batches, and the counter looks impressive. But if every user stares at a blank screen for forty seconds, every token missed its target. Goodput is zero.",
+          "show": "On 'Pack thousands of requests', the crowd fills the bottom band and request pills from all of them pile into one enormous tray at the G P U. On 'the counter looks impressive', the stream thickens into a torrent and the throughput counter races upward, the blue bar glowing. On 'blank screen', every little screen in the crowd stays blank with a blinking cursor while a large stopwatch over the crowd runs to '40 s'; as it passes '1 s', the first-token mark on the targets card turns grey, and from then on every particle reaching the gate turns grey and drops into the bin. On 'Goodput is zero', the goodput bar drains to empty and its counter reads '0', while the throughput counter still races."
         },
         {
           "id": "b3",
-          "say": "A latency target is a promise about the two waits. Say, the first word within one second, and every token after it within fifty milliseconds. Those numbers are only an illustration. Every service sets its own.",
-          "show": "The targets card slides in top-right: an amber line 'first token ≤ 1 s' and a coral line 'each next token ≤ 50 ms', with a grey tag 'illustrative'. The stopwatch over the gate shows the same two marks."
+          "say": "Tokens nobody was willing to wait for. Goodput is throughput times the share that arrived in time.",
+          "show": "On 'nobody was willing to wait for', the camera pushes gently in on the overflowing grey bin, with the glowing throughput bar and the empty goodput outline side by side above it. On 'Goodput is throughput times', the camera eases back, the crowd, stopwatch, torrent and targets card clear, and an equation builds under the bars term by term: '1,000 tokens/s' as the throughput counter settles there; '× 70% in time' on 'the share'; '= 700 tokens/s' on 'arrived in time', as the goodput bar fills teal to 70% of its outline. A grey 'illustrative' tag sits beside the equation, and 300 grey tokens stack in the bin."
         },
         {
           "id": "b4",
-          "say": "Now watch the two come apart. Pack thousands of requests into huge batches and work through them slowly. Each read of the weights now serves thousands of tokens. They get generated, and the counter looks impressive.",
-          "show": "The user crowd fills the bottom band. Request pills from all of them pile into one enormous tray at the G P U. On 'the counter looks impressive', the particle stream thickens into a torrent and the throughput counter races upward, the blue bar glowing."
-        },
-        {
-          "id": "b5",
-          "say": "But suppose every user stares at a blank screen for forty seconds before their first character appears. Every one of those tokens missed its first-token target. Goodput is zero.",
-          "show": "Every little screen in the crowd stays blank with a blinking cursor; a large stopwatch over the crowd runs to '40 s'. As it passes '1 s', the gate's first-token mark turns grey; from then on every particle reaching the gate turns grey and falls into the bin. On 'Goodput is zero', the goodput bar drains to empty and its counter reads '0', while the throughput counter is still racing."
-        },
-        {
-          "id": "b6",
-          "say": "The system is producing tokens nobody was willing to wait for. Every one of them cost the full price to make, and not one of them counts.",
-          "show": "The camera pushes gently in on the overflowing grey 'missed target' bin, with the still-glowing throughput bar and the empty goodput outline side by side above it."
-        },
-        {
-          "id": "b7",
-          "say": "Usually it is not all or nothing. Say a system makes a thousand tokens a second, and seven hundred of them belong to requests that met both targets. Throughput, a thousand. Goodput, seven hundred.",
-          "show": "Reset: the crowd and the torrent clear. The throughput counter settles on '1,000 tokens/s'. The goodput bar fills teal to 70% of its outline, counter '700 tokens/s', with a bracket '70%'. The 300 late tokens sit as a grey stack in the bin, labelled '300 late: same cost, no credit'."
-        },
-        {
-          "id": "b8",
-          "say": "Think back to the van. Its weekly load looks enormous on a chart. But if the promise was next-day delivery, every letter on it arrived late.",
-          "show": "A small inset slides in bottom-left: the delivery van with its '7,000' counter, and a stamp 'promised: next day'. On 'arrived late', every envelope in the van turns grey."
-        },
-        {
-          "id": "b9",
-          "say": "So goodput, not raw throughput, is what a production system is optimising for. If you ever run a system for real users, rather than benchmark one, this is the distinction that matters most.",
-          "show": "The inset fades. The word 'Goodput' enlarges and moves to centre in teal while 'Throughput' shrinks to grey above it. On 'run a system for real users', a small user-crowd icon appears beside 'Goodput'; on 'rather than benchmark one', a stopwatch-on-a-test-bench icon appears beside 'Throughput', greyed."
-        }
-      ]
-    },
-    {
-      "id": "ch17_s08",
-      "name": "four numbers, and the one that decides",
-      "figs": [143, 145],
-      "visual": "Four cards in a two-by-two grid at centre. Top row, with a small header 'what the user feels': an amber card 'time to first token' with 'TTFT' and a pause-bar icon, and a coral card 'time per output token' with 'TPOT' and an icon of evenly spaced pills. Bottom row, header 'what the operator counts': a blue card 'throughput' with a counter icon, and a teal card 'goodput' with a filter icon. In b2 a teal tag 'cache hit' attaches to the TTFT card and a coral tag 'fewer bytes' to the TPOT card. In b3 the goodput card lifts forward and the other three dim. The idea: four numbers, and the one that decides.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "So a serving system is judged on four numbers. Two waits the user feels: time to first token, and time per output token. Two counts the operator keeps: throughput, and goodput.",
-          "show": "The top row's header and two cards land on 'Two waits the user feels', each card on its spoken name. The bottom row's header and two cards land on 'Two counts the operator keeps', each on its spoken name."
-        },
-        {
-          "id": "b2",
-          "say": "The two waits come from phases at opposite ends of the roofline, so they need opposite fixes. A cache hit shortens only the first. Moving fewer bytes mostly helps the second.",
-          "show": "A thin double-headed arrow between the two top cards is labelled 'opposite ends of the roofline'. On 'A cache hit', a teal tag 'cache hit' clips onto the TTFT card. On 'Moving fewer bytes', a coral tag 'fewer bytes' clips onto the TPOT card."
-        },
-        {
-          "id": "b3",
-          "say": "And of the four, one decides. Goodput. The tokens people were actually willing to wait for.",
-          "show": "The other three cards dim to 30%. The teal goodput card lifts forward and grows to centre; beneath it, in white, 'the one that decides'. Hold."
+          "say": "Goodput, not raw throughput, is what production optimises. For anyone who operates a system rather than benchmarks one, no distinction matters more.",
+          "show": "The equation fades. On 'Goodput, not raw throughput', the word 'Goodput' enlarges and moves to centre in teal while 'Throughput' shrinks to grey above it. On 'operates a system', a small user-crowd icon appears beside 'Goodput'; on 'benchmarks one', a stopwatch-on-a-test-bench icon appears beside 'Throughput', greyed. Hold."
         }
       ]
     }
   ],
   "checks": [
-    {"claim": "Van illustration (illustrative numbers, not from the atlas): 7,000 letters a week = 1,000 a day", "python": "print(7000/7)", "result": "1000.0"},
-    {"claim": "One request alone on an H100: 3.35 TB/s / 140 GB = 23.9, 'twenty-four tokens a second'; ten requests sharing a read: 3.35 TB/s / 14 GB = 239, 'about two hundred and forty' (matches ch12)", "python": "print(3.35e12/140e9, 3.35e12/14e9)", "result": "23.928571428571427 239.28571428571428"},
-    {"claim": "TTFT arithmetic floor for a 2,000-token prompt (about 290 trillion ops, ch12) at the H100's 989 trillion ops/s = 0.29 s, 'about three tenths of a second'; consistent with the atlas's 'half a second for a short prompt' once real chips run below peak", "python": "print(290e12/989e12)", "result": "0.29322548028311424"},
-    {"claim": "Ten times the prompt, 20,000 tokens: weights 2.8e15 ops plus causal attention 2,621,440 x 20,000 x 20,001 / 2 = 5.2e14 ops; at 989 trillion ops/s that is 3.36 s (weights alone 2.83 s), 'more than three seconds even at full speed'", "python": "p=2621440; n=20000; w=n*140e9; a=p*n*(n+1)/2; print(w, a, (w+a)/989e12, w/989e12)", "result": "2800000000000000.0 524314214400000.0 3.361288386653185 2.8311425682507583"},
-    {"claim": "TPOT for one request: 140 GB / 3.35 TB/s = 41.8 ms on an H100, 'about forty-two'; 140 GB / 4.8 TB/s = 29.2 ms on an H200, 'about twenty-nine'", "python": "print(140e9/3.35e12*1e3, 140e9/4.8e12*1e3)", "result": "41.791044776119406 29.166666666666668"},
-    {"claim": "Cold prefill of the 1,032-token weather conversation (Example A): 1,032 x 140 billion = 144.5 trillion ops, plus 1.4 trillion for attention; at H100 peak 146 to 147.5 ms, said 'about a hundred and fifty milliseconds', drawn to 148 ms", "python": "p=2621440; n=1032; w=n*140e9; a=p*n*(n+1)/2; print(w/1e12, a/1e12, w/989e12*1e3, (w+a)/989e12*1e3)", "result": "144.48 1.39730092032 146.08695652173915 147.49979870608695"},
-    {"claim": "Warm prefill of 5 tokens: 0.7 trillion ops = 0.7 ms of arithmetic, but one read of 140 GB of weights = 41.8 ms, plus 1,032 x 327,680 bytes of cache = 0.1 ms; total 41.9 ms, 'about forty-two milliseconds' (5 ops per byte is far below the 295 ridge, so it is bandwidth bound)", "python": "w=5*140e9; print(w/1e12, w/989e12*1e3, 140e9/3.35e12*1e3, 1032*327680/3.35e12*1e3, (140e9+1032*327680)/3.35e12*1e3)", "result": "0.7 0.7077856420626897 41.791044776119406 0.10094500298507462 41.89198977910448"},
-    {"claim": "206 times less prefill work (1,032 / 5) gives only about 3.5 times less waiting (147.5 ms / 41.9 ms); the first word comes about 105 ms sooner, said 'about a hundred milliseconds sooner'", "python": "cold=(1032*140e9+2621440*1032*1033/2)/989e12*1e3; warm=(140e9+1032*327680)/3.35e12*1e3; print(1032/5, cold/warm, cold-warm)", "result": "206.4 3.520954709572166 105.60780892698247"},
-    {"claim": "Long history, 20,000 tokens: cold prefill 3.36 s at peak vs warm about 44 ms (weights plus 6.6 GB of cache) gives about 3.3 s sooner, 'seconds sooner'; on screen '≈ 3.4 s cold'", "python": "cold=(20000*140e9+2621440*20000*20001/2)/989e12; warm=(140e9+20000*327680)/3.35e12; print(cold, warm, cold-warm)", "result": "3.361288386653185 0.04374734328358209 3.317541043369603"},
-    {"claim": "Decode step after prefill, warm or cold: the cache is the same 1,032 tokens = 0.338 GB, so each step reads 140.34 GB, 41.9 ms on an H100, 'about forty-two milliseconds'", "python": "print(1032*327680/1e9, (140e9+1032*327680)/1e9, (140e9+1032*327680)/3.35e12*1e3)", "result": "0.33816576 140.33816576 41.89198977910448"},
-    {"claim": "Ridge on the H100 = 989 / 3.35 = 295 ops per byte, so a prefill longer than about 295 tokens is compute bound ('a prompt of any real length')", "python": "print(989/3.35)", "result": "295.2238805970149"},
-    {"claim": "H100 to H200 swap: TPOT 41.8 to 29.2 ms; TTFT for the 2,000-token prompt stays 293 ms because the H200's dense 16-bit arithmetic equals the H100's 989 trillion ops/s (same compute die; a hardware fact not stated in the atlas) and the prompt's ~146 GB of bytes take only 43.6 ms on an H100 and 30.4 ms on an H200, far inside the arithmetic time", "python": "print(290e12/989e12*1e3, 146e9/3.35e12*1e3, 146e9/4.8e12*1e3)", "result": "293.2254802831142 43.582089552238806 30.416666666666668"},
-    {"claim": "Interference: a 0.293 s prefill run in place of a 41.8 ms decode step makes one gap 7.0 times the usual length, 'seven times too long'", "python": "print(0.29322548/0.041791045)", "result": "7.016466805268927"},
-    {"claim": "Goodput illustration (illustrative numbers): 700 of 1,000 tokens a second in time = 70%, 300 late", "python": "print(700/1000*100, 1000-700)", "result": "70.0 300"},
-    {"claim": "Storyboard scale for the cache-hit lanes at 3 px per ms: cold block 147.5 ms = 442 px, warm block and token spacing 41.9 ms = 126 px, axis 0 to 500 ms = 1,500 px; the cold lane's ninth token lands at 483 ms, inside the axis", "python": "print(147.5*3, 41.9*3, 500*3, 147.5+8*41.9)", "result": "442.5 125.69999999999999 1500 482.7"}
+    {
+      "claim": "Van illustration (illustrative numbers, not from the atlas): 7,000 letters a week = 1,000 a day; the courier's 20 a day is a stated illustration",
+      "python": "print(7000/7)",
+      "result": "1000.0"
+    },
+    {
+      "claim": "One request alone on an H100: 3.35 TB/s / 140 GB = 23.9, '≈ 24 tokens/s'; ten requests sharing one read: 3.35 TB/s / 14 GB = 239, '≈ 240 tokens/s' (weights only, matches ch12)",
+      "python": "print(3.35e12/140e9, 3.35e12/14e9)",
+      "result": "23.928571428571427 239.28571428571428"
+    },
+    {
+      "claim": "TPOT for one request: 140 GB / 3.35 TB/s = 41.8 ms on an H100, '≈ 42 ms'; 140 GB / 4.8 TB/s = 29.2 ms on an H200, '29 ms'",
+      "python": "print(140e9/3.35e12*1e3, 140e9/4.8e12*1e3)",
+      "result": "41.791044776119406 29.166666666666668"
+    },
+    {
+      "claim": "TTFT gauge for a 2,000-token prompt: about 290 trillion ops (ch12) at the H100's 989 trillion ops/s = 0.29 s at full speed; consistent with the atlas's 'half a second for a short prompt' once real chips run below peak",
+      "python": "print(290e12/989e12)",
+      "result": "0.29322548028311424"
+    },
+    {
+      "claim": "Ridge on the H100 = 989 / 3.35 = 295 ops per byte (the dashed ridge on the small roofline); a prefill longer than about 295 tokens is compute bound, hence 'with a long prompt to read in'. A 5-token warm prefill is 5 ops per byte, far below the ridge, so it waits on bytes",
+      "python": "print(989/3.35, 5*140e9/140e9)",
+      "result": "295.2238805970149 5.0"
+    },
+    {
+      "claim": "Example A, per CHAPTER_NOTES: 1,027 of 1,032 tokens held warm (a 99.5% hit), 5 prefilled; cold prefills all 1,032, 1,032 / 5 = 206 times the work. CORRECTION kept from ch15/ch16: atlas figs 44 and 47 say '906 of 911'; the film uses 1,027 of 1,032 so warm and cold describe the same conversation",
+      "python": "print(1027/1032*100, 1032/5)",
+      "result": "99.51550387596899 206.4"
+    },
+    {
+      "claim": "Cold prefill of the 1,032-token weather conversation: 1,032 x 140 billion = 144.48 trillion ops plus 1.40 trillion of causal attention = 145.9 trillion; at 989 trillion ops/s = 147.5 ms, '≈ 148 ms' on screen (not narrated)",
+      "python": "w=1032*140e9; a=2621440*1032*1033/2; print(w/1e12, a/1e12, (w+a)/1e12, (w+a)/989e12*1e3)",
+      "result": "144.48 1.39730092032 145.87730092032 147.49979870608695"
+    },
+    {
+      "claim": "Warm prefill of 5 tokens: 0.7 trillion ops = 0.7 ms of arithmetic (the hairline amber sliver), but one read of 140 GB of weights = 41.8 ms plus 1,032 x 327,680 bytes of cache = 0.1 ms; total 41.9 ms, '≈ 42 ms: one 140 GB read'",
+      "python": "w=5*140e9; print(w/1e12, w/989e12*1e3, 140e9/3.35e12*1e3, 1032*327680/3.35e12*1e3, (140e9+1032*327680)/3.35e12*1e3)",
+      "result": "0.7 0.7077856420626897 41.791044776119406 0.10094500298507462 41.89198977910448"
+    },
+    {
+      "claim": "206 times less prefill work gives only 3.5 times less waiting (147.5 ms / 41.9 ms), said 'three and a half times'. CORRECTION (reviewer): the first word comes 105.6 ms sooner, which rounds to '≈ 106 ms', not the earlier draft's truncated '≈ 105 ms'; it also matches the screen's own 148 - 42",
+      "python": "cold=(1032*140e9+2621440*1032*1033/2)/989e12*1e3; warm=(140e9+1032*327680)/3.35e12*1e3; print(1032/5, cold/warm, cold-warm, 148-42)",
+      "result": "206.4 3.520954709572166 105.60780892698247 106"
+    },
+    {
+      "claim": "Decode step after prefill, warm or cold: the cache is the same 1,032 tokens = 0.338 GB, so each step reads 140.34 GB, 41.9 ms on an H100, '≈ 42 ms' in both lanes",
+      "python": "print(1032*327680/1e9, (140e9+1032*327680)/1e9, (140e9+1032*327680)/3.35e12*1e3)",
+      "result": "0.33816576 140.33816576 41.89198977910448"
+    },
+    {
+      "claim": "H100 to H200 swap: TPOT 41.8 to 29.2 ms; TTFT for the 2,000-token prompt stays 0.29 s because the H200's dense 16-bit arithmetic equals the H100's 989 trillion ops/s (same compute die; a hardware fact not stated in the atlas), and the prompt's ~146 GB of bytes take only 43.6 ms on an H100 and 30.4 ms on an H200, far inside the 293 ms of arithmetic ('barely moves', 'same arithmetic')",
+      "python": "print(290e12/989e12*1e3, 146e9/3.35e12*1e3, 146e9/4.8e12*1e3)",
+      "result": "293.2254802831142 43.582089552238806 30.416666666666668"
+    },
+    {
+      "claim": "Interference (on screen, not narrated): the other streams' next token waits for the 293 ms prefill plus its own 41.8 ms decode step = 335 ms, 8.0 times the usual 41.8 ms gap, '≈ 335 ms, 8× the usual gap'. CORRECTION kept from the earlier draft: comparing the prefill alone (7.0 times) leaves out the step that actually makes the token",
+      "python": "p=290e12/989e12*1e3; d=140e9/3.35e12*1e3; print(p, d, p+d, (p+d)/d, p/d)",
+      "result": "293.2254802831142 41.791044776119406 335.01652505923363 8.01646684963166 7.016466849631661"
+    },
+    {
+      "claim": "Goodput illustration (illustrative numbers, tagged on screen): 1,000 tokens/s x 70% in time = 700 tokens/s; 300 late",
+      "python": "print(1000*0.70, 700/1000*100, 1000-700)",
+      "result": "700.0 70.0 300"
+    },
+    {
+      "claim": "Storyboard scale for the cache-hit lanes at 3 px per ms: cold block 147.5 ms = 442 px, warm block and token spacing 41.9 ms = 126 px, axis 0 to 500 ms = 1,500 px; the cold lane's ninth token lands at 483 ms, inside the axis",
+      "python": "print(147.5*3, 41.9*3, 500*3, 147.5+8*41.9)",
+      "result": "442.5 125.69999999999999 1500 482.7"
+    }
   ]
 }

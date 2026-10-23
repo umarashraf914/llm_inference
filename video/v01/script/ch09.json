@@ -11,248 +11,109 @@
   "scenes": [
     {
       "id": "ch09_s01",
-      "name": "from a parameter count to a byte count",
+      "name": "the whole model, and where it can sit",
       "figs": [
-        105
+        105,
+        106
       ],
-      "visual": "Dark canvas. Top band, centre: an equation that builds term by term, 'memory = parameter count × bytes per parameter', with 'parameter count' in blue, 'memory' and 'bytes per parameter' in coral, the operators in white. Middle band: the worked line, each piece landing under its own term: '70 billion parameters', '× 2 bytes', '= 140 GB, in 16-bit precision'. A small grey side note sits to the right of the worked line. Bottom right, arriving only in the last beat: a small G P U package miniature, an amber square labelled 'chip' with an empty coral-outlined container beside it labelled 'memory beside the chip'. The equation and worked line persist until the last beat, when the result swells into a solid coral block and slides into that container. The idea the motion makes visible: a count of weights becomes an amount of bytes, and those bytes are a physical thing that has to sit somewhere.",
+      "visual": "One continuous shot in two stages. Stage 1 (b1–b2), centre: an equation that builds term by term, 'memory = parameter count × bytes per parameter' ('memory' and 'bytes per parameter' coral, 'parameter count' blue, operators white), with the worked line beneath, each piece under its own term: '70 B', '× 2 bytes', '= 140 GB'. Lower right: a small amber square 'chip' and, beside it, an empty coral-outlined container 'memory beside the chip'. Stage 2 (b3–b5): the equation shrinks to a one-line strip at top-left, '70 B × 2 bytes = 140 GB', and a three-row timing chart fills the frame under the header 'Fetching 140 GB from each place'. Row icons down the left third: a hard-drive icon 'disk'; the coral container from stage 1, relabelled 'memory beside the chip · H100'; the amber chip square, relabelled 'the chip itself'. The right two thirds hold one shared linear time axis, 0 to 20 s across 1,200 px, ticks every 5 s, faint grey, tagged 'same scale'. Row 1 gets a full-width coral bar; row 2 a coral sliver 2.5 px wide, truly to scale, shown under a magnifier; row 3 gets no bar. Each beat below says what dims or leaves, so no more than five text items besides numbers are bright at once. The idea: one block of bytes, three places it could be fetched from, and only the middle one both holds it and is fast.",
       "beats": [
         {
           "id": "b1",
-          "say": "Earlier you counted every weight in the model. But a memory chip doesn't store weights. It stores bytes. So first, a conversion you will use constantly. Memory equals the parameter count, times the bytes per parameter.",
-          "show": "Top-left, the small blue ledger card from the previous chapter, '70.6 B parameters', appears and fades. The equation builds left to right on the spoken words: 'memory' (coral) on 'memory equals', '=' draws on, 'parameter count' (blue) on 'parameter count', '×' on 'times', 'bytes per parameter' (coral) on 'bytes per parameter'."
+          "say": "You have met this conversion: seventy billion parameters, at two bytes each, make a hundred and forty gigabytes.",
+          "show": "Opens on '70.6 B parameters' exactly as the previous chapter left it: blue, with an amber outline, over a fraction bar with a blank denominator. The fraction bar and the amber outline dissolve; the number rises to centre as the equation draws on around it and settles in the blue 'parameter count' slot. On 'seventy billion', the slot's value rounds to '70 B' and a grey side note at the right keeps the exact count: '70.6 B × 2 = 141.2 GB ≈ 140'. On 'two bytes', '× 2 bytes' lands under 'bytes per parameter' with a small grey tag '16-bit'. On 'a hundred and forty gigabytes', coral '= 140 GB' lands under 'memory'."
         },
         {
           "id": "b2",
-          "say": "Seventy billion parameters. Each is stored in sixteen bits, which is two bytes. Seventy billion times two is a hundred and forty billion bytes. A hundred and forty gigabytes, in sixteen-bit precision.",
-          "show": "Under 'parameter count', a blue counter runs from 0 to '70,000,000,000' on 'seventy billion'. Under 'bytes per parameter', a strip of 16 small bit cells appears on 'sixteen bits', splits into two groups of 8 each tagged 'byte', then collapses into a tile '× 2 bytes'. On 'a hundred and forty gigabytes', the coral result '= 140 GB, in 16-bit precision' lands under 'memory'."
+          "say": "That is the entire model, off the chip in the memory beside it, the same for every request.",
+          "show": "The side note dims to 30%. On 'entire model', the coral '140 GB' swells into a solid coral block and slides down-right into the empty container beside the amber 'chip' square. Three tags arrive one at a time on their words, each dimming to 40% as the next lands: 'the entire model', 'off the chip', 'same for every request'. Takeaway band: 'the weights are the model'."
         },
         {
           "id": "b3",
-          "say": "With the exact count from earlier, seventy point six billion, it comes to a hundred and forty-one. Close enough. The round hundred and forty is the number we'll carry.",
-          "show": "Grey side note to the right of the worked line: '70.6 B × 2 = 141.2 GB', then '≈ 140 GB' beneath it. The note dims to 40% and stays."
+          "say": "One last look at the disk. From a fast drive, fetching it all takes about twenty thousand milliseconds. From the memory beside an H one hundred, about forty-two: roughly five hundred times faster.",
+          "show": "The three tags and the takeaway band leave; the equation and side note shrink into the one-line strip at top-left. The header draws on, the hard-drive icon fades in above the container and the chip square, which slide left to become the row-2 and row-3 icons, and the time axis draws on with its 'same scale' tag. On 'disk', row 1's coral bar grows from 0 to the 20 s mark in about two seconds of screen time, small grey tag 'time-lapse'; at its end, grey '≈ 7 GB/s' and white 'about 20,000 ms'. On 'forty-two', row 2's sliver appears in a blink with grey '3.35 TB/s' and white 'about 42 ms', and a magnifier circle pops over it to show it enlarged. On 'five hundred times', the 'time-lapse', '≈ 7 GB/s' and '3.35 TB/s' tags fade to 30%, the magnifier closes, and an amber bracket joins rows 1 and 2 at the right with '20,000 ÷ 42 ≈ 476×', which morphs in place into 'roughly 500×'."
         },
         {
           "id": "b4",
-          "say": "Notice the formula has two knobs. A bigger model means more bytes. Or give each weight fewer bytes: store it in one byte instead of two, and the same model is seventy gigabytes. That second knob gets a later video of its own.",
-          "show": "Two small dial icons appear, one under 'parameter count', one under 'bytes per parameter'. On 'one byte instead of two', the second dial turns from '2' to '1'; the coral result morphs from '140 GB' to '70 GB' while a thin coral bar under it halves in length. Grey tag 'a later video'. The dial turns back to '2' and the result returns to '140 GB'."
+          "say": "The chip itself is not slow. It is impossible: it holds about a tenth of a gigabyte in all.",
+          "show": "The bracket and its text leave. Rows 1 and 2 dim to 25% and their time and rate tags leave, so row 3 is the focus. On 'not slow', a grey tag 'no bar' sits at the start of row 3. On 'impossible', a coral block '140 GB' slides along row 3 toward a tiny blue box at the axis origin and stops dead against it, unable to enter; the 'no bar' tag becomes white 'it does not fit'. On 'a tenth of a gigabyte', the box's label lands, '≈ 0.1 GB, whole chip', with a smaller grey tag under it, 'a few hundred KB per working area', and coral '> 1,000× too big' beside the stalled block."
         },
         {
           "id": "b5",
-          "say": "That hundred and forty gigabytes is the entire model. It sits in one pool of memory beside the chip, off the chip itself. It does not change between requests. It is the model.",
-          "show": "The equation and side note fade. The coral '140 GB' result swells into a solid coral block and slides down-right into the empty container beside the amber 'chip' square. Tags appear on the spoken phrases: 'the entire model', 'off the chip', 'does not change between requests'. Last line, white, centred under the package: 'It is the model.'"
+          "say": "So the model is loaded once, and stays. Disk speeds vary widely, but the gap does not. The disk explains only slow start-ups, and why nobody streams weights from storage.",
+          "show": "Row 3's block and tags leave and the row dims; rows 1 and 2 return to full with their 'about 20,000 ms' and 'about 42 ms' labels. On 'loaded once', a teal arrow 'load once' sweeps from the disk icon down into the container in row 2. On 'vary widely', a grey caveat tag under row 1: 'disk figures approximate, vary by hardware'; on 'the gap does not', a small amber 'roughly 500×' glows once between the two rows. On 'slow start-ups', row 1 turns grey, gains the tag 'start-up only', and slides off the left edge trailing 'after the load: never again'. Row 2's container brightens and glides to centre, where the next scene picks it up."
         }
       ]
     },
     {
       "id": "ch09_s02",
-      "name": "three places, three speeds",
+      "name": "close and wide: what the memory beside the chip is",
       "figs": [
-        106
+        105,
+        107
       ],
-      "visual": "Header across the top: 'Reading 140 GB from each place'. Three rows down the left third, each an icon and a label: a hard-drive icon 'From a disk'; a memory-module icon 'From the memory beside the chip (H100)'; a processor icon 'From the chip's own memory'. The right two thirds hold one shared linear time axis, 0 to 20 seconds across about 1,500 px, ticks every 5 s, faint grey along the bottom, tagged 'same scale'. Row 1 gets a full-width coral bar; row 2 a coral bar about 3 px wide, truly to scale, shown under a magnifier; row 3 gets no bar at all. A stopwatch icon sits top-right. All three rows persist; the disk row leaves in the last beat. The idea: three tiers, wildly different speeds, and only the middle one both fits the model and is fast.",
+      "visual": "Opens from the coral container at centre. Main element: the GPU package illustration (S.gpu, three stack sites per side) seen from above, centred and large: a blue slab, the amber die at centre, coral stacks left and right. The view changes twice, always by 2D camera zoom and crossfade, never by 3D rotation: in b2 the camera zooms into one stack and its plan-view rectangle crossfades into a side-elevation drawing of eight thin coral layers with fine vertical lines through them; in b3 the whole top view crossfades into a side elevation of the package: a long blue slab along the bottom, one coral stack at left and the amber die at right, a small gap between them, and a dense fan of hair-thin coral lines across the slab. In b3–b4 a small inset at top-right shows a laptop board in the same side elevation for comparison. One header line across the top is replaced on each change, never stacked: 'not faster chips', 'close and wide', 'wide needs short', 'a placement, not a technology'. Colour by meaning: amber for the processing chip, coral for the memory and the bits on its wires, blue for the package and the slab.",
       "beats": [
         {
           "id": "b1",
-          "say": "Why there, beside the chip? You met three places the file can sit. Now time them side by side, doing the same job each time: reading all hundred and forty gigabytes.",
-          "show": "Header draws on. The three rows' icons and labels fade in top to bottom on 'three places'. The faint time axis draws along the bottom with the tag 'same scale'. The stopwatch appears top-right at '0 s'."
+          "say": "Here is the package, the one part carrying chip and memory together. At its centre, the processing chip: one slab of silicon, called a die.",
+          "show": "The container grows into the package top view with its six stack sites still empty outlines. Label on the blue slab: 'one package'. Grey tag top-left: 'HBM = high bandwidth memory'. On 'processing chip', the amber rectangle at the centre pulses, label 'processing chip'; on 'called a die', that label morphs into 'GPU die'."
         },
         {
           "id": "b2",
-          "say": "From a disk, at roughly seven gigabytes a second for a fast drive, it takes about twenty seconds. Twenty thousand milliseconds.",
-          "show": "Row 1's coral bar grows from 0 to the 20 s mark over about two seconds of screen time, with a small grey tag 'time-lapse'; the stopwatch runs to '20 s'. At the bar's end: grey '≈ 7 GB/s', white 'about 20,000 ms'."
+          "say": "Around it, the stacks you met earlier: memory dies bonded one on another. The H one hundred has five, eighty gigabytes in all.",
+          "show": "On 'stacks', five sites fill coral one at a time; the sixth fills as a dimmed solid grey stack tagged 'sixth stack, not enabled'. On 'memory dies bonded', the camera zooms into the front-left stack and its plan-view rectangle crossfades into a side elevation: eight thin coral layers stack upward one by one, the top three labelled 'die', fine vertical lines drawing down through all eight, tag '× 8 = 16 GB'. On 'has five', the camera pulls back and the elevation crossfades back into the top view; the five coral stacks light in turn while a counter steps '16, 32, 48, 64, 80 GB'. On 'eighty gigabytes', a small spec card 'Memory capacity: 80 GB' slides in beside the package and ticks."
         },
         {
           "id": "b3",
-          "say": "From the memory beside the chip, at the H one hundred's three point three five terabytes per second, it takes about forty-two milliseconds.",
-          "show": "Row 2's bar appears in a blink: a coral sliver about 3 px wide on the same axis. Labels: grey '3.35 TB/s', white 'about 42 ms'. A magnifier circle pops over the sliver and shows it enlarged, so the viewer can see it is really there."
+          "say": "Not faster memory chips. They sit millimetres away on the same slab, joined by a bus of five thousand one hundred and twenty wires. The memory is close, and wide.",
+          "show": "The spec card, the 'sixth stack' tag and the 'GPU die' label leave. Header 'not faster chips', and one grey tag under the slab: 'per wire: about a laptop's speed'. The top view crossfades into the side elevation: blue slab, coral stack left, amber die right. On 'millimetres away', a dimension arrow 'millimetres' spans the gap. On 'a bus', a dense fan of hair-thin coral lines draws across the slab with the counter '5 × 1,024 = 5,120 wires', and coral particles flow along all of them at once. The per-wire tag leaves. At top-right the inset draws on: a laptop board, coral memory module and amber processor 'centimetres' apart, joined by a sparse band, tag '128 wires'; amber between inset and main view: '40×'. On 'close, and wide', the header becomes 'close and wide'."
         },
         {
           "id": "b4",
-          "say": "Twenty thousand divided by forty-two is roughly five hundred. That's why, on the same scale, the second bar is barely a sliver.",
-          "show": "A bracket joins rows 1 and 2 at the right with amber '20,000 ÷ 42 ≈ 480×', then white 'roughly 500×' beneath it. The magnifier shrinks away."
+          "say": "And wide needs short. Wires that thin carry a clean signal only over millimetres, so the memory cannot move further out and grow.",
+          "show": "Header 'wide needs short'. The inset and '40×' dim to 30%. The camera zooms (2D) on the fan: crisp square coral pulses run along the hair-thin lines. On 'only over millimetres', one thin wire stretches out to the inset's centimetres and its square pulse smears into a soft blurred wave, grey tag 'high and low blur'; it snaps back. On 'cannot move further out', a grey hand cursor drags the stack away from the die; the fan stretches, frays and turns grey; the stack snaps back and the wires turn coral again."
         },
         {
           "id": "b5",
-          "say": "Make that concrete. Read the weights off a disk for every token, and a three-hundred-token answer takes about a hundred minutes. From the memory beside the chip, about twelve and a half seconds. So the model is loaded once, and stays there.",
-          "show": "Two small timer cards slide in at the right, each beside its row: row 1 'a 300-token answer: ≈ 100 min' in coral, row 2 'a 300-token answer: ≈ 12.5 s' in teal. On 'loaded once', the cards fade and a teal arrow labelled 'load once' sweeps from the disk icon down into the memory icon."
-        },
-        {
-          "id": "b6",
-          "say": "The disk numbers are approximate, and vary widely by hardware. The gap between the tiers does not.",
-          "show": "Grey tag under row 1: 'disk figures approximate, vary by hardware'. White tag between rows 1 and 2: 'the gap does not'."
-        },
-        {
-          "id": "b7",
-          "say": "The third row is not slow. It is impossible. The chip keeps a few hundred kilobytes in each of its small working areas, about a tenth of a gigabyte in all. A hundred and forty gigabytes is more than a thousand times too big. It does not fit.",
-          "show": "Row 3: no bar. A tiny blue box at the axis origin labelled '≈ 0.1 GB, whole chip', with a smaller grey tag 'a few hundred KB per working area'. A coral block labelled '140 GB' slides along the row toward the box and stops dead against it, unable to enter. White label 'it does not fit', coral '> 1,000× too big'."
-        },
-        {
-          "id": "b8",
-          "say": "So the disk row explains why start-up is slow, and why nobody streams weights from storage. After the load, it never appears again.",
-          "show": "Row 1 turns grey and slides off the left edge, trailing the tag 'start-up only'. Row 2 brightens and moves to centre: the memory beside the chip is where everything happens from here on."
+          "say": "The name describes a placement, not a technology. The price is memory that is small and expensive.",
+          "show": "The camera pulls back to the full side elevation; the inset, the blur tag and the dimension arrow leave. Header 'a placement, not a technology'. On 'small', a pair of bars to scale under the package: a coral bar '80 GB · one H100' and, above it, a coral outline '140 GB · the model' overhanging it by 60 GB, grey tag 'more than one chip: later in the series'. On 'expensive', a price-tag icon appears beside the stack. Takeaway band: 'close and wide · small and expensive'."
         }
       ]
     },
     {
       "id": "ch09_s03",
-      "name": "inside the package",
-      "figs": [
-        105,
-        107
-      ],
-      "visual": "The G P U package illustration seen from above, centred and large. A blue rounded slab labelled 'one package'. In its centre an amber rectangle labelled 'GPU die', the processing chip. Around it five coral HBM stacks, three down the left side and two down the right, with a faint dashed outline of a sixth, unused site on the right (the real H100 package has six sites with five in use). Mid-scene the camera dives into one stack and tilts it into a side cross-section: eight thin coral layers, each a 'die' (label shown on the top three, plus a '× 8' tag), with thin vertical lines running down through all of them. Then the camera pulls back and rotates the whole package to a side view: a long blue slab along the bottom, a coral stack on the left and the amber die on the right, a small gap between them marked 'millimetres', and a dense fan of hair-thin lines across the slab joining them. Colour by meaning: amber for the processing chip, coral for memory and for the bytes on the wires, blue for the package and the slab.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "So what is that memory beside the chip, physically? You know its name, high bandwidth memory, H B M. Here is a G P U package seen from above. In the middle sits the processing chip, the slab of silicon holding those thousands of workers.",
-          "show": "The blue slab draws on, label 'one package'. Title tag top-left: 'HBM = high bandwidth memory'. On 'the processing chip', the amber rectangle fades in at the centre, label 'GPU die'."
-        },
-        {
-          "id": "b2",
-          "say": "A single flat slab of silicon like that is called a die. Around it stand the towers of memory you heard about earlier, the stacks. The H one hundred has five.",
-          "show": "On 'called a die', the 'GPU die' label pulses. Five coral stacks pop in one at a time around the die, three left and two right, with a small counter stepping 1 to 5. A faint dashed sixth outline on the right carries the grey tag 'unused site'. One stack gets the label 'HBM stack'."
-        },
-        {
-          "id": "b3",
-          "say": "Look inside one stack. It is a pile of memory dies, each thinner than a sheet of paper, bonded one on top of another. Thousands of tiny vertical connections run straight down through them all.",
-          "show": "The camera dives into the front-left stack and tilts it into a side cross-section: eight thin coral layers build upward one by one, the top three labelled 'die', tag '× 8'. On 'vertical connections', thin lines draw downward through all eight layers, tag 'connections through the silicon'."
-        },
-        {
-          "id": "b4",
-          "say": "On the H one hundred, each stack is eight dies tall and holds sixteen gigabytes. Five stacks of sixteen is eighty gigabytes, the capacity on the spec sheet. Building upward packs more memory into the little floor space beside the chip.",
-          "show": "Beside the cross-section: '8 dies → 16 GB'. The camera pulls back to the top view; the five stacks light in turn while a counter steps '16, 32, 48, 64, 80 GB'. A small spec-sheet card slides in, 'Memory capacity: 80 GB', and ticks. Tag: 'build up, not out'."
-        },
-        {
-          "id": "b5",
-          "say": "Now turn the package on its side. The stacks and the processing chip are bonded side by side onto one shared slab of silicon, millimetres apart. Across that gap runs the bus, one thousand and twenty-four wires from every stack.",
-          "show": "The camera rotates to the side view: blue shared slab along the bottom, a coral stack on the left, the amber die on the right. A dimension arrow 'millimetres' spans the gap. A dense fan of hair-thin lines draws across the slab between them, tag '1,024 wires per stack'."
-        },
-        {
-          "id": "b6",
-          "say": "Five stacks make five thousand one hundred and twenty wires, all carrying bits at the same moment. A very wide parallel bus. Each stack delivers about six hundred and seventy gigabytes a second. Together, three point three five terabytes per second.",
-          "show": "The view widens to show five fans of wires side by side, one per stack; counter '5 × 1,024 = 5,120 wires'. Coral particles flow along every wire at once. Five small flow counters '≈ 670 GB/s' slide together and sum into one larger coral counter '3.35 TB/s'."
-        }
-      ]
-    },
-    {
-      "id": "ch09_s04",
-      "name": "close and wide, small and expensive",
-      "figs": [
-        107,
-        105
-      ],
-      "visual": "Split screen, divided by a faint grey vertical line. Left half: the H100 side view from the previous scene, shrunk: a coral stack and the amber die on a blue slab, a 'millimetres' gap, a dense fan of hair-thin coral lines. Right half: a laptop circuit board seen from the side: an amber processor and a coral memory module several centimetres apart on a dark grey board, joined by a sparse band of thicker lines, with a 'centimetres' dimension arrow. A one-line header across the top changes with each beat; at most two tags per side. Midway the right half clears for a capacity comparison drawn as bars to scale. Then the split dissolves and the full package returns in side view, all five stacks and the die, for the trip the bytes make on every pass. The idea: the bandwidth comes from placement, placement has a price, and close is still not on.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "Here is what the name really means. It is not faster memory chips. You saw earlier that each of these wires runs no faster than a laptop's, about five or six billion bits a second.",
-          "show": "The split builds. Identical grey per-wire tags on both sides: left '≈ 5.2 Gbit/s per wire', right '≈ 6 Gbit/s per wire'. Header: 'not faster chips'."
-        },
-        {
-          "id": "b2",
-          "say": "The difference is placement. A laptop's memory sits centimetres from its processor, joined by about a hundred and twenty-eight wires. H B M sits as close as physically possible, millimetres away, joined by five thousand one hundred and twenty. Forty times as many.",
-          "show": "Dimension arrows draw on: 'centimetres' on the right, 'millimetres' on the left. Wire counters: right '128', left '5,120'. Amber between the halves: '5,120 ÷ 128 = 40×'. Header: 'close and wide'."
-        },
-        {
-          "id": "b3",
-          "say": "And wide needs short. To fit thousands of wires side by side, each has to be microscopically thin. A wire that thin only carries a clean signal over millimetres. Stretch it to centimetres, and high and low blur together.",
-          "show": "Header: 'wide needs short'. The left fan zooms in: crisp square coral pulses run along hair-thin lines. On 'stretch it', one thin wire stretches out to the length of the laptop's connection; its square pulse smears into a soft, blurred wave, grey tag 'high and low blur'. It snaps back."
-        },
-        {
-          "id": "b4",
-          "say": "That's why the memory can't simply be moved further away and made bigger. The name describes a placement, not a technology. Close and wide.",
-          "show": "A grey hand cursor drags the left stack away from the die; the wire fan stretches, frays and turns grey. The stack snaps back into place and the wires turn coral again. Header: 'a placement, not a technology'."
-        },
-        {
-          "id": "b5",
-          "say": "The price is that it is small and expensive. Every stack has to fit in that little floor space beside the chip, and bonding dies this precisely is a costly way to build memory.",
-          "show": "Header: 'small and expensive'. A price-tag icon appears beside the left stack. The laptop board on the right fades out, leaving the right half empty."
-        },
-        {
-          "id": "b6",
-          "say": "Eighty gigabytes is less than our one model. That's why the H one hundred was a what-if earlier: a model this size is really spread across two chips or more. Here, keep the simple picture, one chip reading the whole model.",
-          "show": "Right half, bars to scale: a coral bar '80 GB, one H100' and above it a longer coral outline '140 GB, the model' overhanging by 60 GB; grey tag 'two chips or more, a later video'. On 'keep the simple picture', the bars dim."
-        },
-        {
-          "id": "b7",
-          "say": "And close is still not on. Every forward pass, one trip through all eighty layers to make one token, reads all hundred and forty gigabytes out of H B M, across that bus, into the arithmetic units.",
-          "show": "The split dissolves; the full package returns in side view, five stacks and the die on the slab. Coral particles stream from every stack across the bus into the amber die, where each flashes amber and vanishes. A coral counter under the bus runs from 0 to '140 GB'; tag 'one forward pass'."
-        },
-        {
-          "id": "b8",
-          "say": "Every single time. Strictly, almost all: on the way in, the embedding table gives up only a handful of rows, as you saw earlier. That spares about two gigabytes, so the round number stands.",
-          "show": "The counter resets and runs to '140 GB' again, labelled 'pass 2', then 'pass 3', faster each time. Small grey note along the bottom: 'embedding table: a few rows read, ≈ 2 GB spared, ≈ 139 GB per pass'."
-        },
-        {
-          "id": "b9",
-          "say": "High bandwidth memory is close, and it is wide. But it is still off the compute die. That trip, across a few millimetres, is what everything from here on is about.",
-          "show": "The camera pushes in on the gap between the nearest stack and the die until the gap fills the centre of the frame and glows coral. Final line, white, centred: 'close and wide, but still off the die'."
-        }
-      ]
-    },
-    {
-      "id": "ch09_s05",
       "name": "read, never written",
       "figs": [
-        108
+        108,
+        105
       ],
-      "visual": "Centre: one coral block labelled '140 GB of weights', with a small lock icon on its corner. Header: 'Nothing about the weights changes while the service runs'. Left and right of the block, a user icon each with a speech bubble. A bottom band arrives midway: a horizontal bus line from a coral 'HBM' block at the left to an amber 'chip' block at the right, with a token counter above it; right of the chip, a small blue box '≈ 0.1 GB on chip' used when the layers stream through. End state: two large arrows from the centre pointing in opposite directions, teal to the left and coral to the right. The idea: one unchanging fact, with two consequences that point opposite ways.",
+      "visual": "One continuous composition across the frame, left to right: at left a coral block '140 GB of weights' (the memory beside the chip) with a small lock icon on its corner; across the left-centre the bus, a thick band of hair-thin coral lines; centre-right the amber chip; at the far right two user icons, one above the other, each joined to the chip by a thin blue line. Header across the top: 'The weights are read, never written', with a grey sub-line 'nothing about them changes while the service runs'. From b4 a small blue box '≈ 0.1 GB on chip' sits inside the chip. Nothing clears: elements dim, brighten or grow. The end state grows out of the same picture: a teal arrow from the block to the users and a coral arrow along the bus, then a push-in on the bus. Colour by meaning: coral for every movement of the weights, amber for the chip, blue for the users' questions and answers, teal for the consequence that helps.",
       "beats": [
         {
           "id": "b1",
-          "say": "One more fact about these bytes, and it matters as much as their size. Memory can be read, which copies numbers out, or written, which changes them. In training, these weights were written trillions of times. While the service runs, they are only ever read.",
-          "show": "Header draws on; the coral block fades in centre. On 'read', a teal arrow copies a small tile out of the block, label 'read: copy out'. On 'written', a pencil icon hovers over the block, label 'write: change'; on 'only ever read', the pencil is crossed out in grey and the lock icon clicks shut. Small inset bottom-left: grey 'training: trillions of writes', white 'serving: reads only'."
+          "say": "One more fact. While the service runs, the weights are only copied out, never changed. Training rewrote them at every step. Serving leaves them exactly as they were.",
+          "show": "Header and sub-line draw on; the coral block fades in at left. On 'copied out', a coral arrow lifts a copy of one small tile out of the block, label 'read = copy out'; the block is unchanged. On 'never changed', a pencil icon hovers over the block, label 'write = change', and is crossed out in grey; the lock clicks shut. On 'Training', a small grey inset at bottom-left: 'training: rewritten every step'; on 'Serving', a white line under it: 'serving: read only'."
         },
         {
           "id": "b2",
-          "say": "Two different users, two different questions. One asks about tomorrow's weather. The other wants help with some code. The same numbers do the work for both, and are left exactly as they were.",
-          "show": "A user icon slides in on the left with bubble 'weather tomorrow?'; another slides in on the right with bubble 'fix my code'. Coral copy-streams flow from the block to both users at once. The block does not change; tag under it: 'the same 140 GB, for every request from every user'."
+          "say": "Two users, two questions, the same hundred and forty gigabytes doing both jobs. So one copy serves everybody, which later makes batching possible: many users per pass.",
+          "show": "The read and write labels and the inset leave; the sub-line dims to 30%. The bus and the amber chip draw on to the right of the block; the two users slide in at the far right with bubbles 'weather tomorrow?' and 'fix my code'. Each question travels as a small blue pill along its line into the chip, and the bubbles shrink away. Coral streams flow from the block across the bus into the chip, flashing amber there, and small blue answer pills travel back out to each user. The block never changes. On 'the same hundred and forty gigabytes', a tag under the block: 'the same 140 GB, for every request from every user'. On 'one copy serves everybody', that tag morphs into teal 'one copy serves everyone' and a faint teal outline wraps the block and both users. On 'batching', both users' blue pills enter the chip together on one coral stream; small grey tag 'batching: later'."
         },
         {
           "id": "b3",
-          "say": "The one thing that does change as people talk is the running record the server keeps of each conversation. That comes back later. The weights themselves never change.",
-          "show": "Beside each user a small blue strip grows a little, label 'running record, per conversation', grey tag 'later'. The coral block stays exactly as it was; the lock glints."
+          "say": "The other side: every forward pass moves all one hundred and forty gigabytes across that bus, into the arithmetic units. Every single time.",
+          "show": "The users, their pills and the batching tag dim to 30%; the teal outline and tag stay faint. The bus brightens. A coral packet '140 GB' crosses from the block into the chip, where it flashes amber and vanishes; a token counter above the chip ticks 'token 1'. The next identical packet crosses for 'token 2', then 'token 3', each crossing taking exactly the same time. Tag above the bus: 'every forward pass'. Small grey tag under the chip: 'at most ≈ 24 a second · H100'. Grey footnote along the bottom edge: 'strictly: all but a few embedding rows, ≈ 2 GB of ≈ 141'."
         },
         {
           "id": "b4",
-          "say": "That's why one copy in memory can serve everybody. A thousand users, each with a private copy, would need a hundred and forty terabytes of this small, expensive memory. Instead, one copy serves them all.",
-          "show": "Behind the block, ghost copies multiply into a large faint grid while a counter reads '1,000 × 140 GB = 140 TB'. On 'one copy serves them all', the grid collapses back into the single block. Teal tag: 'one copy serves everyone'."
+          "say": "That is pure overhead, a cost paid again and again for nothing new. Nothing is learned, or saved, by having fetched the weights before.",
+          "show": "The rate tag and the footnote leave. The small blue box '≈ 0.1 GB on chip' appears inside the chip. Each packet now arrives as a long ribbon of many small coral slices that pass through the box a few at a time, each slice dropped out of the far side as the next arrives; the ribbons are labelled in turn 'layer 1', 'layer 2', … 'layer 80'. On 'again and again', a coral running total under the bus climbs while the token counter speeds up, grey tag 'time-lapse', and stops at '500 tokens → 70 TB'. On 'or saved', the counter ticks once more and the 'layer 1' ribbon sets off across the bus again from the block, exactly as before."
         },
         {
           "id": "b5",
-          "say": "It's also what makes batching possible. When several users' tokens are ready at the same moment, one read of the weights can do the work for all of them. That idea comes back later.",
-          "show": "Blue token pills from both users ride together on one coral flow leaving the block. Teal tag: 'batching: one read, many users'; small grey 'later'."
-        },
-        {
-          "id": "b6",
-          "say": "Now the other side of the same fact. The reading is pure overhead. The same bytes cross the same bus for every token. On an H one hundred, flat out, that's about twenty-four times a second.",
-          "show": "The users fade. The bottom band builds: coral 'HBM' block at left, the bus line, amber 'chip' at right, a token counter above. Each tick of the counter sends an identical coral packet '140 GB' across the bus. Amber note: '3.35 TB/s ÷ 140 GB ≈ 24 per second'."
-        },
-        {
-          "id": "b7",
-          "say": "A five-hundred-token answer reads the same hundred and forty gigabytes five hundred times. That's the seventy terabytes you met earlier, every pass identical to the last.",
-          "show": "The token counter accelerates to '500'; a coral running total climbs to '70 TB'. Each packet that crosses gets a faint grey stamp 'identical'."
-        },
-        {
-          "id": "b8",
-          "say": "Why not keep the weights on the chip after one read? Because the chip holds about a tenth of a gigabyte. Even one layer's weights, about one point seven gigabytes, are more than ten times too big.",
-          "show": "Right of the chip, the small blue box '≈ 0.1 GB on chip' appears. A coral tile 'one layer ≈ 1.7 GB' tries to drop into it and overflows it many times over; amber '1.7 ÷ 0.12 ≈ 14×'."
-        },
-        {
-          "id": "b9",
-          "say": "So the slices stream through and are dropped. By the time layer eighty is done, layer one is long gone, and the next token starts again from layer one. Nothing is learned by reading the weights, and nothing is saved by having read them before.",
-          "show": "Small coral tiles labelled 'layer 1', 'layer 2', and on to 'layer 80' stream through the box, each pushing the previous one out. On 'the next token', the counter ticks and 'layer 1' is fetched across the bus again. Tag: 'nothing learned, nothing saved'."
-        },
-        {
-          "id": "b10",
-          "say": "Two consequences, pointing opposite ways. One copy can serve everyone. And yet the same bytes must be re-read, every single time.",
-          "show": "Everything clears to two large arrows from the centre: teal pointing left, 'one copy serves everyone'; coral pointing right, 'the same bytes, re-read every token'."
-        },
-        {
-          "id": "b11",
-          "say": "So the toll for each pass is fixed: a hundred and forty gigabytes. What can change is how much useful work one pass gets done. And that differs enormously between reading a prompt in and writing an answer out.",
-          "show": "The coral arrow condenses into a fixed tag '140 GB per pass: fixed'. The teal arrow turns into a question mark, 'work per pass?'. Two faint grey labels fade in below: 'reading the prompt in', 'writing the answer out'."
+          "say": "Two consequences, pointing opposite ways. One copy serves everyone, yet the same bytes are fetched every time. The memory is close and wide, but still off the chip, and that trip is what the rest of this film is about.",
+          "show": "The running total and the 'layer' labels leave. On 'one copy serves everyone', a large teal arrow grows from the block toward the two users, which brighten, label 'one copy serves everyone'. On 'fetched every time', a large coral arrow grows along the bus into the chip, label 'the same bytes, fetched every token'. On 'still off the chip', both arrow labels dim to 40% and the camera pushes in on the bus between the block and the chip until the gap fills the centre of the frame and glows coral. Takeaway band: 'close and wide, but still off the die'. Hold."
         }
       ]
     }
@@ -264,14 +125,9 @@
       "result": "140000000000.0 140.0"
     },
     {
-      "claim": "Fig 105 reconciled with ch08's exact count: 70.6 B × 2 bytes = 141.2 GB; the film says so and keeps the round 140 GB",
+      "claim": "Fig 105 reconciled with ch08's exact count (on screen, s01.b1 side note): 70.6 B × 2 bytes = 141.2 GB ≈ 140; the film keeps the round 140 GB",
       "python": "print(70.6e9*2/1e9)",
       "result": "141.2"
-    },
-    {
-      "claim": "Fig 105 (added, two knobs): 70 billion weights at 1 byte each = 70 GB",
-      "python": "print(70e9*1/1e9)",
-      "result": "70.0"
     },
     {
       "claim": "Fig 106: disk row 'about 20,000 ms' implies about 7 GB/s (a fast NVMe drive, illustrative, matching ch02): 140 GB / 7 GB/s = 20 s = 20,000 ms",
@@ -284,79 +140,59 @@
       "result": "41.791044776119406"
     },
     {
-      "claim": "Fig 106: 20,000 ms / 41.8 ms = 479, on screen '≈ 480×', said 'roughly five hundred' as in the atlas",
-      "python": "print(20000/(140e9/3.35e12*1e3))",
-      "result": "478.57142857142856"
+      "claim": "Fig 106: on screen '20,000 ÷ 42 ≈ 476×' (478.6 with the unrounded 41.79 ms), which morphs into the atlas's 'roughly 500×'",
+      "python": "print(20000/42, 20000/(140e9/3.35e12*1e3))",
+      "result": "476.1904761904762 478.57142857142856"
     },
     {
-      "claim": "Fig 106 storyboard: on a 1,500 px axis for 20 s, the 41.8 ms bar is about 3 px wide (truly to scale, shown under a magnifier)",
-      "python": "print(1500*(140e9/3.35e12)/20)",
-      "result": "3.1343283582089554"
+      "claim": "Fig 106 storyboard: on a 1,200 px axis for 20 s, the 41.8 ms bar is 2.5 px wide (truly to scale, shown under a magnifier)",
+      "python": "print(1200*(140e9/3.35e12)/20)",
+      "result": "2.5074626865671643"
     },
     {
-      "claim": "Fig 106 (added worked example): a 300-token answer (ch01, fig 7) read from disk every token = 100 min; from H100 memory = 12.5 s",
-      "python": "print(300*20/60, 300*140e9/3.35e12)",
-      "result": "100.0 12.537313432835822"
+      "claim": "CORRECTION to fig 106 'the chip holds a few hundred kilobytes': true per working area (an H100 SM has 256 KB registers + 256 KB L1/shared), but the whole chip holds 132 × 512 KB + 50 MB L2 ≈ 0.12 GB, shown as '≈ 0.1 GB, whole chip' to match ch02 and ch06. 140 GB is ≈ 1,150× that (1,400× against a flat 0.1 GB); either way '> 1,000× too big'",
+      "python": "c=132*512*1024+50*1024**2; print(c, c/1e9, 140e9/c, 140e9/0.1e9)",
+      "result": "121634816 0.121634816 1150.9862439385777 1400.0"
     },
     {
-      "claim": "CORRECTION to fig 106 'the chip holds a few hundred kilobytes': true per working area (an H100 SM has 256 KB registers + 256 KB L1/shared), but the whole chip holds 132 × 512 KB + 50 MB L2 ≈ 0.12 GB; the film says both, matching ch02. 140 GB is ≈ 1,150× that, 'more than a thousand times too big'",
-      "python": "print(132*512*1024+50*1024**2, (132*512*1024+50*1024**2)/1e9, 140e9/(132*512*1024+50*1024**2))",
-      "result": "121634816 0.121634816 1150.9862439385777"
-    },
-    {
-      "claim": "Fig 105/107 (added, published H100 spec): each HBM3 stack is 8 dies × 2 GB = 16 GB; 5 stacks × 16 GB = 80 GB, the spec-sheet capacity",
+      "claim": "Fig 105/107 (added, published H100 spec, on screen): each HBM3 stack is 8 dies × 2 GB = 16 GB; 5 stacks × 16 GB = 80 GB, the spec-sheet capacity",
       "python": "print(8*2, 5*16)",
       "result": "16 80"
     },
     {
-      "claim": "Fig 105/107 (added, matches ch06): 5 stacks × 1,024 wires = 5,120-wire bus",
+      "claim": "Fig 105/107 (added, matches ch06): 5 stacks × 1,024 wires = a 5,120-wire bus",
       "python": "print(5*1024)",
       "result": "5120"
     },
     {
-      "claim": "Fig 105 (added): each of the 5 stacks delivers 3.35 TB/s / 5 = 670 GB/s",
-      "python": "print(3.35e12/5/1e9)",
-      "result": "670.0"
-    },
-    {
-      "claim": "Fig 107 (added, matches ch06): 3.35 TB/s over 5,120 wires = 5.23 Gbit/s per wire, no faster than a laptop's ≈ 6 Gbit/s",
+      "claim": "Fig 107 'not faster memory chips' (matches ch06): 3.35 TB/s over 5,120 wires = 5.23 Gbit/s per wire, about a laptop's ≈ 6 Gbit/s; shown as one shared tag 'per wire: about a laptop's speed'",
       "python": "print(3.35e12*8/5120)",
       "result": "5234375000.0"
     },
     {
-      "claim": "Fig 107 (added, matches ch06): 5,120 wires vs a laptop's 128 = 40×",
+      "claim": "Fig 107 (added, matches ch06, on screen): 5,120 wires vs a laptop's 128 = 40×",
       "python": "print(5120/128)",
       "result": "40.0"
     },
     {
-      "claim": "Fig 107 'small' (added, matches ch02/ch06): the 140 GB model is 1.75× one H100's 80 GB, overhanging by 60 GB, so it needs two chips or more",
+      "claim": "Fig 107 'small' (added, matches ch02/ch06, on screen): the 140 GB model is 1.75× one H100's 80 GB, overhanging it by 60 GB",
       "python": "print(140/80, 140-80)",
       "result": "1.75 60"
     },
     {
-      "claim": "Fig 105 'reads all 140 GB' reconciled with ch07's embedding exception: table = 128,256 × 8,192 × 2 = 2.10 GB, only a few rows read; with the exact 70.6 B count, 141.2 − 2.1 ≈ 139 GB per pass, so the round 140 stands",
+      "claim": "Fig 105 'reads all 140 GB' reconciled with ch07's embedding exception (on-screen footnote, s03.b3): the table is 128,256 × 8,192 × 2 = 2.10 GB and only a few rows are fetched, so strictly ≈ 2 GB of ≈ 141 GB is spared (141.2 − 2.1 = 139.1); the round 140 stands",
       "python": "print(128256*8192*2/1e9, 70.6e9*2/1e9-128256*8192*2/1e9)",
       "result": "2.101346304 139.09865369599999"
     },
     {
-      "claim": "Fig 108 (added): a thousand private copies × 140 GB = 140 TB",
-      "python": "print(1000*140e9/1e12)",
-      "result": "140.0"
-    },
-    {
-      "claim": "Fig 108 (added): on an H100 the weights can cross the bus at most 3.35 TB/s / 140 GB = 23.9 times a second, 'about twenty-four' (ch02's figure)",
+      "claim": "Fig 108 (added, on screen, ch02's figure): on an H100 the weights can cross the bus at most 3.35 TB/s / 140 GB = 23.9 times a second, '≈ 24 a second'",
       "python": "print(3.35e12/140e9)",
       "result": "23.928571428571427"
     },
     {
-      "claim": "Fig 108 (added, matches ch04): a 500-token answer reads 500 × 140 GB = 70 TB",
+      "claim": "Fig 108 (added, on screen, matches ch04): a 500-token answer fetches 500 × 140 GB = 70 TB",
       "python": "print(500*140e9/1e12)",
       "result": "70.0"
-    },
-    {
-      "claim": "Fig 108 (added): one layer's weights, 855.6 M × 2 bytes = 1.71 GB (ch08), are ≈ 14× the ≈ 0.12 GB on chip, 'more than ten times too big'",
-      "python": "print(855.6e6*2/1e9, 855.6e6*2/(132*512*1024+50*1024**2))",
-      "result": "1.7112 14.068340433054956"
     }
   ]
 }

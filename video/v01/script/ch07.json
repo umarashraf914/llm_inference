@@ -2,354 +2,322 @@
   "chapter": "ch07",
   "title": "From text to vectors",
   "kicker": "07 · From text to vectors",
-  "figs": [84, 85, 86, 87, 88, 89, 90],
+  "figs": [
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90
+  ],
   "scenes": [
     {
       "id": "ch07_s01",
       "name": "a list and a grid",
-      "figs": [84],
-      "visual": "One continuous shot on the dark canvas. Top band: a single heading line that changes per beat. Centre: a row of eight blue number cells that becomes the top row of a 4 x 8 blue grid. Later the row lifts out to the left third ('one token's state') and the grid moves to the right third ('a block of weights'), then the grid shrinks into one tile of a wall of tiny matrix tiles. Every cell is blue (structure, neutral data). No amber appears until the last beat, because nothing is calculated yet. The idea the motion makes visible: a vector is a row, a matrix is rows stacked, and a model is a pile of such grids.",
+      "figs": [
+        84
+      ],
+      "visual": "One continuous shot on the dark canvas. Top band: one short heading that changes per beat. Centre: a row of eight blue number cells, 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2, which becomes the top row of a 4 × 8 blue grid. In b2 a copy of that row floats to the left third and the grid glides to the right third. In b3 the camera pulls back and the grid becomes one tile in a wall of 560 small tiles, 20 columns × 28 rows, filling as a counter runs. Blue and grey only: no amber until the multiply in b3. The idea the motion makes visible: a vector is a row, a matrix is rows stacked, and a model is a pile of such grids.",
       "beats": [
         {
           "id": "b1",
-          "say": "Before we follow your words into the model, we need two words of our own, and they're simpler than they sound. A vector is just a list of numbers. Here are eight of them, written in a row.",
-          "show": "Top band heading fades in: 'A vector is a list of numbers'. Starting on 'list of numbers', eight blue rounded cells pop in left to right across the centre, about 0.2 s apart: 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2. On 'eight of them', a thin bracket draws under the row with the grey label 'eight numbers, written in a row'."
+          "say": "A vector is a list of numbers, like these eight. A matrix is a grid of them, four rows of eight.",
+          "show": "Heading: 'a vector: a list of numbers'. On 'list of numbers', eight blue cells pop in left to right across the centre, 0.15 s apart, showing 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2. On 'grid of them', the heading changes to 'a matrix: a grid of numbers' and three more rows of eight cells drop in beneath, one row on each word of 'four rows of eight'; grey label under the grid: '4 × 8 = 32 numbers'."
         },
         {
           "id": "b2",
-          "say": "A matrix is a grid of them. Stack four rows of eight, and you have a matrix holding thirty-two numbers. Rows run across. Columns run down.",
-          "show": "Heading morphs to 'A matrix is a grid of them'. The vector row rises slightly and three more rows of eight blue cells drop in beneath it, one row per word of 'four rows of eight'. Grey label under the grid: '4 rows x 8 = 32 numbers'. On 'Rows run across', a soft white highlight sweeps along row 2; on 'Columns run down', a highlight sweeps down column 3."
+          "say": "That's all the linear algebra you need. A vector holds one token's state. A matrix holds a block of weights.",
+          "show": "On 'linear algebra', the '4 × 8' label fades and the heading changes to 'two terms, that's all'. On 'one token's state', a copy of the top row lifts out and floats to the left third, tagged 'one token's state'. On 'block of weights', the grid glides to the right third, its cells change to faint grey decimals, and it is tagged 'a block of weights'."
         },
         {
           "id": "b3",
-          "say": "That's the whole vocabulary. A vector holds the state of one token, everything the model currently has to say about it. A matrix holds a block of the model's weights, the trained numbers you met at the very start.",
-          "show": "On 'one token', the top row lifts out of the grid and floats to the left third, keeping its eight numbers, tagged 'one token's state'. A fresh blank row fills the gap and the 4 x 8 grid glides to the right third, tagged 'a block of weights'; its cells fill with faint grey decimals, echoing the file of numbers from the very first chapter."
-        },
-        {
-          "id": "b4",
-          "say": "A whole model is a few hundred of these grids. Our seventy-billion-parameter example has about five hundred and sixty, and you'll count them yourself in the next chapter. Running the model means multiplying vectors by them, over and over.",
-          "show": "Camera pulls back. The right-hand grid shrinks to a small tile and a wall of identical tiles fills in around it, row after row, while a counter beside the wall runs up to '~560 matrices' with the small tag '70B model'. On 'multiplying vectors by them', the left vector slides into the wall, a soft amber pulse ripples across the tiles, and the vector slides back. Bottom line settles: 'running the model = vector x matrix, repeated'."
-        },
-        {
-          "id": "b5",
-          "say": "That's all the linear algebra, the maths of vectors and matrices, you'll need. Just one operation follows from here: multiply and add. It's next.",
-          "show": "The wall and its labels dim to 30%. The vector brightens, a single tile pulls forward from the wall to sit beside it, and an amber 'x' fades in between them, previewing the next scene's layout. Small heading: 'one operation: multiply and add'."
+          "say": "A model is a few hundred such grids. Running it means multiplying vectors by them, with one operation: multiply and add.",
+          "show": "On 'a few hundred', both tags fade and the camera pulls back: the grid shrinks into the top-left tile of a wall that fills row by row, 20 columns × 28 rows = 560 tiles, while a counter beside it runs to '~560' with the tag 'our 70B model'. On 'multiplying vectors by them', the left vector slides into the wall and a soft amber pulse ripples across the tiles, the first amber in the chapter. On 'multiply and add', the heading changes to 'one operation: multiply and add', in amber."
         }
       ]
     },
     {
       "id": "ch07_s02",
       "name": "multiply and add, row by row",
-      "figs": [85],
-      "visual": "One continuous shot. Left third: the input vector 'in', a vertical column of five blue cells reading 0.4, -1.2, 0.0, 0.9, 0.3 (the first five numbers of the previous scene's vector). An amber 'x' to its right. Centre: a matrix of 4 rows x 5 columns of blue weight tiles; row 1 shows its values 0.5, 0.25, -0.7, 1.0, -1.0, the other rows show faint unlabelled values. A '=' to its right. Right third: the output 'out', a column of four empty blue-outlined cells. Top-right corner: a small amber operation counter ('multiplications', 'additions') that ticks throughout. The motion shows a row meeting the input: the input column tips over to lie along the row, the pairs multiply into amber product chips, the chips feed an amber running total, and the total drops into one output cell. Rows 2 to 4 then repeat at speed.",
+      "figs": [
+        85
+      ],
+      "visual": "Left third: the input 'in', a vertical column of five blue cells, 0.4, -1.2, 0.0, 0.9, 0.3 (the first five numbers of the previous scene's vector), with an amber '×' to its right. Centre: a matrix of 4 rows × 5 columns of blue weight tiles, grey label '4 × 5 matrix'; row 1 shows 0.5, 0.25, -0.7, 1.0, -1.0, rows 2 to 4 show faint unlabelled values. A '=' to its right. Right third: 'out', a column of four empty blue-outlined cells. Top right: a small amber counter with two lines, 'multiplications' and 'additions'. All of this is in place as the scene opens. The motion: a ghost copy of the input tips over to lie along a row, each pair multiplies into an amber chip, the chips fall into an amber running total, and the total drops into one output cell. This row-meets-input move is the picture that scenes 5 and 6 contrast with and reuse.",
       "beats": [
         {
           "id": "b1",
-          "say": "Here's that operation. On the left, an input vector of five numbers. In the middle, a matrix with four rows of five. On the right, empty space for the answer.",
-          "show": "Elements assemble on their cue words: the five-cell 'in' column on 'input vector'; the matrix on 'four rows of five', tiles dropping in row by row; the four empty 'out' cells on 'the answer'. Small grey labels: 'in' under the left column, '4 x 5 = 20 weights' under the matrix, 'out' under the right column."
+          "say": "Lay the matrix's first row against the input. Multiply each pair and add the products. That single number, zero point five, is the output's first entry.",
+          "show": "On 'first row', row 1 brightens and rows 2 to 4 dim; a ghost copy of 'in' rotates 90 degrees and slides up to lie just above row 1, so 0.4 sits over 0.5, -1.2 over 0.25, 0.0 over -0.7, 0.9 over 1.0 and 0.3 over -1.0. On 'multiply each pair', five amber chips pop out beneath the pairs, left to right: 0.2, -0.3, 0, 0.9, -0.3, and the counter ticks to 'multiplications: 5'. On 'add the products', the chips slide one by one into an amber running-total box at the row's right end, which steps 0, 0.2, -0.1, -0.1, 0.8, 0.5; counter 'additions: 5'. On 'zero point five', the 0.5 flies into the top 'out' cell, which fills blue."
         },
         {
           "id": "b2",
-          "say": "Take the first row and lay it against the input, number beside number. Multiply each pair. That gives zero point two, minus zero point three, zero, zero point nine, and minus zero point three.",
-          "show": "Row 1 brightens and the other rows dim. A ghost copy of the 'in' column rotates 90 degrees and slides up to lie directly above row 1, so 0.4 sits over 0.5, -1.2 over 0.25, 0.0 over -0.7, 0.9 over 1.0 and 0.3 over -1.0. As each product is spoken, an amber chip pops out beneath its pair: 0.2, -0.3, 0, 0.9, -0.3. The corner counter ticks 'multiplications: 5'."
+          "say": "Every row does the same, giving the output vector: the multiply-and-add from the very start, once per row.",
+          "show": "On 'Every row', the ghost input copies itself onto rows 2, 3 and 4 and all three run the same move together at triple speed, amber chips flashing in parallel because no row waits for another; their totals drop into 'out' cells 2 to 4, which fill blue (values not shown). The counter reaches 20 and 20. On 'from the very start', a small inset of the chapter-one picture, five inputs times five weights feeding one 'add' into one output, fades in at top left, tagged 'one row = this'."
         },
         {
           "id": "b3",
-          "say": "Now add them into a running total that starts at zero. It goes to zero point two, then minus zero point one, stays there, climbs to zero point eight, and lands on zero point five. That single number is the first entry of the output.",
-          "show": "An amber running-total box appears at the right end of row 1 reading 0. Each product chip slides into it in turn and the total steps 0 -> 0.2 -> -0.1 -> -0.1 -> 0.8 -> 0.5, timed to the spoken values. Corner counter ticks 'additions: 5'. On 'first entry of the output', the 0.5 flies into the top 'out' cell, which fills blue showing '0.5'."
+          "say": "Twenty weights mean twenty multiplications and twenty additions. Each weight is used exactly once, the fact every operation count rests on.",
+          "show": "On 'Twenty weights', the inset fades and the counter slides to centre top and enlarges: 'multiplications: 20', 'additions: 20'. On 'used exactly once', the twenty tiles flash amber once each in reading order, never twice, and a label appears under the matrix: 'each weight: 1 multiply + 1 add'."
         },
         {
           "id": "b4",
-          "say": "Notice the zero in the middle of the input. Whatever weight it met, it contributed nothing to the total. Hold onto that. It comes back in a couple of minutes.",
-          "show": "The 0.0 input cell and its product chip '0' pulse once in grey, joined by a thin grey line to the label 'times zero adds nothing'. The label then shrinks and parks, at 40% opacity, in the lower-left corner, where it stays for the rest of the scene."
-        },
-        {
-          "id": "b5",
-          "say": "Do the same for every row and you have the whole output vector. Four rows, four outputs. It's the picture from the very beginning, inputs times their own weights added into one output, just repeated once per row.",
-          "show": "Rows 2, 3 and 4 run the same move at triple speed: the ghost input slides down to each row, five amber chips flash and collapse into a total, and the total drops into 'out' cells 2, 3 and 4, which fill blue (values not shown). On 'the picture from the very beginning', a small inset of the chapter-one diagram, five inputs times five weights feeding 'add them up' into 'one output', fades in top-left with the tag 'one row = this'."
-        },
-        {
-          "id": "b6",
-          "say": "Count the work. Twenty weights are drawn, so twenty multiplications and twenty additions. Every weight is used exactly once, one multiply and one add. The operation count later in this story is built directly on that fact.",
-          "show": "The corner counter slides to centre-top and enlarges: 'multiplications: 20', 'additions: 20'. All twenty matrix tiles flash amber once each, in reading order, never twice. Label under the matrix: 'every weight: 1 multiply + 1 add'."
-        },
-        {
-          "id": "b7",
-          "say": "And no row has to wait for another. All four sums can run at the same moment, which is exactly the kind of work a graphics processor's thousands of plain workers are built for.",
-          "show": "The four rows separate slightly. Four small worker icons, simple processor-core glyphs, appear one per row and all four rows run their multiply-and-add simultaneously, amber chips flashing in parallel. Label: 'rows are independent'."
-        },
-        {
-          "id": "b8",
-          "say": "In the real model the grids are thousands of numbers wide, but the move is identical. This is the only heavy operation in the entire model. Everything else is a rounding error beside it.",
-          "show": "Camera pulls back: the 4 x 5 matrix becomes the top-left corner of a vast grid running off-screen, with '8,192' along its top edge. On the right, a tall amber bar labelled 'vector x matrix' rises beside a hairline grey bar labelled 'everything else'. Small grey note: 'schematic, not to scale'."
+          "say": "Scaled up, it's the only heavy operation in the model. Everything else is a rounding error beside it.",
+          "show": "On 'Scaled up', the counter and label fade and the camera pulls back: the 4 × 5 matrix becomes the top-left corner of a vast grid running off screen, with '8,192' along its top edge, and 'in' and 'out' stretch into long columns. On 'only heavy operation', a tall amber bar labelled 'vector × matrix' rises at the right; on 'rounding error', a hairline grey bar labelled 'everything else' appears beside it, with the grey note 'schematic'."
         }
       ]
     },
     {
       "id": "ch07_s03",
-      "name": "from text to vectors",
-      "figs": [86],
-      "visual": "Three station cards across the middle band, left to right, joined by two arrows that draw on: 'Text' (document icon), 'Tokens' (a row-of-pills icon), 'Vectors' (stacked-bars icon). Grey sublabels appear under them during the scene: 'a 500-word prompt', 'roughly 600 to 800 tokens', '8,192 numbers each'. A sample sentence, 'the quick brown fox jumps', the five-token example from chapter one, travels through the stations. Text is white; token pills and IDs are blue; vectors are blue cell strips. No amber appears at all, because nothing here is a calculation, and that absence is the point of the last beat.",
+      "name": "two conversions",
+      "figs": [
+        86
+      ],
+      "visual": "Three station cards across the middle band, left to right, joined by two arrows that draw on: 'Text' (document icon), 'Tokens' (row-of-pills icon), 'Vectors' (stacked-bars icon). A sample sentence, 'the quick brown fox jumps', the five-token example from the first chapter, travels through them. Text is white, token pills blue, vectors blue cell strips. No amber appears, because nothing here is a calculation. Clears are stated per beat so that, besides numbers, no more than five text items are bright at once.",
       "beats": [
         {
           "id": "b1",
-          "say": "So the model only ever multiplies vectors by matrices. But what you type is text. How does a sentence turn into vectors? Through two conversions.",
-          "show": "The three station cards fade in left to right with their titles 'Text', 'Tokens', 'Vectors'. On 'two conversions', the two connecting arrows draw on, each carrying a small numbered badge, '1' and '2'."
+          "say": "But you type text. The tokeniser first cuts it into tokens, on average a little smaller than words. Common words are one token, rare words several.",
+          "show": "On 'you type text', the three cards and their titles fade in, the white sentence types on inside the Text card, and the two arrows draw on. On 'tokeniser', the sentence slides along arrow 1 and snaps into five blue pills in the Tokens card: 'the', 'quick', 'brown', 'fox', 'jumps'. On 'smaller than words', a grey sublabel fades in under the Tokens card: '500 words → 600–800 tokens (1.2–1.6 per word)'. On 'rare words several', the white word 'unbelievably' drops in below and splits into three pills, 'un', 'believ', 'ably', tagged 'illustrative split'."
         },
         {
           "id": "b2",
-          "say": "The first is the tokeniser. You met tokens at the very start: pieces of text, on average a little smaller than words. Common words are usually one token. Rare words break into several.",
-          "show": "Inside the Text card, the white sentence 'the quick brown fox jumps' types on, slides along arrow 1 and snaps into five blue pills in the Tokens card: 'the', 'quick', 'brown', 'fox', 'jumps'. On 'Rare words break into several', a white word 'unbelievably' drops in below and splits into three pills 'un', 'believ', 'ably', with the grey tag 'illustrative split'."
+          "say": "Then the embedding step turns each token into a vector, eight thousand one hundred and ninety-two numbers long in our model.",
+          "show": "At the start, 'unbelievably', its pills and its tag fade out, and the sublabel dims to 40%. On 'embedding step', each of the five pills slides along arrow 2 and unrolls into a long horizontal blue strip of cells in the Vectors card, five strips of identical length, stacked. On 'eight thousand one hundred and ninety-two', the label '8,192 numbers each' draws along the top of the strips. On 'in our model', the Text and Tokens cards dim to 30%, and the five strips multiply into a tall block with '700 tokens' counted up its left edge and, under it, '700 × 8,192 ≈ 5.7 million numbers'; the block's outline sharpens into the blue grid style of the first scene, a matrix."
         },
         {
           "id": "b3",
-          "say": "A five-hundred-word prompt comes out as roughly six to eight hundred tokens, somewhere between one point two and one point six tokens per word.",
-          "show": "Sublabels fade in under the first two cards: 'a 500-word prompt' and 'roughly 600 to 800 tokens'. A small grey note beneath the Tokens card: '1.2 to 1.6 tokens per word'."
-        },
-        {
-          "id": "b4",
-          "say": "And each token is really a number. The tokeniser keeps a fixed list of about a hundred and twenty-eight thousand pieces, and a token's I D is simply its entry number in that list.",
-          "show": "A slim list icon labelled 'vocabulary: 128,256 pieces' appears above the Tokens card. On 'really a number', each of the five pills flips over to show an integer beneath its word: the 1820, quick 4062, brown 14198, fox 4271, jumps 35308, with a tiny grey tag 'IDs illustrative'."
-        },
-        {
-          "id": "b5",
-          "say": "The second conversion is the embedding step. Each token number picks out one row of a table, and that row becomes the token's vector. Every vector has the same fixed length: several thousand numbers, eight thousand one hundred and ninety-two for our seventy-billion example.",
-          "show": "A dashed outline of a tall table flickers behind arrow 2, labelled 'embedding table'. Each ID slides along arrow 2 and unrolls into a long horizontal blue strip of cells in the Vectors card, five strips of identical length stacked. On 'eight thousand one hundred and ninety-two', the sublabel '8,192 numbers each' appears under the card."
-        },
-        {
-          "id": "b6",
-          "say": "So a seven-hundred-token prompt becomes a grid seven hundred rows tall and eight thousand one hundred and ninety-two numbers wide. That's about five point seven million numbers. Your prompt has become a matrix.",
-          "show": "The five strips multiply into a tall block of rows; a counter on its left edge runs to '700 rows', a width label '8,192' draws along its top, and a total appears under it: '~5.7 million numbers'. On 'has become a matrix', the block's outline sharpens into the same blue grid style as the matrices earlier in the chapter."
-        },
-        {
-          "id": "b7",
-          "say": "Each vector will also carry where its token sits in the sequence, and we'll come to that shortly. From here on, the text itself is gone. It only reappears at the very end, when a chosen token's number is looked up in that same list, in reverse, to print it.",
-          "show": "A faint teal tag '+ position, shortly' clips onto the side of the block and dims. The white sentence in the Text card fades to nothing, leaving the card empty. Far right, beyond the Vectors card, a ghost arrow leads to a small white word with the grey label 'number back to text, at the very end'."
-        },
-        {
-          "id": "b8",
-          "say": "Notice that neither conversion was a calculation. The tokeniser splits text by looking pieces up in a list. The embedding step reads one row per token. Everything downstream is linear algebra, multiplying and adding on arrays of numbers.",
-          "show": "Both arrows glow. Labels drop onto them: arrow 1 'lookup in a list', arrow 2 'read one row'; a grey tag 'no arithmetic' sits under each. Everything except the Vectors block dims, and one line appears beneath it: 'only numbers from here on'."
+          "say": "Neither conversion is a calculation. Both are lookups. From here on there's no text, only arrays of numbers, and everything downstream is linear algebra.",
+          "show": "At the start, the sublabel and the '5.7 million' line fade, and the Text and Tokens cards return to full. On 'Neither conversion', each arrow gets a grey tag, arrow 1 'lookup in a list', arrow 2 'read one row', each with a small crossed-out calculator icon. On 'no text', the white sentence in the Text card fades to nothing, leaving the card empty. On 'everything downstream', both cards and both arrows dim to 30%, leaving the Vectors block bright with one line beneath it: 'only numbers from here on'."
         }
       ]
     },
     {
       "id": "ch07_s04",
       "name": "a token ID is a row number",
-      "figs": [87],
-      "visual": "The lookup idiom. Centre: a tall blue table, the embedding table, drawn as horizontal row bars with row numbers on the left edge: 0, 1, 2, an ellipsis, 4271, an ellipsis, 128,254, 128,255. Top band heading: 'The embedding table: one row per token'. Width label across the top of the table: '8,192 numbers per row'. Left third: a blue pill 'ID 4271'. Right third: an empty slot where the copied row lands, labelled 'that row'. A coral pointer slides down the left edge to row 4271, and the copy travels right as a coral memory read. Amber never appears; a crossed-out calculator icon makes the absence of arithmetic explicit. Address bookkeeping is shown in small grey text, not amber, because it is not arithmetic on the weights.",
+      "figs": [
+        87
+      ],
+      "visual": "The lookup idiom. Centre: a tall blue table, the embedding table, drawn as horizontal row bars with row numbers down its left edge: 0, 1, 2, an ellipsis, 4271, an ellipsis, 128,254, 128,255. Width label across its top: '8,192 numbers per row'. Top band: a heading. Left third: the blue 'fox' pill from the previous scene. Right third: an empty slot labelled 'that row'. A coral pointer slides down to row 4271 and the copy travels right trailing a coral streak, because copying a row is memory traffic. Amber never appears; a crossed-out calculator makes the absence of arithmetic explicit. The position bookkeeping is small grey text, not amber, because it is arithmetic on whole numbers, not on the weights.",
       "beats": [
         {
           "id": "b1",
-          "say": "Let's look closer at that second step. Here's the embedding table. It has one row for every token in the vocabulary, about a hundred and twenty-eight thousand rows, numbered from zero. Each row holds eight thousand one hundred and ninety-two numbers.",
-          "show": "Heading fades in. The table builds top-down: rows 0, 1, 2 draw in, an ellipsis, then the bottom rows 128,254 and 128,255. A counter on the right edge runs from 0 to '128,256 rows'. On 'eight thousand one hundred and ninety-two', the width label '8,192 numbers per row' draws across the top."
+          "say": "The second step uses the embedding table: a row for every vocabulary token, about a hundred and twenty-eight thousand.",
+          "show": "Heading: 'embedding table: one row per token'. On 'embedding table', the table builds top-down: rows 0, 1, 2, an ellipsis, then the bottom rows 128,254 and 128,255, while a counter on its right edge runs to '128,256 rows'. On 'a hundred and twenty-eight thousand', the width label '8,192 numbers per row' draws across the top."
         },
         {
           "id": "b2",
-          "say": "The tokeniser hands over an integer. Say it's four thousand two hundred and seventy-one. That integer isn't fed into any formula. It's a row number. The model goes to row four two seven one and copies it out.",
-          "show": "On 'an integer', the pill 'ID 4271' slides in from the left. On 'row number', a coral pointer drops from the pill onto the table's left edge and slides down past the first ellipsis, stopping at the row labelled '4271', which highlights. On 'copies it out', a copy of that row lifts off and slides right into the slot labelled 'that row', trailing a short coral streak."
+          "say": "Fox, say, arrives as the whole number four thousand two hundred and seventy-one. That isn't fed into a formula. It's a row number, and the model copies that row out.",
+          "show": "On 'Fox', the blue 'fox' pill slides in from the left and flips to read 'fox · ID 4271', with a tiny grey tag 'ID illustrative'. On 'isn't fed into a formula', a small grey box 'f( )' appears beside the pill and a slash crosses it out. On 'row number', a coral pointer drops from the pill onto the table's left edge and slides down past the first ellipsis to the row labelled 4271, which highlights. On 'copies that row out', a copy of the row lifts off and slides right into the 'that row' slot, trailing a short coral streak."
         },
         {
           "id": "b3",
-          "say": "Nothing is calculated. No multiplication, no addition, no arithmetic on the weights at all. The only sum anywhere is finding where the row begins.",
-          "show": "A grey calculator icon appears above the table and a slash draws through it, with the label 'no arithmetic on the weights'. The pointer at row 4271 blinks once."
+          "say": "Nothing is calculated, no multiplication, no addition. Just one memory read, at a position worked out from the row number. That's a lookup.",
+          "show": "At the start, the 'ID illustrative' tag and the crossed-out box fade, and the '128,256 rows' counter dims to 40%. On 'Nothing is calculated', a grey calculator icon appears above the table and a slash draws through it. On 'one memory read', the copied row in the slot gets a coral label: 'one memory read, 16 KB'. On 'worked out from the row number', two lines of small grey bookkeeping build beside the pointer: '1 row = 8,192 × 2 bytes = 16,384 bytes', then '4271 × 16,384 = 69,976,064 bytes in'. On 'lookup', the heading changes to 'a lookup'."
         },
         {
           "id": "b4",
-          "say": "Each row is eight thousand one hundred and ninety-two numbers at two bytes each, sixteen thousand three hundred and eighty-four bytes. So row four two seven one starts about seventy million bytes into the table. That's bookkeeping on whole numbers, not maths on the model.",
-          "show": "Small grey bookkeeping text builds term by term beside the pointer: 'row size = 8,192 x 2 bytes = 16,384 bytes', then on 'seventy million', 'row 4271 starts at 4271 x 16,384 = 69,976,064 bytes in'. On 'bookkeeping', the text shrinks into a small tag on the pointer."
-        },
-        {
-          "id": "b5",
-          "say": "So the whole operation is a single memory read at a computed address: about sixteen kilobytes, copied out, per token.",
-          "show": "The copied row in the right slot gets a coral label: 'one memory read, 16 KB'. The coral streak behind it replays once, brighter, the only motion on screen."
-        },
-        {
-          "id": "b6",
-          "say": "That's what a lookup means. The table is a learned parameter like any other, its numbers set during training. But reaching into it costs zero floating-point operations.",
-          "show": "The whole table gets a faint grey tag 'learned during training'. In the top-right corner a teal counter appears: 'floating-point operations: 0'. Hold on the full composition."
+          "say": "The table is learned like any other weights, but reaching into it costs zero floating-point operations.",
+          "show": "At the start, the 'that row' slot label fades and the width label dims to 40%. On 'learned', the bookkeeping shrinks into a small tag on the pointer and a faint grey tag 'learned in training' attaches to the table. On 'zero floating-point operations', a teal counter appears at top right: 'floating-point operations: 0'. Hold on the full composition."
         }
       ]
     },
     {
       "id": "ch07_s05",
       "name": "written as a multiply, done as a gather",
-      "figs": [88],
-      "visual": "Top band: a long horizontal one-hot strip of about twenty small blue cells, all showing grey '0' except one bright white '1' in the cell tagged '#4271', with ellipses at both ends and the label 'one-hot: 128,256 entries, exactly one is 1'. Middle-left: an equation card 'one-hot x embedding table = row 4271'. Right half: the embedding table from the previous scene, upright. Bottom band, at the end: two cost cards, amber 'multiply: counted in operations' and coral 'gather: counted in memory reads'. The motion shows the textbook multiply wiping out every row but one, an amber counter running up to about a billion, then a grey strike-through over the whole multiply and a direct coral fetch replacing it.",
+      "figs": [
+        88
+      ],
+      "visual": "The embedding table from the previous scene stays upright at centre right, with its row numbers. Top band: a one-hot strip of about twenty small cells, grey '0's and one bright white '1' in a cell tagged '#4271', with ellipses at both ends. Middle left: an equation card. In b2 the strip rotates to stand vertically along the table's left edge, one entry beside each row. That is the visual contrast with scene 2: there the input lay along a row and each answer number came from a row; here the input runs down the side and each answer number comes from a column. Amber marks the multiplications the textbook version would do; coral marks the gather that is actually done. Bottom band, at the end: two cost cards.",
       "beats": [
         {
           "id": "b1",
-          "say": "Textbooks describe this step differently. They write the token as a vector with about a hundred and twenty-eight thousand entries, one per vocabulary token, all zero except a single one in slot four two seven one. It's called a one-hot vector: one entry hot, the rest cold.",
-          "show": "The one-hot strip draws on left to right: grey 0s, then the single bright '1' in the cell tagged '#4271', then more 0s, with ellipses at both ends. On 'one-hot vector', the label 'one-hot: 128,256 entries, exactly one is 1' appears beneath the strip."
+          "say": "Textbooks write this as a multiply. A one-hot vector, all zeros except a single one at fox's row, times the table, gives fox's row.",
+          "show": "On 'one-hot vector', the strip draws on left to right across the top band: grey 0s, the white '1' in the cell tagged '#4271', more 0s; label beneath it: 'one-hot: 128,256 entries, one of them 1'. On 'times the table', the equation card fades in at middle left: 'one-hot × table = row 4271'."
         },
         {
           "id": "b2",
-          "say": "Then they multiply it by the table. Each entry of the one-hot vector meets one whole row. Every zero wipes its row out. The single one keeps row four two seven one exactly as it is. Add it all up, and the answer is that row.",
-          "show": "The equation card fades in: 'one-hot x embedding table = row 4271'. On 'meets one whole row', each table row receives its one-hot entry as a small tag on its left edge. On 'wipes its row out', the rows tagged 0 go dark grey in a fast top-to-bottom cascade; row 4271, tagged 1, stays bright. On 'add it all up', every row collapses into a single sum row below the table, identical to row 4271."
+          "say": "That vector is as long as the table is tall, so it stands down the side, not across a row. Each answer number takes a column of pairs, all but one times zero, and times zero adds nothing.",
+          "show": "On 'as long as the table is tall', a brace '128,256' draws along the strip and a matching brace along the table's height. On 'stands down the side', the strip's label fades and the strip rotates 90 degrees and slides to stand along the table's left edge, each entry beside its row, the '1' beside row 4271. On 'a column of pairs', one column of the table outlines in amber from top to bottom and an amber counter box appears: '128,256 multiplications per answer number'. On 'all but one times zero', every cell in that column greys out except the one in row 4271, and a grey line appears under the counter: '128,255 of them × 0'. On 'adds nothing', the greyed cells blink once."
         },
         {
           "id": "b3",
-          "say": "That's true. It's also a description nobody implements. Look at the work. For each of the eight thousand one hundred and ninety-two numbers in the answer, it takes about a hundred and twenty-eight thousand multiplications, and all but one are multiplications by zero.",
-          "show": "One column of the table lights up top to bottom to show the multiplications that feed a single output number. An amber counter box appears: '128,256 multiplications per output number'. A grey line appears under it: '128,255 of them by zero'."
+          "say": "True, but nobody does it: about a billion multiplications to copy one row. The maths says multiply. The hardware does a gather, fetching rows straight from memory.",
+          "show": "On 'about a billion', the counter gains a line, '× 8,192 answer numbers', its total runs up to '≈ 1.05 billion multiplications', and amber column outlines sweep across the whole table. On 'The maths says multiply', a grey strike-through slashes across the equation card and the counter, and both dim to 30%. On 'gather', the strip and column outlines fade, a coral arrow runs from the '#4271' entry straight to row 4271, and the row slides out, the same move as the previous scene; on 'fetching rows', three more rows from different heights slide out and stack beside it, labelled 'gather'."
         },
         {
           "id": "b4",
-          "say": "Across the whole row, that's about a billion multiplications, just to produce a copy. And anything multiplied by zero adds nothing to the sum, as you saw a couple of minutes ago.",
-          "show": "'x 8,192 output numbers' slides into the counter box and the amber total runs up to '~1.05 billion multiplications'. The parked label 'times zero adds nothing' from the matrix-multiply scene floats in from the lower left and docks beside the counter."
-        },
-        {
-          "id": "b5",
-          "say": "So the arithmetic is skipped entirely. The implementation indexes straight into the table and fetches the row. The mathematics says multiply. The hardware does a gather, which means collecting the chosen rows from memory and laying them side by side.",
-          "show": "A grey strike-through slashes across the equation card and the amber counter, and both dim. A coral arrow runs straight from the '#4271' cell to row 4271, and the row slides out, the same move as the previous scene. On 'side by side', three more rows arrive from different heights of the table and stack beside it, labelled 'gather'."
-        },
-        {
-          "id": "b6",
-          "say": "That difference matters for the rest of this story, because the two have completely different costs. A multiply is measured in operations. A gather is measured in memory reads.",
-          "show": "Two cost cards rise into the bottom band: left, amber, with a calculator icon, 'multiply: counted in operations'; right, coral, with a memory-chip icon, 'gather: counted in memory reads'."
-        },
-        {
-          "id": "b7",
-          "say": "It's worth making a habit of this. Several steps in a model like this one are written as a full matrix multiply, and actually done as something much cheaper.",
-          "show": "Everything dims except one centred line: 'written as a multiply, done as something cheaper'. Hold."
+          "say": "That matters from here on: one costs operations, the other memory reads. A habit worth keeping: several steps are written as a full multiply and done as something much cheaper.",
+          "show": "At the start, the struck card and counter fade out. On 'costs operations', an amber cost card with a calculator icon rises at bottom left: 'multiply: counted in operations'. On 'memory reads', a coral card with a memory-chip icon rises beside it: 'gather: counted in memory reads'. On 'habit worth keeping', everything dims except one centred line: 'written as a multiply, done as something cheaper'."
         }
       ]
     },
     {
       "id": "ch07_s06",
-      "name": "the same shape at both ends",
-      "figs": [89],
-      "visual": "Two identical blue tables side by side: left third 'Input embedding', right third 'Output projection', both tagged '128,256 x 8,192'. Between them a dim grey stack of slabs labelled 'inside the model' (no detail; the next chapter fills it in). Below each table, a dashed grey bar outline of equal length labelled 'rows read'. The idea: identical shape, opposite reading pattern. Rows read are coral, because reading rows is memory traffic.",
+      "name": "the same shape, read two ways",
+      "figs": [
+        89
+      ],
+      "visual": "Two identical blue tables: left third 'Input embedding', right third 'Output projection', both tagged '128,256 × 8,192'. Between them a dim grey stack of slabs labelled 'inside the model' (no detail; the next chapter fills it in). Under each table a small ledger: a coral 'rows read' bar (bytes moved), and below it an operations figure. Coral means rows read, because reading is memory traffic; amber is the output end's arithmetic; teal is the input end's zero. Both bars share one scale; the input bar is a hairline drawn wider than true scale, and says so. In b4 the two tables slide together into one shared table.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now jump to the other end of the model. Remember, its output is a score for every token in the vocabulary. Those scores come from a second table with exactly the same shape: one row per vocabulary token, eight thousand one hundred and ninety-two numbers in each.",
-          "show": "The embedding table slides to the left third and is labelled 'Input embedding'. The dim slab stack 'inside the model' fades in at centre. On 'a second table', a twin table draws in at the right third, labelled 'Output projection'. Both get the tag '128,256 x 8,192'. On 'a score for every token', a small inset of the chapter-one score list, 'cat 8.2, dog 7.1, the 3.5, banana 0.4', fades in above the right table."
+          "say": "At the model's other end, a table of the same shape, the output projection, scores every token: each row against the vector leaving the top of the model.",
+          "show": "On 'other end', the embedding table from the previous scene slides into the left third, titled 'Input embedding', and the dim slab stack 'inside the model' fades in at centre. On 'output projection', a twin table draws in at the right third, titled 'Output projection'; both get the tag '128,256 × 8,192'. On 'leaving the top of the model', a blue strip emerges from the top of the slab stack and sweeps down the right table row by row, the row-meets-vector move from scene 2; each row it passes sends a small amber score chip into a counter that runs to 'scores: 128,256'."
         },
         {
           "id": "b2",
-          "say": "Each score is one row multiplied against the model's final vector, the multiply and add you just watched, done about a hundred and twenty-eight thousand times. You'll see this last step properly in the next chapter. For now, compare how the two tables are read.",
-          "show": "A blue strip labelled 'final vector, 8,192' emerges from the slab stack and sweeps down the right table's rows; each row it passes emits a small amber score chip that streams upward into the score list. A counter beside the table runs to 'scores: 128,256'."
+          "say": "On the way in, a two-hundred-token prompt reads two hundred rows, zero point one six percent. The rest is never touched.",
+          "show": "At the start, the scores counter fades. On 'two hundred rows', three thin coral lines flash inside the left table's ellipsis region with the tag '200 of 128,256'; the rest of the table stays dark. On 'zero point one six percent', the left 'rows read' bar draws as a coral hairline labelled '0.16% · 3.28 MB', with the grey notes 'wider than true scale' and '1 MB = a million bytes'. On 'never touched', the rest of the left table dims further."
         },
         {
           "id": "b3",
-          "say": "On the way in, a two-hundred-token prompt touches two hundred rows out of about a hundred and twenty-eight thousand. That's zero point one six percent. The rest of the table is never looked at.",
-          "show": "Under the left table, the 'rows read' bar gets a coral hairline at its left end, labelled '200 rows = 0.16%', with a tiny grey note 'drawn wider than true scale'. In the left table, 200 scattered rows flash briefly; the rest stay dark."
+          "say": "On the way out, every row is read, all two point one gigabytes, again for every new token.",
+          "show": "At the start, the grey notes 'wider than true scale' and '1 MB = a million bytes' fade. On 'every row is read', all rows of the right table light in a top-to-bottom coral sweep and the right 'rows read' bar fills completely: '100%'. On 'two point one gigabytes', the bar's label becomes '2.10 GB', with the small term '128,256 × 8,192 × 2 bytes' beneath it. On 'every new token', the sweep repeats twice while a small tick reads 'token 2', 'token 3'; a stopwatch icon beside the bar reads '≈ 0.63 ms each on H100', and at the tip of the left hairline a tiny tag appears: '+16 KB per new token'."
         },
         {
           "id": "b4",
-          "say": "On the way out, the model has to score every single token, so it reads every row. One hundred percent. And it does that again for every new token it makes.",
-          "show": "Under the right table the bar fills completely in coral: '100%, every token'. All rows of the right table light in a top-to-bottom sweep; the sweep repeats twice while a small counter beside it ticks 'new token 1', 'new token 2', 'new token 3'."
+          "say": "Zero operations in, two point one billion out, for the same stored weights. Even when one table serves both ends, one end gathers a few rows and the other streams them all.",
+          "show": "At the start, the stopwatch, the token ticks and the '+16 KB' tag fade. On 'Zero operations in', a teal '0 operations' lands under the left table. On 'two point one billion out', an amber counter under the right table runs from 0 to '2.10 billion operations', with the small term '1 multiply + 1 add per weight'. On 'same stored weights', a white '=' flashes between the two tables. On 'one table serves both ends', the ledgers and the slab stack fade, and the two tables slide together and merge into one, tagged 'shared, in some models'. On 'gathers a few rows', a thin coral arrow plucks three rows from its left side; on 'streams them all', a broad coral flow pours through every row on its right side."
+        },
+        {
+          "id": "b5",
+          "say": "A genuine exception to the rule that every token reads every weight: one of the model's largest matrices adds almost nothing to traffic on the way in.",
+          "show": "On 'genuine exception', a line appears in the top band: 'an exception to: every token reads every weight'. On 'largest matrices', a size tag attaches to the table: '1.05 billion weights ≈ 1.5% of 70B'. On 'almost nothing', the thin coral arrow on the left pulses once beside the label 'almost no traffic in'. Hold."
         }
       ]
     },
     {
       "id": "ch07_s07",
-      "name": "what each end costs",
-      "figs": [89],
-      "visual": "The two tables from the previous scene shrink into the top band as small icons with their labels, 'Input embedding' left and 'Output projection' right. Middle band, 'Bytes moved': two coral bars on one shared scale, a hairline for the input end and a full-width bar for the output end. Lower band, 'Operations': a teal '0' for the input end and an amber counter for the output end. Near the end the two table icons slide together into one shared table, with a thin coral arrow plucking a few rows on one side and a broad coral stream pouring through every row on the other.",
+      "name": "order has to be put in",
+      "figs": [
+        90
+      ],
+      "visual": "Upper half: two rows of five blue token pills, row A 'the dog bit the man' and row B 'the man bit the dog'. Lower half: two simple open bins, the bags, one under each row. Each pill drops a short blue vector strip with a distinctive cell pattern, and identical tokens drop identical strips. Teal position badges, the fix, clip onto each pill-and-strip pair in b3. Two small option cards appear at the right in b3. On-screen text stays to the heading, the option cards and one closing line.",
       "beats": [
         {
           "id": "b1",
-          "say": "Turn that into bytes. Each number takes two bytes, so one whole table is about a hundred and twenty-eight thousand rows, times eight thousand one hundred and ninety-two, times two. That's two point one gigabytes.",
-          "show": "An equation builds term by term in the middle band, each term landing on its spoken word: '128,256 rows' x '8,192' x '2 bytes' = '2.10 GB'. The equation then slides up to become the band's title, and the full-width coral bar for the output end draws under it, labelled '2.10 GB'."
+          "say": "One thing is missing. The dog bit the man. The man bit the dog. Identical tokens, entirely different meaning.",
+          "show": "Heading: 'same words, different order'. Row A pills slide in on 'The dog bit the man', row B on 'The man bit the dog'. On 'Identical tokens', thin grey lines link matching words between the rows; the lines for 'dog' and 'man' criss-cross between positions 2 and 5."
         },
         {
           "id": "b2",
-          "say": "On the way in, the prompt's two hundred rows come to just three point two eight megabytes, and each new token adds one more row, about sixteen kilobytes.",
-          "show": "Beneath the big bar, the input end's coral hairline draws, labelled '3.28 MB' with the grey note 'wider than true scale'. A tiny tag appears at its tip: '+16 KB per new token'."
+          "say": "The lookup gives dog the same row wherever it sits, so both sentences become the same bag of vectors, with nothing in them to tell the two apart.",
+          "show": "On 'same row', each pill drops a short blue strip straight down; the 'dog' strip under row A, position 2, and the 'dog' strip under row B, position 5, have exactly the same cell pattern and both outline in white once; then the same for 'man'. On 'same bag of vectors', the strips tumble into the bin beneath each row, and both bins end up holding the same five strips in a loose pile. On 'tell the two apart', a grey '=' appears between the bins and pulses once."
         },
         {
           "id": "b3",
-          "say": "On the way out, the full two point one gigabytes is read for every token the model makes. On an H one hundred, that read alone takes about six tenths of a millisecond, every time.",
-          "show": "The output bar's label extends to '2.10 GB, again for the next token'. A stopwatch icon appears beside it with '~0.63 ms on H100 at 3.35 TB/s'. The coral bar pulses three times, once per imagined token."
+          "say": "One way or another, each token must carry which token it is and where it sits. Position is added into each vector at the start, or applied inside attention, where tokens look at each other.",
+          "show": "On 'where it sits', the strips lift back out of the bins and line up under their pills, the bins fade, and teal badges '1' to '5' clip onto each pill-and-strip pair in order, so the two dogs now read 'dog · 2' and 'dog · 5'. On 'added into each vector', a small option card appears at the right: 'add it in at the start'. On 'inside attention', a second card appears below it: 'apply it inside attention', with a tiny glyph of tokens joined by arcs on 'look at each other'."
         },
         {
           "id": "b4",
-          "say": "Now the arithmetic. The input end does zero floating-point operations. The output end does a multiply and an add for every one of its weights, about two point one billion operations. The same quantity of stored weights: zero against two billion.",
-          "show": "Lower band 'Operations': on 'zero', a teal '0' lands under the input end. Under the output end, the term '128,256 x 8,192 x 2' builds and an amber counter runs from 0 to '2.10 billion'. On 'the same quantity of stored weights', the two table icons in the top band flash together with an '=' between them."
-        },
-        {
-          "id": "b5",
-          "say": "Some models use one shared table for both ends. Even then, the reading isn't shared. One end gathers a handful of rows. The other end streams all of them.",
-          "show": "The two table icons in the top band slide together and merge into one larger table labelled 'shared, in some models'. On 'gathers a handful', a thin coral arrow plucks three rows from its left side. On 'streams all of them', a broad coral flow pours through every row on its right side."
-        },
-        {
-          "id": "b6",
-          "say": "So here's a genuine exception to the rule you learned earlier, that every token reads every weight. The embedding table is one of the largest single matrices in the model, about one and a half percent of all seventy billion weights. Yet on the way in, it adds almost nothing to the traffic.",
-          "show": "A line appears at the top: 'an exception to: every token reads every weight'. A size tag attaches to the table: '1.05 billion weights, ~1.5% of 70B'. On 'almost nothing', the input end's coral hairline pulses once beside the label 'almost no traffic in'. Hold."
-        }
-      ]
-    },
-    {
-      "id": "ch07_s08",
-      "name": "order has to be written in",
-      "figs": [90],
-      "visual": "Upper half: two rows of five token pills. Row A 'the dog bit the man' in blue; row B 'the man bit the dog' in a slightly lighter blue. Lower half: two simple open bins, the 'bags', one under each row. Each pill drops its vector, a short blue cell strip with a distinctive pattern, and identical tokens drop identical strips. Teal position badges 1 to 5, the fix, later clip onto each strip so the two sentences' vectors visibly differ. A dim slab stack, 'inside the model', waits at the right edge for the last beat.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "One thing is still missing. Here are two sentences. The dog bit the man. The man bit the dog. Exactly the same five tokens, and an entirely different meaning.",
-          "show": "Heading: 'The same words, a different order'. Row A pills slide in on 'The dog bit the man', row B on 'The man bit the dog'. On 'the same five tokens', thin grey lines link matching words between the rows; the lines for 'dog' and 'man' criss-cross between positions 2 and 5."
-        },
-        {
-          "id": "b2",
-          "say": "Now think about what the lookup gives you. The word dog gets the same row of the table whether it sits second or fifth. So both sentences turn into the very same five vectors, just in a different order.",
-          "show": "Each pill drops a short blue vector strip straight down beneath it. The 'dog' strip under row A, position 2, and the 'dog' strip under row B, position 5, have exactly the same cell pattern, and both briefly outline in white; the same for 'man'. Label: 'same token, same row'."
-        },
-        {
-          "id": "b3",
-          "say": "The step where tokens share information, coming in the next chapter, blends vectors by weighting them and adding them up. And adding doesn't care about order. With nothing else, both sentences would arrive as the same bag of vectors, and produce the same answer.",
-          "show": "On 'adding doesn't care about order', a small inline sum '2 + 5 = 5 + 2' flashes in white. Then the strips from each row tumble into the bin beneath it. Both bins end up holding the same five strips in a loose pile. A grey '=' appears between the bins with the label 'same bag, same answer'."
-        },
-        {
-          "id": "b4",
-          "say": "So the model can't treat its input as an unordered bag. Where each token sits has to become part of what it is. Each token's vector carries two things: which token it is, and where in the sequence it appeared.",
-          "show": "The strips lift back out of the bins and line up under their pills again. Teal badges '1' to '5' clip onto the left end of each strip in order. Label under the rows: 'which token + where it sits'."
-        },
-        {
-          "id": "b5",
-          "say": "There are two ways to put position in. Add a position signal into each vector right at the start, or apply it later, inside attention, the step where tokens look at each other. Models shaped like our seventy-billion example use the second way.",
-          "show": "Two small option cards appear at the right: 'add it in at the start' and 'apply it inside attention'. On 'Models shaped like our seventy-billion example', a teal tick and the tag '70B example' land on the second card."
-        },
-        {
-          "id": "b6",
-          "say": "Either way, dog in second place and dog in fifth place no longer look the same, and the two sentences finally come apart.",
-          "show": "The 'dog, 2' strip and the 'dog, 5' strip take visibly different teal tints. The strips drop back into their bins, and the grey '=' between the bins turns into a '≠'."
-        },
-        {
-          "id": "b7",
-          "say": "It's a small fact, easy to state and easy to forget. The vectors alone don't say what order anything came in. Position has to be put there on purpose.",
-          "show": "Everything dims except the two sentence rows with their teal badges. A centred line appears: 'vectors alone carry no order'. Hold."
-        },
-        {
-          "id": "b8",
-          "say": "So every token is now a vector that knows what it is and where it sits. Next, what the model actually does with those vectors once they're inside.",
-          "show": "A recap strip draws across the bottom, each item lighting in turn on the spoken words: 'text', 'token IDs', 'rows', 'vectors + position'. The vectors then slide right into the dim slab stack 'inside the model', which brightens slightly as the scene ends."
+          "say": "Models shaped like ours do the second. Easy to state, easy to forget: the vectors alone don't say what order anything came in.",
+          "show": "On 'Models shaped like ours', a teal tick and the tag '70B example' land on the 'inside attention' card. On 'Easy to state', the option cards fade and the grey '=' between the rows turns into a teal '≠'. On 'the vectors alone', the teal badges dim to 30%, leaving the bare strips, and one centred line appears beneath the rows: 'vectors alone carry no order'. Hold."
         }
       ]
     }
   ],
   "checks": [
-    {"claim": "fig 84: four rows of eight = 32 numbers", "python": "4*8", "result": "32"},
-    {"claim": "fig 85: a 4 x 5 matrix has 20 weights; one multiply and one add per weight, into a running total that starts at zero, gives 20 multiplications + 20 additions = 40 operations", "python": "print(4*5, 4*5*2)", "result": "20 40"},
-    {"claim": "added worked example for fig 85, row 1: inputs 0.4, -1.2, 0.0, 0.9, 0.3 times weights 0.5, 0.25, -0.7, 1.0, -1.0 give products 0.2, -0.3, 0, 0.9, -0.3, summing to 0.5", "python": "x=[0.4,-1.2,0.0,0.9,0.3]; w=[0.5,0.25,-0.7,1.0,-1.0]; p=[a*b for a,b in zip(x,w)]; print([round(v,4) for v in p], round(sum(p),4))", "result": "[0.2, -0.3, -0.0, 0.9, -0.3] 0.5"},
-    {"claim": "running total for that row: 0 -> 0.2 -> -0.1 -> -0.1 -> 0.8 -> 0.5", "python": "import itertools; x=[0.4,-1.2,0.0,0.9,0.3]; w=[0.5,0.25,-0.7,1.0,-1.0]; print([round(v,4) for v in itertools.accumulate(a*b for a,b in zip(x,w))])", "result": "[0.2, -0.1, -0.1, 0.8, 0.5]"},
-    {"claim": "'about five hundred and sixty matrices' in the 70B example: 80 layers x 7 per layer (4 attention + 3 feed-forward, as fig 100 counts them) = 560, plus the two vocabulary tables = 562. The atlas says 'a few hundred'; the film says 'a few hundred' and gives the 70B count.", "python": "print(80*7, 80*7+2)", "result": "560 562"},
-    {"claim": "fig 86: 500 words -> 600 to 800 tokens is 1.2 to 1.6 tokens per word", "python": "print(600/500, 800/500)", "result": "1.2 1.6"},
-    {"claim": "a 700-token prompt as 8,192-wide vectors is about 5.7 million numbers", "python": "700*8192", "result": "5734400"},
-    {"claim": "one embedding row = 8,192 numbers x 2 bytes = 16,384 bytes, 'about sixteen kilobytes'", "python": "8192*2", "result": "16384"},
-    {"claim": "row 4271 starts 4271 x 16,384 = 69,976,064 bytes into the table, 'about seventy million bytes'", "python": "4271*8192*2", "result": "69976064"},
-    {"claim": "CORRECTION, figs 87-88: vocabulary is 128,256 (film bible), so the last row ID is 128,255, not 127,999 as drawn; narration says 'about a hundred and twenty-eight thousand', screen shows 128,256", "python": "128256-1", "result": "128255"},
-    {"claim": "CORRECTION, fig 88: '128,000 multiplications, 127,999 of them by zero' is the count per output number; with the 128,256 vocabulary it is 128,256 per output number, 128,255 by zero", "python": "print(128256, 128256-1)", "result": "128256 128255"},
-    {"claim": "fig 88 added: the full one-hot multiply for one row = 128,256 x 8,192 = 1.05 billion multiplications, 'about a billion'", "python": "128256*8192", "result": "1050673152"},
-    {"claim": "share of those multiplications that are by zero (all but 8,192)", "python": "(128256*8192-8192)/(128256*8192)*100", "result": "99.99922030938124"},
-    {"claim": "CORRECTION, fig 89 (and width in fig 87): the atlas draws 128,000 x 4,096 (an 8B model's width), giving 1.05 GB. Film uses the 70B shape per the film bible: 128,256 x 8,192 x 2 bytes = 2.10 GB per table", "python": "print(128000*4096*2, 128256*8192*2, 128256*8192*2/1e9)", "result": "1048576000 2101346304 2.101346304"},
-    {"claim": "CORRECTION, fig 89: a 200-token prompt gathers 200 rows = 200 x 8,192 x 2 = 3.28 MB (atlas, at 4,096 wide: 1.6 MB)", "python": "print(200*4096*2, 200*8192*2, 200*8192*2/1e6)", "result": "1638400 3276800 3.2768"},
-    {"claim": "CORRECTION, fig 89: 200 rows of 128,256 = 0.156%, shown as 0.16%. The atlas's 0.15% truncates 200/128,000 = 0.15625%; correct rounding is 0.16% either way", "python": "print(200/128000*100, 200/128256*100)", "result": "0.15625 0.15593812375249502"},
-    {"claim": "bytes bar ratio, 3.28 MB against 2.10 GB, is the same 0.156%, so the input bar is a hairline drawn wider than scale", "python": "200*8192*2/(128256*8192*2)*100", "result": "0.15593812375249502"},
-    {"claim": "CORRECTION, fig 89: output projection operations = 128,256 x 8,192 x 2 (one multiply + one add per weight) = 2.10 billion, not the atlas's 1.05 billion (4,096 width)", "python": "print(2*128000*4096, 2*128256*8192)", "result": "1048576000 2101346304"},
-    {"claim": "reading the 2.10 GB output table at 3.35 TB/s on an H100 takes about 0.63 ms per token, 'about six tenths of a millisecond'", "python": "128256*8192*2/3.35e12*1e3", "result": "0.6272675534328358"},
-    {"claim": "the embedding table, 1.05 billion weights, is about 1.5% of 70 billion", "python": "128256*8192/70e9*100", "result": "1.5009616457142856"},
-    {"claim": "'one of the largest single matrices': a 70B feed-forward matrix is 8,192 x 28,672 = 235 million weights; the embedding table is 4.5 times larger", "python": "print(8192*28672, 128256*8192/(8192*28672))", "result": "234881024 4.473214285714286"}
+    {
+      "claim": "fig 84: four rows of eight = 32 numbers",
+      "python": "print(4*8)",
+      "result": "32"
+    },
+    {
+      "claim": "fig 85: a 4 x 5 matrix has 20 weights; one multiply and one add per weight, into a running total that starts at zero, gives 20 multiplications + 20 additions = 40 operations",
+      "python": "print(4*5, 4*5*2)",
+      "result": "20 40"
+    },
+    {
+      "claim": "added worked example for fig 85, row 1: inputs 0.4, -1.2, 0.0, 0.9, 0.3 times weights 0.5, 0.25, -0.7, 1.0, -1.0 give products 0.2, -0.3, 0, 0.9, -0.3, summing to 0.5 (spoken: 'zero point five')",
+      "python": "x=[0.4,-1.2,0.0,0.9,0.3]; w=[0.5,0.25,-0.7,1.0,-1.0]; p=[a*b for a,b in zip(x,w)]; print([round(v,4) for v in p], round(sum(p),4))",
+      "result": "[0.2, -0.3, -0.0, 0.9, -0.3] 0.5"
+    },
+    {
+      "claim": "running total shown on screen for that row: 0 -> 0.2 -> -0.1 -> -0.1 -> 0.8 -> 0.5",
+      "python": "import itertools; x=[0.4,-1.2,0.0,0.9,0.3]; w=[0.5,0.25,-0.7,1.0,-1.0]; print([round(v,4) for v in itertools.accumulate(a*b for a,b in zip(x,w))])",
+      "result": "[0.2, -0.1, -0.1, 0.8, 0.5]"
+    },
+    {
+      "claim": "'~560' matrices on screen for the 70B example (narration keeps the atlas's 'a few hundred'): 80 layers x 7 per layer (4 attention + 3 feed-forward, as fig 100 counts them) = 560, plus the two vocabulary tables = 562. The tile wall is 20 x 28 = 560 tiles",
+      "python": "print(80*7, 80*7+2, 20*28)",
+      "result": "560 562 560"
+    },
+    {
+      "claim": "fig 86 on screen: 500 words -> 600 to 800 tokens is 1.2 to 1.6 tokens per word",
+      "python": "print(600/500, 800/500)",
+      "result": "1.2 1.6"
+    },
+    {
+      "claim": "on screen: a 700-token prompt as 8,192-wide vectors is about 5.7 million numbers",
+      "python": "print(700*8192)",
+      "result": "5734400"
+    },
+    {
+      "claim": "on screen: one embedding row = 8,192 numbers x 2 bytes = 16,384 bytes, '16 KB' (also the '+16 KB per new token' tag)",
+      "python": "print(8192*2)",
+      "result": "16384"
+    },
+    {
+      "claim": "on screen: row 4271 starts 4271 x 16,384 = 69,976,064 bytes into the table",
+      "python": "print(4271*8192*2)",
+      "result": "69976064"
+    },
+    {
+      "claim": "CORRECTION, figs 87-88: vocabulary is 128,256 (film bible), so the last row ID is 128,255, not 127,999 as drawn; narration says 'about a hundred and twenty-eight thousand', screen shows 128,256",
+      "python": "print(128256-1)",
+      "result": "128255"
+    },
+    {
+      "claim": "CORRECTION, fig 88: '128,000 multiplications, 127,999 of them by zero' is the count per output number; with the 128,256 vocabulary it is 128,256 per answer number, 128,255 by zero (on screen)",
+      "python": "print(128256, 128256-1)",
+      "result": "128256 128255"
+    },
+    {
+      "claim": "fig 88 added: the full one-hot multiply for one row = 128,256 x 8,192 = 1.05 billion multiplications, spoken as 'about a billion'",
+      "python": "print(128256*8192)",
+      "result": "1050673152"
+    },
+    {
+      "claim": "CORRECTION, fig 89 (and width in fig 87): the atlas draws 128,000 x 4,096 (an 8B model's width), giving 1.05 GB. Film uses the 70B shape per the film bible: 128,256 x 8,192 x 2 bytes = 2.10 GB per table, spoken 'two point one gigabytes'",
+      "python": "print(128000*4096*2, 128256*8192*2, 128256*8192*2/1e9)",
+      "result": "1048576000 2101346304 2.101346304"
+    },
+    {
+      "claim": "CORRECTION, fig 89: a 200-token prompt gathers 200 rows = 200 x 8,192 x 2 = 3.28 MB on screen (atlas, at 4,096 wide: 1.6 MB)",
+      "python": "print(200*4096*2, 200*8192*2, 200*8192*2/1e6)",
+      "result": "1638400 3276800 3.2768"
+    },
+    {
+      "claim": "CORRECTION, fig 89: 200 rows of 128,256 = 0.156%, shown and spoken as 0.16%. The atlas's 0.15% truncates 200/128,000 = 0.15625%; correct rounding is 0.16% either way",
+      "python": "print(200/128000*100, 200/128256*100)",
+      "result": "0.15625 0.15593812375249502"
+    },
+    {
+      "claim": "bytes bar ratio, 3.28 MB against 2.10 GB, is the same 0.156%, so the input bar is a hairline drawn wider than true scale (flagged on screen)",
+      "python": "print(200*8192*2/(128256*8192*2)*100)",
+      "result": "0.15593812375249502"
+    },
+    {
+      "claim": "CORRECTION, fig 89: output projection operations = 128,256 x 8,192 x 2 (one multiply + one add per weight) = 2.10 billion, spoken 'two point one billion', not the atlas's 1.05 billion (4,096 width). Consistent with fig 88's 1.05 billion, which counts multiplications only",
+      "python": "print(2*128000*4096, 2*128256*8192)",
+      "result": "1048576000 2101346304"
+    },
+    {
+      "claim": "on screen: reading the 2.10 GB output table at 3.35 TB/s on an H100 takes about 0.63 ms per token",
+      "python": "print(128256*8192*2/3.35e12*1e3)",
+      "result": "0.6272675534328358"
+    },
+    {
+      "claim": "on screen: the embedding table, 1.05 billion weights, is about 1.5% of 70 billion",
+      "python": "print(128256*8192, 128256*8192/70e9*100)",
+      "result": "1050673152 1.5009616457142856"
+    },
+    {
+      "claim": "'one of the model's largest matrices': a 70B feed-forward matrix is 8,192 x 28,672 = 235 million weights; the embedding table is 4.5 times larger",
+      "python": "print(8192*28672, 128256*8192/(8192*28672))",
+      "result": "234881024 4.473214285714286"
+    }
   ]
 }

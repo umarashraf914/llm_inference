@@ -21,6 +21,8 @@ written in parallel, consistent with each other.
 | decode ceiling on H100 | 3.35e12 / 140e9 = 23.9, "about 24 tokens a second" | |
 | the "30 ms" | 140 GB / 4.8 TB/s = 29.2 ms on an H200 | |
 | KV cache per token | 2 × 80 × 8 × 128 × 2 = 327,680 bytes, "about 320 kilobytes" (4,096 bytes per layer) | |
+| storage on the chip itself (H100) | a few hundred KB per working area (SM: 256 KB registers + 256 KB L1/shared); 132 × 512 KB + 50 MB L2 = 0.12 GB in all, 1/1,150 of the model | "a few hundred kilobytes in each small working area, about a tenth of a gigabyte in all, about a thousandth of the model". Never "a few hundred kilobytes" for the whole chip (fig 12/106 correction, ch02) |
+| disk vs memory beside the chip | 140 GB at ≈ 7 GB/s ≈ 20 s; 20 s ÷ 41.8 ms ≈ 479× | "about twenty seconds", "roughly five hundred times faster" (ch02, ch09) |
 
 **Embedding table, corrected.** Atlas figs 87–89 and 103 draw a 4,096-wide table (that is an
 8B model's width) while figs 99–101 use 8,192. The film uses the 70B shape throughout: one row is

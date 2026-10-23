@@ -18,505 +18,331 @@
   "scenes": [
     {
       "id": "ch13_s01",
-      "name": "every new token re-reads the conversation",
+      "name": "every step reads more than the last",
       "figs": [
         131
       ],
-      "visual": "Dark stage. Top band header, white: 'Every new token re-reads the whole conversation'. Centre: a staircase of three rows of token pills, left-aligned, one row per decode step, each row one pill longer than the one above. Row 1: blue pills 't1' 't2' 't3' and an amber pill 't4'. Row 2: blue 't1'..'t4' and amber 't5'. Row 3: blue 't1'..'t5' and amber 't6'. Amber marks the newest token, the one being worked on in that step. At the right end of each row a grey tag: 'reads 4', 'reads 5', 'reads 6'. From each amber pill, thin blue attention arcs reach back over every pill in its row, including itself. A faint dotted diagonal traces the rising right edge of the staircase. Late in the scene, two cards rise into the bottom third: left, amber, circular-arrows icon, 'recompute it'; right, teal, archive-box icon, 'keep it'. The idea the motion makes visible: each step reads more than the one before, and nothing carries over between steps by itself.",
+      "visual": "Dark stage. Top band header, white: 'Every new token re-reads the whole conversation'. Top-left, a small grey reference tag 'weights: 140 GB every step' that appears in b1 and then dims. Centre: a staircase of three rows of token pills, left-aligned, one row per decode step, each row one pill longer than the one above. Row 1: blue 't1' 't2' 't3' and an amber 't4'. Row 2: blue 't1'..'t4' and amber 't5'. Row 3: blue 't1'..'t5' and amber 't6'. Amber marks the token being computed in that step. At the right end of each row a grey tag: 'reads 4', 'reads 5', 'reads 6'. From each amber pill, thin coral arcs (coral = bytes read) reach back over every pill in its row, plus a small loop onto itself. A faint dotted diagonal traces the rising right edge. Bottom third, from b3: two cards, left amber with a circular-arrows icon 'recompute it', right teal with an archive-box icon 'keep it' holding a small stack. This staircase silhouette returns in scene 5, so keep its proportions. The idea the motion makes visible: each step reads more than the one before, and nothing carries over between steps by itself.",
       "beats": [
         {
           "id": "b1",
-          "say": "So far, the cost of decode has been the weights: a hundred and forty gigabytes read for every token. But each step has a second thing to read. And unlike the weights, it grows.",
-          "show": "Stage opens on a single grey reference tag top-left, 'weights: 140 GB per token', which then dims. On 'it grows', the header draws on and an empty row guide appears in the centre."
+          "say": "Each decode step reads every weight. It also reads a second thing, and this one grows.",
+          "show": "On 'every weight', the grey tag 'weights: 140 GB every step' fades in top-left, then dims to 30%. On 'this one grows', the header writes on and a faint empty row guide appears in the centre."
         },
         {
           "id": "b2",
-          "say": "Watch three decode steps in a row. In each one, the newest token, lit up on the right, is the token being worked on. Its attention has to look back over every token before it, and at itself. Here, four.",
-          "show": "Row 1 slides in: t1, t2, t3 blue, t4 amber. On 'look back', four blue arcs draw from t4 back to t1, t2, t3 and a small loop onto itself. On 'four', the tag 'reads 4' fades in at the row's right end."
+          "say": "The newest token, lit up, attends over every token before it and itself: four, then five, then six. That staircase is the picture behind a cost growing with the square of the length.",
+          "show": "Row 1 slides in; on 'attends over', four coral arcs draw from t4 back to t1, t2, t3 and loop onto t4; on 'four', tag 'reads 4'. On 'five', row 2 builds directly below with five arcs and 'reads 5'; on 'six', row 3 with six arcs and 'reads 6'. On 'staircase', the dotted diagonal draws along the right edges. On 'square', the three rows pulse top to bottom and a grey key phrase fades in under them: 'each step longer than the last'."
         },
         {
           "id": "b3",
-          "say": "On the next step, five. Then six. The amount read grows with every single step.",
-          "show": "On 'five', row 2 builds directly below, t5 amber, five arcs, tag 'reads 5'. On 'six', row 3 builds, t6 amber, six arcs, tag 'reads 6'. On 'grows', the dotted diagonal draws along the right edges of the three rows."
-        },
-        {
-          "id": "b4",
-          "say": "Here is the catch. The model has no memory between steps. When one pass through it ends, nothing it worked out is carried over on its own.",
-          "show": "Replay the step change: as row 2 begins, every arc in row 1 fades to nothing and a small grey label 'nothing carried over' appears in the gap between rows 1 and 2, then fades."
-        },
-        {
-          "id": "b5",
-          "say": "So whatever the new token needs about the earlier ones must be either worked out again, or kept somewhere. Recomputing means redoing the same work, again and again. Keeping means storing something that grows.",
-          "show": "On 'worked out again', the amber card 'recompute it' rises bottom-left, its circular arrows spinning. On 'kept somewhere', the teal card 'keep it' rises bottom-right, and a small stack inside it gains one block each time a row of the staircase pulses."
-        },
-        {
-          "id": "b6",
-          "say": "Which is cheaper, this chapter settles. Keep this staircase in mind: each row one decode step, each longer than the last. It is the picture behind a cost that grows with the square of the length.",
-          "show": "Cards dim. The staircase brightens; the three rows pulse top to bottom. Key phrase fades in under it: 'each step longer than the last'."
+          "say": "The model keeps no memory between steps. So its work on earlier tokens is either redone every time, or kept, in a store that grows. Which is cheaper?",
+          "show": "On 'no memory', rows 2 and 3 dim; row 1's arcs fade to nothing, a grey label 'nothing carried over' appears in the gap between rows 1 and 2, then row 2 re-brightens with all its arcs drawn fresh. On 'redone', the amber card 'recompute it' rises bottom-left, its arrows spinning. On 'kept', the teal card 'keep it' rises bottom-right; the staircase rows pulse once more top to bottom, and the card's small stack gains one block per pulse. On 'Which is cheaper?', a grey question mark appears between the two cards."
         }
       ]
     },
     {
       "id": "ch13_s02",
-      "name": "the causal mask",
+      "name": "the causal triangle",
       "figs": [
         132
       ],
-      "visual": "Header top band: 'Attention is causal', with a grey subline under it: 'a token sees only what came before it'. Left two-thirds: a 5 by 5 grid of rounded cells. Row labels on the left, 'token 1' to 'token 5' (the token asking). Under the columns, grey: 'keys it may attend to'. Allowed cells, the lower-left triangle including the diagonal, light blue; forbidden cells, upper-right, dark grey with faint diagonal hatching and the label 'masked'. Later the grid slides left and shrinks, and two mini-grids appear in the right third, stacked: 'Prefill' and 'Decode'. The idea the motion makes visible: the triangle is filled all at once when every token exists, and row by row when each token must wait for the one before.",
+      "visual": "Opens on the 5 by 5 score grid from chapter 8, exactly as it was left: rows labelled 'the' 'cat' 'sat' 'down' 'it' with a magnifier icon, columns with the same words and a key icon. Those labels morph into 'token 1'.. 'token 5' down the left and a grey column note 'keys it may attend to'. Allowed cells, the lower-left triangle including the diagonal, light blue; forbidden cells, upper-right, dark grey with faint hatching and the label 'masked'. Header top band: 'Attention is causal', grey subline 'a token sees only what came before it'. From b3 the big grid slides into the left third and shrinks, and the right two-thirds hold two mini-grids side by side, 'Prefill' (left) and 'Decode' (right). Beside Decode, a small chip icon with idle grey cores, labelled 'not the hardware'. The idea the motion makes visible: the triangle fills all at once when every token exists, and one row at a time when each token must wait for the one before, with earlier rows never touched again.",
       "beats": [
         {
           "id": "b1",
-          "say": "Earlier you saw that a token only ever looks back, at itself and the tokens before it, never ahead. That rule has a name. Attention is causal, as in cause and effect: what comes later cannot affect what came before.",
-          "show": "Empty 5 by 5 grid draws on, row labels 'token 1' to 'token 5', column note 'keys it may attend to'. On 'causal', the header writes on."
+          "say": "Bring back the grid of scores. Token one sees only itself. Token five sees all five.",
+          "show": "The chapter 8 grid fades in with word labels; on 'grid of scores', the labels morph to 'token 1'..'token 5' and the column note appears. On 'token one', only row 1's first cell lights blue; rows 2, 3 and 4 light two, three and four cells in quick succession; on 'all five', row 5 lights fully."
         },
         {
           "id": "b2",
-          "say": "Here is the grid of scores again: one row for each token asking, one column for each key. Token one may look only at itself. Token five may look at all five.",
-          "show": "On 'token one', only the first cell of row 1 lights blue. Rows 2, 3 and 4 light two, three and four cells in quick succession. On 'token five', all five cells of row 5 light. The lit cells form a lower-left triangle."
+          "say": "Everything ahead is masked out: the causal mask. A token sees only what came before it, so only a triangle is used.",
+          "show": "On 'masked out', the upper-right cells fill dark grey with hatching, one diagonal band at a time, and 'masked' fades in over them. On 'causal mask', the header and subline write on. On 'triangle', a counter top right of the grid reads '15 / 25'; the cells then shrink into the fine mesh of a much larger square with the same lit triangle, the counter changes to '≈ half', and the grid returns to 5 by 5."
         },
         {
           "id": "b3",
-          "say": "Everything ahead of a token is masked out, blanked before softmax turns the scores into weights. That is why it is called the causal mask.",
-          "show": "Upper-right cells fill dark grey with hatching, one diagonal band at a time; the label 'masked' fades in over them. A small tag under the header: 'the causal mask'."
+          "say": "You met the chain earlier: the next token cannot exist until the last is chosen. Under the mask, each new row only looks back, and never changes the rows above.",
+          "show": "Header subline fades. The big grid slides into the left third and shrinks. Right side: mini-grid 'Decode' draws empty and lights row 1. On 'cannot exist', an amber token pill drops out of row 1's right end, slides down with a small chain-link icon and becomes row 2's label; only then does row 2 light. On 'only looks back', row 2's lit cells glow under columns 1 and 2. On 'never changes', small teal padlocks settle on row 1's cells and stay."
         },
         {
           "id": "b4",
-          "say": "So only a triangle of the grid is ever used. With five tokens, fifteen of the twenty-five cells. With thousands of tokens, almost exactly half.",
-          "show": "Counter in the top right of the grid: '15 / 25'. On 'thousands', the grid's cells shrink into a fine mesh of a much larger square with the same lit triangle; the counter changes to '≈ half'."
-        },
-        {
-          "id": "b5",
-          "say": "Now the two phases. In prefill, the whole prompt is already there, every token at once. So the entire triangle can be computed together, in parallel, in one shot.",
-          "show": "The big grid slides left and shrinks. In the right third, mini-grid 'Prefill' appears empty, then its whole triangle lights blue in a single flash. Tag under it, teal: 'one shot'."
-        },
-        {
-          "id": "b6",
-          "say": "In decode, the token at a position does not exist until the one before it has been generated. So the triangle grows one row at a time, each row waiting on the last.",
-          "show": "Below it, mini-grid 'Decode' fills row 1. An amber token pill drops out of row 1's right end, slides down and becomes the label of row 2, and only then does row 2 light. Repeat for rows 3, 4 and 5, each with a small chain-link icon between rows. Tag under it, amber: 'one row at a time'."
-        },
-        {
-          "id": "b7",
-          "say": "That chain is the sequential dependency. It comes from the causal rule, not from the hardware. This triangle is the whole reason the two phases behave so differently. Prefill fills it in one shot. Decode adds one row at a time.",
-          "show": "The two mini-grids sit side by side and replay together: Prefill flashes full, Decode ticks row by row. A small chip icon with idle grey cores sits beside Decode, labelled 'not the hardware'."
+          "say": "Prefill, with every token present, fills the triangle in one shot. Decode adds a row at a time, so each read of the weights serves one token.",
+          "show": "Mini-grid 'Prefill' appears left of Decode; on 'one shot', its whole triangle flashes blue at once, teal tag 'one shot'. On 'a row at a time', Decode ticks rows 3, 4 and 5 one by one, each new row padlocking the one above; amber tag 'one row at a time'. On 'serves one token', a small coral 'weights read' tile drops beside each Decode row as it lights, tagged '1 token'. The chip icon 'not the hardware' fades in beside Decode."
         }
       ]
     },
     {
       "id": "ch13_s03",
-      "name": "the redundant work, quantified",
+      "name": "the redundant work, and two ways to grow",
       "figs": [
-        133
+        133,
+        134
       ],
-      "visual": "Top band header: 'The observation that saves everything'. Upper half: a row of six blue token pills 't1' to 't6'; above each pill a small blue key tile 'K' and value tile 'V', stacked. A seventh pill 't7', amber, arrives from the right. A wide banner with a teal border spans the top, two lines: 'Earlier keys and values' / 'do not depend on the new token'. Lower half, under a second header 'How bad that would get': a pair of boxes, left blue 'generating token 1,000', right amber 'recompute 999 positions'; below them a small staircase of amber blocks for the four-token example, and an equation that builds term by term. The idea the motion makes visible: earlier keys and values stay frozen while new tokens arrive, so recomputing them is pure repetition, and that repetition piles up as a triangle.",
+      "visual": "Header top band: 'The observation that saves everything'. Left half, upper: a row of six blue token pills 't1' to 't6', each with a small blue key tile 'K' and value tile 'V' stacked above it; an amber pill 't7' arrives from the right. A teal-bordered banner over them, two lines: 'Earlier keys and values' / 'do not depend on the new token'. Left half, lower, from b2: a blue box 'generating token 1,000' and an amber box 'recompute 999 positions'; then a staircase of amber blocks in columns of 0, 1, 2 and 3 inside a dashed 4 by 3 rectangle, and an equation that builds term by term. Right half, from b4: one chart titled 'Two ways to grow', a single shared y axis 'total work' and x axis 'tokens', a teal straight line 'Linear' and an amber upward curve 'Quadratic', with a strip of per-token bars under each, and a grey 'schematic' tag. The idea the motion makes visible: earlier keys and values are frozen, so recomputing them is pure repetition, and that repetition piles up as a triangle whose total outruns anything linear.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now the observation that saves everything. Look at the keys and values of the earlier tokens. They do not depend on the new token at all.",
-          "show": "Pills t1 to t6 with their K and V tiles. On 'new token', t7 slides in from the right, amber. The K and V tiles above t1 to t6 stay perfectly still. The teal banner draws on."
+          "say": "Now the observation that saves everything: earlier keys and values do not depend on the new token. Settled when their tokens were processed, they never change.",
+          "show": "Header writes on. Left upper: t1 to t6 with their K and V tiles. On 'the new token', t7 slides in amber from the right; the earlier tiles stay perfectly still and the teal banner draws on. On 'never change', a small query arrow from t3 tries to reach forward to t7 and stops at a thin grey wall labelled 'mask', with the grey label 't3 never saw t7'; arrow and wall fade, and small teal padlocks settle onto every earlier K and V tile."
         },
         {
           "id": "b2",
-          "say": "They were fully settled when those tokens were processed, and they never change afterwards. Attention only looks back, so nothing that arrives later can reach back and alter them. Exactly why that makes them safe to keep comes back later.",
-          "show": "A faint arrow tries to draw backwards from t7 towards t3's tiles and stops at a thin grey wall labelled 'mask', then fades. Small teal padlock icons settle onto the earlier K and V tiles."
+          "say": "Recomputing them is identical work, repeated. Generating token one thousand would recompute all nine hundred and ninety-nine earlier positions.",
+          "show": "Upper group dims to 40%. On 'token one thousand', the blue box 'generating token 1,000' appears lower left; on 'nine hundred and ninety-nine', the amber box 'recompute 999 positions' appears beside it and a dense strip of 999 hairline amber ticks flashes beneath."
         },
         {
           "id": "b3",
-          "say": "So recomputing them for every new token would be doing identical work, over and over. How bad would that get? Generating token one thousand would mean recomputing all nine hundred and ninety-nine earlier positions, each one through every layer.",
-          "show": "Upper half dims. Second header writes on. On 'token one thousand', the blue box 'generating token 1,000' appears; on 'nine hundred and ninety-nine', the amber box 'recompute 999 positions' appears and a dense strip of 999 hairline amber ticks flashes beneath it."
+          "say": "Add it up: for n tokens, n times one less than n, then halved. For a thousand, about half a million recomputations, where a thousand would do.",
+          "show": "Boxes shrink upward. On 'Add it up', four columns of 0, 1, 2 and 3 amber blocks build left to right with '0 + 1 + 2 + 3 = 6'; a dashed 4 by 3 rectangle outlines them and its empty half shades grey: '4 × 3 = 12, half = 6'. On 'then halved', the equation morphs to 'total = n(n − 1) / 2', tag 'quadratic in n'. On 'a thousand', n becomes 1,000 and an amber counter runs to 499,500; a small teal '1,000' sits beside it."
         },
         {
           "id": "b4",
-          "say": "Add it up over a whole answer. Start small, with four tokens. The first recomputes nothing. The second, one earlier position. The third, two. The fourth, three. Zero plus one plus two plus three: six.",
-          "show": "Below the boxes, four columns appear left to right holding 0, 1, 2 and 3 amber blocks, a staircase. The equation '0 + 1 + 2 + 3 = 6' builds one term per spoken number."
+          "say": "Two shapes worth recognising. Linear: flat work per token. Quadratic: each token costs more than the last. Barely different at ten tokens, at ten thousand quadratic is about a thousand times worse.",
+          "show": "Right half: the chart draws with its shared axes and grey 'schematic' tag. On 'Linear', equal teal bars fill the strip under the axis and the teal total climbs as a straight line. On 'Quadratic', the amber block columns from the left slide across into the strip as rising bars and the amber total bends upward. On 'ten tokens', both curves are marked at x = 10, 'about equal'. On 'ten thousand', the x axis stretches to 10,000 and the y axis visibly rescales: its tick labels jump, the teal line flattens toward the floor while the amber curve climbs. Tags: teal '× 1,000', amber '× 1,000,000', and an amber readout '≈ 1,000× worse'."
         },
         {
           "id": "b5",
-          "say": "Notice the shape. Those six blocks fill exactly half of a four by three rectangle, and half of twelve is six. For any number of tokens, n, the total is half of n times n minus one.",
-          "show": "A dashed 4 by 3 rectangle outlines the staircase; the empty half shades grey, label '4 × 3 = 12, half = 6'. Then the equation morphs into the general form 'total = n(n − 1) / 2'."
-        },
-        {
-          "id": "b6",
-          "say": "For a thousand tokens: a thousand times nine hundred and ninety-nine, halved. Four hundred and ninety-nine thousand, five hundred. About half a million recomputations, where a thousand would do.",
-          "show": "n becomes 1,000 in the formula; an amber counter runs from 0 to 499,500. Beside it a small teal figure, '1,000', for comparison. Tag: 'quadratic in n'."
-        },
-        {
-          "id": "b7",
-          "say": "That waste grows with the square of the length. Double the conversation, and it roughly quadruples. Quadratic, set against linear. Without a fix, long conversations would not just be expensive. They would be impossible.",
-          "show": "n changes to 2,000; the counter runs to 1,999,000 and a tag '≈ 4×' appears. Key phrase centred: 'quadratic against linear'."
+          "say": "Recomputing is the quadratic shape, so nobody does it: long conversations would be impossible, not merely expensive. Almost every scaling problem ahead is one such term outgrowing everything linear.",
+          "show": "A label 'recompute every step' attaches to the amber curve; on 'impossible', the curve runs off the top of the frame with the tag 'impossible, not just expensive'. Left half dims. On 'Almost every', a key phrase fades in under the chart: 'one quadratic term outgrows everything linear'."
         }
       ]
     },
     {
       "id": "ch13_s04",
-      "name": "two ways to grow",
+      "name": "what a cache is, in general",
       "figs": [
-        134
+        135
       ],
-      "visual": "Two small charts stacked in the left two-thirds, each with x axis 'tokens' and y axis 'total work'. Top chart, teal, labelled 'Linear', with a strip of equal-height bars under it, one bar per token, captioned 'work per token stays flat'. Bottom chart, amber, labelled 'Quadratic', with a strip of bars that each stand taller than the last, captioned 'work per token keeps rising'. Right third: a comparison readout used from beat 3. Header top band: 'Two ways to grow'. The idea the motion makes visible: per-token cost either stays level or climbs, and the totals separate dramatically as the length grows.",
+      "visual": "Header top band, two lines: 'A cache is something kept' / 'so it need not be made again'. Two cards side by side in the centre. Left, amber: a calculator icon and 'work it out every time', with a small tally counter. Right, teal: a calculator icon, a sticky-note icon and 'work it out once, keep it'. Lower centre, from b2: a balance-scale icon with a coral block 'space' on one pan and a teal block 'time saved' on the other. In b3 the sticky note morphs into a vertical stack of thin teal entries that grows. The idea the motion makes visible: a cache spends space to save repeated effort, and pays only when the kept thing is used again.",
       "beats": [
         {
           "id": "b1",
-          "say": "These two shapes are worth being able to recognise on sight. Linear: the work for each token stays flat, so the total climbs in a straight line.",
-          "show": "Top chart: equal teal bars appear one per token along the bottom strip; above them the cumulative total draws as a straight ramp. Caption 'work per token stays flat' fades in."
+          "say": "First the general idea; it makes the specific easier to judge. A cache is something kept so it need not be made again.",
+          "show": "The two cards fade up, still. On 'A cache is', the two-line header writes on."
         },
         {
           "id": "b2",
-          "say": "Quadratic: the work for each token keeps rising, because every token costs more than the last. So the total bends upward, steeper and steeper.",
-          "show": "Bottom chart: amber bars of heights 1, 2, 3, 4 and onward appear; the cumulative curve bends upward. Caption 'work per token keeps rising' fades in."
+          "say": "Work it out once, note it, then read the note. The trade is always memory for time, paying only if the note is read again.",
+          "show": "Left card shows '37 × 48'; its calculator pulses four times as the tally counts 1, 2, 3, 4. Right card: on 'once', the calculator pulses once and a sticky note appears, '37 × 48 = 1,776'; on 'read the note', it glows teal three times as later requests read it. On 'memory for time', the balance scale appears: coral 'space' drops onto one pan, teal 'time saved' rises on the other. On 'read again', a second note '52 × 17 = 884' appears, sits unread and fades to grey, tag 'never reused: wasted space'."
         },
         {
           "id": "b3",
-          "say": "Say the two cost about the same at ten tokens. Now go to ten thousand, a thousand times longer. The linear total grows a thousandfold. The quadratic total grows about a millionfold.",
-          "show": "Both charts mark a point at '10', labelled 'about equal'. Camera pulls back along the x axis to '10,000'. Tags appear: teal '× 1,000' on the linear line, amber '× 1,000,000' on the quadratic curve."
-        },
-        {
-          "id": "b4",
-          "say": "So at ten tokens, you could barely tell them apart. At ten thousand, the quadratic one is about a thousand times worse.",
-          "show": "Right-third readout builds two lines: 'at 10: about the same' and 'at 10,000: ≈ 1,000× worse', the second in amber."
-        },
-        {
-          "id": "b5",
-          "say": "Recomputing everything at every step is the second shape. That is why nobody does it, and why the thing coming next exists. Almost every scaling problem in this series is one term of the second kind, growing past everything of the first.",
-          "show": "A label 'recompute every step' attaches to the quadratic curve. Then a key phrase fades in under both charts: 'one quadratic term outgrows everything linear'."
+          "say": "In decode, every earlier token is needed at every later step, about as favourable as it gets. The cost: the store grows every token. That is the key-value cache.",
+          "show": "Grey note and scale fade. The useful note morphs into a vertical stack of thin teal entries. Each step one entry is added on top, and on every step all entries glow at once, showing that every one is used. On 'grows', a coral tag beside it: 'grows every token'. On 'key-value cache', the stack is labelled 'key-value cache', and a small grey tag appears under it: 'the central problem ahead'."
         }
       ]
     },
     {
       "id": "ch13_s05",
-      "name": "what a cache is, in general",
+      "name": "the key-value cache",
       "figs": [
-        135
+        136
       ],
-      "visual": "Header top band, two lines: 'A cache is something kept' / 'so it need not be made again'. Two cards side by side in the centre. Left, amber: a calculator icon and 'work it out every time', with a small tally counter. Right, teal: a calculator icon, a sticky-note icon and 'work it out once, keep it'. Lower centre: a balance-scale icon with 'space' on one pan and 'time' on the other. In the last beats the sticky note morphs into a vertical stack of entries that grows. The idea the motion makes visible: a cache spends space to save repeated effort, and it only pays when the kept thing is used again.",
+      "visual": "Left half: the GPU package illustration, compute die in the middle, HBM stacks around it, a wide bus between them. One HBM stack is enlarged; inside it a region outlined teal and labelled 'KV cache' holds rows of paired tiles, one row per token, each a small K tile and V tile. Right half, top: a panel 'Each decode step' with three boxes in a row joined by arrows: amber 'compute one K and V', teal 'append to cache', coral 'read the whole cache'. Right half, lower: a small counter area used in b3, then, in b4, the staircase silhouette from scene 1 (rows of pills with coral arcs and 'reads' tags). Coral particles always mean the cache being read. The idea the motion makes visible: each step creates one new entry, adds it to the end, and then reads everything that has accumulated, so the computing stops growing but the reading does not.",
       "beats": [
         {
           "id": "b1",
-          "say": "Before the fix itself, the general idea, because the specific one is easier to judge once you know what the trade always is. A cache is something kept so that it need not be made again.",
-          "show": "Header writes on. The two cards fade up, empty of motion."
+          "say": "The server's notes from earlier are exactly these: each token's keys and values, kept in a dedicated region of H B M.",
+          "show": "GPU package fades in. On 'notes', a grey sticky-note icon labelled 'the server's notes' appears over the package and splits into rows of K and V tile pairs. On 'H B M', the camera pushes into one HBM stack; the rows settle into a region that outlines teal and is labelled 'KV cache', six rows already in it."
         },
         {
           "id": "b2",
-          "say": "Think of a long multiplication you need over and over. You can work it out every time. Or you can work it out once, write the answer on a note, and from then on just read the note.",
-          "show": "Left card: '37 × 48' shown; the calculator pulses four times, tally counting 1, 2, 3, 4. Right card: the calculator pulses once, a sticky note appears reading '37 × 48 = 1,776', then glows teal three times as later requests just read it."
+          "say": "Each decode step now computes only the new token's key and value, appends them, and reads the whole cache for attention.",
+          "show": "Camera eases back so package and cache region are both visible; the panel 'Each decode step' draws on top right, unlit. On 'computes', the amber box lights and one K and V pair appears on the die. On 'appends', the pair slides along the bus into the next empty row and the teal box lights. On 'reads', coral particles stream from every row of the cache back to the die and the coral box lights."
         },
         {
           "id": "b3",
-          "say": "The trade is always the same: memory in exchange for time. You spend space, the note, to avoid repeating an effort.",
-          "show": "Balance scale appears lower centre; a blue block 'space' drops onto one pan, and a teal block 'time saved' rises on the other."
+          "say": "Nothing earlier is recomputed: the recomputing goes from quadratic to linear. Every serving system does this; it is why decode is practical at all.",
+          "show": "The three-box loop runs three more times, faster each time, the cache gaining a row per pass. Lower right: a teal counter 'K and V computed: 1,000' beside an amber '499,500' that is struck through; tag 'recompute: quadratic → linear'. On 'Every serving system', four small server-rack icons slide in along the bottom, each with a teal 'KV cache' badge, and a grey tag 'obvious once seen'."
         },
         {
           "id": "b4",
-          "say": "It pays off only when the kept thing is used again. Something worked out once and never needed again is worth nothing to keep. It just takes up room.",
-          "show": "A second sticky note appears for a different sum, sits unread, and fades to grey with tag 'never reused: wasted space'."
+          "say": "But every token still reads the whole cache. The staircase from the start is still there, each step reading a little more than the last.",
+          "show": "Racks and counters fade. On 'reads the whole cache', the coral box pulses and the coral read stream thickens as more rows accumulate. On 'staircase', the scene 1 staircase silhouette fades in lower right with its coral arcs; a fourth and fifth row add themselves in step with the cache's new rows. Coral tag: 'reads: still growing'."
         },
         {
           "id": "b5",
-          "say": "In decode, every earlier token is needed at every later step. That is about as favourable as a cache can ever get. The cost is that the kept thing grows, by one token's worth, with every step.",
-          "show": "The useful sticky note morphs into a vertical stack of thin teal entries. Each step one entry is added at the top, and on every step all entries glow at once, showing that all of them are used."
-        },
-        {
-          "id": "b6",
-          "say": "That growing store is the key-value cache. It makes the repeated work go away, and in its place it becomes the central problem of most of the rest of this series.",
-          "show": "Stack gets the label 'key-value cache'. A coral tag beside it: 'grows every token'."
+          "say": "A caching trick that solves one problem, and creates the one that dominates everything downstream.",
+          "show": "The scene dims except the cache region and its coral stream. Key phrase centred: 'solves one problem, creates the next'."
         }
       ]
     },
     {
       "id": "ch13_s06",
-      "name": "the key-value cache",
+      "name": "what actually re-enters the model each step",
       "figs": [
-        136
+        137
       ],
-      "visual": "Left half: the GPU package illustration, compute die in the middle, H B M stacks around it, a wide bus between them. One H B M stack is enlarged; inside it a region is outlined teal and labelled 'K V cache', holding rows of paired tiles, one row per token, each row a small K tile and V tile. Right half, top: a panel 'Each decode step' with three boxes in a row joined by arrows: amber 'compute one K and V', teal 'append to cache', coral 'read the whole cache'. The loop of three boxes runs several times, faster each time. The idea the motion makes visible: each step creates only one new entry, adds it to the end, and then reads everything that has accumulated.",
+      "visual": "Two horizontal lanes on the left two-thirds; on the right, a model block drawn as a tall stack of thin layer slabs that both lanes feed. Top lane, header 'What you might picture', subline 'the whole text, fed in again': nine blue token pills and an ellipsis, label 'all 1,032 tokens, every step'. Bottom lane, header 'What actually happens', subline 'one token, plus the cache': nine dashed-outline pills, each with a tiny K and V tile, and one solid amber pill at the right end; label 'already in the cache, not recomputed'. Between the lanes, from b2: two bars drawn to scale. Teal threads from the amber pill back to the dashed pills mean reused, not recomputed. The idea the motion makes visible: the text grows, but only one token enters the model per step.",
       "beats": [
         {
           "id": "b1",
-          "say": "So here it is. Earlier we called it a running record the server keeps of everything it has already processed. Now you can see what that record holds: every key and every value that every token has produced.",
-          "show": "GPU package fades in on the left. Camera pushes into one H B M stack; a region inside outlines teal and is labelled 'K V cache', with six rows of K and V tile pairs already in it."
+          "say": "One correction most people need. It is tempting to picture all one thousand and thirty-two tokens of the weather chat re-entering the model every step.",
+          "show": "Model block draws on the right. Top lane builds: nine blue pills, ellipsis, label 'all 1,032 tokens, every step'. A small step counter ticks 1, 2, 3; on each tick the whole row streams into the model block."
         },
         {
           "id": "b2",
-          "say": "They are written into a dedicated region of the memory beside the chip, the H B M. And each decode step now does three things.",
-          "show": "Camera eases back so the package and the cache region are both visible. The panel 'Each decode step' draws on top right with its three boxes unlit."
+          "say": "That would be a thousand times the work at this length, and worse as it grows. Only the newest token goes through. The rest is already there, as keys and values.",
+          "show": "On 'a thousand times', two bars draw between the lanes to scale: amber '1,032 tokens per step', long; teal '1 token per step', a sliver; tag '≈ 1,000×'. On 'worse as it grows', the amber bar lengthens a little. On 'Only the newest', the bottom lane builds: dashed pills with their label, and only the amber pill flows into the model. On 'keys and values', teal threads reach back from it to each dashed pill, lighting its small K and V tile."
         },
         {
           "id": "b3",
-          "say": "First, the new token computes only its own key and value. Second, it appends them, adding them on the end of the cache. Third, it reads the whole accumulated cache to do its attention.",
-          "show": "On 'its own', the amber box lights and one K and V pair appears on the compute die. On 'appends', the pair slides along the bus into the next empty row of the cache and the teal box lights. On 'reads', coral particles stream from every row of the cache back to the die and the coral box lights."
-        },
-        {
-          "id": "b4",
-          "say": "Then the next token does the same, and the next. Nothing earlier is ever recomputed. For a thousand tokens, that is a thousand key-and-value computations, instead of half a million. Quadratic has become linear.",
-          "show": "The three-box loop runs three more times, faster each time, the cache gaining a row each pass. A teal counter 'computed: 1,000' appears beside an amber '499,500' that is struck through."
-        },
-        {
-          "id": "b5",
-          "say": "It is an obvious optimisation once you have seen it. Every serving system implements it, and it is the reason decode is practical at all.",
-          "show": "A row of four small server-rack icons slides in along the bottom, each with a small teal 'K V cache' badge."
-        },
-        {
-          "id": "b6",
-          "say": "But look again at the third step. Every token still reads the whole cache, and the cache keeps growing. That is the price of the trick, and it is the reason every other optimisation in this series exists.",
-          "show": "Racks fade. Camera returns to the cache: the coral read stream thickens as more rows accumulate; the coral box 'read the whole cache' pulses."
-        },
-        {
-          "id": "b7",
-          "say": "A caching trick that solves one problem, and creates the one that dominates everything downstream.",
-          "show": "Key phrase centred over a dimmed scene: 'solves one problem, creates the next'."
+          "say": "The sequence grows, but the work per step does not grow with it the way that picture suggests.",
+          "show": "Top lane is crossed out, dims and slides off; bars fade. In the bottom lane, the amber pill turns dashed and joins the row, a new amber pill arrives and flows in alone: the row is longer, the flow into the model is still one pill. Key phrase where the top lane was: 'one token in, plus the cache'."
         }
       ]
     },
     {
       "id": "ch13_s07",
-      "name": "what actually re-enters the model each step",
+      "name": "where the eighty comes from",
       "figs": [
-        137
+        138,
+        140
       ],
-      "visual": "Two horizontal lanes. Right side of the frame: a model block drawn as a tall stack of thin layer slabs. Top lane, header 'What you might picture' with subline 'the whole text, fed in again': nine blue token pills and an ellipsis, labelled 'all 1,032 tokens, through the model, every step'; all of them flow into the model block each step. Bottom lane, header 'What actually happens: one token, plus the cache': nine dashed-outline pills and one solid amber pill at the right end, labelled 'already in the cache, not recomputed'; only the amber pill flows into the model, while thin teal attention threads reach from it back to the dashed pills. The idea the motion makes visible: the text grows, but only one token enters the model per step.",
+      "visual": "Top band: an equation in a bar with a thin white outline, set on two lines: 'cache per token =' / '2 × layers × KV heads × head dim × bytes'. Terms land one at a time, each with a small grey label beneath. In this scene only '2' and '× layers' land; the rest are blank slots. Lower left: the tempting picture from chapter 8, an 'embedding' box with a single block of three tiles 'Q', 'K', 'V' above it and one arrow carrying it up a stack of layers. Lower right: two stacks of eighty thin layer slabs side by side, the left one dimmer and labelled 'earlier token', the right one brighter and labelled 'new token'; every slab holds its own small K and V tile pair. The idea the motion makes visible: the layers term exists only because every layer makes and keeps its own key and value.",
       "beats": [
         {
           "id": "b1",
-          "say": "One more picture is worth correcting, because almost everyone carries it. Take the weather conversation from earlier, one thousand and thirty-two tokens. It is natural to imagine the whole text being fed through the model again for every new token.",
-          "show": "Top lane builds: nine blue pills, ellipsis, label 'all 1,032 tokens, through the model, every step'. Each tick of a small step counter, the whole row streams into the model block."
+          "say": "How big is the cache? Build its formula for one token: two, one key and one value, then the layers.",
+          "show": "'cache per token =' writes on, with blank slots after it. On 'two', '2' lands with a blue K tile and V tile beneath and the grey label 'one key, one value'. On 'layers', '× layers' lands, grey label 'layers'."
         },
         {
           "id": "b2",
-          "say": "That is not what happens. Only the newest token goes through the model. Everything before it is already represented by keys and values, computed once and kept. Which is exactly what the cache is for.",
-          "show": "Bottom lane builds: the earlier pills appear as dashed outlines with the label 'already in the cache, not recomputed'. One amber pill flows into the model; teal threads reach back from it to the dashed pills."
+          "say": "In the tempting picture from earlier, query, key and value are made once and carried up: no layers term. But every layer makes its own, from its own input and weights.",
+          "show": "Lower left, the tempting picture redraws: 'embedding', the one Q, K, V block, one arrow up the stack. On 'no layers term', a teal tag 'no layers term' appears under it and '× layers' in the equation flickers grey. On 'every layer makes its own', the tempting picture is crossed out and dims; lower right, the two stacks of eighty slabs draw upward, each slab growing its own K and V pair in a slightly different shade of blue. Tag '× 80'."
         },
         {
           "id": "b3",
-          "say": "Re-running the whole context at every step would mean a thousand and thirty-two tokens through the model instead of one. About a thousand times the work at this length, and worse as the conversation grows.",
-          "show": "Between the lanes, two bars to scale: amber '1,032 tokens per step', long; teal '1 token per step', a sliver. Tag: '≈ 1,000×'."
-        },
-        {
-          "id": "b4",
-          "say": "It is the same point you met with streaming: within an answer, nothing is re-sent. The growing text is not fed back in. It is already there, in a form the model can attend to without recomputing it.",
-          "show": "Bars fade. The amber token's threads light the dashed pills teal in turn as its attention reaches them."
-        },
-        {
-          "id": "b5",
-          "say": "So the sequence grows, but the work per step does not grow with it in the way the first picture suggests.",
-          "show": "Top lane dims and slides off. Key phrase in its place: 'one token in, plus the cache'."
+          "say": "And all eighty are kept: layer forty needs an earlier token's layer-forty key, not its layer-one key. Made once, the cache would be eighty times smaller, and most of this series would not exist.",
+          "show": "On 'layer forty', a query arrow runs from the new token's slab 40 straight across to the earlier token's slab-40 K tile, which lights. The earlier stack's slab-1 K tile greys out with a small cross and the label 'wrong layer'. On 'eighty times smaller', '× layers' glows coral and gains the value '80' beneath, and a grey ghost of one stack collapses to a single slab, tag '÷ 80'. Key phrase lower centre: 'every layer keeps its own'."
         }
       ]
     },
     {
       "id": "ch13_s08",
-      "name": "where the eighty comes from",
-      "figs": [
-        140,
-        138
-      ],
-      "visual": "Top band: an equation that builds term by term, in a bar with a thin white outline: 'cache per token = 2 × layers × K V heads × head dimension × bytes', each term with a small grey label beneath it as it lands. Lower left: the tempting picture from earlier, a single Q, K, V block sitting above an 'embedding' box with one arrow carrying it up a stack of layers. Lower right: a stack of eighty thin layer slabs, each with its own small K and V tile pair. The idea the motion makes visible: the layers term exists only because every layer makes its own key and value.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "So how big is this cache? There is a formula, and it is worth knowing by heart. Build it one piece at a time, for a single token.",
-          "show": "Top band: 'cache per token =' writes on, with empty space after it."
-        },
-        {
-          "id": "b2",
-          "say": "First, a two. Each token leaves two things in the cache: one key and one value.",
-          "show": "'2' lands; under it, a blue K tile and V tile and the grey label 'one key, one value'."
-        },
-        {
-          "id": "b3",
-          "say": "Next, the number of layers. This is where something from earlier pays off. Remember the tempting picture, with query, key and value made once at the bottom and carried up through the model?",
-          "show": "'× layers' lands. Lower left, the tempting picture redraws: 'embedding', a single Q K V block above it, and one arrow carrying it up a stack."
-        },
-        {
-          "id": "b4",
-          "say": "If that were how it worked, each token would have one key and one value, full stop. There would be no layers term in this formula at all.",
-          "show": "Tag 'no L at all' appears teal under the tempting picture; the '× layers' term in the equation flickers grey."
-        },
-        {
-          "id": "b5",
-          "say": "But every layer makes its own, from its own input and with its own weights. So the same token has a different key and a different value in each of the eighty layers.",
-          "show": "The tempting picture is crossed out and dims. Lower right, a stack of eighty thin slabs draws upward; each slab grows its own small K and V pair in a different shade of blue. Tag '× 80'."
-        },
-        {
-          "id": "b6",
-          "say": "And all eighty have to be kept. When layer forty attends back to an earlier token, it needs that token's layer forty key, not its layer one key.",
-          "show": "A query arrow from a new token at slab 40 reaches back to an earlier token's slab-40 K tile, which lights. The earlier token's slab-1 K tile greys out with a small cross and label 'wrong layer'."
-        },
-        {
-          "id": "b7",
-          "say": "So the cache holds eighty keys and eighty values for every token. If the projection happened only once, the cache would be eighty times smaller, and most of this series would not need to exist.",
-          "show": "The '× layers' term in the equation glows coral and gains the subscript '80'. Key phrase lower centre: 'every layer keeps its own'."
-        }
-      ]
-    },
-    {
-      "id": "ch13_s09",
       "name": "three hundred and twenty kilobytes per token",
       "figs": [
         139,
         140
       ],
-      "visual": "Left third: one blue token pill at the bottom; above it a tall column of eighty slots labelled 'L1', 'L2', … 'L10', '…', 'L80', each slot holding a small K tile and V tile. Header over the column: 'One token, eighty layers deep'. Top band: the equation from the previous scene persists, and its terms fill with numbers as they are explained. Right two-thirds: an arithmetic panel that builds the per-layer bytes, then the per-token total, with a counter. The idea the motion makes visible: a small per-layer amount multiplied by the eighty layers.",
+      "visual": "Top band: the two-line equation from scene 7 persists; its remaining slots fill with numbers as they are spoken. Left third: one blue token pill at the bottom; above it a tall column of eighty slots labelled 'L1', 'L2', … 'L10', '…', 'L80', each slot a small K and V pair; header over the column 'One token, eighty layers deep'. Right two-thirds: an arithmetic panel that builds per-layer bytes, then the per-token total, with a coral byte counter. The idea the motion makes visible: a small per-layer amount, multiplied by eighty.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now the rest of the formula. How big is one key? Earlier you saw that attention is split into heads, and that this model has only eight key-value heads. Each head is a hundred and twenty-eight numbers wide.",
-          "show": "Equation terms '× K V heads' and '× head dimension' brighten; under them the numbers '8' and '128' drop in."
+          "say": "The rest is the model's shape, Llama three seventy B: eight key-value heads, each a hundred and twenty-eight numbers wide, two bytes per number.",
+          "show": "A grey tag 'Llama 3 70B' appears beside the equation. On 'eight', '× KV heads' lands with '8' under it; on 'a hundred and twenty-eight', '× head dim' lands with '128'; on 'two bytes', '× bytes' lands with '2' and the grey label '16-bit'. Right panel: a K tile stretches into eight segments of 128 cells, label '8 × 128 = 1,024 numbers', and a matching V tile beside it."
         },
         {
           "id": "b2",
-          "say": "So one key is eight times a hundred and twenty-eight: one thousand and twenty-four numbers. One value is the same size. In sixteen-bit precision, each number takes two bytes, and that is the last term.",
-          "show": "Right panel: a K tile stretches into eight segments of 128 cells, label '8 × 128 = 1,024 numbers'; a V tile beside it, same. '× bytes' brightens in the equation and '2' drops under it."
+          "say": "Two, times eight, times a hundred and twenty-eight, times two: four thousand and ninety-six bytes, about four kilobytes per layer. Times eighty: three hundred and twenty-seven thousand, six hundred and eighty bytes.",
+          "show": "Right panel builds '2 × 8 × 128 × 2 = 4,096 bytes' one term per spoken number, then the label 'per layer, per token: 4 KB'; slot 'L1' fills with its pair. On 'Times eighty', slots L2 to L80 fill rapidly and a coral counter runs to 327,680. The top equation becomes fully numeric: '2 × 80 × 8 × 128 × 2 = 327,680 bytes'."
         },
         {
           "id": "b3",
-          "say": "Multiply it out for one layer. Two, times eight, times a hundred and twenty-eight, times two bytes: four thousand and ninety-six bytes. About four kilobytes, for one token, in one layer.",
-          "show": "Right panel builds '2 × 8 × 128 × 2 = 4,096 bytes' term by term, then the label 'per layer, per token: 4 KB'. In the left column, slot 'L1' fills with its K and V pair."
+          "say": "About three hundred and twenty kilobytes per token. It is large because of the eighty: every layer holds its own version of the token.",
+          "show": "Large figure centre right: '≈ 320 KB per token', with a small grey note under it '327,680 bytes = 320 × 1,024' and a grey tag 'used from here on'. On 'the eighty', the '80' term and the whole left column glow coral together; label beside the column: 'a key and a value at every one of the eighty'."
+        }
+      ]
+    },
+    {
+      "id": "ch13_s09",
+      "name": "which terms can shrink",
+      "figs": [
+        139
+      ],
+      "visual": "Top band: the numeric equation '2 × 80 × 8 × 128 × 2' with each term labelled underneath: 'K and V', 'layers', 'KV heads', 'head dim', 'bytes'. Centre: two horizontal coral bars drawn to scale: a long ghost bar '64 KV heads: 2.6 MB per token' and a bar one-eighth as long '8 KV heads: 320 KB per token'. Lower band: a padlock on the layers term and three teal arrows pointing up at the shrinkable terms. The idea the motion makes visible: the eighty cannot move, so every saving has to come from the other terms.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here the shared key-value heads from earlier pay off. Sixty-four, one per query head, would make the cache eight times bigger: about two point six megabytes per token.",
+          "show": "In the equation, the '8' under 'KV heads' turns into '64' and glows amber. On 'eight times bigger', a long coral ghost bar draws across the centre, label '64 KV heads: 2.6 MB per token', with a small grey '× 8' at its end."
         },
         {
-          "id": "b4",
-          "say": "Now stack it eighty layers deep. Four thousand and ninety-six bytes, times eighty, is three hundred and twenty-seven thousand, six hundred and eighty bytes. That is the whole formula: two, times eighty, times eight, times a hundred and twenty-eight, times two.",
-          "show": "The column fills L2 to L80 rapidly, each slot gaining a K and V pair; a coral counter runs to 327,680. The top equation becomes fully numeric: '2 × 80 × 8 × 128 × 2 = 327,680 bytes'."
+          "id": "b2",
+          "say": "That eightfold cut is grouped-query attention, already built in. Nothing cuts the layers, because the layers are the model.",
+          "show": "The '64' turns back to '8', now teal. The ghost bar contracts to one-eighth of its length, '8 KV heads: 320 KB per token', with a teal tag 'grouped-query attention: ÷ 8'. On 'Nothing cuts the layers', a padlock settles onto the '80', label 'that is the model'."
         },
         {
-          "id": "b5",
-          "say": "Call it about three hundred and twenty kilobytes. Memory is often counted in kilobytes of one thousand and twenty-four bytes, and in those it is exactly three hundred and twenty. In the round thousands used earlier, about three hundred and twenty-eight.",
-          "show": "Large figure: '≈ 320 KB per token'. Small grey note under it: '320 × 1,024 bytes, or 328 × 1,000'."
-        },
-        {
-          "id": "b6",
-          "say": "That is the number the rest of this film uses. It is large because of the eighty. And the eighty is there because each layer works on a different version of the same token.",
-          "show": "The '× 80' term and the full left column glow coral together; label beside the column: 'a key and a value at every one of the eighty'."
+          "id": "b3",
+          "say": "So every technique that shrinks the cache attacks another term: fewer heads, narrower heads, or fewer bytes per number. Knowing which makes the rest of the series easier to follow.",
+          "show": "Three teal arrows draw up from below, one per phrase: 'fewer heads' to 'KV heads', 'narrower heads' to 'head dim', 'fewer bytes' to 'bytes'. On 'Knowing which', the bars fade and the labelled equation sits alone in the centre, with '320 KB, decomposed' beneath it."
         }
       ]
     },
     {
       "id": "ch13_s10",
-      "name": "which terms can shrink",
+      "name": "how big the cache gets",
       "figs": [
-        139
+        140
       ],
-      "visual": "Top band: the numeric equation '2 × 80 × 8 × 128 × 2' with each term labelled underneath: 'K and V', 'layers', 'K V heads', 'head dimension', 'bytes'. Centre: two horizontal bars drawn to scale, coral: a long ghost bar '64 K V heads: 2.6 MB per token' and a bar one-eighth as long '8 K V heads: 320 KB per token'. Lower band: padlock on the layers term and teal arrows pointing at the other shrinkable terms. The idea the motion makes visible: the eighty cannot move, so every saving has to come from the other terms.",
+      "visual": "Upper band: a blue bar, full width minus margins, labelled 'weights: 140 GB', fixed as the reference. Under it, drawn to the same scale, a coral bar 'KV cache' that starts at zero length and grows. Grey note 'drawn to scale'. Left: a token counter. Right third: a three-row table that fills: '1,000 tokens → 0.33 GB', '10,000 tokens → 3.3 GB', '100,000 tokens → 33 GB'. Both bars stay on screen into the next scene. The idea the motion makes visible: the cache grows in a straight line with the conversation, and at long lengths it is a sizeable fraction of the model itself.",
       "beats": [
         {
           "id": "b1",
-          "say": "Now the payoff promised earlier, when this model shared its keys and values. It has sixty-four query heads. If each of them had its own key and value, there would be sixty-four key-value heads, not eight.",
-          "show": "In the equation, the '8' under 'K V heads' briefly turns into '64' and glows amber."
+          "say": "The cache grows in a straight line with the conversation. A thousand tokens: a third of a gigabyte.",
+          "show": "Weights bar draws on, '140 GB'; empty coral cache bar beneath, counter at '0 tokens'. On 'A thousand', the counter runs to 1,000, the cache bar becomes a hairline, and the row '1,000 tokens → 0.33 GB' appears. Without narration, the counter runs on to 10,000, the bar becomes a thin sliver, row '10,000 tokens → 3.3 GB'."
         },
         {
           "id": "b2",
-          "say": "Then the cache would be eight times bigger, about two and a half megabytes for every token.",
-          "show": "A long coral ghost bar draws across the centre, label '64 K V heads: 2.6 MB per token'."
+          "say": "A hundred thousand: thirty-three gigabytes, already a quarter of the model itself, for one conversation.",
+          "show": "On 'A hundred thousand', the counter runs to 100,000, the cache bar reaches about a quarter of the weights bar, row '100,000 tokens → 33 GB'. On 'a quarter', a bracket joins the 33 GB bar to the 140 GB bar, tag '≈ ¼ of the model'; small grey tag 'one conversation'."
         },
         {
           "id": "b3",
-          "say": "Cutting the key-value heads from sixty-four to eight is what grouped-query attention does, and this model already uses it. That eightfold saving is already built into the three hundred and twenty kilobytes.",
-          "show": "The '64' in the equation turns back to '8' in teal. The ghost bar contracts to one-eighth of its length, '8 K V heads: 320 KB per token', with a teal tag 'grouped-query attention: ÷ 8'."
-        },
-        {
-          "id": "b4",
-          "say": "Nothing cuts the number of layers, because the layers are the model. So every technique that shrinks this cache attacks one of the other terms: how many key-value heads, how wide each one is, or how many bytes each number takes.",
-          "show": "A padlock icon settles onto the '80' term, label 'that is the model'. Three teal arrows draw from below to 'K V heads', 'head dimension' and 'bytes'."
-        },
-        {
-          "id": "b5",
-          "say": "Three hundred and twenty kilobytes, decomposed. Knowing which term each later technique attacks makes the rest of the series much easier to follow.",
-          "show": "Bars fade. The labelled equation sits alone in the centre, with '≈ 320 KB per token' beneath it."
+          "say": "A formula worth memorising: it turns any model's shape and context length straight into gigabytes.",
+          "show": "The two-line equation returns in the top band. Two input tags slide into it from the left, 'any model shape' and 'any context length'; an output tag appears on the right: 'gigabytes'."
         }
       ]
     },
     {
       "id": "ch13_s11",
-      "name": "how big the cache gets",
-      "figs": [
-        140
-      ],
-      "visual": "Upper band: a blue bar, full width minus margins, labelled 'weights: 140 GB', fixed as the reference. Under it, drawn to the same scale, a coral bar 'K V cache' that starts at zero length and grows. Left: a token counter. Right third: a three-row table that fills: '1,000 tokens → 0.33 GB', '10,000 tokens → 3.3 GB', '100,000 tokens → 33 GB'. The idea the motion makes visible: the cache grows in a straight line with the conversation, and at long lengths it is a sizeable fraction of the model itself.",
-      "beats": [
-        {
-          "id": "b1",
-          "say": "That is per token. A conversation holds many tokens, and the cache grows in a straight line with its length. Every token held in context adds another three hundred and twenty kilobytes.",
-          "show": "Weights bar draws on, '140 GB'. Empty coral cache bar beneath it, counter at '0 tokens'. Grey note: 'drawn to scale'."
-        },
-        {
-          "id": "b2",
-          "say": "A thousand tokens: about a third of a gigabyte. Ten thousand tokens: three point three gigabytes. A hundred thousand tokens: thirty-three gigabytes.",
-          "show": "Counter runs to 1,000; the cache bar is a hairline; table row '1,000 tokens → 0.33 GB'. Counter runs to 10,000; bar a thin sliver; row '3.3 GB'. Counter runs to 100,000; bar reaches about a quarter of the weights bar; row '33 GB'."
-        },
-        {
-          "id": "b3",
-          "say": "Put a real conversation in it. The weather conversation, one thousand and thirty-two tokens, was about four kilobytes of text on the wire. Its cache is about a third of a gigabyte, some eighty thousand times bigger.",
-          "show": "Small inset card left: blue 'text: about 4 KB' beside coral 'cache: about 0.34 GB', with a grey '≈ 80,000×' between them."
-        },
-        {
-          "id": "b4",
-          "say": "And at a hundred thousand tokens, the cache is already about a quarter of the model's own hundred and forty gigabytes. For a single conversation.",
-          "show": "Inset fades. The 33 GB cache bar and the 140 GB weights bar are bracketed together; tag '≈ ¼ of the model'."
-        },
-        {
-          "id": "b5",
-          "say": "A formula worth memorising. It converts any model's shape, and any context length, straight into gigabytes.",
-          "show": "The equation from earlier returns at the top band; two input tags slide into it, 'any model shape' and 'any context length', and an output tag appears: 'gigabytes'."
-        }
-      ]
-    },
-    {
-      "id": "ch13_s12",
       "name": "the cache and the weights compete",
       "figs": [
         141
       ],
-      "visual": "GPU package across the frame: compute die on the right. On the left, a large rounded panel 'H B M, one bandwidth budget' containing two blocks: a wide one 'the weights, read every step' and a narrower one 'the cache, read every step' that can grow. A single bus runs from the panel to the die, with coral particles flowing along it from both blocks; a grey label under the bus: 'both draw on the same bus'. Top right: a ceiling readout 'tokens per second ≤ bandwidth ÷ bytes per token' with live numbers. Later, several small cache blocks appear beside the single weights block, and four teal technique cards slide up along the bottom. The idea the motion makes visible: the weights and the cache drain one shared pipe, so a bigger cache means fewer tokens per second.",
+      "visual": "Continues from scene 10's two bars, which fold into blocks. GPU package across the frame, compute die on the right. On the left, a large rounded panel 'HBM, one bandwidth budget' containing two blocks: a wide blue one 'weights, read every step' and a narrower one 'cache, read every step' that can grow. A single bus runs from the panel to the die, carrying coral particles from both blocks; grey label under the bus 'both draw on the same bus'. Top right: a ceiling readout 'tokens/s ≤ bandwidth ÷ bytes per token' with live numbers. Later, five small cache blocks sit beside the weights block, and four teal technique cards slide up along the bottom. Keep at most five text items visible: labels fade as new ones arrive. The idea the motion makes visible: the weights and the cache drain one shared pipe, so a bigger cache means fewer tokens per second.",
       "beats": [
         {
           "id": "b1",
-          "say": "One last consequence, and it shapes everything after this. Every decode step reads every weight. It also reads every cache entry, up to the current position. Both come out of the same memory, across the same bus.",
-          "show": "Panel and both blocks fade in. On 'every weight', coral particles flow from the weights block along the bus; on 'every cache entry', particles from the cache block join the same bus. Label 'both draw on the same bus'."
+          "say": "Every step reads every weight and every cache entry so far, over one bus. So the ceiling from earlier, bandwidth over bytes per token, sinks as the cache grows.",
+          "show": "The two bars fold into blocks inside the HBM panel; the bus and die draw on. On 'every weight', coral particles flow from the weights block along the bus; on 'every cache entry', particles from the cache block join the same bus; label 'both draw on the same bus'. On 'the ceiling', the readout builds top right: 'tokens/s ≤ bandwidth ÷ bytes per token'."
         },
         {
           "id": "b2",
-          "say": "Remember the ceiling from earlier: bandwidth divided by bytes per token. Three point three five terabytes per second, over a hundred and forty gigabytes, is about twenty-four tokens a second on an H one hundred.",
-          "show": "Top-right readout builds: '3.35 TB/s ÷ 140 GB ≈ 24 tokens/s'."
+          "say": "On an H one hundred, the weights alone allow about twenty-four tokens a second. Add a hundred-thousand-token cache, and each step reads a hundred and seventy-three gigabytes: about nineteen. Illustrative, but the direction is general.",
+          "show": "Readout fills: '3.35 TB/s ÷ 140 GB ≈ 24 tokens/s'. On 'a hundred-thousand-token cache', the cache block grows to '33 GB'; the denominator becomes '140 + 33 = 173 GB' and the result counter drops from 24 to 19, the particle stream per token visibly longer. Grey tag 'illustrative: one request, H100'. On 'general', a small slider beside the readout: as the cache block grows the number falls, as it shrinks the number rises."
         },
         {
           "id": "b3",
-          "say": "Now take one conversation a hundred thousand tokens long. Each step reads a hundred and forty gigabytes of weights, plus about thirty-three of cache: a hundred and seventy-three in all. The ceiling falls to about nineteen tokens a second.",
-          "show": "The cache block grows to '33 GB'. The readout's denominator becomes '140 + 33 = 173 GB' and the result counter drops from 24 to 19. The particle flow per token visibly lengthens."
+          "say": "Batching shares one read of the weights among many conversations, but each cache is read for its own conversation alone.",
+          "show": "Slider, illustrative tag, readout and bus label fade; the block labels shorten to 'weights' and 'cache'. On 'shares one read', the weights block gains a teal tag 'read once, shared', and five small user icons appear beside the die, one particle stream from the weights block branching to all five. On 'each cache', five small cache blocks appear in shades of coral under one bracket 'one cache per conversation', each streaming to its own user icon only."
         },
         {
           "id": "b4",
-          "say": "That example is illustrative: one conversation, on its own. But the direction is general. The bigger the cache grows, the more bytes each token costs, and the lower that ceiling sits.",
-          "show": "Grey tag 'illustrative: one request, H100'. A small slider beside the readout: as the cache block grows the ceiling number falls, and as it shrinks the number rises."
+          "say": "That competition shapes every technique ahead: shrinking the cache, sharing it between requests that start alike, splitting it across machines, or never storing parts at all.",
+          "show": "The bracket fades. Four teal cards slide up along the bottom, one per phrase: a shrink-arrows icon 'shrink it'; a two-users icon 'share a common prefix'; a two-servers icon 'split across machines'; a crossed-out-block icon 'don't store parts'."
         },
         {
           "id": "b5",
-          "say": "So the model and the conversation's own state compete for the same resource. And when many conversations are batched together to share one read of the weights, each of them still brings its own cache.",
-          "show": "Beside the single weights block, now tagged teal 'read once, shared', five small cache blocks appear in different shades of coral, each tagged 'one per conversation'. All six feed the same bus."
-        },
-        {
-          "id": "b6",
-          "say": "That competition shapes every technique in the rest of the series. Shrinking the cache. Sharing it between requests that begin the same way. Splitting it across machines. Or never storing parts of it at all.",
-          "show": "Four teal cards slide up along the bottom, one per phrase: shrink-arrows icon 'shrink it'; two-users icon 'share a common prefix'; two-servers icon 'split across machines'; crossed-out-block icon 'don't store parts'."
-        },
-        {
-          "id": "b7",
-          "say": "Two different things, reading from one budget. Once the cache is large, optimising the weights alone stops being enough.",
-          "show": "Cards dim. Key phrase centred over the panel: 'two things, one budget'."
+          "say": "The model and the conversation's state: two different things, reading from one budget. Once the cache is large, optimising the weights alone stops being enough.",
+          "show": "Cards dim. On 'two different things', the weights block and the cache blocks pulse in turn. Key phrase centred over the panel: 'two things, one budget'."
         }
       ]
     }
   ],
   "checks": [
     {
-      "claim": "fig 132: with 5 tokens the causal triangle uses 1+2+3+4+5 = 15 of 25 cells",
+      "claim": "fig 132 (on screen): with 5 tokens the causal triangle uses 1+2+3+4+5 = 15 of 25 cells",
       "python": "print(5*6/2, 5*5)",
       "result": "15.0 25"
     },
     {
-      "claim": "fig 132: with 1,000 tokens the triangle is almost exactly half the grid",
+      "claim": "fig 132 (on screen): with 1,000 tokens the triangle is almost exactly half the grid",
       "python": "print((1000*1001/2)/1000**2)",
       "result": "0.5005"
     },
     {
-      "claim": "fig 133: four-token example 0 + 1 + 2 + 3 = 6 = 4 x 3 / 2 (half of a 4 by 3 rectangle)",
+      "claim": "fig 133 (on screen): four-token example 0 + 1 + 2 + 3 = 6 = 4 x 3 / 2 (half of a 4 by 3 rectangle)",
       "python": "print(sum(range(4)), 4*3/2)",
       "result": "6 6.0"
     },
@@ -526,17 +352,12 @@
       "result": "499500.0"
     },
     {
-      "claim": "fig 133 (added): doubling to 2,000 tokens roughly quadruples the waste",
-      "python": "print(2000*1999/2, (2000*1999/2)/(1000*999/2))",
-      "result": "1999000.0 4.002002002002002"
-    },
-    {
-      "claim": "fig 134: if linear and quadratic totals are about equal at 10 tokens, going to 10,000 grows linear x1,000 and quadratic about x1,000,000, so quadratic ends about 1,000 times worse. Atlas wording 'a thousand times worse' is read as this ratio; with n(n-1)/2 the exact figure is 1,111",
+      "claim": "fig 134: if linear and quadratic totals are about equal at 10 tokens, going to 10,000 grows linear x1,000 and quadratic about x1,000,000, so quadratic ends about 1,000 times worse. Atlas wording 'a thousand times worse' is read as this ratio; with n(n-1)/2 the exact figure is 1,111, hence 'about'",
       "python": "print(10000/10, (10000*9999/2)/(10*9/2), ((10000*9999/2)/(10*9/2))/(10000/10))",
       "result": "1000.0 1111000.0 1111.0"
     },
     {
-      "claim": "fig 136 (added): with the cache, 1,000 key-and-value computations instead of 499,500, about 500 times fewer",
+      "claim": "fig 136 (on screen): with the cache, 1,000 key-and-value computations instead of 499,500, about 500 times fewer",
       "python": "print(499500/1000)",
       "result": "499.5"
     },
@@ -546,9 +367,14 @@
       "result": "1032.0"
     },
     {
-      "claim": "cache analogy (added): the sticky-note sum 37 x 48 = 1,776",
-      "python": "print(37*48)",
-      "result": "1776"
+      "claim": "cache analogy (added, on screen): the sticky-note sum 37 x 48 = 1,776 and the unread note 52 x 17 = 884",
+      "python": "print(37*48, 52*17)",
+      "result": "1776 884"
+    },
+    {
+      "claim": "fig 138: if keys and values were made once, the cache would be 80 times smaller: 327,680 / 80 = 4,096 bytes, one layer's worth",
+      "python": "print(327680/80, 2*1*8*128*2)",
+      "result": "4096.0 4096"
     },
     {
       "claim": "fig 139: one key = 8 KV heads x 128 = 1,024 numbers (queries are 64 x 128 = 8,192); at 2 bytes, 2,048 bytes per key",
@@ -561,12 +387,12 @@
       "result": "4096 327680 327680"
     },
     {
-      "claim": "fig 139/140: 327,680 bytes is exactly 320 KB counting 1,024-byte kilobytes, and 327.68 counting 1,000-byte kilobytes (the film defined a kilobyte as 1,000 bytes in ch02/ch04, so both are stated; 'about 320' kept per CHAPTER_NOTES)",
+      "claim": "fig 139/140: 327,680 bytes is exactly 320 KB counting 1,024-byte kilobytes, and 327.68 counting 1,000-byte kilobytes (the film defined a kilobyte as 1,000 bytes in ch02). Narration keeps the canonical 'about 320 kilobytes' from CHAPTER_NOTES; the screen shows '327,680 bytes = 320 × 1,024' so the two conventions are not silently mixed",
       "python": "print(327680/1024, 327680/1000)",
       "result": "320.0 327.68"
     },
     {
-      "claim": "fig 139: with 64 KV heads (no grouped-query attention) the cache would be 2,621,440 bytes per token = 2.62 MB = 2.5 MiB, eight times larger ('about two and a half megabytes', on screen '2.6 MB')",
+      "claim": "fig 139: with 64 KV heads (no grouped-query attention) the cache would be 2,621,440 bytes per token = 2.62 MB in the film's decimal units (2.5 only in binary MiB), eight times larger. Corrected: narration now says 'about two point six megabytes', matching the on-screen '2.6 MB'",
       "python": "print(2*80*64*128*2, 2*80*64*128*2/1e6, 2*80*64*128*2/2**20, 2*80*64*128*2/327680)",
       "result": "2621440 2.62144 2.5 8.0"
     },
@@ -579,11 +405,6 @@
       "claim": "fig 140: 33 GB against 140 GB of weights is about a quarter (23.4%)",
       "python": "print(327680*100000/1e9/140)",
       "result": "0.23405714285714285"
-    },
-    {
-      "claim": "fig 140 (added, Example A): the 1,032-token weather conversation's cache is 338 MB, about a third of a gigabyte; against about 4 KB of text that is some 80,000 times bigger (81,920 per token at 4 bytes per token; 84,541 against 4,000 bytes)",
-      "python": "print(1032*327680, 1032*327680/1e9, 1032*327680/4000, 327680/4)",
-      "result": "338165760 0.33816576 84541.44 81920.0"
     },
     {
       "claim": "fig 141 / fig 130 recall: H100 ceiling 3.35 TB/s / 140 GB = 23.9, about 24 tokens a second",
