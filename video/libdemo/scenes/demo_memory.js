@@ -21,11 +21,20 @@ V.scene('demo_memory', S => {
   S.add(fx.in([blkLabel, blk], { from: 'left', d: 0.6 }), 'b1+0.3');
   S.add(h200.grow('kv', 30, { d: 1.4 }), 'b1+0.9');
   S.add(h200.overflow(), 'b1+2.4');
+  // a seek-safe word change: fx.swap restores its build-time text when sought back past a second swap
+  const swapTo = (el, before, after) => {
+    const p = { v: 0 }, set = () => { el.textContent = p.v < 0.5 ? before : after; };
+    const t = gsap.timeline();
+    t.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -12, duration: 0.2, ease: 'power2.in', immediateRender: false }, 0);
+    t.fromTo(p, { v: 0 }, { v: 1, duration: 0.001, immediateRender: false, onStart: set, onUpdate: set, onReverseComplete: set }, 0.2);
+    t.fromTo(el, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out', immediateRender: false }, 0.2);
+    return t;
+  };
   S.add(blk.resize(70, { d: 0.7 }), 'b1+1.4');
-  S.add(fx.swap(blkLabel, 'weights at 8 bits'), 'b1+1.4');
+  S.add(swapTo(blkLabel, 'weights at 16 bits', 'weights at 8 bits'), 'b1+1.4');
   S.add(blk.resize(35, { d: 0.7 }), 'b1+2.5');
-  S.add(fx.swap(blkLabel, 'weights at 4 bits'), 'b1+2.5');
-  S.add(fx.out(p1, { d: 0.35 }), 'b2-0.45');
+  S.add(swapTo(blkLabel, 'weights at 8 bits', 'weights at 4 bits'), 'b1+2.5');
+  S.add(fx.out(p1, { d: 0.3 }), 'b2-0.75');
 
   // ---------------------------------------------------------------- b2-b3: the KV cache
   const p2 = S.g();
@@ -52,7 +61,7 @@ V.scene('demo_memory', S => {
   S.add(pool.mark([0, 1, 2]), 'b3');
   S.add(pool.evict([3, 4, 5, 6], { grey: true, stagger: 0.08 }), 'b3+0.8');
   S.add(pool.fill([3, 4, 5, 6], { tone: 'neutral', from: 'right', stagger: 0.08 }), 'b3+2.0');
-  S.add(fx.out(p2, { d: 0.35 }), 'b4-0.45');
+  S.add(fx.out(p2, { d: 0.3 }), 'b4-0.75');
 
   // ---------------------------------------------------------------- b4: bytes moving
   const p4 = S.g();

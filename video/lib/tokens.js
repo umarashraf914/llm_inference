@@ -71,7 +71,7 @@ const __TOK = (() => {
       if (st.color) {
         const c = st.color;
         if (st.style === 'solid') return { base: true, solid: c, text: DARK };
-        return { base: true, flat: c, fo: 0.2, stroke: c, so: 0.85, sw: 2, text: 'ink' };
+        return { base: true, flat: c, fo: 0.24, stroke: c, so: 0.9, sw: 2, text: 'ink' };
       }
       const tone = st.tone || 'struct', style = st.style || 'soft';
       if (style === 'solid') return { base: true, solid: tone, text: DARK };
@@ -127,9 +127,10 @@ const __TOK = (() => {
   /** A blue shade for request k (slightly different blues, deterministic). */
   function shade(S, k, seed) {
     const r = S.rand(((seed || 7) * 7919 + k * 104729) >>> 0);
-    r(); const a = r(), b = r();
-    const toward = a < 0.5 ? '#a9c8ff' : '#4d7fe6';
-    return mix(S, 'struct', b < 0.33 ? '#7d8cff' : toward, 0.18 + 0.32 * r());
+    r();
+    const towards = ['#9cc6ff', '#3f68d4', '#8f8dff', '#4fc3ff'];
+    const pickT = towards[(k + Math.floor(r() * 4)) % 4];
+    return mix(S, 'struct', pickT, 0.35 + 0.3 * r());
   }
   /** Chip metrics shared by libToken and the strip's layout. */
   function metrics(S, o) {
@@ -239,7 +240,7 @@ function libTokenize(text, o = {}) {
  *    .frameEl, and geometry as drawn: .x .y (top) .w .h .l .r .t .b .cx .cy .rad .wNarrow, .text, .state.
  *    .__dx/.__dy is the planned offset (where helpers have moved it).
  * Helpers (each returns a tween/timeline for S.add; call in time order):
- *    .pop({d: 0.5, from: 0.5}) pop in · .in({from: 'up', d: 0.6, dist: 30}) slide in · .out({d: 0.35})
+ *    .pop({d: 0.5, from: 0.6}) pop in · .in({from: 'up', d: 0.6, dist: 30}) slide in · .out({d: 0.35})
  *    .flyIn([x, y], {d: 0.8}) fly in from a point (parent coords) · .moveTo([x, y], {d: 0.7}) centre to a point
  *    .moveBy(dx, dy, {d}) · .travel(pathD | <path>, {d: 1, ease, appear}) the centre follows a path (start it at
  *        the chip's current centre; appear: fades in as it sets off)
@@ -310,8 +311,8 @@ function libToken(S, o = {}, parent) {
   g.moveBy = (dx, dy, mo = {}) => go([g.__dx + (dx || 0), g.__dy + (dy || 0)], mo.d ?? 0.5, mo.ease);
   g.pop = (po = {}) => {
     const d = po.d ?? 0.5, tl = gsap.timeline();
-    tl.fromTo(g, { autoAlpha: 0 }, { autoAlpha: 1, duration: Math.min(0.18, d * 0.4), ease: 'power1.out' }, 0);
-    tl.fromTo(body, { scale: po.from ?? 0.5, transformOrigin: '50% 50%' }, { scale: 1, duration: d, ease: po.ease || 'back.out(2.2)', transformOrigin: '50% 50%' }, 0);
+    tl.fromTo(g, { autoAlpha: 0 }, { autoAlpha: 1, duration: Math.min(0.2, d * 0.4), ease: 'power2.in' }, 0);
+    tl.fromTo(body, { scale: po.from ?? 0.6, transformOrigin: '50% 50%' }, { scale: 1, duration: d, ease: po.ease || 'back.out(2.2)', transformOrigin: '50% 50%' }, 0);
     return tl;
   };
   g.in = (io = {}) => {
@@ -434,7 +435,7 @@ function libToken(S, o = {}, parent) {
   };
   g.badge = (txt, bo = {}) => {
     const br = Math.max(17, Math.round(size * 0.52));
-    const bx = x + g.__w - Math.round(br * 0.35), by = y + Math.round(br * 0.2);
+    const bx = x + g.__w - Math.round(br * 0.1), by = y - Math.round(br * 0.2);
     const bg = S.g(null, g);
     const tone = bo.tone || 'helps';
     S.circle({ x: bx, y: by, r: br, fill: T.BASE }, bg);
@@ -556,6 +557,7 @@ function libTokenStrip(S, o = {}, parent) {
     const d = ro.d ?? 0.6, ease = ro.ease || 'power3.inOut';
     root.items.forEach((c, k) => {
       c.line = P[k].line;
+      if (c.__fell) return;   // out of the window: placed by push
       const tx = P[k].x - c.x0, ty = P[k].y - c.cy0 + c.__drop + c.__lift;
       if (Math.abs(tx - c.__dx) < 0.01 && Math.abs(ty - c.__dy) < 0.01) return;
       const arc = ro.arc && tx < c.__dx - c.__w ? -(h * 1.15) : 0;
@@ -594,7 +596,7 @@ function libTokenStrip(S, o = {}, parent) {
         const mx = jx - lead[i] / 2;
         const m = S.line({ x1: mx, y1: L.y - h * 0.36, x2: mx, y2: L.y + h * 0.36, stroke: '#ffffff', sw: 2.5, strokeOpacity: 0.9 }, decoG);
         m.setAttribute('data-audit', 'ignore');
-        m.style.opacity = 0;
+        T.hide(m);
         root.__cutMarks.push(m);
       }
       jx += tws[i];
@@ -667,14 +669,14 @@ function libTokenStrip(S, o = {}, parent) {
     const chip = make(sp, p);
     chip.raw = it.t;
     const d = ao.d ?? (ao.via ? 1 : ao.from ? 0.8 : 0.5);
-    const landAt = ao.via ? d + 0.15 : ao.from ? d * 0.8 : 0.08;
+    const arrive = ao.via || ao.from ? d : 0;   // when the chip reaches its place: room opens just before
     if (si >= 0) {
       const slot = root.items[si];
       root.items.splice(si, 1, chip);
-      tl.fromTo(slot, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, Math.max(0, landAt - 0.1));
+      tl.fromTo(slot, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, Math.max(0, arrive - 0.15));
     } else root.items.push(chip);
     sync();
-    relayoutInto(tl, ao.via || ao.from ? Math.max(0, landAt - 0.35) : 0.02, { d: 0.45 });
+    relayoutInto(tl, Math.max(0, arrive - 0.55), { d: 0.45 });
     if (ao.via) {
       tl.add(chip.travel(ao.via, { d, appear: true }), 0);
       tl.add(chip.moveTo([chip.cx, chip.cy], { d: 0.3, ease: 'power2.out' }), d);
@@ -688,6 +690,7 @@ function libTokenStrip(S, o = {}, parent) {
     list.forEach((t, k) => tl.add(root.append(t, so), k * every));
     return tl;
   };
+  const fallen = [];   // chips that left the window, newest first
   root.push = (t, po = {}) => {
     const tl = gsap.timeline(), d = po.d ?? 0.5;
     const ap = root.append(t, { ...po, d: po.popD });
@@ -696,19 +699,31 @@ function libTokenStrip(S, o = {}, parent) {
     const n = root.tokens.length;
     if (n > keep) {
       const first = root.tokens[n - keep];
-      const target = -(first.x0 + first.__dx - L.x);
-      tl.add(S.fx.xform(content, { x: target }, { d, ease: 'power2.inOut' }), 0);
+      const C1 = -(first.x0 + first.__dx - L.x);   // the content's new x
+      tl.add(S.fx.xform(content, { x: C1 }, { d, ease: 'power2.inOut' }), 0);
       if (po.drop !== false) {
-        root.tokens.slice(0, n - keep).forEach((c, i) => {
-          if (c.__drop) return;
-          c.__drop = po.dy ?? Math.round(h * 0.95);
-          tl.add(root.drop.one(c, { d }), 0.05);
+        root.tokens.slice(0, n - keep).filter(c => !c.__fell).forEach(c => {
+          c.__fell = true; fallen.unshift(c);
+          tl.add(c.setState(po.state || 'dim', { d }), 0);
+        });
+        // the newest fallen chip drops straight down below the window's left end; older ones move along, the
+        // oldest fade. Targets counter the content's scroll (same duration and ease), so they hold still.
+        const dy = po.dy ?? (o.window ? h + 32 : Math.round(h * 0.95)), maxF = po.fallen ?? 3;
+        let fx0 = L.x;
+        fallen.forEach((c, k) => {
+          const tx = fx0 - c.x0 - C1, ty = L.y + dy - c.cy0;
+          fx0 += c.__w + gap;
+          tl.fromTo(c, { x: c.__dx, y: c.__dy }, { x: tx, y: ty, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
+          c.__dx = tx; c.__dy = ty;
+          if (k >= maxF && !c.__gone) { c.__gone = true; tl.fromTo(c, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.7, immediateRender: false }, 0); }
         });
       }
     }
     tl.token = ap.token;
     return tl;
   };
+  /** Geometry of the fallen-chip row (for an 'out of reach' tag): {x1, cy} after the pushes so far. */
+  root.fallenRow = (po = {}) => ({ x1: L.x, cy: L.y + (po.dy ?? (o.window ? h + 32 : Math.round(h * 0.95))) });
   root.reveal = (range, ro = {}) => {
     const cs = pick(range), tl = gsap.timeline(), every = ro.every ?? 0.08;
     cs.forEach((c, k) => tl.add(c.pop({ d: ro.d ?? 0.5 }), k * every));
@@ -831,7 +846,7 @@ function libTokenStrip(S, o = {}, parent) {
   root.cut = (co = {}) => {
     const d = co.d ?? 0.9, tl = gsap.timeline();
     (root.__cutMarks || []).forEach((m, k) => {
-      tl.fromTo(m, { autoAlpha: 1, drawSVG: '50% 50%' }, { drawSVG: '0% 100%', duration: 0.22, ease: 'power2.out', immediateRender: false }, k * 0.04);
+      tl.fromTo(m, { autoAlpha: 0, drawSVG: '50% 50%' }, { autoAlpha: 1, drawSVG: '0% 100%', duration: 0.22, ease: 'power2.out', immediateRender: false }, k * 0.04);
       tl.fromTo(m, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, 0.32 + k * 0.04);
     });
     const t0 = 0.22;
@@ -921,7 +936,8 @@ function libTokenStrip(S, o = {}, parent) {
  *    .unpillify(a, b, {d})         relax them back into text
  *    .glow(a, b, {hold: 0.8})      white ring round tokens a..b, on and off
  *    .dimTokens(a, b, {to: 0.5}) / .undimTokens(a, b)
- *    .ghosts(a, b, {d: 0.5})       unstreamed tokens a..b show as dashed outlines: what was never computed
+ *    .ghosts(a, b, {d: 0.5, caret})  unstreamed tokens a..b show as dashed outlines: what was never computed
+ *        (the caret fades, since generation stopped; caret: true keeps it)
  *    .bracket(a, b, {label, tone}) -> a bracket <g> under tokens a..b, hidden until its .drawOn()
  *    .blink({n: 3, period: 0.9})   the caret blinks n times (deterministic), e.g. while waiting
  *    .showCaret() / .hideCaret()
@@ -989,7 +1005,8 @@ function libChatWindow(S, o = {}, parent) {
   const maxLines = o.maxLines ?? Math.max(1, Math.floor((bottom - (ay - lineH / 2)) / lineH));
   const answerG = S.g(null, root);
   const scroller = S.g(null, answerG);
-  root.sparkle = S.icon('ph:sparkle-fill', { x: iconX, y: ay, size: icon, color: tone }, scroller);
+  const sparkleFade = S.g(null, scroller);   // scroll fade (attribute opacity); the icon itself takes drawOn / fx (style)
+  root.sparkle = S.icon('ph:sparkle-fill', { x: iconX, y: ay, size: icon, color: tone }, sparkleFade);
   // ---- tokens, laid out word by word (a word = a token with a leading space plus the pieces glued to it)
   const toks = Array.isArray(o.answer) ? o.answer.slice() : libTokenize(o.answer || '', { splits: o.splits });
   const spW = S.measure(' ', { size, weight });
@@ -1021,12 +1038,22 @@ function libChatWindow(S, o = {}, parent) {
     return { g: outer, mid, inner, flash, stand, box, text, raw: t, i: k, line: p.line, word: p.word, x: p.x, w: p.w, y: ly, __sx: 0, __a: 0, __f: 0, __dim: 1 };
   });
   root.lines = toks.length ? pos[toks.length - 1].line + 1 : 0;
-  // ---- caret: caretG takes the pillify spread (GSAP x); the rect is placed by the stream
+  // ---- caret: after the newest landed token (set by the stream), at that token's live pill spread, so it
+  // follows pillify / unpillify whatever order the helpers were called in
   const caretH = Math.round(size * 1.12);
-  const caretG = S.g(null, answerG);
-  if (o.caret !== false) root.caret = S.rect({ x: ax, y: ay - caretH / 2, w: 3, h: caretH, r: 1.5, fill: tone }, caretG);
-  root.caretG = caretG;
-  const caretAt = k => (k < 0 ? { x: ax, y: ay } : { x: root.tokens[k].x + root.tokens[k].w + 4, y: root.tokens[k].y });
+  if (o.caret !== false) root.caret = S.rect({ x: ax, y: ay - caretH / 2, w: 3, h: caretH, r: 1.5, fill: tone }, answerG);
+  root.__caretK = -1;
+  const placeCaret = () => {
+    if (!root.caret) return;
+    const k = root.__caretK;
+    let x = ax, y = ay;
+    if (k >= 0) {
+      const tk = root.tokens[k];
+      x = tk.x + tk.w + 4 + (+gsap.getProperty(tk.mid, 'x') || 0) + (+gsap.getProperty(tk.stand, 'opacity') || 0) * (pPad + 2);
+      y = tk.y;
+    }
+    root.caret.setAttribute('x', T.f2(x)); root.caret.setAttribute('y', T.f2(y - caretH / 2));
+  };
   Object.assign(root, { x: X, y: Y, w: W, h: H, l: X, r: X + W, t: Y, b: Y + H, cx: X + W / 2, cy: Y + H / 2, ax, ay, aw, lineH, maxLines, answerG, size });
 
   // ---- streaming: one proxy per call, driving the landed state, pill flash, caret and scroll
@@ -1047,7 +1074,6 @@ function libChatWindow(S, o = {}, parent) {
     nextK = Math.max(nextK, to);
     const dur = (times.length ? times[times.length - 1] : 0) + Math.max(relax, 0.35) + 0.02;
     const proxy = { t: 0 };
-    let lastCaret = '';
     const render = () => {
       const tt = proxy.t;
       let sc = s0;
@@ -1056,11 +1082,11 @@ function libChatWindow(S, o = {}, parent) {
       scroller.setAttribute('transform', tr);
       if (root.caret) root.caret.setAttribute('transform', tr);
       const fadeOf = ln => T.clamp(1 - (sc - ln) / 0.7);
-      if (sc > 0 || steps.length) root.sparkle.setAttribute('opacity', fadeOf(0).toFixed(3));
+      if (sc > 0 || steps.length) sparkleFade.setAttribute('opacity', fadeOf(0).toFixed(3));
       let newest = from - 1;
       for (let k = from; k < to; k++) {
         const tk = root.tokens[k], age = tt - times[k - from];
-        const landed = age >= 0;
+        const landed = age > 0;
         if (landed) newest = k;
         const a = landed ? T.clamp(age / 0.06) * fadeOf(tk.line) : 0;
         const f = landed ? Math.pow(T.clamp(1 - age / relax), 1.6) : 0;
@@ -1071,10 +1097,8 @@ function libChatWindow(S, o = {}, parent) {
         const tk = root.tokens[k], a = fadeOf(tk.line);
         if (Math.abs(a - tk.__a) > 1e-4) { tk.inner.setAttribute('opacity', a.toFixed(3)); tk.__a = a; }
       }
-      if (root.caret) {
-        const c = caretAt(newest), key = `${c.x},${c.y}`;
-        if (key !== lastCaret) { root.caret.setAttribute('x', c.x); root.caret.setAttribute('y', c.y - caretH / 2); lastCaret = key; }
-      }
+      root.__caretK = newest;
+      placeCaret();
     };
     const tw2 = gsap.fromTo(proxy, { t: 0 }, { t: dur, duration: dur, ease: 'none', immediateRender: false, onUpdate: render, onStart: render, onReverseComplete: () => { proxy.t = 0; render(); } });
     tw2.times = times;
@@ -1125,37 +1149,41 @@ function libChatWindow(S, o = {}, parent) {
   // ---- pills that stand apart, glow, dim, ghosts
   const rng = (a, b) => T.idx([a, b ?? a], root.tokens.length).map(i => root.tokens[i]);
   const caretSpread = (tl, d) => {
-    // the caret follows the newest landed token's spread when that token is on a spread line
-    const k = nextK - 1;
-    const want = k >= 0 ? root.tokens[k].__sx : 0;
-    const from = caretG.__sx || 0;
-    if (Math.abs(want - from) > 0.01) tl.fromTo(caretG, { x: from }, { x: want, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
-    caretG.__sx = want;
+    // re-place the caret on every frame of the spread (it reads the token's live position)
+    const p = { v: 0 };
+    tl.fromTo(p, { v: 0 }, { v: 1, duration: d, ease: 'none', immediateRender: false, onUpdate: placeCaret, onReverseComplete: placeCaret }, 0);
+  };
+  const setSx = (tl, tk, v, d) => {
+    if (Math.abs(v - tk.__sx) > 0.01) tl.fromTo(tk.mid, { x: tk.__sx }, { x: v, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
+    tk.__sx = v;
   };
   root.pillify = (a, b, po = {}) => {
-    const spread = po.spread ?? Math.round(2 * pPad + 8), d = po.d ?? 0.4, tl = gsap.timeline();
+    const want = po.spread ?? Math.round(2 * pPad + 10), d = po.d ?? 0.4, tl = gsap.timeline();
     const ts = rng(a, b);
-    const lastLine = ts[ts.length - 1].line, lastI = ts[ts.length - 1].i;
-    ts.forEach((tk, k) => {
-      const from = tk.__sx; tk.__sx = k * spread;
-      tl.fromTo(tk.mid, { x: from }, { x: tk.__sx, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
-      tl.fromTo(tk.stand, { opacity: 0 }, { opacity: 1, duration: d, ease: 'power1.out', immediateRender: false }, 0);
-    });
-    root.tokens.filter(t => t.i > lastI && t.line === lastLine).forEach(tk => {
-      const from = tk.__sx; tk.__sx = (ts.length - 1) * spread;
-      tl.fromTo(tk.mid, { x: from }, { x: tk.__sx, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
-    });
+    // spread line by line: pills on one line stand apart by `want` px, less if the line has no room left
+    const byLine = {};
+    ts.forEach(tk => (byLine[tk.line] = byLine[tk.line] || []).push(tk));
+    for (const ln of Object.keys(byLine).map(Number)) {
+      const arr = byLine[ln], onLine = root.tokens.filter(t => t.line === ln);
+      const lastOn = onLine[onLine.length - 1], first = arr[0], lastP = arr[arr.length - 1];
+      const prev = root.tokens[first.i - 1], after = onLine.filter(t => t.i > lastP.i);
+      const base = prev && prev.line === ln && !/^\s/.test(first.raw) ? pPad + 3 : 0;            // clear a glued neighbour before
+      const extra = after.length && !/^\s/.test(after[0].raw) ? pPad + 3 : 0;                    // and after
+      const room = ax + aw + pad * 0.3 - (lastOn.x + lastOn.w + (lastOn === lastP ? pPad : 0)) - base - extra;
+      const sp = arr.length > 1 ? Math.max(2 * pPad + 2, Math.min(want, room / (arr.length - 1))) : 0;
+      if (arr.length > 1 && room < (arr.length - 1) * sp - 1) S.warn(`libChatWindow.pillify: line ${ln + 1} overflows by ${Math.round((arr.length - 1) * sp - room)} px; pillify fewer tokens or widen the window`);
+      arr.forEach((tk, k) => { setSx(tl, tk, base + k * sp, d); tk.__pill = true; });
+      arr.forEach(tk => tl.fromTo(tk.stand, { opacity: 0 }, { opacity: 1, duration: d, ease: 'power1.out', immediateRender: false }, 0));
+      after.forEach(tk => setSx(tl, tk, base + (arr.length - 1) * sp + extra, d));
+    }
     caretSpread(tl, d);
     return tl;
   };
   root.unpillify = (a, b, po = {}) => {
     const d = po.d ?? 0.4, tl = gsap.timeline();
-    const ts = rng(a, b), lastI = ts[ts.length - 1].i, lastLine = ts[ts.length - 1].line;
-    ts.concat(root.tokens.filter(t => t.i > lastI && t.line === lastLine)).forEach(tk => {
-      const from = tk.__sx; tk.__sx = 0;
-      if (from) tl.fromTo(tk.mid, { x: from }, { x: 0, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
-    });
-    ts.forEach(tk => tl.fromTo(tk.stand, { opacity: 1 }, { opacity: 0, duration: d, ease: 'power1.in', immediateRender: false }, 0));
+    const ts = rng(a, b), lines = new Set(ts.map(t => t.line));
+    root.tokens.filter(t => lines.has(t.line) && t.i >= ts[0].i).forEach(tk => setSx(tl, tk, 0, d));
+    ts.forEach(tk => { tk.__pill = false; tl.fromTo(tk.stand, { opacity: 1 }, { opacity: 0, duration: d, ease: 'power1.in', immediateRender: false }, 0); });
     caretSpread(tl, d);
     return tl;
   };
@@ -1194,11 +1222,17 @@ function libChatWindow(S, o = {}, parent) {
     const tl = gsap.timeline(), ts = rng(a, b);
     ts.forEach((tk, k) => {
       if (!tk.ghost) {
-        tk.ghost = S.rect({ ...tk.box, stroke: tone, strokeOpacity: 0.6, sw: 2, dash: '6 6' }, tk.mid);
+        // split each word space between its neighbours, leaving a 4 px gap; glued pieces split at the seam
+        const prev = root.tokens[tk.i - 1], next = root.tokens[tk.i + 1];
+        const gluedL = prev && prev.line === tk.line && !/^\s/.test(tk.raw), gluedR = next && next.line === tk.line && !/^\s/.test(next.raw);
+        const x1 = gluedL ? tk.x + 2 : tk.x - Math.max(3, spW / 2 - 2), x2 = gluedR ? tk.x + tk.w - 2 : tk.x + tk.w + Math.max(3, spW / 2 - 2);
+        tk.ghost = S.rect({ x: x1, y: tk.box.y, w: Math.max(6, x2 - x1), h: tk.box.h, r: tk.box.r, stroke: tone, strokeOpacity: 0.6, sw: 2, dash: '6 6' }, tk.mid);
         tk.ghost.setAttribute('data-audit', 'ignore');
       }
       tl.fromTo(tk.ghost, { autoAlpha: 0 }, { autoAlpha: 1, duration: go.d ?? 0.5, ease: 'power1.out' }, k * (go.stagger ?? 0.04));
     });
+    // generation has stopped: the caret goes (caret: true keeps it)
+    if (root.caret && go.caret !== true) tl.fromTo(root.caret, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, 0);
     return tl;
   };
   root.bracket = (a, b, bo = {}) => {
@@ -1334,7 +1368,7 @@ function libBubble(S, o = {}, parent) {
  * Helpers (return tweens/timelines; call in time order):
  *    .grow(range, {d: 0.8, stagger: 0.25})  segments grow from their left ends (rows: each row with its label)
  *    .toStack({d: 1.1, stagger: 0.08})      rows slide end to end into the stacked bar, labels swap over
- *    .count({d: 1.2})                       the total counter appears and runs up to the sum
+ *    .count({d: 1.2, from: 0})              the total counter appears and runs up to the sum
  *    .land(i, [x, y], {d: 0.8})             a segment flies in from a point and lands in place
  *    .append(seg, {d: 0.7})                 add a segment at the end (it grows in)
  *    .paint(range, state, {d: 0.4, stagger}) recolour segments (e.g. 'cached' teal for a hit, 'prefill' amber)
@@ -1363,7 +1397,7 @@ function libPromptStack(S, o = {}, parent) {
   const X = t => sx + t * scale;
   Object.assign(root, { X, scale, total: totalTok });
   const labelMode = o.labels || 'auto';
-  const placedAbove = [], placedBelow = [];   // x-extents of outside labels / values, per tier
+  const placedAbove = [], placedBelow = [], ticks = [];   // x-extents of outside labels / values per tier; leader ticks
   const tierFor = (list, box, gapX) => { let k = 0; for (; k < 6; k++) if (!(list[k] || []).some(b => !(box[1] + gapX < b[0] || box[0] - gapX > b[1]))) break; (list[k] = list[k] || []).push(box); return k; };
   // ---- context-window outline
   if (o.capacity) {
@@ -1376,7 +1410,7 @@ function libPromptStack(S, o = {}, parent) {
   }
   // ---- one segment, drawn at its stack geometry
   let cum = 0;
-  const makeSeg = (s, i, x, w, last) => {
+  const makeSeg = (s, i, x, w, last, nx = Infinity) => {   // nx: the next segment's centre x
     const g = S.g(null, segG), body = S.g(null, g), barG = S.g(null, body), inG = S.g(null, body);
     const carve = last ? 0 : Math.min(gap, w * 0.25);
     const bw = Math.max(1.5, w - carve);
@@ -1395,24 +1429,30 @@ function libPromptStack(S, o = {}, parent) {
       const lx = iconIn ? x + 16 + iconSize + 10 + room / 2 + 8 : x + bw / 2;
       seg.label = S.text(s.label, { x: lx, y: sy + h / 2 + 1, size, weight: 600, anchor: 'middle', color: tc, maxW: Math.max(20, room + 8) }, inG);
     } else if (s.label && labelMode !== 'none') {
-      // above the bar, in the lowest tier where it collides with nothing and sits on no lower tier's tick
-      const cx = x + bw / 2;
-      const lx1 = Math.max(cx - lw / 2, sx - 4), box = [lx1, lx1 + lw];
-      let tier = 0;
-      for (; tier < 6; tier++) {
-        const clash = (placedAbove[tier] || []).some(b => !(box[1] + 18 < b[0] || box[0] - 18 > b[1]));
-        const onTick = placedAbove.slice(0, tier).some(list => (list || []).some(b => cx > b[0] - 10 && cx < b[1] + 10));
-        if (!clash && !onTick) break;
+      // above the bar with a leader tick from the segment's centre. Candidates per tier: centred on the tick,
+      // starting at it, ending at it. Valid when it clears labels in its tier, the tick misses every lower
+      // tier's label, and no higher tier's tick runs through it. Lean left when the next segment is close.
+      const cx = x + bw / 2, ly0 = sy - 32, tierH = Math.round(size * 1.4);
+      const order = nx - cx < lw * 0.6 ? ['end', 'mid', 'start'] : ['mid', 'start', 'end'];
+      let best = null;
+      for (let tier = 0; tier < 6 && !best; tier++) {
+        for (const a of order) {
+          let b0 = a === 'mid' ? cx - lw / 2 : a === 'start' ? cx - 14 : cx + 14 - lw;
+          b0 = Math.max(b0, sx - 4);
+          const box = [b0, b0 + lw];
+          const clash = (placedAbove[tier] || []).some(b => !(box[1] + 18 < b[0] || box[0] - 18 > b[1]));
+          const crossesLower = placedAbove.slice(0, tier).some(list => (list || []).some(b => cx > b[0] - 10 && cx < b[1] + 10));
+          const tickThrough = ticks.some(tk => tk.tier > tier && tk.x > box[0] - 10 && tk.x < box[1] + 10);
+          if (!clash && !crossesLower && !tickThrough) { best = { tier, box }; break; }
+        }
       }
-      (placedAbove[tier] = placedAbove[tier] || []).push(box);
-      const ly = sy - 32 - tier * Math.round(size * 1.4);
+      if (!best) best = { tier: 5, box: [cx - lw / 2, cx + lw / 2] };
+      (placedAbove[best.tier] = placedAbove[best.tier] || []).push(best.box);
+      ticks.push({ x: cx, tier: best.tier });
+      const ly = ly0 - best.tier * tierH;
       const og = S.g(null, labG);
-      seg.label = S.text(s.label, { x: box[0], y: ly, size, weight: 600, color: 'ink' }, og);
-      seg.tick = S.line({ x1: cx, y1: sy - 5, x2: cx, y2: ly + size * 0.6, stroke: '#ffffff', strokeOpacity: 0.35, sw: 1.5 }, og);
-      if (iconIn === false && s.icon) {
-        seg.badge = S.icon(s.icon, { x: box[0] - 10 - size * 0.5, y: ly, size: Math.round(size * 1.05), color: s.tone }, og);
-        seg.label.setAttribute('x', box[0]);
-      }
+      seg.label = S.text(s.label, { x: best.box[0], y: ly, size, weight: 600, color: 'ink' }, og);
+      seg.tick = S.line({ x1: cx, y1: sy - 5, x2: cx, y2: ly + size * 0.62, stroke: '#ffffff', strokeOpacity: 0.35, sw: 1.5 }, og);
       seg.outs.push(og);
     }
     if (o.values !== false && s.tokens !== undefined) {
@@ -1431,7 +1471,9 @@ function libPromptStack(S, o = {}, parent) {
     const x = X(0) + cum * scale;
     const w = s.w ?? (s.tokens || 0) * scale;
     cum += s.w !== undefined ? s.w / scale : (s.tokens || 0);
-    return makeSeg(s, i, x, w, i === specs.length - 1);
+    const nsp = specs[i + 1];
+    const nx = nsp ? X(0) + cum * scale + (nsp.w ?? (nsp.tokens || 0) * scale) / 2 : Infinity;
+    return makeSeg(s, i, x, w, i === specs.length - 1, nx);
   });
   // ---- rows: each segment as its own bar on a common left edge, label on the left, value on the right
   if (rows) {
@@ -1497,8 +1539,10 @@ function libPromptStack(S, o = {}, parent) {
   root.count = (co = {}) => {
     const tl = gsap.timeline();
     if (!root.totalEl) return tl.set({}, {}, 0.01);
-    tl.fromTo(root.totalEl, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0);
-    tl.add(S.fx.count(root.totalEl, 0, root.total, { d: co.d ?? 1.2, fmt: S.fmt.int }), 0);
+    const el = root.totalEl;
+    el.textContent = el.__prefix + S.fmt.int(co.from ?? 0) + el.__suffix;   // the state before the count, however it is reached
+    tl.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0);
+    tl.add(S.fx.count(el, co.from ?? 0, root.total, { d: co.d ?? 1.2, fmt: S.fmt.int }), 0);
     return tl;
   };
   root.land = (i, pt, lo = {}) => {
@@ -1544,7 +1588,11 @@ function libPromptStack(S, o = {}, parent) {
     hi.w = tw;
     if (hi.label) { tl.fromTo(hi.label, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3, immediateRender: false }, 0); hi.label = null; }
     if (ho.label && tokens > 0) {
-      const lab = S.text(ho.label, { x: ho.labelX ?? sx + tw / 2, y: ho.labelY ?? sy - 36, size: ho.size || 28, weight: 600, anchor: 'middle', color: tone }, topG);
+      const lx = ho.labelX ?? sx + tw / 2, lw = S.measure(ho.label, { size: ho.size || 28, weight: 600 });
+      let tier = 0;   // the lowest tier of outside labels it clears (labels and their ticks)
+      while (tier < 6 && ((placedAbove[tier] || []).some(b => !(lx + lw / 2 + 18 < b[0] || lx - lw / 2 - 18 > b[1])) ||
+        ticks.some(t => t.tier > tier && t.x > lx - lw / 2 - 10 && t.x < lx + lw / 2 + 10))) tier++;
+      const lab = S.text(ho.label, { x: lx, y: ho.labelY ?? sy - 34 - tier * Math.round(size * 1.4), size: ho.size || 28, weight: 600, anchor: 'middle', color: tone }, topG);
       T.hide(lab);
       tl.fromTo(lab, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.4, immediateRender: false }, d * 0.8);
       tl.labelEl = lab; hi.label = lab;
@@ -1555,7 +1603,8 @@ function libPromptStack(S, o = {}, parent) {
     const nx = X(tokens);
     const ng = S.g(null, topG);
     S.line({ x1: nx, y1: sy - 14, x2: nx, y2: sy + h + 14, stroke: '#ffffff', sw: 3.5 }, ng);
-    if (no.label) ng.label = S.text(no.label, { x: nx, y: sy + h + 44, size: no.size || 26, weight: 600, anchor: 'middle', color: 'ink' }, ng);
+    const vTiers = placedBelow.length;   // value rows under the bar: the label goes beneath them
+    if (no.label) ng.label = S.text(no.label, { x: nx, y: sy + h + (vTiers ? 28 + vTiers * Math.round(vSize * 1.35) + 6 : 40), size: no.size || 26, weight: 600, anchor: 'middle', color: 'ink' }, ng);
     const tl = gsap.timeline();
     tl.fromTo(ng, { autoAlpha: 0, y: -16 }, { autoAlpha: 1, y: 0, duration: no.d ?? 0.4, ease: 'power3.out' }, 0);
     tl.notchEl = ng;

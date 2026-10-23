@@ -15,7 +15,9 @@
  *   S.xset / S.fx.xform the holder; never tween the component root's x/y/scale with raw GSAP.
  * - Colour = meaning: coral bytes (weights, traffic, the cache's bytes), teal helps (a reused prefix, a hit,
  *   "yours"), amber compute (the chip), grey for invalid or evicted, blue for neutral structure.
- * - Root groups never take DOM-reserved names: the reuse helper is .reuse(), not .prefix().
+ * - Root groups never take DOM-reserved names: the reuse helper is .reuse(), not .prefix(); a cell's empty
+ *   outline is .slotEl, not .slot.
+ * - Everything is a pure function of time: frames match whether reached by playing or seeking either way.
  */
 
 /* ------------------------------------------------------------------ private helpers */
@@ -85,8 +87,23 @@ var _libMem = (function () {
     const go = () => apply(p.v);
     return gsap.fromTo(p, { v: from }, {
       v: to, duration: o.d ?? 1, ease: o.ease || 'power2.inOut', immediateRender: false,
-      onStart: go, onUpdate: go, onReverseComplete: () => apply(from),
+      onStart: go, onUpdate: go, onReverseComplete: o.back || (() => apply(from)),
     });
+  }
+  /**
+   * Seek-safe text changes. set(str) writes the text. count runs fmt(from → to) and, sought back before its
+   * start, restores `prev` (the text planned before it); swap fades out, changes the text, fades back in.
+   */
+  function countText(set, from, to, fmt, prev, o = {}) {
+    return drive(from, to, v => set(fmt(v)), { d: o.d ?? 1.2, ease: o.ease || 'power2.out', back: () => set(prev) });
+  }
+  function swapText(el, set, before, after, o = {}) {
+    const d = o.d ?? 0.4;
+    const t = gsap.timeline();
+    t.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -12, duration: d / 2, ease: 'power2.in', immediateRender: false }, 0);
+    t.add(drive(0, 1, v => set(v < 0.5 ? before : after), { d: 0.001, ease: 'none', back: () => set(before) }), d / 2);
+    t.fromTo(el, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: d / 2, ease: 'power2.out', immediateRender: false }, d / 2);
+    return t;
   }
   /** an instant, reversible attribute change at a point in a timeline */
   function setAttr(t, el, from, to, at) {
@@ -137,7 +154,7 @@ var _libMem = (function () {
       : S.measure(t.textContent, { size: o.size, weight: o.weight, family: parts ? 'mono' : o.family }));
     return t;
   }
-  return { GRAD, DARK, BASE, GREY, mix, solid, card, rr, hatch, num, decFor, sel, drive, setAttr, setVis, crack, vlabel, amountText, id: p => `${p}-${++uid}` };
+  return { GRAD, DARK, BASE, GREY, mix, solid, card, rr, hatch, num, decFor, sel, drive, countText, swapText, setAttr, setVis, crack, vlabel, amountText, id: p => `${p}-${++uid}` };
 })();
 
 
@@ -209,7 +226,7 @@ function libMemBlock(S, o = {}, parent) {
   const fam = o.family || (style !== 'card' && label != null && /^[≈~+\-−]?\s*[\d.,]/.test(String(label)) ? 'mono' : 'sans');
   const ty = outside ? y + h + 34 : y + h / 2 - (o.sub ? subSize * 0.62 : 0);
   if (label != null) g.labelEl = M.amountText(S, label, { x: x + w / 2, y: ty, size, weight: 650, anchor: 'middle', color: outside ? c : inkMain, family: fam }, g);
-  if (o.sub) g.subEl = S.text(o.sub, { x: x + w / 2, y: outside ? ty + size * 0.98 : y + h / 2 + size * 0.58, size: subSize, weight: 500, anchor: 'middle', color: outside ? 'muted' : inkSub, family: style === 'card' ? 'mono' : 'sans' }, g);
+  if (o.sub) g.subEl = M.amountText(S, o.sub, { x: x + w / 2, y: outside ? ty + size * 0.98 : y + h / 2 + size * 0.58, size: subSize, weight: 500, anchor: 'middle', color: outside ? 'muted' : inkSub, family: style === 'card' ? 'mono' : 'sans' }, g);
   Object.assign(g, { x, y, w, h, l: x, r: x + w, t: y, b: y + h, cx: x + w / 2, cy: y + h / 2, gb: gb0, tone, style });
 
   const plan = { gb: gb0 };
@@ -548,7 +565,7 @@ function libMemoryBar(S, o = {}, parent) {
  *     r                    slab corner radius (default from the slab size),
  *     tone = 'bytes'       slab colour: coral bytes; 'helps' for a teal store, 'struct' for blue K/V tiles,
  *     shade = 0            0..0.4: each layer (grid) or slab a slightly different shade ("its own K and V"),
- *     letters              'K'/'V' inside each slab; default on when the slab is big enough (row 64×64: on),
+ *     letters              'K'/'V' (24 px) inside each slab; default on when it fits (64×64: on; 48×48: off),
  *     empty = true         show empty slots as dashed outlines,
  *     frame = true         a panel round the slots; frameTone = 'neutral' ('helps' for "the cache" shelf),
  *     pad = 16             panel padding,
@@ -558,14 +575,15 @@ function libMemoryBar(S, o = {}, parent) {
  *     tokens               labels under the columns (row without perRow, grid), e.g. ['t1', 't2', …] or
  *                          ['layer 1', 'layer 2', 'layer 3'] for a shelf of compartments,
  *     layerLabels = true   grid: 'L1' beside the bottom row and 'L<layers>' beside the top one}
- * Returns <g> with .cells (flat; .cell(t, l) for the grid), each cell with .slotEl .slab .base (.k .v) .cx .cy,
+ * Returns <g> with .cells (flat; .cell(t, l) for the grid), each cell with .slotEl .slab .base (.k .v) .kl .vl
+ *   (the letters) .x .y .cx .cy,
  *   .pick(sel, layers) → cells, .slotCenter(i, l = 0) → [x, y], .slotBox(i) → {x, y, w, h} (a grid column),
  *   .frameEl .labelEl .subEl .legendEl .tokenEls .halo, .area {x, y, w, h} .frame {x, y, w, h}, .count()
  *   (slots planned full so far) and anchors .x .y .w .h .l .r .t .b .cx .cy (the panel)
  * Helpers (return timelines; call in time order; sel = index | [i, j, …] | {from, to} | 'all'):
  *   .append(n = 1, {d = 0.45, stagger = 0.12, from = 'down'|'up'|'left'|'right'|[x, y], tone, layerStagger})
  *        fill the next n empty slots; a grid fills a token's column from layer 1 up. from [x, y] flies each
- *        slab in from that point (e.g. the chip that just made it).
+ *        slab in from that point (e.g. the edge of the chip that made it); it shows from 30% of the way.
  *   .fill(sel, {…same, layers})     fill particular slots: refill evicted blocks, recompute invalid ones
  *                                   (their crack lifts), or other users' blocks with tone 'neutral'
  *   .read({d = 0.6, stagger = 0, sel, layers, to = 0.5})   full slabs flash at once: "all of it is read"
@@ -574,7 +592,7 @@ function libMemoryBar(S, o = {}, parent) {
  *   .tint(sel, tone, {d = 0.4, stagger = 0.04, layers})     cross-fade slabs to another tone ('helps' teal,
  *        'neutral' grey "old t2"); tone null restores their own colour
  *   .mark(sel, {tone = 'helps', d = 0.4, stagger = 0.04, layers})  outline slots ("yours"); tone null removes
- *   .invalidate(sel, {stagger = 0.3, d = 0.35, layers})   slabs crack and go grey with a dashed edge: stale
+ *   .invalidate(sel, {stagger = 0.3, d = 0.35, layers})   slabs crack and go grey (dashed edge from 30 px): stale
  *   .evict(sel = 'all', {stagger = 0.06, d = 0.4, drop = 18, grey = false})  slabs drop out, leaving empty
  *        slots (grey: they first turn grey, "least recently used"); clears tints, cracks and outlines
  *   .clear({…}) = .evict('all', {…})
@@ -675,6 +693,10 @@ function libKVCache(S, o = {}, parent) {
   g.halo = halo;
 
   // ---------------------------------------------------------------- slabs
+  // A cell: an empty-slot outline, then the slab (moved for fill/evict) holding its faces, one K/V
+  // letter pair and its overlays. A face is the K and V shapes in one state: null (its own tone), a tint
+  // tone ('helps', 'neutral', …) or 'invalid'. State changes cross-fade faces; the letters only change
+  // colour, so a slab never shows two sets of letters at once.
   const cellLayer = S.g(null, g);
   const cells = [];                          // index t * NL + l
   const kd = (x, y) => M.rr(x, y, hw, ch, [r, ri, ri, r]);
@@ -684,10 +706,6 @@ function libKVCache(S, o = {}, parent) {
     const C = colours(t, c.t, c.l);
     fg.k = S.path({ d: kd(c.x, c.y), fill: C.k }, fg);
     fg.v = S.path({ d: vd(c.x, c.y), fill: C.v, stroke: C.s, strokeOpacity: 0.9, sw: 1.5 }, fg);
-    if (letters) {
-      fg.kl = S.text('K', { x: c.x + hw / 2, y: c.y + ch / 2 + 1, size: lsz, weight: 700, family: 'mono', anchor: 'middle', color: C.kl }, fg);
-      fg.vl = S.text('V', { x: c.x + hw + sgap + hw / 2, y: c.y + ch / 2 + 1, size: lsz, weight: 700, family: 'mono', anchor: 'middle', color: C.vl }, fg);
-    }
     return fg;
   }
   for (let i = 0; i < n; i++) for (let l = 0; l < NL; l++) {
@@ -699,23 +717,28 @@ function libKVCache(S, o = {}, parent) {
     c.faces = S.g(null, c.slab);
     c.base = face(c, tone, c.faces);
     c.k = c.base.k; c.v = c.base.v;
-    c.over = S.g(null, c.slab);             // invalid face, glint and ring live here (built when first needed)
+    if (letters) {
+      const C = colours(tone, i, l);
+      c.kl = S.text('K', { x: x + hw / 2, y: y + ch / 2 + 1, size: lsz, weight: 700, family: 'mono', anchor: 'middle', color: C.kl }, c.slab);
+      c.vl = S.text('V', { x: x + hw + sgap + hw / 2, y: y + ch / 2 + 1, size: lsz, weight: 700, family: 'mono', anchor: 'middle', color: C.vl }, c.slab);
+    }
+    c.over = S.g(null, c.slab);             // crack, glint and ring live here (built when first needed)
     const on = i < (o.filled ?? 0);
-    c.__p = { on, tone, face: null, bad: false, ring: null };
+    c.__p = { on, tone, face: null, ring: null };
     if (on) gsap.set(c.slotEl, { autoAlpha: 0 });
     else gsap.set(c.slab, { autoAlpha: 0 });
     cells.push(c);
   }
   const cellAt = (i, l = 0) => cells[i * NL + l];
-  // per-cell overlays, built lazily at helper-call (build) time: deterministic
-  const tintFace = (c, t) => {
-    c.tints = c.tints || {};
-    if (!c.tints[t]) { c.tints[t] = face(c, t, c.faces); gsap.set(c.tints[t], { autoAlpha: 0 }); }
-    return c.tints[t];
+  // faces and overlays are built lazily at helper-call (build) time: deterministic
+  const faceEl = (c, k) => {
+    if (k === null || k === undefined) return c.base;
+    c.alt = c.alt || {};
+    if (!c.alt[k]) { c.alt[k] = face(c, k, c.faces); gsap.set(c.alt[k], { autoAlpha: 0 }); }
+    return c.alt[k];
   };
-  const faceEl = (c, t) => (t ? tintFace(c, t) : c.base);
-  const inv = c => c.invEl || (c.invEl = (() => {
-    const e = face(c, 'invalid', c.over);
+  const marks = c => c.marksEl || (c.marksEl = (() => {
+    const e = S.g(null, c.over);
     if (ch >= 30 && cw >= 30) S.rect({ x: c.x - 3, y: c.y - 3, w: cw + 6, h: ch + 6, r: r + 2, stroke: M.GREY.edge, sw: 2, dash: '5 4' }, e);
     e.crack = S.path({ d: M.crack(c.x, c.y, cw, ch), stroke: M.DARK, sw: Math.max(2, Math.min(3.5, cw / 18)) }, e);
     e.crack.setAttribute('data-audit', 'ignore');
@@ -743,11 +766,23 @@ function libKVCache(S, o = {}, parent) {
     const dd = Math.max(18, Math.min(30, ch * 0.5));
     return { up: { y: dd }, down: { y: -dd }, left: { x: dd }, right: { x: -dd } }[from] || { y: -dd };
   };
-  // cross-fade the visible face of a cell from one tone (null = its own) to another
+  const toneOf = (c, k) => (k === null || k === undefined ? c.__p.tone : k);
+  // cross-fade a cell from face a to face b over d (instantly when d is 0); letters tween colour
   const swapFace = (t, c, a, b, at, d) => {
     if (a === b) return;
-    t.fromTo(faceEl(c, a), { autoAlpha: 1 }, { autoAlpha: 0, duration: d, ease: 'power1.inOut', immediateRender: false }, at);
-    t.fromTo(faceEl(c, b), { autoAlpha: 0 }, { autoAlpha: 1, duration: d, ease: 'power1.inOut', immediateRender: false }, at);
+    const ia = d > 0 ? { duration: d, ease: 'power1.inOut', immediateRender: false } : { duration: 0.001, immediateRender: false };
+    t.fromTo(faceEl(c, a), { autoAlpha: 1 }, { autoAlpha: 0, ...ia }, at);
+    t.fromTo(faceEl(c, b), { autoAlpha: 0 }, { autoAlpha: 1, ...ia }, at);
+    if (letters) {
+      const A = colours(toneOf(c, a), c.t, c.l), B = colours(toneOf(c, b), c.t, c.l);
+      if (A.kl !== B.kl) t.fromTo(c.kl, { attr: { fill: A.kl } }, { attr: { fill: B.kl }, ...ia }, at);
+      if (A.vl !== B.vl) t.fromTo(c.vl, { attr: { fill: A.vl } }, { attr: { fill: B.vl }, ...ia }, at);
+    }
+    if (a === 'invalid') t.fromTo(marks(c), { autoAlpha: 1 }, { autoAlpha: 0, ...ia }, at);
+    if (b === 'invalid') {
+      t.fromTo(marks(c), { autoAlpha: 0 }, { autoAlpha: 1, ...ia }, at);
+      if (d > 0) t.fromTo(marks(c).crack, { drawSVG: '0%' }, { drawSVG: '100%', duration: d * 0.8, ease: 'power2.out', immediateRender: false }, at + 0.05);
+    }
   };
 
   // ---------------------------------------------------------------- helpers
@@ -764,13 +799,12 @@ function libKVCache(S, o = {}, parent) {
       for (let l = 0; l < NL; l++) {
         if (lsel && !lsel.includes(l)) continue;
         const c = cellAt(i, l), p = c.__p, at = q * st + l * ls;
-        if (p.on && !p.bad) continue;
-        if (p.bad) {
+        if (p.on && p.face !== 'invalid') continue;
+        if (p.on) {
           // recompute: the crack lifts and the slab comes back in its own colour
-          t.fromTo(inv(c), { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.7, immediateRender: false }, at);
-          t.fromTo(c.base, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.7, immediateRender: false }, at);
+          swapFace(t, c, 'invalid', null, at, d * 0.7);
           t.fromTo(c.slab, { scale: 1, transformOrigin: '50% 50%' }, { scale: 1.08, duration: d * 0.35, yoyo: true, repeat: 1, ease: 'sine.inOut', transformOrigin: '50% 50%', immediateRender: false }, at);
-          p.bad = false; p.face = null;
+          p.face = null;
           continue;
         }
         if (p.tone !== tn) {
@@ -778,13 +812,17 @@ function libKVCache(S, o = {}, parent) {
           const A = colours(p.tone, i, l), B = colours(tn, i, l);
           M.setAttr(t, c.base.k, { fill: A.k }, { fill: B.k }, at);
           M.setAttr(t, c.base.v, { fill: A.v, stroke: A.s }, { fill: B.v, stroke: B.s }, at);
-          if (c.base.vl) M.setAttr(t, c.base.vl, { fill: A.vl }, { fill: B.vl }, at);
+          if (letters) { M.setAttr(t, c.kl, { fill: A.kl }, { fill: B.kl }, at); M.setAttr(t, c.vl, { fill: A.vl }, { fill: B.vl }, at); }
           p.tone = tn;
         }
         const v = fromVec(c, from);
         t.fromTo(c.slotEl, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.6, immediateRender: false }, at + (fly ? d * 0.9 : 0.05));
-        t.fromTo(c.slab, { autoAlpha: 0, x: v.x || 0, y: v.y || 0 },
-          { autoAlpha: 1, x: 0, y: 0, duration: fly ? d * 1.8 : d, ease: fly ? 'power2.inOut' : 'power3.out', immediateRender: false }, at);
+        if (fly) {
+          // a slab flown in from a point (the chip that made it) emerges a little way out, then glides home
+          const D = d * 1.8;
+          t.fromTo(c.slab, { x: v.x, y: v.y }, { x: 0, y: 0, duration: D, ease: 'power2.inOut', immediateRender: false }, at);
+          t.fromTo(c.slab, { autoAlpha: 0 }, { autoAlpha: 1, duration: D * 0.3, ease: 'power1.out', immediateRender: false }, at + D * 0.3);
+        } else t.fromTo(c.slab, { autoAlpha: 0, x: v.x || 0, y: v.y || 0 }, { autoAlpha: 1, x: 0, y: 0, duration: d, ease: 'power3.out', immediateRender: false }, at);
         p.on = true;
       }
     });
@@ -805,18 +843,16 @@ function libKVCache(S, o = {}, parent) {
         const c = cellAt(i, l), p = c.__p;
         if (!p.on) continue;
         let at = q * st;
-        let shown = p.bad ? 'bad' : p.face;            // the face showing as the slab leaves
-        if (eo.grey && !p.bad && p.face !== 'neutral') { swapFace(t, c, p.face, 'neutral', at, 0.25); shown = 'neutral'; at += 0.3; }
+        let shown = p.face;                              // the face showing as the slab leaves
+        if (eo.grey && shown !== 'invalid' && shown !== 'neutral') { swapFace(t, c, shown, 'neutral', at, 0.25); shown = 'neutral'; at += 0.3; }
         t.fromTo(c.slab, { autoAlpha: 1, x: 0, y: 0 }, { autoAlpha: 0, y: drop, duration: d, ease: 'power2.in', immediateRender: false }, at);
         t.fromTo(c.slotEl, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.8, immediateRender: false }, at + d * 0.4);
         // once hidden, reset the slab to its plain state so a refill starts clean
         const z = at + d + 0.02;
         t.fromTo(c.slab, { y: drop }, { y: 0, duration: 0.001, immediateRender: false }, z);
-        if (shown === 'bad') M.setVis(t, inv(c), 1, 0, z);
-        else if (shown) M.setVis(t, faceEl(c, shown), 1, 0, z);
-        if (shown) M.setVis(t, c.base, 0, 1, z);
+        swapFace(t, c, shown, null, z, 0);
         if (p.ring) M.setVis(t, ring(c), 1, 0, z);
-        Object.assign(p, { on: false, bad: false, ring: null, face: null });
+        Object.assign(p, { on: false, ring: null, face: null });
       }
     });
     return t;
@@ -834,7 +870,7 @@ function libKVCache(S, o = {}, parent) {
     pick(s, to.layers).forEach((c, q) => {
       const p = c.__p;
       const want = !tn || tn === p.tone ? null : tn;
-      if (!p.on || p.bad || p.face === want) return;
+      if (!p.on || p.face === 'invalid' || p.face === want) return;
       swapFace(t, c, p.face, want, q * st, d);
       p.face = want;
     });
@@ -868,7 +904,7 @@ function libKVCache(S, o = {}, parent) {
       for (let l = 0; l < NL; l++) {
         const c = cellAt(i, l), p = c.__p;
         const want = to > from && p.tone !== 'helps' ? 'helps' : null;
-        if (po.tint !== false && p.on && !p.bad && p.face !== want) { swapFace(t, c, p.face, want, at, 0.3); p.face = want; }
+        if (po.tint !== false && p.on && p.face !== 'invalid' && p.face !== want) { swapFace(t, c, p.face, want, at, 0.3); p.face = want; }
         if (po.rings) {
           const e = ring(c);
           if (to > from && !p.ring) { M.setAttr(t, e, { stroke: S.tone('helps') }, { stroke: S.tone('helps') }, at); t.fromTo(e, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25, immediateRender: false }, at); p.ring = 'helps'; }
@@ -895,13 +931,11 @@ function libKVCache(S, o = {}, parent) {
       for (let l = 0; l < NL; l++) {
         if (lsel && !lsel.includes(l)) continue;
         const c = cellAt(i, l), p = c.__p;
-        if (!p.on || p.bad) continue;
-        const e = inv(c), at = q * st;
-        t.fromTo(faceEl(c, p.face), { autoAlpha: 1 }, { autoAlpha: 0, duration: d, ease: 'power2.out', immediateRender: false }, at);
-        t.fromTo(e, { autoAlpha: 0 }, { autoAlpha: 1, duration: d, ease: 'power2.out', immediateRender: false }, at);
-        t.fromTo(e.crack, { drawSVG: '0%' }, { drawSVG: '100%', duration: d * 0.8, ease: 'power2.out', immediateRender: false }, at + 0.05);
+        if (!p.on || p.face === 'invalid') continue;
+        const at = q * st;
+        swapFace(t, c, p.face, 'invalid', at, d);
         if (p.ring) { t.fromTo(ring(c), { autoAlpha: 1 }, { autoAlpha: 0, duration: d, immediateRender: false }, at); p.ring = null; }
-        p.bad = true; p.face = null;     // a recompute (fill) brings back the base face
+        p.face = 'invalid';            // a recompute (fill) brings back the slab's own colour
       }
     });
     return t;
@@ -945,12 +979,15 @@ function libKVCache(S, o = {}, parent) {
  *   .flow(from, to, {density = 'steady' ('trickle'|'steady'|'dense') | every, speed = 520, size, lanes,
  *        shape = 'chip', opacity, tone}) particles between two time specs. It wraps S.flow and, like S.flow,
  *        schedules itself (the one helper that does); it returns the flow groups. Speed should mean something.
- *   .pass({amount = 140, unit = 'GB', label, d = 1.2, ease, count = false, flash = true, slices = 0, length})
+ *   .pass({amount = 140, unit = 'GB', label, d = 1.2, ease, count = false, countFrom = 0, flash = true, slices = 0, length})
  *        → timeline: a packet labelled '140 GB' leaves the memory, crosses and is consumed by the chip, which
- *        flashes; with count the meter runs 0 → amount over the crossing; slices > 0 draws it as a ribbon.
+ *        flashes; with count the meter runs countFrom → countFrom + amount over the crossing (0 → 140 per
+ *        token; countFrom 140 for a running total); slices > 0 draws it as a ribbon. The packet shows only
+ *        inside the conduit; a label too big for it rides beside, on the side away from the rate.
  *        The timeline's .packet is the packet group.
  *   .flash({d = 0.45, to = 0.45}) → the chip flashes amber (arithmetic on the bytes that arrived)
- *   .setRate(text, {d}) → swaps the rate label (e.g. '4.8 TB/s')
+ *   .setRate(text, {d = 0.4}) → swaps the rate label (e.g. '4.8 TB/s'). Rate and meter changes are seek-safe:
+ *        call setRate/countRate (not S.fx.swap/count) to change them, as often as needed.
  *   .countRate(to, {from = 0, d = 1.2, dec, unit}) → the rate label counts up to a value ('3.35 TB/s'),
  *        keeping the unit of the label as built
  * Example:
@@ -1037,20 +1074,28 @@ function libByteStream(S, o = {}, parent) {
   };
   const rateSize = o.rateSize ?? 36;
   const rk = ['below', 'left'].includes(o.rateSide) ? 1 : -1;
+  const rateW = str => S.measure(str, { size: rateSize, weight: 650, family: 'mono' });
+  let setRateText = null;
   if (o.rate !== null) {
-    g.rateEl = side(rk, o.rate ?? '3.35 TB/s', { size: rateSize, weight: 650, family: 'mono', color: tone });
+    const built = String(o.rate ?? '3.35 TB/s');
+    g.rateEl = side(rk, built, { size: rateSize, weight: 650, family: 'mono', color: tone });
+    const rx = +g.rateEl.getAttribute('x'), ry = +g.rateEl.getAttribute('y'), anc = g.rateEl.getAttribute('text-anchor');
     if (o.rateSub) {
-      const rw = S.measure(g.rateEl.textContent, { size: rateSize, weight: 650, family: 'mono' });
-      const rx = +g.rateEl.getAttribute('x'), anc = g.rateEl.getAttribute('text-anchor');
       const sw = S.measure(o.rateSub, { size: 26, weight: 500 });
-      if (anc === 'middle') {   // keep the pair centred over the conduit
-        const shift = (sw + 14) / 2;
-        g.rateEl.setAttribute('x', rx - shift);
-        g.rateSubEl = S.text(o.rateSub, { x: rx - shift + rw / 2 + 14, y: +g.rateEl.getAttribute('y') + 3, size: 26, weight: 500, color: 'muted' }, labels);
-      } else if (anc === 'start') g.rateSubEl = S.text(o.rateSub, { x: rx + rw + 14, y: +g.rateEl.getAttribute('y') + 3, size: 26, weight: 500, color: 'muted' }, labels);
-      else g.rateSubEl = S.text(o.rateSub, { x: rx, y: +g.rateEl.getAttribute('y') + rateSize * 0.95, size: 26, weight: 500, color: 'muted', anchor: 'end' }, labels);
-    }
+      if (anc === 'end') g.rateSubEl = S.text(o.rateSub, { x: rx, y: ry + rateSize * 0.95, size: 26, weight: 500, color: 'muted', anchor: 'end' }, labels);
+      else g.rateSubEl = S.text(o.rateSub, { x: rx, y: ry + 3, size: 26, weight: 500, color: 'muted' }, labels);
+      if (anc === 'middle') g.rateEl.setAttribute('text-anchor', 'start');
+      // the rate and its word stay a pair: centred over the conduit (or after the rate), whatever the rate reads
+      setRateText = str => {
+        g.rateEl.textContent = str;
+        const w = rateW(str);
+        if (anc === 'middle') { const l = rx - (w + 14 + sw) / 2; g.rateEl.setAttribute('x', l.toFixed(2)); g.rateSubEl.setAttribute('x', (l + w + 14).toFixed(2)); }
+        else if (anc === 'start') g.rateSubEl.setAttribute('x', (rx + w + 14).toFixed(2));
+      };
+    } else setRateText = str => { g.rateEl.textContent = str; };
+    setRateText(built);
   }
+  const plan = { rate: o.rate === null ? null : String(o.rate ?? '3.35 TB/s'), meter: null };
   if (o.label) g.labelEl = side(-rk, o.label, { size: o.labelSize ?? 28, weight: 550, color: 'muted' });
 
   // ---------------------------------------------------------------- meter
@@ -1060,6 +1105,7 @@ function libByteStream(S, o = {}, parent) {
     const mxp = mo.x ?? (sk ? sk.cx : x2), myp = mo.y ?? (sk ? sk.t - msz * 1.9 : y2 - 140);
     const mg = S.g(null, labels);
     mg.num = S.counter({ x: mxp, y: myp, size: msz, value: 0, anchor: 'middle', color: 'ink', fmt: v => `${M.num(v)} ${mo.unit ?? 'GB'}` }, mg);
+    plan.meter = mg.num.textContent;
     mg.labelEl = S.text(mo.label ?? 'bytes moved', { x: mxp, y: myp + msz * 0.92, size: 26, weight: 550, color: 'muted', anchor: 'middle' }, mg);
     g.meter = mg;
   }
@@ -1088,21 +1134,18 @@ function libByteStream(S, o = {}, parent) {
     const d = fo.d ?? 0.45;
     return gsap.fromTo(g.sink.glow, { opacity: 0 }, { opacity: fo.to ?? 0.45, duration: d / 2, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false });
   };
-  g.setRate = (text, ro = {}) => S.fx.swap(g.rateEl, text, ro);
+  g.setRate = (text, ro = {}) => {
+    const before = plan.rate; plan.rate = text;
+    return M.swapText(g.rateEl, setRateText, before, text, ro);
+  };
   g.countRate = (to, ro = {}) => {
     const built = String(o.rate ?? '3.35 TB/s').trim();
     const unit = ro.unit ?? built.replace(/^[≈~\s]*[-\d.,]+\s*/, '');
     const dec = ro.dec ?? ((String(to).split('.')[1] || '').length);
     const pre = (built.match(/^[≈~]\s*/) || [''])[0];
     const f = v => `${pre}${Number(v).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })} ${unit}`;
-    g.rateEl.__prefix = ''; g.rateEl.__suffix = '';
-    if (g.rateSubEl && g.rateEl.getAttribute('text-anchor') === 'middle') {
-      // the text changes width as it counts: pin the pair's left edge where the built text put it
-      const left = +g.rateEl.getAttribute('x') - S.measure(g.rateEl.textContent, { size: rateSize, weight: 650, family: 'mono' }) / 2;
-      g.rateEl.setAttribute('text-anchor', 'start'); g.rateEl.setAttribute('x', left);
-      g.rateSubEl.setAttribute('x', left + S.measure(f(to), { size: rateSize, weight: 650, family: 'mono' }) + 14);
-    }
-    return S.fx.count(g.rateEl, ro.from ?? 0, to, { d: ro.d ?? 1.2, ease: ro.ease || 'power2.out', fmt: f });
+    const before = plan.rate; plan.rate = f(to);
+    return M.countText(setRateText, ro.from ?? 0, to, f, before, ro);
   };
   g.pass = (po = {}) => {
     const amount = po.amount ?? 140, unit = po.unit ?? 'GB', d = po.d ?? 1.2;
@@ -1115,23 +1158,46 @@ function libByteStream(S, o = {}, parent) {
     const box = S.g(null, pk);
     box.setAttribute('transform', `rotate(${ang.toFixed(3)})`);
     const slices = po.slices ?? 0;
+    const parts = [];                          // [rect, local x, width, radius]: clipped to the conduit as it moves
     if (slices > 0) {
       const sw = (plen - (slices - 1) * 3) / slices;
-      for (let i = 0; i < slices; i++) S.rect({ x: -plen / 2 + i * (sw + 3), y: -ph / 2, w: sw, h: ph, r: Math.min(3, sw / 2), fill: M.solid(S, tone) }, box);
-    } else S.rect({ x: -plen / 2, y: -ph / 2, w: plen, h: ph, r: Math.min(10, ph / 2), fill: M.solid(S, tone) }, box);
+      for (let i = 0; i < slices; i++) { const px = -plen / 2 + i * (sw + 3), pr = Math.min(3, sw / 2); parts.push([S.rect({ x: px, y: -ph / 2, w: sw, h: ph, r: pr, fill: M.solid(S, tone) }, box), px, sw, pr]); }
+    } else { const pr = Math.min(10, ph / 2); parts.push([S.rect({ x: -plen / 2, y: -ph / 2, w: plen, h: ph, r: pr, fill: M.solid(S, tone) }, box), -plen / 2, plen, pr]); }
     const text = po.label ?? `${M.num(amount)} ${unit}`;
     const tsz = po.size ?? Math.min(30, Math.max(24, Math.round(ph * 0.6)));
     const tw = text ? S.measure(text, { size: tsz, weight: 700, family: 'mono' }) : 0;
     if (text && slices === 0 && horiz && tw + 22 <= plen && ph >= 30) pk.labelEl = M.amountText(S, text, { x: 0, y: 1, size: tsz, weight: 700, family: 'mono', anchor: 'middle', color: M.DARK }, pk);
     else if (text) {
-      // too thin (or sideways) for text inside: it rides beside the packet
-      const off = W / 2 + 26;
-      pk.labelEl = horiz ? M.amountText(S, text, { x: 0, y: -(off + 4), size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'middle', color: tone }, pk)
-        : M.amountText(S, text, { x: off, y: 0, size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'start', color: tone }, pk);
+      // too thin (or sideways) for text inside: it rides beside the packet, on the side away from the rate
+      const k = -rk, off = W / 2 + 26;
+      pk.labelEl = horiz ? M.amountText(S, text, { x: 0, y: k * (off + 4), size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'middle', color: tone }, pk)
+        : M.amountText(S, text, { x: -k * off, y: 0, size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: k < 0 ? 'start' : 'end', color: tone }, pk);
+      pk.beside = true;
     }
     gsap.set(pk, { autoAlpha: 0 });
     const s0 = -plen / 2 - 4, s1 = len + plen / 2 + 4;
-    const place = s => { const [px, py] = at(s); pk.setAttribute('transform', `translate(${px.toFixed(2)},${py.toFixed(2)})`); };
+    // the label fades out before it would slide under the memory block or the chip
+    const lhw = pk.labelEl ? (horiz ? pk.labelEl.width() / 2 : Math.max(24, tsz) * 0.6) + 10 : 0;
+    // a riding label also gives way to a static label on its side of the conduit, at the midpoint
+    const midHalf = pk.beside && g.labelEl ? (horiz ? S.measure(g.labelEl.textContent, { size: o.labelSize ?? 28, weight: 550 }) / 2 : (o.labelSize ?? 28) * 0.6) + 12 : -1;
+    const place = s => {
+      const [px, py] = at(s);
+      pk.setAttribute('transform', `translate(${px.toFixed(2)},${py.toFixed(2)})`);
+      // the packet shows only inside the conduit: it leaves the memory and enters the chip, never overlaps them
+      let shown = 0;
+      for (const [el, lx, lw, lr] of parts) {
+        const a = Math.max(lx, -s), b = Math.min(lx + lw, len - s), w = Math.max(0, b - a);
+        el.setAttribute('x', a.toFixed(2)); el.setAttribute('width', w.toFixed(2));
+        const rr2 = Math.min(lr, w / 2); el.setAttribute('rx', rr2.toFixed(2)); el.setAttribute('ry', rr2.toFixed(2));
+        shown += w;
+      }
+      halo.setAttribute('opacity', (0.9 * Math.min(1, shown / (plen * 0.5))).toFixed(3));
+      if (pk.labelEl) {
+        let room = Math.min(g.source ? s - lhw : 1e9, g.sink ? len - s - lhw : 1e9);
+        if (midHalf > 0) room = Math.min(room, Math.abs(s - len / 2) - lhw - midHalf);
+        pk.labelEl.setAttribute('opacity', Math.max(0, Math.min(1, room / 24)).toFixed(3));
+      }
+    };
     place(s0);
     const fd = Math.min(0.2, d * 0.2);
     const t = gsap.timeline();
@@ -1139,7 +1205,11 @@ function libByteStream(S, o = {}, parent) {
     t.add(M.drive(s0, s1, place, { d, ease: po.ease || 'power1.inOut' }), 0);
     t.fromTo(pk, { autoAlpha: 1 }, { autoAlpha: 0, duration: fd, immediateRender: false }, d - fd);
     if (po.flash !== false && g.sink) t.add(g.flash({ d: 0.5 }), d - 0.22);
-    if (po.count && g.meter) t.add(S.fx.count(g.meter.num, 0, amount, { d, ease: po.ease || 'power1.inOut' }), 0);
+    if (po.count && g.meter) {
+      const c0 = po.countFrom ?? 0, num = g.meter.num, before = plan.meter;
+      plan.meter = num.__fmt(c0 + amount);
+      t.add(M.countText(str => { num.textContent = str; }, c0, c0 + amount, num.__fmt, before, { d, ease: po.ease || 'power1.inOut' }), 0);
+    }
     t.packet = pk;
     return t;
   };

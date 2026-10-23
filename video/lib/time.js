@@ -44,11 +44,12 @@ var _libTime = (function () {
   }
   const trim = v => num(v, decOf(v));
   const unitSec = u => (u === 'ms' ? 0.001 : u === 's' ? 1 : u === 'min' ? 60 : u === 'h' ? 3600 : 1);
-  /** a duration in the best unit: 0.1 ms, 41.8 ms, 20 s, 15 min, 24 h (v is in `unit`) */
+  /** a duration in the best unit: 0.1 ms, 41.8 ms, 20 s, 100 s, 15 min, 24 h (v is in `unit`) */
   function human(v, unit) {
     if (!['ms', 's', 'min', 'h'].includes(unit)) return trim(v) + (unit ? ' ' + unit : '');
-    const s = v * unitSec(unit), a = Math.abs(s);
-    const [f, u] = a >= 3600 ? [3600, 'h'] : a >= 60 ? [60, 'min'] : a >= 1 ? [1, 's'] : a >= 1e-3 || a === 0 ? [1e-3, 'ms'] : [1e-6, 'µs'];
+    const s = v * unitSec(unit), a = Math.abs(s), whole = k => Math.abs(a / k - Math.round(a / k)) < 1e-9;
+    const [f, u] = a === 0 ? [unitSec(unit), unit] : a >= 3600 && whole(3600) ? [3600, 'h'] : a >= 300 && whole(60) ? [60, 'min']
+      : a >= 1 ? [1, 's'] : a >= 1e-5 ? [1e-3, 'ms'] : [1e-6, 'µs'];
     return trim(Math.round(s / f * 1000) / 1000) + ' ' + u;
   }
   /** rounded-rectangle path with per-corner radii [tl, tr, br, bl] */
@@ -182,13 +183,15 @@ var _libTime = (function () {
  *     value = 0         ms shown at build;  text = null  readout text at build instead (e.g. '?'),
  *     unit = 'ms'       readout unit: 'ms' | 's' | 'auto' (ms below 1 s, then s);  decimals = 0;
  *     approx = false    prefix '≈ ';  fmt  (ms => string) replaces unit/decimals/approx,
- *     readout = 'below' 'below' | 'right' | 'inside' (lower face, under the hand) | 'none',
- *     readoutSize = max(26, size·0.15), readoutW (plate width; default fits every value it will show),
- *     texts = []        extra strings the readout will show, to size the plate up front,
- *     max = span        largest value the readout will count to (sizes the plate; flicker range),
+ *     readout = 'below' 'below' | 'right' | 'inside' (low on the face, no ring; the hand crosses it near
+ *                       6 o'clock, so prefer it for runs that stay off the bottom of the dial) | 'none',
+ *     readoutSize = max(26, size·0.15) (inside: max(24, size·0.12)), readoutW (fixed plate width; default: fits what it shows,
+ *                       digits at the width of the largest value counted to, so it never jitters),
+ *     texts = []        words the readout will show (only used for the widget's bounds),
+ *     max = span        largest value the readout will count to (plate width; flicker range),
  *     label = ''        muted caption under the readout (e.g. 'slowed down'), labelSize = 26,
  *     marks = []        target marks on the bezel: [{ms, tone = 'helps'}],
- *     ring = true       the elapsed ring;  buttons = true  crown and pusher}
+ *     ring = true       the elapsed ring (off with readout 'inside');  buttons = true  crown and pusher}
  * Returns <g> with .body .face .hand .ring .readout (text) .plate .labelEl .crown .marks[] .crossEl and
  *   geometry .cx .cy .rad (dial radius) .l .r .t .b (whole widget, crown to label), .w .h.
  * Helpers (return tweens/timelines; call in time order):
@@ -198,7 +201,8 @@ var _libTime = (function () {
  *   .laps(n, lapMs, {every = 0.6}) — n runs 0 → lapMs, each `every` s, resetting at each (a steady beat)
  *   .flicker(d, {seed = 1, rate = 20}) — readout flickers through seeded random values up to `max`,
  *        the hand whirls; afterwards the watch shows what it showed before (follow with .set(0) to stop at 0)
- *   .show(text, {d = 0.4})      readout flips to words: '?', 'tens of ms', '≈ 20 s' (next run clears it)
+ *   .show(text, {d = 0.4})      readout flips to words: '?', 'tens of ms', '≈ 20 s'; the plate resizes to fit.
+ *        The next run / set flips back to digits (show(null) does it on its own)
  *   .flash({tone = 'bytes', d = 0.8}) the readout and rim glow once
  *   .cross({tone = 'muted', d = 0.45, dim = 0.5}) a stroke draws across the watch; the watch dims
  *   .mark(i, {tone = 'muted', d = 0.4}) recolour target mark i (e.g. grey once the hand has passed it)
@@ -261,16 +265,16 @@ function libStopwatch(S, o = {}, parent) {
   S.path({ d: dMaj, stroke: '#ffffff', strokeOpacity: 0.85, sw: sw(0.026, 1.8), cap: 'butt' }, body);
   // the elapsed ring: a faint track and an arc in the hand's colour
   const RA = R * 0.6, WA = sw(0.075, 3);
-  if (o.ring !== false) {
+  if (o.ring ?? (o.readout !== 'inside')) {
     S.circle({ x: cx, y: cy, r: RA, stroke: '#ffffff', strokeOpacity: 0.06, sw: WA }, body);
     g.ring = S.path({ d: '', stroke: accent, strokeOpacity: tone === 'neutral' ? 0.5 : 0.85, sw: WA, cap: 'butt' }, body);
   }
   // target marks on the bezel
   g.marks = (o.marks || []).map(m => {
     const a = (m.ms / span) * Math.PI * 2, s = Math.sin(a), c = -Math.cos(a), px = Math.cos(a), py = Math.sin(a);
-    const tip = R * 0.875, base = R * 0.99, hw = R * 0.05;
+    const tip = R * 0.79, base = R * 1.05, hw = Math.max(5, R * 0.075);
     const P = (r, k) => `${T.f2(cx + s * r + px * k)},${T.f2(cy + c * r + py * k)}`;
-    const mk = S.path({ d: `M${P(tip, 0)}L${P(base, hw)}L${P(base, -hw)}Z`, fill: m.tone || 'helps' }, body);
+    const mk = S.path({ d: `M${P(tip, 0)}L${P(base, hw)}L${P(base, -hw)}Z`, fill: m.tone || 'helps', stroke: T.BASE, sw: 1.5 }, body);
     mk.__fill = S.tone(m.tone || 'helps');
     return mk;
   });
@@ -285,37 +289,34 @@ function libStopwatch(S, o = {}, parent) {
 
   // ---------------------------------------------------------------- readout
   const mode = o.readout || 'below';
-  const rs = Math.round(o.readoutSize ?? Math.max(26, size * 0.15));
-  const texts = [o.text, fmt(o.value ?? 0), fmt(o.max ?? span), ...(o.texts || [])].filter(t => t != null && t !== '');
+  const rs = Math.round(o.readoutSize ?? Math.max(mode === 'inside' ? 24 : 26, size * (mode === 'inside' ? 0.12 : 0.15)));
+  // The plate fits what it shows: digits get the width of the widest value the watch will count to
+  // (so it never jitters while counting); words get their own width, and a swap glides between the two.
   const wOf = t => S.measure(t, { size: rs, weight: 600, family: 'mono' });
-  let plateW = o.readoutW ?? Math.max(...texts.map(wOf)) + rs * 1.1;
+  const pad = rs * 1.1;
+  let numW = Math.max(wOf(fmt(o.value ?? 0)), wOf(fmt(o.max ?? span))), maxW = numW;
+  const regNum = str => { numW = Math.max(numW, wOf(str)); maxW = Math.max(maxW, numW); };
+  const regTxt = str => { if (str != null) maxW = Math.max(maxW, wOf(str)); };
+  [o.text, ...(o.texts || [])].forEach(regTxt);
+  const W = t => (o.readoutW ? o.readoutW - pad : t == null ? numW : wOf(t)) + pad;
   const plateH = Math.round(rs * 1.62);
-  let px, py, rx, ry;   // plate top-left, readout centre
-  if (mode === 'right') { px = cx + R * 1.12 + 6; py = cy - plateH / 2; }
-  else { px = cx - plateW / 2; py = cy + R * 1.0 + Math.max(12, R * 0.12); }
-  if (mode === 'inside') { rx = cx; ry = cy + R * 0.42; }
+  const px0 = cx + R * 1.12 + 6, py = mode === 'right' ? cy - plateH / 2 : cy + R * 1.0 + Math.max(12, R * 0.12);
   const ro = S.g(null, g);
-  if (mode === 'below' || mode === 'right') {
-    g.plate = S.rect({ x: px, y: py, w: plateW, h: plateH, r: Math.round(plateH * 0.3), fill: T.BASE, fillOpacity: 0.96, stroke: '#ffffff', strokeOpacity: 0.14, sw: 1.5 }, ro);
-    rx = px + plateW / 2; ry = py + plateH / 2 + 1;
-  }
+  if (mode === 'below' || mode === 'right') g.plate = S.rect({ x: 0, y: py, w: 10, h: plateH, r: Math.round(plateH * 0.3), fill: T.BASE, fillOpacity: 0.96, stroke: '#ffffff', strokeOpacity: 0.14, sw: 1.5 }, ro);
   const roT = S.g(null, ro);
-  if (mode !== 'none') g.readout = S.text('', { x: rx, y: ry, size: rs, weight: 600, family: 'mono', anchor: 'middle', color: 'ink' }, roT);
-  const fitPlate = t => {   // a later value wider than the plate: widen it now (build time), around its centre
-    if (!g.plate || t == null) return;
-    const need = wOf(t) + rs * 1.1;
-    if (need <= plateW) return;
-    if (mode === 'below') px -= (need - plateW) / 2;
-    plateW = need; rx = px + plateW / 2;
-    g.plate.setAttribute('x', px); g.plate.setAttribute('width', plateW);
-    g.readout.setAttribute('x', rx);
-    bounds();
+  const ry = mode === 'inside' ? cy + R * 0.46 : py + plateH / 2 + 1;
+  if (mode !== 'none') g.readout = S.text('', { x: cx, y: ry, size: rs, weight: 600, family: 'mono', anchor: 'middle', color: 'ink' }, roT);
+  const placePlate = pw => {
+    if (!g.plate) return;
+    const x0 = mode === 'right' ? px0 : cx - pw / 2;
+    g.plate.setAttribute('x', T.f2(x0)); g.plate.setAttribute('width', T.f2(pw));
+    g.readout.setAttribute('x', T.f2(x0 + pw / 2));
   };
   // caption
   const ls = o.labelSize || 26;
   if (o.label) {
     const ly = mode === 'below' ? py + plateH + 14 + ls * 0.6 : mode === 'right' ? py + plateH + 12 + ls * 0.6 : cy + R + 16 + ls * 0.6;
-    g.labelEl = S.text(o.label, { x: mode === 'right' ? px + plateW / 2 : cx, y: ly, size: ls, color: 'muted', weight: 500, anchor: 'middle' }, g);
+    g.labelEl = S.text(o.label, { x: mode === 'right' ? px0 + 4 : cx, y: ly, size: ls, color: 'muted', weight: 500, anchor: mode === 'right' ? 'start' : 'middle' }, g);
   }
   // the cross ("no time in it"), hidden until .cross()
   g.crossEl = S.g(null, g);
@@ -324,18 +325,22 @@ function libStopwatch(S, o = {}, parent) {
   g.crossLine = S.line({ x1: cx - k, y1: cy - k, x2: cx + k, y2: cy + k, stroke: 'muted', sw: sw(0.065, 3.5) }, g.crossEl);
   g.crossEl.style.opacity = 0;
 
-  function bounds() {
+  function bounds() {   // the widest the widget gets (plate at its widest)
     const top = cy - R * (o.buttons === false ? 1 : 1.23);
     let bot = cy + R, l = cx - R, r = cx + R;
-    if (g.plate) { bot = Math.max(bot, py + plateH); l = Math.min(l, px); r = Math.max(r, px + plateW); }
-    if (g.labelEl) { const lw = S.measure(o.label, { size: ls, weight: 500 }); bot = Math.max(bot, +g.labelEl.getAttribute('y') + ls * 0.6); l = Math.min(l, +g.labelEl.getAttribute('x') - lw / 2); r = Math.max(r, +g.labelEl.getAttribute('x') + lw / 2); }
+    const pw = o.readoutW ?? maxW + pad;
+    if (g.plate) { bot = Math.max(bot, py + plateH); l = Math.min(l, mode === 'right' ? px0 : cx - pw / 2); r = Math.max(r, mode === 'right' ? px0 + pw : cx + pw / 2); }
+    if (g.labelEl) {
+      const lw = S.measure(o.label, { size: ls, weight: 500 }), lx = +g.labelEl.getAttribute('x');
+      bot = Math.max(bot, +g.labelEl.getAttribute('y') + ls * 0.6);
+      l = Math.min(l, mode === 'right' ? lx : lx - lw / 2); r = Math.max(r, mode === 'right' ? lx + lw : lx + lw / 2);
+    }
     Object.assign(g, { cx, cy, rad: R, t: top, b: bot, l, r, w: r - l, h: bot - top });
   }
-  bounds();
 
   // ---------------------------------------------------------------- state and drawing
   const flickVal = (fp, k) => { const rnd = S.rand((fp.seed * 7919 + k * 104729) >>> 0); rnd(); return Math.floor(rnd() * (fp.max + 1)); };
-  T.plannable(g, { ms: o.value ?? 0, txt: o.text ?? null, sw: 1, fq: 0, fp: null }, () => {
+  T.plannable(g, { ms: o.value ?? 0, txt: o.text ?? null, sw: 1, sa: null, sb: null, fq: 0, fp: null }, () => {
     const L = g.__live;
     const flick = L.fq > 0 && L.fq < 1 && L.fp;
     let ang = (L.ms / span) * 360;
@@ -354,24 +359,35 @@ function libStopwatch(S, o = {}, parent) {
       const s = L.sw > 0 && L.sw < 1 ? L.sw : 1, fade = Math.abs(1 - 2 * s);
       roT.setAttribute('opacity', s < 1 ? fade.toFixed(3) : 1);
       roT.setAttribute('transform', s < 1 ? `translate(0 ${((s < 0.5 ? -1 : 1) * (1 - fade) * rs * 0.35).toFixed(2)})` : '');
+      const e = s * s * (3 - 2 * s);
+      placePlate(s < 1 ? W(L.sa) + (W(L.sb) - W(L.sa)) * e : W(flick ? null : L.txt));
     }
   });
   g.__render();
+  bounds();
 
   // ---------------------------------------------------------------- helpers
   g.press = (po = {}) => {
     if (!g.crown) return gsap.timeline();
     return gsap.fromTo(g.crown, { y: 0 }, { y: R * 0.05, duration: po.d ?? 0.07, yoyo: true, repeat: 1, ease: 'power1.inOut', immediateRender: false });
   };
+  const toDigits = tl => { if (g.__plan.txt != null) tl.add(g.show(null, { d: 0.3 }), 0); };
   g.run = (from, to, ro2 = {}) => {
-    fitPlate(fmt(from)); fitPlate(fmt(to));
+    regNum(fmt(from)); regNum(fmt(to)); bounds();
     const d = ro2.d ?? 1.5;
     const tl = gsap.timeline();
-    tl.add(T.drive(g, { ms: to, txt: null }, { from: { ms: from }, d, ease: ro2.ease || 'none' }), 0);
+    toDigits(tl);
+    tl.add(T.drive(g, { ms: to }, { from: { ms: from }, d, ease: ro2.ease || 'none' }), 0);
     if (ro2.press !== false) { tl.add(g.press(), 0); tl.add(g.press(), d); }
     return tl;
   };
-  g.set = (ms, so = {}) => { fitPlate(fmt(ms)); return T.drive(g, { ms, txt: null }, { d: so.d ?? 0.4, ease: so.ease || 'power2.inOut' }); };
+  g.set = (ms, so = {}) => {
+    regNum(fmt(ms)); bounds();
+    const tl = gsap.timeline();
+    toDigits(tl);
+    tl.add(T.drive(g, { ms }, { d: so.d ?? 0.4, ease: so.ease || 'power2.inOut' }), 0);
+    return tl;
+  };
   g.reset = (so = {}) => g.set(0, { d: so.d ?? 0.45, ease: so.ease || 'power3.inOut' });
   g.laps = (n, lapMs, lo = {}) => {
     const every = lo.every ?? 0.6, tl = gsap.timeline();
@@ -380,14 +396,14 @@ function libStopwatch(S, o = {}, parent) {
   };
   g.flicker = (d = 1.5, fo = {}) => {
     const fp = { d, seed: fo.seed ?? 1, rate: fo.rate ?? 20, max: fo.max ?? o.max ?? span };
-    fitPlate(fmt(fp.max));
+    regNum(fmt(fp.max)); bounds();
     return T.drive(g, { fq: 1, fp }, { from: { fq: 0 }, d, ease: 'none' });
   };
   g.show = (text, so = {}) => {
-    fitPlate(text);
+    regTxt(text); bounds();
     return T.drive(g, { txt: text, sw: 1 }, {
       from: { sw: 0 }, d: so.d ?? 0.4, ease: 'none',
-      interp: (a, b, q) => ({ txt: q < 0.5 ? a.txt : b.txt, sw: q }),
+      interp: (a, b, q) => ({ txt: q < 0.5 ? a.txt : b.txt, sw: q, sa: a.txt, sb: b.txt }),
     });
   };
   g.flash = (fo = {}) => {
@@ -425,7 +441,8 @@ function libStopwatch(S, o = {}, parent) {
  * on the axis follows it when it rescales (0–400 ms → 0–16 s, or extended to the left), and things
  * outside the window fade at its ends.
  *
- * o: {x = 260, y = 700 (the axis line), w = 1400, t0 = 0, t1 = 30, unit = 'ms' ('ms' | 's' | any word | ''),
+ * o: {x = 260, y = 700 (the axis line), w = 1400, t0 = 0, t1 = 30,
+ *     unit = 'ms' ('ms' | 's' | 'year' (plain 1995, 2017; spans read '22 years') | any word | ''),
  *     log = false (t0 > 0; ticks at powers of ten, labels like '100 ms', '1 s'),
  *     ticks = auto (a step, e.g. 0.1 | an array of values | false), minor = auto (subdivisions | 0),
  *     labels = true (| 'ends' | false), unitOn = 'last' ('all' on log axes | 'none'), fmt (v, isLast) => label,
@@ -435,7 +452,8 @@ function libStopwatch(S, o = {}, parent) {
  *     caption = '' (a muted word under the labels, e.g. 'time'), clip = true (fade what leaves the window),
  *     rows = 1, barH = 48, rowGap = 16, gap = 16 (spans sit in rows above the line; row 0 is the top one)}
  * Returns <g> with .X(t) (time → x, as it is now) .T(x) .rowTop(i) .rowY(i) (centre) .line .scale .labelY
- *   and anchors .x .y .w .l .r.
+ *   .under (bottom of the tick labels) and anchors .x .y .w .l .r. Every label (.labelEl) can take fx.swap,
+ *   fx.in or fx.dim: the component's own fades act on wrapper groups, never on the text.
  * Helpers (return tweens/timelines unless noted; call each element's helpers in time order):
  *   .span(ta, tb, so) → a span <g> (built visible) with .bar .labelEl .grow() .to() .recolor(), where
  *        so: {tone = 'struct', style = 'solid' | 'soft' | 'outline' | 'ghost' (dashed), row = 0, y (top), h = barH,
@@ -457,17 +475,18 @@ function libStopwatch(S, o = {}, parent) {
  *        the label sits in a gap in the line, or beyond it when the gap is too small.
  *        Helpers .draw({d = 0.6}) (opens from its centre), .to(ta, tb, {d = 0.8})
  *   .pin(t) → <g> whose x = 0 is time t (draw anything inside it; it rides the axis); .moveTo(t, {d})
- *   .stream({from = every, every = 30, count = 10, y = rowY(0), h = 40, w, text, texts[], state}) →
+ *   .stream({from = every, every = 30, count = 10 | times = [..] (irregular: a stall), y = rowY(0), h = 40, w,
+ *            text, texts[], state}) →
  *        {chips[], times[], play({d = 2 | slow (× real time), ease}) → timeline of chips dropping in at their
  *        times (hidden until then), at(k) → seconds into play() when chip k lands}
  *   .rescale(t0, t1, {d = 1.2, ease, ticks, minor, labels, startLabel, endLabel}) — the window slides
  *        or zooms; the old ticks fade as the new ones arrive
  *   .draw({d = 1}) — the line draws left to right and ticks appear as it passes them (hidden until then)
  * Example (the film's 30 ms bar):
- *   const ax = libTimeAxis(S, { x: 210, y: 720, w: 1500, t0: 0, t1: 30, ticks: false, line: false, barH: 80 });
+ *   const ax = libTimeAxis(S, { x: 210, y: 720, w: 1500, t0: 0, t1: 30, ticks: false, line: false, barH: 80, gap: 0 });
  *   const sliver = ax.span(0, 0.1, { tone: 'compute', square: 'right', label: 'arithmetic, under 1%', labelPos: 'above' });
  *   const rest = ax.span(0.1, 30, { tone: 'bytes', square: 'left', label: 'something else' });
- *   const dim = ax.bracket(0, 30, { label: '≈ 30 ms per token', y: 790 });
+ *   const dim = ax.bracket(0, 30, { label: '≈ 30 ms per token', y: 760 });
  *   S.add(rest.grow({ d: 1.2 }), 'b1~thirty'); S.add(dim.draw(), 'b1~thirty+0.4'); S.add(sliver.to(0, 0.14), 'b3~came');
  */
 function libTimeAxis(S, o = {}, parent) {
@@ -487,7 +506,7 @@ function libTimeAxis(S, o = {}, parent) {
   const showTicks = o.ticks !== false, showLabels = showTicks && o.labels !== false;
   g.labelY = below ? y + tickLen + 8 + size * 0.55 : y - tickLen - 8 - size * 0.55;
   const under = showLabels && below ? g.labelY + size * 0.6 : y + (showTicks && below ? tickLen : 0);
-  Object.assign(g, { x, y, w, l: x, r: x + w });
+  Object.assign(g, { x, y, w, l: x, r: x + w, under });
   // ticks and labels appear as the drawing line passes them
   const reveal = px => {
     const dl = sc.__live.dl;
@@ -514,7 +533,7 @@ function libTimeAxis(S, o = {}, parent) {
   }));
 
   // ---------------------------------------------------------------- tick sets (one per domain)
-  const timeUnit = ['ms', 's', 'min', 'h'].includes(unit);
+  const timeUnit = ['ms', 's', 'min', 'h'].includes(unit), years = unit === 'year';
   function tickSet(dom, sp) {
     const tg = S.g(null, axisG);
     const V = T.ticks(dom.t0, dom.t1, sc.log, sp.ticks, sp.minor, w);
@@ -522,28 +541,40 @@ function libTimeAxis(S, o = {}, parent) {
     const eps = Math.abs(dom.t1 - dom.t0) * 1e-6;
     const majors = V.major.filter(v => v >= dom.t0 - eps && v <= dom.t1 + eps);
     const unitOn = sp.unitOn ?? (sc.log ? 'all' : 'last');
-    const lab = sp.fmt || ((v, last) => (sc.log && timeUnit ? T.human(v, unit)
+    const lab = sp.fmt || ((v, last) => (years ? String(Math.round(v)) : sc.log && timeUnit ? T.human(v, unit)
       : T.trim(v) + ((unitOn === 'all' || (unitOn === 'last' && last)) && unit ? ' ' + unit : '')));
-    let L = majors.map((v, i) => ({ v, text: lab(v, i === majors.length - 1) }));
+    // '400 ms': the number centres on its tick and the unit hangs to the right
+    const hang = (v, text) => (!sp.fmt && !years && !sc.log && unit && text === T.trim(v) + ' ' + unit ? meas(T.trim(v), size, 500, 'mono') : 0);
+    let L = majors.map((v, i) => { const text = lab(v, i === majors.length - 1); return { v, i, text, nw: hang(v, text) }; });
     const near = (a, b) => Math.abs(a - b) <= eps;
-    if (sp.startLabel != null) { const f = L.find(l => near(l.v, dom.t0)); if (f) f.text = sp.startLabel; else L.unshift({ v: dom.t0, text: sp.startLabel }); }
-    if (sp.endLabel != null) { const f = L.find(l => near(l.v, dom.t1)); if (f) f.text = sp.endLabel; else L.push({ v: dom.t1, text: sp.endLabel }); }
+    if (sp.startLabel != null) { const f = L.find(l => near(l.v, dom.t0)); if (f) Object.assign(f, { text: sp.startLabel, words: true }); else L.unshift({ v: dom.t0, i: -1, text: sp.startLabel, words: true }); }
+    if (sp.endLabel != null) { const f = L.find(l => near(l.v, dom.t1)); if (f) Object.assign(f, { text: sp.endLabel, words: true }); else L.push({ v: dom.t1, i: -1, text: sp.endLabel, words: true }); }
     const mode = sp.labels ?? true;
     if (!showTicks || mode === false) L = [];
     else if (mode === 'ends') L = L.filter((l, i) => i === 0 || i === L.length - 1);
     L.forEach(l => {
       l.px = at(l.v); l.tw = meas(l.text, size, 500, 'mono');
-      l.anchor = l.px - l.tw / 2 < x - 24 ? 'start' : l.px + l.tw / 2 > x + w + 24 ? 'end' : 'middle';
-      l.l = l.anchor === 'start' ? l.px - 2 : l.anchor === 'end' ? l.px - l.tw + 2 : l.px - l.tw / 2;
+      // numbers centre on their tick; words at the ends hang inwards; nothing leaves the safe area
+      const atStart = near(l.v, dom.t0), atEnd = near(l.v, dom.t1);
+      l.anchor = (l.words && atStart && !atEnd) || l.px - l.tw / 2 < 96 ? 'start' : (l.words && atEnd) || l.px + l.tw / 2 > 1824 ? 'end' : 'middle';
+      if (l.anchor === 'middle' && l.nw && l.px - l.nw / 2 + l.tw <= 1824) { l.anchor = 'start'; l.dx = -l.nw / 2; }
+      else l.dx = l.anchor === 'start' ? -2 : l.anchor === 'end' ? 2 : 0;
+      l.l = l.anchor === 'start' ? l.px + l.dx : l.anchor === 'end' ? l.px - l.tw + 2 : l.px - l.tw / 2;
       l.r = l.l + l.tw;
     });
-    // thin the labels until neighbours keep 18 px apart (the ends always stay)
-    const clear = k => k.every((l, i) => !i || l.l >= k[i - 1].r + 18);
+    // Thin the labels until neighbours keep 18 px apart. Words and the two ends always stay; the
+    // numbers keep a regular pattern through zero (every k-th step), minus any that crowd a word.
+    const fixed = L.filter((l, i) => l.words || i === 0 || i === L.length - 1);
+    const regular = L.filter(l => !fixed.includes(l));
+    const step = !sc.log && majors.length > 1 ? majors[1] - majors[0] : 0;
+    const hits = (a, b) => a.l < b.r + 18 && b.l < a.r + 18;
     let keep = L;
     for (const k of [1, 2, 3, 4, 5, 6, 8, 10, 20, 50]) {
-      keep = L.filter((l, i) => i % k === 0 || i === L.length - 1);
-      if (keep.length > 2 && keep[keep.length - 1].l < keep[keep.length - 2].r + 18) keep.splice(keep.length - 2, 1);
-      if (clear(keep)) break;
+      const reg = regular.filter(l => (step ? Math.abs(Math.round(l.v / step)) % k === 0 : l.i % k === 0) && !fixed.some(f => hits(f, l)));
+      keep = [...fixed, ...reg].sort((a, b) => a.px - b.px);
+      const fx2 = keep.filter(l => fixed.includes(l));
+      for (let j = fx2.length - 2; j >= 0; j--) if (fx2.length > 2 && hits(fx2[j], fx2[j + 1]) && !fx2[j].words && j > 0) keep.splice(keep.indexOf(fx2[j]), 1);
+      if (keep.every((l, i) => !i || l.l >= keep[i - 1].r + 18)) break;
     }
     const dy = below ? 1 : -1;
     const majEls = showTicks ? majors.map(v => ({ v, el: S.line({ x1: x, y1: y, x2: x, y2: y + dy * tickLen, stroke: o.tickTone || 'muted', sw: 2, strokeOpacity: 0.8, cap: 'butt' }, tg) })) : [];
@@ -563,7 +594,7 @@ function libTimeAxis(S, o = {}, parent) {
       }
       labEls.forEach(l => {
         const px = sc.X(l.v);
-        l.el.setAttribute('x', f2(px + (l.anchor === 'start' ? -2 : l.anchor === 'end' ? 2 : 0)));
+        l.el.setAttribute('x', f2(px + l.dx));
         l.el.setAttribute('opacity', (a * sc.vis(px) * reveal(px)).toFixed(3));
       });
     });
@@ -590,13 +621,19 @@ function libTimeAxis(S, o = {}, parent) {
     sp.skins = [sp.bar];
     const lsz = so.size ?? 26, tpl = so.label != null ? String(so.label) : '';
     const decs = so.decimals ?? Math.min(2, T.decOf(Math.abs(tb - ta)));
-    const vfmt = so.fmt || (v => T.num(v, decs) + (unit ? ' ' + unit : ''));
+    const vfmt = so.fmt || (v => (years ? `${T.num(v, decs)} year${Math.abs(v - 1) < 1e-9 ? '' : 's'}` : T.num(v, decs) + (unit ? ' ' + unit : '')));
     const textAt = v => tpl.replace('{v}', vfmt(v));
     const pos0 = so.labelPos || 'auto';
     if (tpl) {
       sp.labelG = S.g(null, sp);
       if (pos0 === 'above' || pos0 === 'below') sp.leader = S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: so.labelColor || T.ink(S, tone), sw: 2, strokeOpacity: 0.85 }, sp.labelG);
-      sp.labelEl = S.text(textAt(tb - ta), { x: 0, y: top + h / 2 + 1, size: lsz, weight: 600 }, sp.labelG);
+      sp.__lin = S.g(null, sp.labelG);
+      sp.labelEl = S.text(textAt(tb - ta), { x: 0, y: top + h / 2 + 1, size: lsz, weight: 600 }, sp.__lin);
+      // a counting label rides outside the end while the bar is too narrow to hold it, then moves in
+      if (tpl.includes('{v}') && (pos0 === 'auto' || pos0 === 'tip')) {
+        sp.__lout = S.g(null, sp.labelG);
+        sp.labelOut = S.text('', { x: 0, y: top + h / 2 + 1, size: lsz, weight: 600, color: so.labelColor || T.ink(S, tone) }, sp.__lout);
+      }
     }
     const lift = so.lift ?? 30;
     T.plannable(sp, { ta, tb, p: 1, dir: 'left' }, () => {
@@ -615,16 +652,23 @@ function libTimeAxis(S, o = {}, parent) {
       if (sp.base) sp.base.setAttribute('d', d);
       if (!sp.labelEl) return;
       const txt = textAt(Math.abs(L.tb - L.ta) * Math.min(1, p));
-      if (sp.labelEl.textContent !== txt) sp.labelEl.textContent = txt;
+      if (tpl.includes('{v}') && sp.labelEl.textContent !== txt) sp.labelEl.textContent = txt;
       const tw = meas(txt, lsz, 600, 'sans'), twFull = meas(textAt(Math.abs(L.tb - L.ta)), lsz, 600, 'sans');
       const fa = sc.clampX(X0), fb = sc.clampX(X1);
       const pos = pos0 === 'auto' ? (twFull + 28 <= fb - fa ? (tpl.includes('{v}') ? 'tip' : 'inside') : 'right') : pos0;
       let lx, ly = top + h / 2 + 1, anchor = 'middle', op = 1, col = so.labelColor || T.ink(S, tone);
+      let outOp = 0;
       if (pos === 'tip') {          // inside, riding the growing end (a counting value reads as it grows)
         const fromRight = L.dir === 'right';
         lx = fromRight ? a + 14 : b - 14; anchor = fromRight ? 'start' : 'end';
         col = so.labelColor || (style === 'solid' ? T.DARK : S.tone('ink'));
         op = T.clamp((b - a - tw - 28) / 24, 0, 1);
+        if (sp.labelOut) {
+          outOp = p > 0.001 ? 1 - op : 0;
+          if (sp.labelOut.textContent !== txt) sp.labelOut.textContent = txt;
+          sp.labelOut.setAttribute('x', f2(fromRight ? a - 14 : b + 14));
+          sp.labelOut.setAttribute('text-anchor', fromRight ? 'end' : 'start');
+        }
       } else if (pos === 'inside') {
         lx = (fa + fb) / 2;
         col = so.labelColor || (style === 'solid' ? T.DARK : S.tone('ink'));
@@ -645,7 +689,10 @@ function libTimeAxis(S, o = {}, parent) {
       sp.labelEl.setAttribute('x', f2(lx)); sp.labelEl.setAttribute('y', f2(ly));
       sp.labelEl.setAttribute('text-anchor', anchor);
       sp.labelEl.setAttribute('fill', col);
-      sp.labelG.setAttribute('opacity', (op * (inView ? 1 : 0)).toFixed(3));
+      sp.__lin.setAttribute('opacity', op.toFixed(3));
+      if (sp.leader) sp.leader.setAttribute('opacity', op.toFixed(3));
+      if (sp.__lout) sp.__lout.setAttribute('opacity', outOp.toFixed(3));
+      sp.labelG.setAttribute('opacity', inView ? 1 : 0);
     });
     sc.add(sp);
     Object.assign(sp, { t: top, b: top + h, h, cy: top + h / 2, l: sc.X(ta), r: sc.X(tb), tone });
@@ -673,13 +720,13 @@ function libTimeAxis(S, o = {}, parent) {
     const y1 = mo.y1 ?? g.rowTop(0) - 16, y2 = mo.y2 ?? y;
     mg.line = S.line({ x1: x, y1, x2: x, y2, stroke: tone, sw: mo.sw ?? 2.5, dash: mo.style === 'ghost' ? '7 6' : undefined, cap: mo.style === 'ghost' ? 'butt' : 'round' }, inner);
     if (mo.dot !== false) mg.dot = S.circle({ x, y: y2, r: 6, fill: tone }, inner);
-    if (mo.label) mg.labelEl = S.text(mo.label, { x, y: y1 - 14 - msz * 0.5, size: msz, color: tone === 'ink' ? 'ink' : T.ink(S, tone), anchor: mo.anchor || 'middle', weight: 600 }, inner);
+    if (mo.label) { mg.__lg = S.g(null, inner); mg.labelEl = S.text(mo.label, { x, y: y1 - 14 - msz * 0.5, size: msz, color: tone === 'ink' ? 'ink' : T.ink(S, tone), anchor: mo.anchor || 'middle', weight: 600 }, mg.__lg); }
     T.plannable(mg, { t, dp: 1 }, () => {
       const L = mg.__live, px = sc.X(L.t), dp = T.clamp(L.dp, 0, 1);
       mg.line.setAttribute('x1', f2(px)); mg.line.setAttribute('x2', f2(px));
       mg.line.setAttribute('y1', f2(y2 - (y2 - y1) * dp));
       if (mg.dot) { mg.dot.setAttribute('cx', f2(px)); mg.dot.setAttribute('opacity', dp > 0 ? 1 : 0); }
-      if (mg.labelEl) { mg.labelEl.setAttribute('x', f2(px)); mg.labelEl.setAttribute('opacity', T.clamp((dp - 0.6) * 2.5, 0, 1).toFixed(3)); }
+      if (mg.labelEl) { mg.labelEl.setAttribute('x', f2(px)); mg.__lg.setAttribute('opacity', T.clamp((dp - 0.6) * 2.5, 0, 1).toFixed(3)); }
       inner.setAttribute('opacity', (sc.vis(px) * (dp > 0 ? 1 : 0)).toFixed(3));
     });
     sc.add(mg);
@@ -695,7 +742,7 @@ function libTimeAxis(S, o = {}, parent) {
     const tone = bo.tone || 'muted', bsz = bo.size ?? 26;
     const yy = bo.y ?? (up ? g.rowTop(0) - 24 : under + 26);
     bg.path = S.path({ d: '', stroke: tone, sw: bo.sw ?? 2.5, cap: 'butt', join: 'miter' }, inner);
-    if (bo.label) bg.labelEl = S.text(bo.label, { x, y: yy, size: bsz, color: tone === 'muted' ? 'muted' : T.ink(S, tone), anchor: 'middle', weight: 600 }, inner);
+    if (bo.label) { bg.__lg = S.g(null, inner); bg.labelEl = S.text(bo.label, { x, y: yy, size: bsz, color: tone === 'muted' ? 'muted' : T.ink(S, tone), anchor: 'middle', weight: 600 }, bg.__lg); }
     const tw = bo.label ? meas(bo.label, bsz, 600, 'sans') : 0;
     T.plannable(bg, { ta, tb, dp: 1 }, () => {
       const L = bg.__live, dp = T.clamp(L.dp, 0, 1);
@@ -714,7 +761,7 @@ function libTimeAxis(S, o = {}, parent) {
         ly = yy + dir * (bsz * 0.6 + 14);
       }
       bg.path.setAttribute('d', dp > 0.001 ? d : '');
-      if (bg.labelEl) { bg.labelEl.setAttribute('x', f2(m)); bg.labelEl.setAttribute('y', f2(ly)); bg.labelEl.setAttribute('opacity', T.clamp((dp - 0.55) * 2.5, 0, 1).toFixed(3)); }
+      if (bg.labelEl) { bg.labelEl.setAttribute('x', f2(m)); bg.labelEl.setAttribute('y', f2(ly)); bg.__lg.setAttribute('opacity', T.clamp((dp - 0.55) * 2.5, 0, 1).toFixed(3)); }
     });
     sc.add(bg);
     bg.draw = (dO = {}) => T.drive(bg, { dp: 1 }, { from: { dp: 0 }, d: dO.d ?? 0.6, ease: dO.ease || 'power2.out' });
@@ -736,8 +783,9 @@ function libTimeAxis(S, o = {}, parent) {
     return inner;
   };
   g.__stream = (so, pinAt, cy) => {
-    const n = so.count ?? 10, every = so.every ?? 30, from = so.from ?? every;
-    const times = Array.from({ length: n }, (_, k) => +(from + k * every).toPrecision(12));
+    const every = so.every ?? 30, from = so.from ?? every;
+    const times = so.times ? so.times.slice() : Array.from({ length: so.count ?? 10 }, (_, k) => +(from + k * every).toPrecision(12));
+    const n = times.length;
     const h = so.h ?? 40;
     const chips = times.map((t, k) => {
       const yg = S.g({ transform: `translate(0 ${f2(cy)})` }, pinAt(t));
@@ -775,8 +823,9 @@ function libTimeAxis(S, o = {}, parent) {
     cur = nu;
     const tl = gsap.timeline();
     tl.add(T.drive(sc, { t0, t1 }, { d, ease: ro.ease || 'power2.inOut', interp: domInterp }), 0);
-    tl.add(T.drive(old, { a: 0 }, { d: d * 0.45, ease: 'power1.in' }), 0);
-    tl.add(T.drive(nu, { a: 1 }, { d: d * 0.45, ease: 'power1.out' }), d * 0.55);
+    // old labels are gone (below 20%) before the new ones pass 20%, so the two sets never read at once
+    tl.add(T.drive(old, { a: 0 }, { d: d * 0.5, ease: 'power1.in' }), 0);
+    tl.add(T.drive(nu, { a: 1 }, { d: d * 0.5, ease: 'power1.out' }), d * 0.5);
     return tl;
   };
   g.draw = (dO = {}) => T.drive(sc, { dl: 1 }, { from: { dl: 0 }, d: dO.d ?? 1, ease: dO.ease || 'power2.inOut' });
@@ -794,7 +843,8 @@ function libTimeAxis(S, o = {}, parent) {
  * o: {x = 160, y = 360 (top of the first lane), w = 1600 (label column + tracks), labelW = 220,
  *     laneH = 64, gap = 22, size = 26 (lane labels),
  *     lanes = [{label, tone (label colour; default muted), icon (an icon id drawn left of the label),
- *               ghost (dashed empty track, e.g. 'seen, if held back'), hidden (until .showLane(i))}],
+ *               iconTone (default tone), ghost (dashed empty track, e.g. 'seen, if held back'),
+ *               hidden (until .showLane(i))}],
  *     t0 = 0, t1 = 400, unit = 'ms', log, clip,
  *     axis = {} (libTimeAxis options for the ruler under the lanes: ticks, minor, labels, startLabel,
  *            endLabel, caption, arrow…) | false (no ruler; the scale still works), axisGap = 22,
@@ -805,11 +855,13 @@ function libTimeAxis(S, o = {}, parent) {
  *   .span(i, ta, tb, so) → a libTimeAxis span filling lane i (labelPos 'auto': inside, or right of a sliver)
  *   .token(i, t, {text, state, h = chipH, w}) → a token chip centred on time t in lane i (built visible;
  *        its .drop() / .pop() hide it until then)
- *   .stream(i, {from, every = 30, count = 10, text, texts[], state, h, w}) → {chips[], times[], play({d | slow}), at(k)}
+ *   .stream(i, {from, every = 30, count = 10 | times = [..], text, texts[], state, h, w}) →
+ *        {chips[], times[], play({d | slow}), at(k)} (see libTimeAxis.stream)
  *   .arrow(i, ta, j, tb, {tone = 'muted', sw = 2.5, label}) → arrow from the chip at ta in lane i to the chip
  *        at tb in lane j (made → seen); .draw({d = 0.5}) draws it on (hidden until then)
- *   .bracket(i, ta, tb, {label, side = 'above' | 'below', tone, style = 'dim' | 'bracket'}) → axis bracket
- *        just above (or below) lane i: '30 ms' between two chips, TTFT, TPOT
+ *   .bracket(i, ta, tb, {label, side = 'above' | 'below', tone, style = 'dim' | 'bracket', y}) → axis bracket
+ *        just above (or below) lane i: '30 ms' between two chips, TTFT, TPOT. Between two lanes, leave
+ *        gap ≥ 70 for it; below the last lane it sits under the ruler's labels.
  *   .marker(t, {label, tone = 'ink', style = 'line' | 'ghost', lanes = [first, last]}) → a vertical line
  *        across the lanes down to the axis, label on top ('send', 'token done ≈ 42 ms')
  *   .band(ta, tb, {tone = 'struct', label, lanes = [first, last]}) → a translucent block across lanes
@@ -881,7 +933,7 @@ function libTimeline(S, o = {}, parent) {
     const yA = g.laneCY(i) + down * (chipH / 2 + 8), yB = g.laneCY(j) - down * (chipH / 2 + 8);
     ag.line = S.path({ d: '', stroke: tone, sw }, inner);
     ag.head = S.path({ d: '', stroke: tone, sw }, inner);
-    if (ao2.label) ag.labelEl = S.text(ao2.label, { x: 0, y: (yA + yB) / 2, size: ao2.size ?? 26, color: T.ink(S, tone), weight: 550 }, inner);
+    if (ao2.label) { ag.__lg = S.g(null, inner); ag.labelEl = S.text(ao2.label, { x: 0, y: (yA + yB) / 2, size: ao2.size ?? 26, color: T.ink(S, tone), weight: 550 }, ag.__lg); }
     T.plannable(ag, { ta, tb, dp: 1 }, () => {
       const L = ag.__live, xa = sc.X(L.ta), xb = sc.X(L.tb), dp = T.clamp(L.dp, 0, 1);
       const ex = xa + (xb - xa) * dp, ey = yA + (yB - yA) * dp;
@@ -889,7 +941,7 @@ function libTimeline(S, o = {}, parent) {
       const dx = xb - xa, dy = yB - yA, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len, hs = 11;
       ag.head.setAttribute('d', `M${f2(ex - ux * hs - uy * hs * 0.6)},${f2(ey - uy * hs + ux * hs * 0.6)}L${f2(ex)},${f2(ey)}L${f2(ex - ux * hs + uy * hs * 0.6)},${f2(ey - uy * hs - ux * hs * 0.6)}`);
       ag.head.setAttribute('opacity', T.clamp((dp - 0.75) * 5, 0, 1).toFixed(3));
-      if (ag.labelEl) { ag.labelEl.setAttribute('x', f2(Math.max(xa, xb) + 16)); ag.labelEl.setAttribute('opacity', T.clamp((dp - 0.6) * 2.5, 0, 1).toFixed(3)); }
+      if (ag.labelEl) { ag.labelEl.setAttribute('x', f2(Math.max(xa, xb) + 16)); ag.__lg.setAttribute('opacity', T.clamp((dp - 0.6) * 2.5, 0, 1).toFixed(3)); }
       inner.setAttribute('opacity', Math.min(sc.vis(xa), sc.vis(xb)).toFixed(3));
     });
     sc.add(ag);
@@ -898,7 +950,8 @@ function libTimeline(S, o = {}, parent) {
   };
   g.bracket = (i, ta, tb, bo = {}) => {
     const up = (bo.side || 'above') === 'above';
-    return g.axis.bracket(ta, tb, { ...bo, side: up ? 'above' : 'below', y: bo.y ?? (up ? lg.laneY(i) - 16 : lg.laneY(i) + laneH + 16) });
+    const yb = i === n - 1 && o.axis !== false ? g.axis.under + 30 : lg.laneY(i) + laneH + 16;   // under the ruler's labels
+    return g.axis.bracket(ta, tb, { ...bo, side: up ? 'above' : 'below', y: bo.y ?? (up ? lg.laneY(i) - 16 : yb) });
   };
   const laneSpan = ls => { const [a, b] = ls || [0, n - 1]; return [lg.laneY(a), lg.laneY(b) + laneH, b === n - 1]; };
   g.marker = (t, mo = {}) => {
@@ -912,13 +965,13 @@ function libTimeline(S, o = {}, parent) {
     const bg = S.g(null, top), inner = S.g(null, bg);
     const tone = bo.tone || 'struct', bsz = bo.size ?? 26, y1 = ya - 10, y2 = yb + 10;
     bg.rect = S.rect({ x: x0, y: y1, w: 1, h: y2 - y1, r: 10, fill: tone, fillOpacity: bo.fillOpacity ?? 0.14, stroke: tone, strokeOpacity: 0.65, sw: 2 }, inner);
-    if (bo.label) bg.labelEl = S.text(bo.label, { x: x0, y: y1 - 14 - bsz * 0.5, size: bsz, color: T.ink(S, tone), anchor: 'middle', weight: 600 }, inner);
+    if (bo.label) { bg.__lg = S.g(null, inner); bg.labelEl = S.text(bo.label, { x: x0, y: y1 - 14 - bsz * 0.5, size: bsz, color: T.ink(S, tone), anchor: 'middle', weight: 600 }, bg.__lg); }
     T.plannable(bg, { ta, tb, p: 1 }, () => {
       const L = bg.__live, a = sc.clampX(sc.X(L.ta)), full = sc.clampX(sc.X(L.tb));
       const b = a + (full - a) * T.clamp(L.p, 0, 1), ww = Math.max(0, b - a);
       bg.rect.setAttribute('x', f2(a)); bg.rect.setAttribute('width', f2(ww));
       bg.rect.setAttribute('rx', f2(Math.min(10, ww / 2))); bg.rect.setAttribute('ry', f2(Math.min(10, ww / 2)));
-      if (bg.labelEl) { bg.labelEl.setAttribute('x', f2((a + full) / 2)); bg.labelEl.setAttribute('opacity', T.clamp(L.p * 3 - 1, 0, 1).toFixed(3)); }
+      if (bg.labelEl) { bg.labelEl.setAttribute('x', f2((a + full) / 2)); bg.__lg.setAttribute('opacity', T.clamp(L.p * 3 - 1, 0, 1).toFixed(3)); }
       inner.setAttribute('opacity', ww > 0.5 ? 1 : 0);
     });
     sc.add(bg);

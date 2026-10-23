@@ -2,7 +2,7 @@
    b1 libStopwatch at three sizes: run + flash, flicker + laps, words + marks, crossed out.
    b2 libTimeAxis: the film's 30 ms bar (sliver, dimension line, trim to 29.2 ms) and two to-scale rows.
    b3 libTimeAxis: chips streaming onto a 1 s ruler, the ruler rescaling to 16 s; a log axis with markers.
-   b4 libTimeline: 'made' vs 'seen' lanes, streams, arrows, brackets and a sweeping band. */
+   b4 libTimeline: made vs seen lanes, streams, arrows, brackets, a sweeping band, a ghost lane shown late. */
 V.scene('demo_time', S => {
   const { fx } = S;
   const title = (t, at, until) => {
@@ -18,7 +18,7 @@ V.scene('demo_time', S => {
   const m1 = S.g();
   const A = libStopwatch(S, { x: 430, y: 520, size: 360, tone: 'bytes', text: '?', label: 'slowed down' }, m1);
   const B = libStopwatch(S, { x: 1010, y: 520, size: 220 }, m1);
-  const C = libStopwatch(S, { x: 1420, y: 470, size: 150, readout: 'right', texts: ['tens of ms'], marks: [{ ms: 15, tone: 'helps' }, { ms: 42, tone: 'compute' }] }, m1);
+  const C = libStopwatch(S, { x: 1420, y: 470, size: 130, readout: 'right', text: '?', marks: [{ ms: 15, tone: 'helps' }, { ms: 42, tone: 'compute' }] }, m1);
   const D = libStopwatch(S, { x: 1500, y: 760, size: 100, readout: 'none' }, m1);
   const capA = caption('run 0 → 30 ms, flash', 430, 912, m1);
   const capB = caption('flicker, then laps of 30 ms', 1010, 912, m1);
@@ -89,21 +89,25 @@ V.scene('demo_time', S => {
   title('libTimeline', 'b4+0.1');
   const m4 = S.g();
   const tl = libTimeline(S, {
-    x: 150, y: 380, w: 1620, labelW: 250, laneH: 64, gap: 110, t0: 0, t1: 400,
-    lanes: [{ label: 'made', icon: 'ph:cpu-duotone', tone: 'ink', iconTone: 'compute' }, { label: 'seen', icon: 'ph:laptop-duotone', tone: 'ink', iconTone: 'struct' }],
+    x: 150, y: 330, w: 1620, labelW: 250, laneH: 64, gap: 104, t0: 0, t1: 400,
+    lanes: [{ label: 'made', icon: 'ph:cpu-duotone', tone: 'ink', iconTone: 'compute' }, { label: 'seen', icon: 'ph:laptop-duotone', tone: 'ink', iconTone: 'struct' },
+      { label: 'held back', icon: 'ph:laptop-duotone', iconTone: 'muted', ghost: true, hidden: true }],
   }, m4);
   const made = tl.stream(0, { from: 30, every: 30, count: 13 });
-  const seen = tl.stream(1, { from: 95, every: 30, count: 11 });
+  const seen = tl.stream(1, { from: 95, every: 30, count: 10 });
   const arrows = [0, 1, 2].map(k => tl.arrow(0, made.times[k], 1, seen.times[k]));
   const b30 = tl.bracket(0, 90, 120, { label: '30 ms' });
   const b65 = tl.bracket(1, 30, 95, { label: '65 ms trip', side: 'below', tone: 'struct' });
-  const band = tl.band(150, 215, { tone: 'helps', label: '≈ 2 in flight' });
+  const band = tl.band(150, 215, { tone: 'helps', label: '≈ 2 in flight', lanes: [0, 1] });
+  const held = tl.span(2, 0, 400, { tone: 'neutral', style: 'soft', label: 'nothing shown yet' });
   S.add(tl.draw({ d: 0.8 }), 'b4');
   S.add(made.play({ d: 1.8 }), 'b4+0.5');
-  S.add(seen.play({ d: 1.8 * (seen.times[10] - seen.times[0]) / (made.times[12] - made.times[0]) }), `b4+${(0.5 + made.at(0) + 65 * 1.8 / 360).toFixed(3)}`);
-  arrows.forEach((a, k) => S.add(a.draw({ d: 0.3 }), `b4+${(0.5 + made.at(k) + 0.05).toFixed(3)}`));
+  S.add(seen.play({ d: 1.8 * (seen.times[9] - seen.times[0]) / (made.times[12] - made.times[0]) }), `b4+${(0.5 + made.at(0) + 65 * 1.8 / 360).toFixed(3)}`);
+  arrows.forEach((a, k) => S.add(a.draw({ d: 65 * 1.8 / 360, ease: 'none' }), `b4+${(0.5 + made.at(k) + 0.15).toFixed(3)}`));
   S.add(b30.draw(), 'b4+1.4');
   S.add(b65.draw(), 'b4+1.6');
   S.add(band.grow({ d: 0.4 }), 'b4+1.9');
   S.add(band.moveTo(300, 365, { d: 1.0 }), 'b4+2.4');
+  S.add(tl.showLane(2), 'b4+2.0');
+  S.add(held.grow({ d: 0.9 }), 'b4+2.3');
 });

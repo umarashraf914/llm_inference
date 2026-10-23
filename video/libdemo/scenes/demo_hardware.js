@@ -4,13 +4,13 @@ V.scene('demo_hardware', S => {
   const { fx } = S;
   const page = () => S.g();
   const showPage = (g, at, until) => {
-    S.add(gsap.fromTo(g, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }), at);
-    if (until) S.add(gsap.to(g, { autoAlpha: 0, duration: 0.35 }), until);
+    S.add(gsap.fromTo(g, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }), at);
+    if (until) S.add(gsap.to(g, { autoAlpha: 0, duration: 0.25 }), until);
   };
 
   // ================================================================ b1: chips at every size
   const p1 = page();
-  showPage(p1, 'b1-0.45', 'b2-0.4');
+  showPage(p1, 'b1-0.45', 'b2-0.05');
   const hero = libChip(S, { x: 520, y: 470, size: 240, label: 'H100', sub: 'idle → on → busy', state: 'idle' }, p1);
   S.add(hero.drawOn({ d: 1.1 }), 'b1');
   S.add(hero.wake({ d: 0.8 }), 'b1+1.3');
@@ -41,13 +41,13 @@ V.scene('demo_hardware', S => {
 
   // ================================================================ b2: spec sheets
   const p2 = page();
-  showPage(p2, 'b2-0.3', 'b3-0.4');
+  showPage(p2, 'b2+0.15', 'b3-0.05');
   // the cold open's sheet: placeholder lines; two brighten, then resolve
   const cold = libSpecSheet(S, {
     x: 110, y: 150, w: 640, title: 'chip spec sheet', start: 'placeholder', rowStyle: 'inline', rowH: 54,
     rows: [null, { label: 'operations per second', value: '?', tone: 'compute' }, null, { label: 'bytes per second', value: '?', tone: 'bytes' }, null, null],
   }, p2);
-  S.add(fx.in(cold, { from: 'left' }), 'b2-0.2');
+  S.add(fx.in(cold, { from: 'left' }), 'b2+0.15');
   S.add(cold.brighten([1, 3]), 'b2+0.5');
   S.add(cold.reveal(1), 'b2+1.0');
   S.add(cold.reveal(3), 'b2+1.5');
@@ -64,7 +64,7 @@ V.scene('demo_hardware', S => {
       { label: 'Power draw', value: '700 W', tone: 'neutral', tag: 'a rate' },
     ],
   }, p2);
-  S.add(fx.in(h100, { from: 'right' }), 'b2-0.2');
+  S.add(fx.in(h100, { from: 'right' }), 'b2+0.15');
   S.add(h100.reveal('all', { stagger: 0.25 }), 'b2+0.2');
   S.add(h100.focus(1), 'b2+1.6');
   S.add(h100.glow(1, { part: 'value' }), 'b2+2.0');
@@ -80,19 +80,19 @@ V.scene('demo_hardware', S => {
 
   // ================================================================ b3: the user's device and the server
   const p3 = page();
-  showPage(p3, 'b3-0.3', 'b4-0.45');
+  showPage(p3, 'b3+0.15', 'b4-0.05');
   const lap = libDevice(S, { x: 330, y: 400, w: 340, chip: true, label: 'your laptop', sub: 'one small chip' }, p3);
   const srv = libServer(S, { x: 1440, y: 330, w: 480, gpus: 4, spinner: true, label: 'A server', sub: 'a few GPUs, always on' }, p3);
   const a = lap.port('right', 16), b = srv.port('left', 16);
   const wire = S.path({ d: `M${a.x},${a.y} C${a.x + 260},${a.y} ${b.x - 260},${b.y} ${b.x},${b.y}`, stroke: 'struct', sw: 3, dash: '10 9', strokeOpacity: 0.6 }, p3);
   const globe = S.icon('ph:globe-hemisphere-west-duotone', { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, size: 56, color: 'struct' }, p3);
-  S.add(fx.draw(wire, { d: 0.6 }), 'b3');
+  S.add(fx.in(wire, { from: 'fade', d: 0.6 }), 'b3+0.2');
   S.add(fx.pop(globe), 'b3+0.3');
-  const q = typeof libToken === 'function' ? libToken(S, { text: 'your question', x: a.x, y: a.y - 40 }, p3) : null;
+  const q = typeof libToken === 'function' ? libToken(S, { text: 'your question', x: a.x + 120, y: a.y - 75 }, p3) : null;
   if (q) {
     S.set(q, { autoAlpha: 0 }, 0);
-    S.add(gsap.fromTo(q, { autoAlpha: 1, x: 0, y: 0 }, { x: b.x - a.x - 60, y: b.y - a.y, duration: 1.0, ease: 'power2.inOut' }), 'b3+0.4');
-    S.add(gsap.to(q, { autoAlpha: 0, duration: 0.25 }), 'b3+1.35');
+    S.add(gsap.fromTo(q, { autoAlpha: 1, x: 0, y: 0 }, { x: b.x - a.x - 290, y: b.y - a.y, duration: 1.0, ease: 'power2.inOut' }), 'b3+0.4');
+    S.add(gsap.to(q, { autoAlpha: 0, duration: 0.2 }), 'b3+1.25');
   }
   S.add(srv.open(), 'b3+1.2');
   S.add(srv.activity({ d: 2.2 }), 'b3+1.4');
@@ -119,11 +119,13 @@ V.scene('demo_hardware', S => {
 
   // ================================================================ b4: a data-centre pull-back
   const p4 = page();
-  showPage(p4, 'b4-0.35');
+  showPage(p4, 'b4+0.1');
   const dc = libDataCentre(S, { x: 960, y: 600, rows: 3, racks: 8, units: 8, rackW: 420, hero: { row: 1, rack: 3, unit: 4 } }, p4);
   const u = dc.unitBox(1, 3, 4);
-  S.add(fx.cam({ x: u.cx, y: u.cy, scale: 1.6, d: 0.05 }), 'b4-0.4');
-  S.add(fx.cam({ x: dc.cx, y: dc.cy, scale: 1000 / dc.h, d: 1.8, ease: 'expo.inOut' }), 'b4+0.2');
+  S.add(fx.cam({ x: u.cx, y: u.cy, scale: 1.6, d: 0.05 }), 'b4');
+  S.add(fx.cam({ x: dc.cx, y: dc.cy, scale: 1000 / dc.h, d: 1.8, ease: 'expo.inOut' }), 'b4+0.5');
+  S.set(dc.labelEl, { autoAlpha: 0 }, 0);                      // the label lands once the camera settles
+  S.add(fx.in(dc.labelEl, { from: 'up', d: 0.5 }), 'b4+2.3');
   S.add(dc.hero.activity({ d: 1.2 }), 'b4');
   S.add(dc.spinFans({ d: 3 }), 'b4+0.6');
   S.add(dc.blink({ d: 2.8 }), 'b4+0.6');

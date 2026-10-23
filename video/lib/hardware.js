@@ -80,11 +80,12 @@ var _libHW = (function () {
     lin('hw-sheen', [[0, '#ffffff', 0.13], [0.42, '#ffffff', 0.02], [1, '#ffffff', 0]], [0, 0, 1, 1]);
     lin('hw-slab', [[0, '#172647'], [1, '#0e1731']]);            // GPU package substrate (blue slab)
     lin('hw-hbm', [[0, '#3b1820'], [1, '#230f16']]);             // HBM stack
-    lin('hw-steel', [[0, '#1e2a46'], [0.5, '#162038'], [1, '#111a2e']]);   // server chassis
+    lin('hw-steel', [[0, '#26334f'], [0.5, '#1c2741'], [1, '#151e34']]);   // server chassis
     lin('hw-cab', [[0, '#141d33'], [1, '#0b1222']]);             // rack cabinet
     lin('hw-glass', [[0, '#13213f'], [1, '#0a1226']]);           // screens
     lin('hw-glass-on', [[0, '#1b3466'], [1, '#0e1c3d']]);
     lin('hw-shell', [[0, '#26324f'], [1, '#18223a']]);           // laptop lid back / phone back
+    lin('hw-hall', [[0, '#101a34'], [1, '#080e1c']]);            // data-centre interior
   }
 
   /** rounded-rectangle subpath (for batched paths) */
@@ -110,13 +111,57 @@ var _libHW = (function () {
       onStart: go, onUpdate: go, onReverseComplete: () => apply(from),
     });
   }
+  /**
+   * A channel of planned drives on one piece of state (a chip's core levels, a server's power light…).
+   * Helpers on one component are created in time order, so a drive created later is scheduled later. When two
+   * overlap, the earlier one stands aside as soon as the later one has started: GSAP renders a timeline's
+   * children in reverse order when seeking backwards, and without this the frame would depend on direction.
+   */
+  function channel() {
+    const list = [];
+    return (from, to, apply, o) => {
+      const idx = list.length, me = {};
+      list.push(me);
+      me.tw = drive(from, to, v => {
+        for (let k = idx + 1; k < list.length; k++) if (list[k].tw.progress() > 0) return;
+        apply(v);
+      }, o);
+      return me.tw;
+    };
+  }
   /** swap a text element's content with a quick fade through zero; pure function of progress */
-  function swapText(el, from, to, o = {}, after) {
-    return drive(0, 1, p => {
-      el.textContent = p < 0.5 ? from : to;
+  function swapText(el, from, to, o = {}, set, ch) {
+    const put = set || (t => { el.textContent = t; });
+    return (ch || drive)(0, 1, p => {
+      put(p < 0.5 ? from : to);
       el.style.opacity = Math.abs(1 - 2 * p).toFixed(3);
-      if (after) after(p < 0.5 ? from : to);
     }, { d: o.d ?? 0.45, ease: 'none' });
+  }
+  /** '3.35 TB/s' → ['3.35', 'TB/s']; '?' → ['?', '']: numbers set in mono, units in sans */
+  function splitUnit(v) {
+    const m = String(v).match(/^(.*?\d[\d.,]*|\?)\s+([^\d\s].*)$/);
+    return m ? [m[1], m[2]] : [String(v), ''];
+  }
+  /** write a value into a <text> as a mono number tspan and a smaller sans unit tspan */
+  function setValueText(el, v, o) {
+    const [num, unit] = o.unit != null ? [String(v), o.unit] : splitUnit(v);
+    while (el.firstChild) el.removeChild(el.firstChild);
+    const a = document.createElementNS(NS, 'tspan');
+    a.textContent = num; a.setAttribute('font-family', "'JetBrains Mono'");
+    el.appendChild(a);
+    if (unit) {
+      const b = document.createElementNS(NS, 'tspan');
+      b.textContent = '\u2009' + unit;
+      b.setAttribute('font-family', "'Inter'"); b.setAttribute('font-size', o.unitSize); b.setAttribute('font-weight', 550);
+      if (o.unitColor) b.setAttribute('fill', o.unitColor);
+      el.appendChild(b);
+    }
+    return { num, unit };
+  }
+  /** width of a value written by setValueText */
+  function valueWidth(S, v, o) {
+    const [num, unit] = o.unit != null ? [String(v), o.unit] : splitUnit(v);
+    return S.measure(num, { size: o.size, weight: 600, family: 'mono' }) + (unit ? S.measure('\u2009' + unit, { size: o.unitSize, weight: 550 }) : 0);
   }
   /** a seeded permutation rank: rank[i] in 0..n-1 */
   function ranks(S, n, seed) {
@@ -248,7 +293,7 @@ var _libHW = (function () {
     return out;
   }
 
-  return { NS, GRAD, BASE, DARK, GREY, clamp, lerp, f2, smooth, nextId, hexRGB, mix, soft, defs, rr, circ, xf, drive, swapText, ranks, sel, ignore, label, badge, spinnerPath, fan, unitShapes };
+  return { NS, GRAD, BASE, DARK, GREY, clamp, lerp, f2, smooth, nextId, hexRGB, mix, soft, defs, rr, circ, xf, drive, channel, swapText, splitUnit, setValueText, valueWidth, ranks, sel, ignore, label, badge, spinnerPath, fan, unitShapes };
 })();
 
 
@@ -309,7 +354,7 @@ function libChip(S, o = {}, parent) {
   if (!hbm) {
     // ---- plain chip: pins on four sides, package, die
     const n = Math.round(H.clamp(s / 16, 2, 10)), span = s * 0.76, step = span / n;
-    const pl = H.clamp(s * 0.075, 3, 16), pt = H.clamp(step * 0.36, 1.3, 6.5);
+    const pl = H.clamp(s * 0.07, 3, 15), pt = H.clamp(step * 0.32, 1.3, 5.5);
     let d = '';
     for (let j = 0; j < n; j++) {
       const t = -span / 2 + (j + 0.5) * step;
@@ -320,8 +365,9 @@ function libChip(S, o = {}, parent) {
     hw = hh = s / 2 + pl + pt / 2;
     body = { x: cx - s / 2, y: cy - s / 2, w: s, h: s };
     const rb = s * 0.12;
-    fillEls.push(S.rect({ x: body.x, y: body.y, w: s, h: s, r: rb, fill: outline ? H.BASE : 'url(#hw-body)', fillOpacity: outline ? 0.9 : 1 }, art));
+    fillEls.push(S.rect({ x: body.x, y: body.y, w: s, h: s, r: rb, fill: outline ? H.BASE : 'url(#hw-body)', fillOpacity: outline ? 0.9 : 1, filter: s >= 80 && !outline ? 'url(#shadow)' : undefined }, art));
     if (!outline) fillEls.push(S.rect({ x: body.x, y: body.y, w: s, h: s, r: rb, fill: 'url(#hw-sheen)' }, art));
+    if (!outline && s >= 60) fillEls.push(H.ignore(S.rect({ x: body.x + sw * 1.6, y: body.y + sw * 1.6, w: s - sw * 3.2, h: s - sw * 3.2, r: rb * 0.8, stroke: '#ffffff', strokeOpacity: 0.07, sw: Math.max(1, sw * 0.6) }, art)));
     root.bodyLine = S.rect({ x: body.x, y: body.y, w: s, h: s, r: rb, stroke: tone, strokeOpacity: 0.92, sw }, art);
     strokeEls.push(root.bodyLine);
     const inset = s * 0.17, ds = s - 2 * inset;
@@ -334,7 +380,8 @@ function libChip(S, o = {}, parent) {
     const gap = s * 0.1, stw = s * 0.3, pad = s * 0.12;
     const W = s + 2 * (gap + stw) + 2 * pad, Hh = s + 2 * pad;
     hw = W / 2; hh = Hh / 2;
-    slab = S.rect({ x: cx - W / 2, y: cy - Hh / 2, w: W, h: Hh, r: s * 0.09, fill: 'url(#hw-slab)', stroke: 'struct', strokeOpacity: 0.5, sw }, art);
+    S.rect({ x: cx - W / 2, y: cy - Hh / 2, w: W, h: Hh, r: s * 0.09, fill: 'url(#hw-slab)', filter: s >= 60 ? 'url(#shadow)' : undefined }, art);
+    slab = S.rect({ x: cx - W / 2, y: cy - Hh / 2, w: W, h: Hh, r: s * 0.09, stroke: 'struct', strokeOpacity: 0.55, sw }, art);
     strokeEls.push(slab);
     if (s >= 64) {      // tiny surface-mount parts along the slab's top and bottom edges
       let cd = '';
@@ -382,11 +429,14 @@ function libChip(S, o = {}, parent) {
   const coresG = H.ignore(S.g(null, art));
   const cores = [];
   if (!outline) {
-    const k = o.cores ?? Math.round(H.clamp(D.w / 13, 2, 12));
-    const pp = D.w * 0.075, g = Math.max(1, D.w * 0.035);
-    const cw = (D.w - 2 * pp - (k - 1) * g) / k;
+    const k = o.cores ?? Math.round(H.clamp(D.w / 15, 2, 12));
+    const pp = D.w * 0.07, g = Math.max(1, D.w * 0.026);
+    const split = k >= 8 && k % 2 === 0;           // big dies: four quadrants either side of a cross channel
+    const extra = split ? g * 1.6 : 0;
+    const cw = (D.w - 2 * pp - (k - 1) * g - extra) / k;
+    const pos = i => pp + i * (cw + g) + (split && i >= k / 2 ? extra : 0);
     for (let r = 0; r < k; r++) for (let c = 0; c < k; c++) {
-      cores.push(S.rect({ x: D.x + pp + c * (cw + g), y: D.y + pp + r * (cw + g), w: cw, h: cw, r: Math.min(cw * 0.2, 4), fill: tone, fillOpacity: 0.24 }, coresG));
+      cores.push(S.rect({ x: D.x + pos(c), y: D.y + pos(r), w: cw, h: cw, r: Math.min(cw * 0.2, 3), fill: tone, fillOpacity: 0.24 }, coresG));
     }
   }
   root.cores = cores;
@@ -409,21 +459,25 @@ function libChip(S, o = {}, parent) {
     root.labelEl = lab.el; root.subEl = lab.sub; root.labelG = lab.g;
   }
 
-  // ---- state painting
+  // ---- state painting: planned base levels (setState) + independent spark layers (compute) + flashes
   const LV = { idle: 0, on: 1, busy: 2 };
   const level0 = LV[o.state || 'on'] ?? 1;
-  let plan = new Array(nC).fill(level0);
+  let plan = new Array(nC).fill(level0);                 // the planned base, for chaining helpers
+  const live = { base: plan.slice(), sparks: [], flashes: [] };   // what is on screen now
   function coreStyle(L) {
     if (L <= 1) return { fill: H.mix(S, H.GREY, AMB, L), op: H.lerp(0.15, 0.24, L) };
     return { fill: AMB, op: H.lerp(0.24, 0.95, Math.min(1, L - 1)) };
   }
-  function paint(levels) {
+  function paint() {
     let sum = 0;
     for (let i = 0; i < nC; i++) {
-      const st = coreStyle(levels[i]);
+      let env = 0;
+      for (const L of live.sparks) if (L[i] > env) env = L[i];
+      const b = live.base[i], lv = b + (2 - b) * env;
+      const st = coreStyle(lv);
       cores[i].setAttribute('fill', st.fill);
       cores[i].setAttribute('fill-opacity', st.op.toFixed(3));
-      sum += levels[i];
+      sum += b;
     }
     const mean = nC ? sum / nC : level0, m1 = Math.min(1, mean);
     const c = H.mix(S, H.GREY, AMB, 0.3 + 0.7 * m1);
@@ -431,20 +485,18 @@ function libChip(S, o = {}, parent) {
     root.bodyLine.setAttribute('stroke-opacity', H.lerp(0.6, 0.92, m1).toFixed(3));
     if (pins) { pins.setAttribute('stroke', c); pins.setAttribute('stroke-opacity', H.lerp(0.38, 0.62, m1).toFixed(3)); }
     glowEl.setAttribute('opacity', (Math.max(0, mean - 1) * 0.3).toFixed(3));
+    flashEl.setAttribute('opacity', Math.max(0, ...live.flashes).toFixed(3));
   }
-  paint(plan);
+  paint();
 
+  const stateCh = H.channel();
   root.setState = (name, so = {}) => {
     const to = LV[name] ?? 1, from = plan.slice(), spread = so.spread ?? 0.6;
     plan = new Array(nC).fill(to);
     if (!nC) return gsap.timeline();
-    const target = plan.slice();
-    return H.drive(0, 1, p => {
-      const lv = from.map((f, i) => {
-        const q = H.clamp((p - spread * rank[i] / nC) / (1 - spread), 0, 1);
-        return H.lerp(f, target[i], H.smooth(q));
-      });
-      paint(lv);
+    return stateCh(0, 1, p => {
+      live.base = from.map((f, i) => H.lerp(f, to, H.smooth(H.clamp((p - spread * rank[i] / nC) / (1 - spread), 0, 1))));
+      paint();
     }, { d: so.d ?? 0.8, ease: 'none' });
   };
   root.wake = so => root.setState('on', so);
@@ -452,8 +504,8 @@ function libChip(S, o = {}, parent) {
   root.busy = so => root.setState('busy', so);
 
   root.compute = (co = {}) => {
-    const d = co.d ?? 2, rate = co.rate ?? 2.2, base = plan.slice();
-    const rnd = S.rand((co.seed ?? 11) * 7919 + nC);
+    const d = co.d ?? 2, rate = co.rate ?? 2.2;
+    const rnd = S.rand((co.seed ?? 11) * 7919 + nC + live.sparks.length * 131);
     const A = 0.05, DEC = 0.3;
     const ev = cores.map(() => {
       const out = [];
@@ -461,28 +513,36 @@ function libChip(S, o = {}, parent) {
       for (;;) { t += -Math.log(1 - rnd() * 0.999) / rate; if (t > d - A - DEC) break; if (t >= 0) out.push(t); }
       return out;
     });
+    const slot = new Float32Array(nC);
+    live.sparks.push(slot);
     return H.drive(0, d, t => {
-      const lv = base.map((b, i) => {
+      for (let i = 0; i < nC; i++) {
         let env = 0;
         for (const t0 of ev[i]) { const dt = t - t0; if (dt < 0) break; const e = dt < A ? dt / A : 1 - (dt - A) / DEC; if (e > env) env = e; }
-        return b + (2 - b) * Math.max(0, env);
-      });
-      paint(lv);
+        slot[i] = Math.max(0, env);
+      }
+      paint();
     }, { d, ease: 'none' });
   };
 
-  root.flash = (fo = {}) => H.drive(0, 1, p => flashEl.setAttribute('opacity', (Math.sin(Math.PI * p) * (fo.to ?? 0.6)).toFixed(3)), { d: fo.d ?? 0.5, ease: 'none' });
+  root.flash = (fo = {}) => {
+    const k = live.flashes.push(0) - 1;
+    return H.drive(0, 1, p => { live.flashes[k] = Math.sin(Math.PI * p) * (fo.to ?? 0.6); paint(); }, { d: fo.d ?? 0.5, ease: 'none' });
+  };
 
-  const halo = S.rect({ x: cx - hw - s * 0.1, y: cy - hh - s * 0.1, w: 2 * hw + s * 0.2, h: 2 * hh + s * 0.2, r: s * 0.18, stroke: tone, sw: Math.max(2, s * 0.022), opacity: 0, filter: `url(#glow-${H.GRAD.includes(tone) ? tone : 'compute'})` }, haloG);
-  H.ignore(halo);
+  // a soft bloom behind the chip (pulse), and the outline's glow
+  const glowTone = t => (H.GRAD.includes(t) ? t : 'compute');
+  const halo = H.ignore(S.circle({ x: cx, y: cy, r: Math.max(hw, hh) * 1.55, fill: `url(#pglow-${glowTone(tone)})`, opacity: 0 }, haloG));
   root.halo = halo;
+  const pulseCh = H.channel();
   root.pulse = (po = {}) => {
-    const k = (po.scale ?? 1.07) - 1, ht = S.tone(po.tone || tone);
-    return H.drive(0, 1, p => {
+    const k = (po.scale ?? 1.07) - 1, gt = glowTone(po.tone || tone);
+    return pulseCh(0, 1, p => {
       const e = Math.sin(Math.PI * p);
       H.xf(art, cx, cy, 1 + k * e);
-      halo.setAttribute('stroke', ht);
+      halo.setAttribute('fill', `url(#pglow-${gt})`);
       halo.setAttribute('opacity', (0.95 * e).toFixed(3));
+      if (e > 0.05) root.bodyLine.setAttribute('filter', `url(#glow-${gt})`); else root.bodyLine.removeAttribute('filter');
     }, { d: po.d ?? 0.6, ease: 'none' });
   };
 
@@ -503,10 +563,11 @@ function libChip(S, o = {}, parent) {
   };
 
   let labelPlan = o.label;
+  const labelCh = H.channel();
   root.rename = (text, ro = {}) => {
     if (!root.labelEl) return gsap.timeline();
     const from = labelPlan; labelPlan = text;
-    return H.swapText(root.labelEl, from, text, ro);
+    return H.swapText(root.labelEl, from, text, ro, null, labelCh);
   };
 
   root.port = (side, gap = 0) => {
@@ -640,92 +701,80 @@ function libSpecSheet(S, o = {}, parent) {
   const face = S.g(null, root);
   root.face = face;
   const rowsIn = (o.rows || []).map(r => (r == null ? { placeholder: true } : typeof r === 'string' ? { label: r } : { ...r }));
-  const size = o.size ?? 28, vsize = o.valueSize ?? Math.round(size * 1.07);
+  const size = o.size ?? 28;
   const cardTone = o.tone || 'neutral';
   const x = o.x ?? 640, y = o.y ?? 260;
+  const soft = t => H.soft(S, t);
   const fmtOf = (v, f) => (f ? f(v) : (Math.abs(v - Math.round(v)) < 1e-9 ? S.fmt.int(v) : String(Math.round(v * 100) / 100)));
 
-  // ------------------------------------------------ card background (shared)
+  // ------------------------------------------------ the card (shared by both layouts)
   function card(w, h) {
     const r = o.r ?? (layout === 'row' ? 18 : 24);
     const fold = o.fold ? Math.min(56, w * 0.09) : 0;
-    let d;
-    if (fold) d = `M${x + r},${y} H${x + w - fold} L${x + w},${y + fold} V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r} V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
-    else d = H.rr(x, y, w, h, r);
+    const d = fold
+      ? `M${x + r},${y} H${x + w - fold} L${x + w},${y + fold} V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r} V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`
+      : H.rr(x, y, w, h, r);
     S.path({ d, fill: H.BASE, filter: 'url(#shadow)' }, face);
     root.bg = S.path({ d, fill: `url(#card-${H.GRAD.includes(cardTone) ? cardTone : 'neutral'})`, stroke: cardTone === 'neutral' ? '#ffffff' : cardTone, strokeOpacity: cardTone === 'neutral' ? 0.16 : 0.55, sw: 2 }, face);
-    if (fold) {
-      S.path({ d: `M${x + w - fold},${y} V${y + fold * 0.8} Q${x + w - fold},${y + fold} ${x + w - fold * 0.8},${y + fold} H${x + w} Z`, fill: '#26324f', stroke: '#ffffff', strokeOpacity: 0.2, sw: 1.5 }, face);
-    }
+    if (fold) S.path({ d: `M${x + w - fold},${y} V${y + fold * 0.8} Q${x + w - fold},${y + fold} ${x + w - fold * 0.8},${y + fold} H${x + w} Z`, fill: '#26324f', stroke: '#ffffff', strokeOpacity: 0.2, sw: 1.5 }, face);
     return { r, fold };
   }
 
-  // ------------------------------------------------ row helpers (shared)
+  // ------------------------------------------------ a row's value: mono number + sans unit, optional pill
   const rows = [];
-  function pillFor(row, text) {
-    if (!row.pill) return;
-    const vw = S.measure(text, { size: vsize, weight: 600, family: 'mono' }) + (row.unitW ? row.unitW + 8 : 0);
-    const pw = vw + 30, ph = Math.round(vsize * 1.55);
-    const right = row.anchor === 'start' ? row.valueX + pw - 15 : row.valueX + 15;
-    for (const el of row.pill) { el.setAttribute('x', H.f2(right - pw)); el.setAttribute('width', H.f2(pw)); el.setAttribute('y', H.f2(row.cy - ph / 2)); el.setAttribute('height', ph); }
-  }
-  function setText(row, text) {
-    row.valueEl.textContent = text;
-    if (row.anchor === 'start' && row.unitEl) row.unitEl.setAttribute('x', H.f2(row.valueX + S.measure(text, { size: vsize, weight: 600, family: 'mono' }) + 8));
-    pillFor(row, text);
+  function writeValue(row, text) {
+    H.setValueText(row.valueEl, text, { unit: row.unit, unitSize: row.usize, unitColor: row.unitColor });
+    row.cur = text;
+    if (row.pill) {
+      const vw = H.valueWidth(S, text, { unit: row.unit, size: row.vsize, unitSize: row.usize });
+      const pw = vw + 30, ph = Math.round(row.vsize * 1.55), right = row.valueX + 15;
+      for (const el of row.pill) { el.setAttribute('x', H.f2(right - pw)); el.setAttribute('width', H.f2(pw)); el.setAttribute('y', H.f2(row.cy - ph / 2)); el.setAttribute('height', ph); }
+    }
     if (root.relayout) root.relayout();
   }
 
   let W, Hh;
   if (layout === 'row') {
-    // ================================================ compact chip card
+    // ================================================ compact chip card: [chip] NAME · value · value / notes
     W = o.w ?? 420;
     const notes = o.note == null ? [] : Array.isArray(o.note) ? o.note : [o.note];
-    const tsize = o.titleSize ?? 36, nsize = o.noteSize ?? 24;
+    const tsize = o.titleSize ?? 36, nsize = o.noteSize ?? 24, vsize = o.valueSize ?? Math.round(tsize * 0.86);
     Hh = o.h ?? Math.round(tsize * 2.4 + notes.length * nsize * 1.3);
     card(W, Hh);
     const pad = o.pad ?? 24;
     const iconS = Math.min(Hh * 0.46, 60);
     const blockH = tsize + notes.length * nsize * 1.3;
-    const top = y + (Hh - blockH) / 2;
-    const ty = top + tsize / 2;
-    if (o.icon !== null) {
-      const chipOpts = typeof o.icon === 'object' ? o.icon : {};
-      root.iconEl = libChip(S, { size: iconS, x: x + pad + iconS * 0.62, y: y + Hh / 2, label: null, ...chipOpts }, face);
-    }
+    const ty = y + (Hh - blockH) / 2 + tsize / 2;
+    if (o.icon !== null) root.iconEl = libChip(S, { size: iconS, x: x + pad + iconS * 0.62, y: y + Hh / 2, label: null, ...(typeof o.icon === 'object' ? o.icon : {}) }, face);
     const tx = o.icon === null ? x + pad : x + pad + iconS * 1.24 + 18;
     root.titleEl = S.text(o.title ?? '', { x: tx, y: ty, size: tsize, weight: 700, family: 'display', color: 'ink' }, face);
     root.noteEl = notes.map((n, i) => S.text(n, { x: tx, y: ty + tsize * 0.55 + nsize * (0.75 + 1.3 * i), size: nsize, weight: 500, color: 'muted' }, face));
-    const sepEls = [];
-    rowsIn.forEach((ri, i) => {
+    rowsIn.forEach(ri => {
       const g = S.g(null, face), body = S.g(null, g), content = S.g(null, body);
       const tone = ri.tone || 'struct';
       const sep = S.text('·', { x: 0, y: ty, size: tsize, weight: 600, color: 'faint' }, content);
-      sepEls.push(sep);
       const valueG = S.g(null, content);
-      const valueEl = S.text(ri.value ?? '', { x: 0, y: ty + 1, size: Math.round(tsize * 0.86), weight: 600, family: 'mono', color: tone }, valueG);
-      const row = { g, body, content, valueG, valueEl, sep, tone, cy: ty, anchor: 'start', valueX: 0, plan: ri.value ?? '', label: ri.label, x, y, w: W, h: Hh };
-      rows.push(row);
+      const valueEl = S.text('', { x: 0, y: ty + 1, size: vsize, weight: 600, family: 'mono', color: tone }, valueG);
+      rows.push({ g, body, content, valueG, valueEl, sep, tone, unit: ri.unit, vsize, usize: Math.round(vsize * 0.82), cy: ty, anchor: 'start', valueX: 0, plan: ri.value ?? '', label: ri.label, x, y, w: W, h: Hh });
     });
     root.relayout = () => {
       let cur = tx + S.measure(root.titleEl.textContent, { size: tsize, weight: 700, family: 'display' });
       rows.forEach(row => {
         row.sep.setAttribute('x', H.f2(cur + 12));
-        const vx = cur + 12 + S.measure('·', { size: tsize, weight: 600 }) + 12;
-        row.valueEl.setAttribute('x', H.f2(vx));
-        row.valueX = vx;
-        cur = vx + S.measure(row.valueEl.textContent, { size: Math.round(tsize * 0.86), weight: 600, family: 'mono' });
+        row.valueX = cur + 12 + S.measure('·', { size: tsize, weight: 600 }) + 12;
+        row.valueEl.setAttribute('x', H.f2(row.valueX));
+        cur = row.valueX + H.valueWidth(S, row.cur ?? '', { unit: row.unit, size: row.vsize, unitSize: row.usize });
       });
-      if (cur > x + W - pad + 1) S.warn(`libSpecSheet row card '${root.titleEl.textContent}': content ${Math.round(cur - x)}px wider than w ${W}`);
+      return cur;
     };
-    root.relayout();
-    const _set = setText;
-    rows.forEach(row => { row.setText = t => { row.valueEl.textContent = t; root.relayout(); }; });
-    void _set;
+    rows.forEach(row => writeValue(row, row.plan));
+    const end = root.relayout();
+    if (end > x + W - pad + 1) S.warn(`libSpecSheet card '${o.title}': content is ${Math.round(end - x + pad)}px wide, w is ${W}`);
   } else {
     // ================================================ full sheet
     W = o.w ?? 640;
     const pad = o.pad ?? 36;
+    const vsize = o.valueSize ?? Math.round(size * 1.07);
     const rowH = o.rowH ?? Math.round(size * 2.3);
     const tsize = o.titleSize ?? 40;
     const hasHead = o.title != null;
@@ -734,23 +783,23 @@ function libSpecSheet(S, o = {}, parent) {
     const bodyTop = hasHead ? headH + pad * 0.4 : pad * 0.8;
     Hh = o.h ?? Math.round(bodyTop + rowsIn.length * rowH + pad * 0.8 + noteH);
     const { fold } = card(W, Hh);
-    // header
     if (hasHead) {
       const hy = y + headH / 2 + 4;
       let tx = x + pad;
       if (o.icon !== null) {
         const iconS = Math.round(tsize * 1.25);
-        if (o.icon === 'doc') root.iconEl = S.icon('ph:file-text-duotone', { x: x + pad + iconS / 2, y: hy, size: iconS, color: 'muted' }, face);
-        else if (typeof o.icon === 'string' && o.icon !== 'chip') root.iconEl = S.icon(o.icon, { x: x + pad + iconS / 2, y: hy, size: iconS, color: 'muted' }, face);
-        else root.iconEl = libChip(S, { size: iconS * 0.74, x: x + pad + iconS / 2, y: hy, label: null, ...(typeof o.icon === 'object' ? o.icon : {}) }, face);
+        const ic = { x: x + pad + iconS / 2, y: hy };
+        if (o.icon === 'doc') root.iconEl = S.icon('ph:file-text-duotone', { ...ic, size: iconS, color: 'muted' }, face);
+        else if (typeof o.icon === 'string' && o.icon !== 'chip') root.iconEl = S.icon(o.icon, { ...ic, size: iconS, color: 'muted' }, face);
+        else root.iconEl = libChip(S, { size: iconS * 0.74, ...ic, label: null, ...(typeof o.icon === 'object' ? o.icon : {}) }, face);
         tx = x + pad + iconS + 20;
       }
+      const kRight = x + W - pad - fold * 0.6;
       const kw = o.kicker ? S.measure(String(o.kicker).toUpperCase(), { size: 24, weight: 650, ls: 0.12 }) + 24 : 0;
-      root.titleEl = S.text(o.title, { x: tx, y: hy, size: tsize, weight: 700, family: 'display', color: 'ink', maxW: x + W - pad - fold * 0.6 - kw - tx }, face);
-      if (o.kicker) root.kickerEl = S.text(String(o.kicker).toUpperCase(), { x: x + W - pad - fold * 0.6, y: hy + 2, size: 24, weight: 650, color: 'faint', ls: 0.12, anchor: 'end' }, face);
+      root.titleEl = S.text(o.title, { x: tx, y: hy, size: tsize, weight: 700, family: 'display', color: 'ink', maxW: kRight - kw - tx }, face);
+      if (o.kicker) root.kickerEl = S.text(String(o.kicker).toUpperCase(), { x: kRight, y: hy + 2, size: 24, weight: 650, color: 'faint', ls: 0.12, anchor: 'end' }, face);
       root.rule = S.line({ x1: x + pad * 0.6, y1: y + headH, x2: x + W - pad * 0.6, y2: y + headH, stroke: '#ffffff', strokeOpacity: 0.12, sw: 1.5 }, face);
     }
-    // columns
     const tagged = rowsIn.filter(r => r.tag);
     const tagSize = 24;
     const tagW = tagged.length ? Math.max(...tagged.map(r => S.measure(r.tag, { size: tagSize, weight: 600 }))) + 32 : 0;
@@ -759,28 +808,26 @@ function libSpecSheet(S, o = {}, parent) {
     const accentX = x + pad, labelX = x + pad + 22;
     const pr = S.rand(o.seed ?? 5);
     const y0 = y + bodyTop;
-    const style = o.rowStyle || 'split', pillStyle = o.valueStyle === 'pill';
+    const inline = o.rowStyle === 'inline', pillStyle = o.valueStyle === 'pill';
     const start = o.start || 'shown';
     rowsIn.forEach((ri, i) => {
       const ry = y0 + i * rowH, cy = ry + rowH / 2;
       const tone = ri.tone || 'struct';
       const g = S.g(null, face);
-      const band = S.rect({ x: x + pad * 0.45, y: ry + 5, w: W - pad * 0.9, h: rowH - 10, r: 12, fill: soft(tone), stroke: tone, strokeOpacity: 0.5, sw: 1.5, opacity: 0 }, g);
+      const band = S.rect({ x: x + pad * 0.45, y: ry + 5, w: W - pad * 0.9, h: rowH - 10, r: 12, fill: soft(tone), stroke: tone, strokeOpacity: 0.55, sw: 1.5, opacity: 0 }, g);
       const flash = H.ignore(S.rect({ x: x + pad * 0.45, y: ry + 5, w: W - pad * 0.9, h: rowH - 10, r: 12, fill: tone, opacity: 0 }, g));
       const body = S.g(null, g);
       if (i > 0) H.ignore(S.line({ x1: labelX, y1: ry, x2: right, y2: ry, stroke: '#ffffff', strokeOpacity: 0.06, sw: 1 }, body));
-      // placeholder bar
       const phH = Math.max(10, Math.round(size * 0.42));
-      const phLen = (valueRight - labelX) * (0.48 + 0.4 * pr());
-      const ph = S.rect({ x: labelX, y: cy - phH / 2, w: phLen, h: phH, r: phH / 2, fill: '#ffffff', fillOpacity: 0.1 }, body);
+      const ph = S.rect({ x: labelX, y: cy - phH / 2, w: (valueRight - labelX) * (0.48 + 0.4 * pr()), h: phH, r: phH / 2, fill: '#ffffff', fillOpacity: 0.1 }, body);
       const content = S.g(null, body);
-      const row = { g, body, content, band, flash, ph, tone, x, y: ry, w: W, h: rowH, cy, placeholder: !!ri.placeholder, plan: ri.value ?? '', label: ri.label };
+      const row = { g, body, content, band, flash, ph, tone, x, y: ry, w: W, h: rowH, cy, placeholder: !!ri.placeholder, plan: ri.value ?? '', label: ri.label, unit: ri.unit, vsize, usize: Math.round(vsize * 0.8) };
       if (!ri.placeholder) {
         row.accent = S.rect({ x: accentX, y: cy - rowH * 0.2, w: 6, h: rowH * 0.4, r: 3, fill: tone }, content);
-        if (style === 'inline') {
+        if (inline) {
           const lt = (ri.label ?? '') + (ri.value != null ? ':' : '');
           row.labelEl = S.text(lt, { x: labelX, y: cy, size: vsize, weight: 600, color: tone }, content);
-          row.valueX = labelX + S.measure(lt, { size: vsize, weight: 600 }) + 12;
+          row.valueX = labelX + S.measure(lt, { size: vsize, weight: 600 }) + 14;
           row.anchor = 'start';
         } else {
           row.labelEl = S.text(ri.label ?? '', { x: labelX, y: cy, size, weight: 550, color: 'ink', maxW: valueRight - labelX - 150 }, content);
@@ -789,15 +836,10 @@ function libSpecSheet(S, o = {}, parent) {
         }
         if (ri.value != null) {
           row.valueG = S.g(null, content);
-          if (pillStyle) {
-            row.pill = [S.rect({ x: 0, y: 0, w: 10, h: 10, r: 12, fill: H.BASE }, row.valueG), S.rect({ x: 0, y: 0, w: 10, h: 10, r: 12, fill: soft(tone), stroke: tone, strokeOpacity: 0.75, sw: 2 }, row.valueG)];
-          }
-          const vcol = style === 'inline' ? 'ink' : pillStyle ? 'ink' : tone;
-          if (ri.unit) row.unitW = S.measure(ri.unit, { size: Math.round(vsize * 0.8), weight: 550 });
-          const numRight = row.anchor === 'end' ? row.valueX - (row.unitW ? row.unitW + 8 : 0) : row.valueX;
-          row.valueEl = S.text(ri.value, { x: numRight, y: cy + 1, size: vsize, weight: 600, family: 'mono', color: vcol, anchor: row.anchor }, row.valueG);
-          if (ri.unit) row.unitEl = S.text(ri.unit, { x: row.anchor === 'end' ? row.valueX : row.valueX + S.measure(ri.value, { size: vsize, weight: 600, family: 'mono' }) + 8, y: cy + 2, size: Math.round(vsize * 0.8), weight: 550, color: pillStyle ? 'muted' : tone, anchor: row.anchor, opacity: pillStyle ? 1 : 0.8 }, row.valueG);
-          pillFor(row, ri.value);
+          if (pillStyle) row.pill = [S.rect({ x: 0, y: 0, w: 10, h: 10, r: 14, fill: H.BASE }, row.valueG), S.rect({ x: 0, y: 0, w: 10, h: 10, r: 14, fill: soft(tone), stroke: tone, strokeOpacity: 0.75, sw: 2 }, row.valueG)];
+          row.unitColor = pillStyle ? S.tone('muted') : undefined;
+          row.valueEl = S.text('', { x: row.valueX, y: cy + 1, size: vsize, weight: 600, family: 'mono', color: pillStyle ? 'ink' : tone, anchor: row.anchor }, row.valueG);
+          writeValue(row, ri.value);
         }
         if (ri.tag) {
           row.tagG = S.g(null, content);
@@ -805,21 +847,18 @@ function libSpecSheet(S, o = {}, parent) {
           S.rect({ x: right - tagW, y: cy - 21, w: tagW, h: 42, r: 21, fill: H.BASE }, row.tagG);
           row.tagBg = S.rect({ x: right - tagW, y: cy - 21, w: tagW, h: 42, r: 21, fill: tt === 'neutral' ? 'none' : soft(tt), stroke: tt === 'neutral' ? '#ffffff' : tt, strokeOpacity: tt === 'neutral' ? 0.3 : 0.7, sw: 1.5 }, row.tagG);
           row.tagEl = S.text(ri.tag, { x: right - tagW / 2, y: cy + 1, size: tagSize, weight: 600, color: tt === 'neutral' ? 'muted' : 'ink', anchor: 'middle' }, row.tagG);
+          row.tagX = right - tagW / 2;
         }
-        row.setText = t => setText(row, t);
       }
-      // start state
-      const hidden = start !== 'shown' && !ri.placeholder;
-      if (hidden) { content.style.opacity = 0; content.style.visibility = 'hidden'; }
-      if (ri.placeholder ? start === 'empty' : start !== 'placeholder') ph.setAttribute('opacity', ri.placeholder ? 1 : 0);
-      if (start === 'empty') ph.setAttribute('opacity', 0);
-      if (!ri.placeholder && start === 'shown') ph.setAttribute('opacity', 0);
+      // start state: placeholder lines show for 'placeholder' rows always, and for real rows when start = 'placeholder'
+      const showPh = ri.placeholder ? start !== 'empty' : start === 'placeholder';
+      ph.setAttribute('opacity', showPh ? 1 : 0);
+      if (!ri.placeholder && start !== 'shown') { content.style.opacity = 0; content.style.visibility = 'hidden'; }
       rows.push(row);
     });
     if (o.note) root.noteEl = S.text(o.note, { x: labelX, y: y + Hh - pad * 0.5 - 14, size: 24, weight: 500, color: 'muted' }, face);
   }
   root.rows = rows;
-  function soft(t) { return H.soft(S, t); }
 
   // ------------------------------------------------ helpers
   const n = rows.length;
@@ -829,7 +868,7 @@ function libSpecSheet(S, o = {}, parent) {
     const t = gsap.timeline();
     real(idx).forEach((i, k) => {
       const row = rows[i], at = k * (ro.stagger ?? 0.12), d = ro.d ?? 0.55;
-      if (row.ph) t.fromTo(row.ph, { opacity: Number(row.ph.getAttribute('opacity') ?? 1) || 0 }, { opacity: 0, duration: d * 0.5, ease: 'power1.in' }, at);
+      if (row.ph) t.fromTo(row.ph, { opacity: Number(row.ph.getAttribute('opacity')) || 0 }, { opacity: 0, duration: d * 0.5, ease: 'power1.in' }, at);
       t.fromTo(row.content, { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: d, ease: 'power3.out' }, at + d * 0.2);
     });
     return t;
@@ -839,23 +878,25 @@ function libSpecSheet(S, o = {}, parent) {
     H.sel(idx, n).forEach(i => {
       const row = rows[i];
       if (!row.ph) return;
-      t.fromTo(row.ph, { attr: { 'fill-opacity': 0.1 }, fill: '#ffffff' }, { attr: { 'fill-opacity': row.placeholder ? 0.28 : 0.55 }, fill: row.placeholder ? '#ffffff' : S.tone(row.tone), duration: bo.d ?? 0.4, ease: 'power2.out' }, 0);
+      t.fromTo(row.ph, { attr: { 'fill-opacity': 0.1 }, fill: '#ffffff' }, { attr: { 'fill-opacity': row.placeholder ? 0.28 : 0.6 }, fill: row.placeholder ? '#ffffff' : S.tone(row.tone), duration: bo.d ?? 0.4, ease: 'power2.out' }, 0);
     });
     return t;
   };
   let opPlan = rows.map(() => 1), bandPlan = rows.map(() => 0);
+  const focusCh = H.channel(), flipCh = H.channel();
+  rows.forEach(row => { row.valCh = H.channel(); row.glowCh = H.channel(); });
   function planTo(ops, bands, d) {
     const fo = opPlan.slice(), fb = bandPlan.slice();
     opPlan = ops; bandPlan = bands;
-    return H.drive(0, 1, p => rows.forEach((row, i) => {
+    return focusCh(0, 1, p => rows.forEach((row, i) => {
       row.body.style.opacity = H.lerp(fo[i], ops[i], p).toFixed(3);
-      row.band.setAttribute('opacity', H.lerp(fb[i], bands[i], p).toFixed(3));
+      if (row.band) row.band.setAttribute('opacity', H.lerp(fb[i], bands[i], p).toFixed(3));
     }), { d: d ?? 0.5, ease: 'power2.inOut' });
   }
   root.focus = (i, fo = {}) => {
     if (i == null) return planTo(rows.map(() => 1), rows.map(() => 0), fo.d);
     const dim = fo.dim ?? 0.3;
-    return planTo(rows.map((_, k) => (k === i ? 1 : dim)), rows.map((_, k) => (k === i && layout !== 'row' ? 1 : 0)), fo.d);
+    return planTo(rows.map((_, k) => (k === i ? 1 : dim)), rows.map((_, k) => (k === i ? 1 : 0)), fo.d);
   };
   root.dimRows = (idx, to = 0.3, dO = {}) => {
     const set = new Set(H.sel(idx, n));
@@ -865,23 +906,21 @@ function libSpecSheet(S, o = {}, parent) {
     const part = go.part || 'row', d = go.d ?? 0.8;
     const t = gsap.timeline();
     real(idx).forEach((i, k) => {
-      const row = rows[i];
-      const at = k * (go.stagger ?? 0);
+      const row = rows[i], at = k * (go.stagger ?? 0);
+      const gt = H.GRAD.includes(go.tone || row.tone) ? (go.tone || row.tone) : 'struct';
       if (part === 'row' && row.flash) {
-        if (go.tone) row.flash.setAttribute('fill', S.tone(go.tone));
-        t.add(H.drive(0, 1, p => row.flash.setAttribute('opacity', (Math.sin(Math.PI * p) * 0.28).toFixed(3)), { d, ease: 'none' }), at);
-      } else {
-        const tgt = part === 'tag' ? row.tagG : row.valueG;
-        if (!tgt) return;
-        const bb = part === 'tag' ? { x: row.tagEl.getAttribute('x'), y: row.cy } : null;
-        const ox = bb ? Number(bb.x) : row.anchor === 'end' ? row.valueX - 40 : row.valueX + 40;
-        const glowF = `url(#glow-${H.GRAD.includes(go.tone || row.tone) ? (go.tone || row.tone) : 'struct'})`;
-        t.add(H.drive(0, 1, p => {
-          const e = Math.sin(Math.PI * p);
-          H.xf(tgt, ox, row.cy, 1 + 0.08 * e);
-          if (e > 0.02) tgt.setAttribute('filter', glowF); else tgt.removeAttribute('filter');
-        }, { d, ease: 'none' }), at);
+        t.add(row.glowCh(0, 1, p => { row.flash.setAttribute('fill', S.tone(gt)); row.flash.setAttribute('opacity', (Math.sin(Math.PI * p) * 0.28).toFixed(3)); }, { d, ease: 'none' }), at);
+        return;
       }
+      const tgt = part === 'tag' ? row.tagG : row.valueG;
+      if (!tgt) return;
+      const vw = row.cur != null ? H.valueWidth(S, row.cur, { unit: row.unit, size: row.vsize, unitSize: row.usize }) : 0;
+      const ox = part === 'tag' ? row.tagX : row.anchor === 'end' ? row.valueX - vw / 2 : row.valueX + vw / 2;
+      t.add(row.glowCh(0, 1, p => {
+        const e = Math.sin(Math.PI * p);
+        H.xf(tgt, ox, row.cy, 1 + 0.08 * e);
+        if (e > 0.03) tgt.setAttribute('filter', `url(#glow-${gt})`); else tgt.removeAttribute('filter');
+      }, { d, ease: 'none' }), at);
     });
     return t;
   };
@@ -889,16 +928,16 @@ function libSpecSheet(S, o = {}, parent) {
     const row = rows[i];
     if (!row || !row.valueEl) return gsap.timeline();
     const from = row.plan; row.plan = text;
-    return H.swapText(row.valueEl, from, text, so, cur => row.setText(cur));
+    return H.swapText(row.valueEl, from, text, so, cur => writeValue(row, cur), row.valCh);
   };
   root.count = (i, from, to, co = {}) => {
     const row = rows[i];
     if (!row || !row.valueEl) return gsap.timeline();
     const f = v => fmtOf(v, co.fmt);
     row.plan = f(to);
-    return H.drive(from, to, v => row.setText(f(v)), { d: co.d ?? 1.2, ease: co.ease || 'power2.out' });
+    return row.valCh(from, to, v => writeValue(row, f(v)), { d: co.d ?? 1.2, ease: co.ease || 'power2.out' });
   };
-  let flipPlan = { title: o.title ?? '', values: rows.map(r => r.plan), notes: (root.noteEl && Array.isArray(root.noteEl)) ? root.noteEl.map(e => e.textContent) : [] };
+  let flipPlan = { title: o.title ?? '', values: rows.map(r => r.plan), notes: Array.isArray(root.noteEl) ? root.noteEl.map(e => e.textContent) : [] };
   root.flip = (to = {}, fo = {}) => {
     const from = flipPlan;
     const next = { title: to.title ?? from.title, values: from.values.slice(), notes: to.notes ?? from.notes };
@@ -908,13 +947,12 @@ function libSpecSheet(S, o = {}, parent) {
     const fcx = x + W / 2, fcy = y + Hh / 2;
     const show = st => {
       if (root.titleEl) root.titleEl.textContent = st.title;
-      rows.forEach((row, i) => { if (row.valueEl && st.values[i] != null) row.setText(st.values[i]); });
       if (Array.isArray(root.noteEl)) root.noteEl.forEach((e, k) => { if (st.notes[k] != null) e.textContent = st.notes[k]; });
+      rows.forEach((row, i) => { if (row.valueEl && st.values[i] != null && row.cur !== st.values[i]) writeValue(row, st.values[i]); });
       if (root.relayout) root.relayout();
     };
-    return H.drive(0, 1, p => {
-      const k = Math.abs(Math.cos(Math.PI * p));
-      H.xf(face, fcx, fcy, 1, Math.max(0.02, k));
+    return flipCh(0, 1, p => {
+      H.xf(face, fcx, fcy, 1, Math.max(0.02, Math.abs(Math.cos(Math.PI * p))));
       show(p < 0.5 ? from : next);
     }, { d: fo.d ?? 0.9, ease: 'power1.inOut' });
   };
@@ -974,7 +1012,11 @@ function libServer(S, o = {}, parent) {
   let trayG = null, clipRect = null;
   root.gpus = [];
   if (gpuN) {
-    const tw = w - 2 * U.e - w * 0.02, th = Math.round(w * 0.36);
+    const tw = w - 2 * U.e - w * 0.02;
+    const gRows = gpuN > 4 ? 2 : 1, perRow = Math.ceil(gpuN / gRows);
+    const gs = Math.min(w * 0.13, (tw * 0.92) / (perRow * 2.3));      // a package icon is 2.04 × size wide
+    const fr = Math.max(6, w * 0.026), fanH = 2 * fr + w * 0.04;
+    const th = Math.round(fanH + gRows * gs * 1.24 + (gRows - 1) * gs * 0.3 + w * 0.06);
     const tx = cx - tw / 2, ty = y0 + h - 4;
     const cid = H.nextId('hw-tray');
     const cp = document.createElementNS(H.NS, 'clipPath');
@@ -987,17 +1029,16 @@ function libServer(S, o = {}, parent) {
     trayG = S.g(null, clipG);
     S.rect({ x: tx, y: ty, w: tw, h: th, r: 10, fill: '#0a1122', stroke: '#ffffff', strokeOpacity: 0.16, sw }, trayG);
     // fans along the back, a few traces, the GPUs
-    const nf = Math.max(3, Math.round(tw / 70));
-    const fr = Math.min(th * 0.11, tw / nf * 0.32);
-    const fanRow = ty + th * 0.16;
+    const nf = Math.max(3, Math.round(tw / (fr * 4.2)));
+    const fanRow = ty + 4 + w * 0.012 + fr;
     root.fans = [];
     for (let i = 0; i < nf; i++) root.fans.push(H.fan(S, trayG, tx + (i + 0.5) * tw / nf, fanRow, fr));
-    H.ignore(S.line({ x1: tx + 14, y1: fanRow + fr + 10, x2: tx + tw - 14, y2: fanRow + fr + 10, stroke: '#ffffff', strokeOpacity: 0.08, sw: 1 }, trayG));
-    const gy = ty + th * 0.62;
-    const probeW = 2.04;     // a package icon is 2.04 × size wide, whatever its stack count
-    const gs = Math.min(th * 0.42, (tw * 0.9) / (gpuN * (probeW + 0.35)));
-    const pitch = tw / gpuN;
-    for (let i = 0; i < gpuN; i++) root.gpus.push(libChip(S, { x: tx + (i + 0.5) * pitch, y: gy, size: gs, hbm: o.gpuHbm ?? 1, seed: (o.seed ?? 9) + i * 17 }, trayG));
+    H.ignore(S.line({ x1: tx + 14, y1: fanRow + fr + w * 0.014, x2: tx + tw - 14, y2: fanRow + fr + w * 0.014, stroke: '#ffffff', strokeOpacity: 0.08, sw: 1 }, trayG));
+    const gTop = ty + fanH + w * 0.015;
+    for (let i = 0; i < gpuN; i++) {
+      const r = Math.floor(i / perRow), c = i % perRow, inRow = r === gRows - 1 ? gpuN - perRow * (gRows - 1) : perRow;
+      root.gpus.push(libChip(S, { x: cx + (c - (inRow - 1) / 2) * (tw / perRow), y: gTop + gs * 0.62 + r * gs * 1.54, size: gs, hbm: o.gpuHbm ?? 1, seed: (o.seed ?? 9) + i * 17 }, trayG));
+    }
     root.tray = { x: tx, y: ty, w: tw, h: th };
     H.ignore(trayG);
   }
@@ -1013,9 +1054,9 @@ function libServer(S, o = {}, parent) {
   if (U.screws) S.path({ d: U.screws, fill: '#3a4766' }, deco);
   S.path({ d: U.bays, fill: '#0a0f1c', stroke: '#ffffff', strokeOpacity: 0.1, sw: Math.max(0.6, sw * 0.5) }, deco);
   if (U.bayLines) S.path({ d: U.bayLines, stroke: '#ffffff', strokeOpacity: 0.16, sw: Math.max(0.8, h * 0.02), cap: 'round' }, deco);
-  S.path({ d: U.vents, fill: '#060a14', fillOpacity: 0.95 }, deco);
+  if (!o.spinner) S.path({ d: U.vents, fill: '#060a14', fillOpacity: 0.95 }, deco);
   if (detail !== 'min') H.ignore(S.line({ x1: x0 + U.e + 2, y1: y0 + 2.5, x2: x0 + w - U.e - 2, y2: y0 + 2.5, stroke: '#ffffff', strokeOpacity: 0.1, sw: 1.2 }, deco));
-  root.outline = S.path({ d: U.chassis, stroke: tone === 'neutral' ? '#ffffff' : tone, strokeOpacity: tone === 'neutral' ? 0.2 : 0.75, sw }, chassisG);
+  root.outline = S.path({ d: U.chassis, stroke: tone === 'neutral' ? '#ffffff' : tone, strokeOpacity: tone === 'neutral' ? 0.26 : 0.75, sw }, chassisG);
 
   // ---- lights
   const ledG = H.ignore(S.g(null, chassisG));
@@ -1026,23 +1067,35 @@ function libServer(S, o = {}, parent) {
   const A = U.act;
   root.actGlow = S.circle({ x: A.x, y: A.y, r: A.r * 3.4, fill: 'url(#pglow-compute)', opacity: 0 }, ledG);
   root.actLed = S.circle({ x: A.x, y: A.y, r: A.r, fill: '#4a3a1c' }, ledG);
+  // lights: a planned power level (power) and independent blink layers (activity), combined in one paint
   let powered = o.on !== false;
-  const paintPower = v => {
+  const lights = { pw: powered ? 1 : 0, blinks: [] };
+  const AMBC = S.tone('compute'), TEAL = S.tone('helps');
+  const paintLights = () => {
+    const v = lights.pw;
     root.powerLed.setAttribute('fill', H.mix(S, '#1d3a33', 'helps', v));
     root.powerGlow.setAttribute('opacity', (0.9 * v).toFixed(3));
-    root.leds.forEach(l => l.setAttribute('opacity', (0.12 + 0.43 * v).toFixed(3)));
+    const on = i => lights.blinks.some(b => b[i]);
+    const a = on(0);
+    root.actLed.setAttribute('fill', a ? AMBC : '#4a3a1c');
+    root.actGlow.setAttribute('opacity', a ? 0.9 : 0);
+    root.leds.forEach((l, k) => {
+      const b = on(k + 1);
+      l.setAttribute('fill', b ? AMBC : TEAL);
+      l.setAttribute('opacity', b ? 1 : (0.12 + 0.43 * v).toFixed(3));
+    });
   };
-  paintPower(powered ? 1 : 0);
+  paintLights();
 
   // ---- spinner
   if (o.spinner) {
-    const sr = h * 0.27, sx = x0 + w * 0.725, sy = cy;
+    const sr = h * 0.2, sx = x0 + w * 0.725, sy = cy;
     const sp = H.spinnerPath(sx, sy, sr);
+    S.circle({ x: sx, y: sy, r: sr * 1.75, fill: '#0a1020', stroke: '#ffffff', strokeOpacity: 0.12, sw: 1.2 }, deco);
     root.spinnerG = S.g({ opacity: 0 }, chassisG);
-    S.circle({ x: sx, y: sy, r: sr * 1.55, fill: '#0a1020', stroke: '#ffffff', strokeOpacity: 0.14, sw: 1.2 }, root.spinnerG);
     const rot = S.g(null, root.spinnerG);
-    S.path({ d: sp.arc, stroke: o.spinnerTone || 'struct', sw: Math.max(2, sr * 0.26), cap: 'round' }, rot);
-    S.path({ d: sp.head, stroke: o.spinnerTone || 'struct', sw: Math.max(2, sr * 0.26), cap: 'round', join: 'round' }, rot);
+    S.path({ d: sp.arc, stroke: o.spinnerTone || 'struct', sw: Math.max(2, sr * 0.3), cap: 'round' }, rot);
+    S.path({ d: sp.head, stroke: o.spinnerTone || 'struct', sw: Math.max(2, sr * 0.3), cap: 'round', join: 'round' }, rot);
     root.spinnerRot = rot; root.spinnerAt = { x: sx, y: sy };
     H.ignore(root.spinnerG);
   }
@@ -1060,6 +1113,7 @@ function libServer(S, o = {}, parent) {
 
   // ---- helpers
   let openPlan = 0;
+  const openCh = H.channel(), powerCh = H.channel(), glowCh = H.channel(), angCh = H.channel(), visCh = H.channel();
   const applyOpen = v => {
     if (!clipRect) return;
     const th = root.tray.h;
@@ -1073,67 +1127,66 @@ function libServer(S, o = {}, parent) {
     if (!clipRect) return t;
     const from = openPlan; openPlan = 1;
     const d = oo.d ?? 0.7;
-    t.add(H.drive(from, 1, applyOpen, { d, ease: 'power3.out' }), 0);
-    if (oo.draw !== false) root.gpus.forEach((g, i) => t.add(g.drawOn({ d: 0.8 }), d * 0.55 + i * (oo.stagger ?? 0.22)));
+    t.add(openCh(from, 1, applyOpen, { d, ease: 'power3.out' }), 0);
+    if (oo.draw !== false && !root.__drawn) { root.__drawn = true; root.gpus.forEach((g, i) => t.add(g.drawOn({ d: 0.8 }), d * 0.55 + i * (oo.stagger ?? 0.22))); }
     return t;
   };
   root.close = (co = {}) => {
     if (!clipRect) return gsap.timeline();
     const from = openPlan; openPlan = 0;
-    return H.drive(from, 0, applyOpen, { d: co.d ?? 0.5, ease: 'power2.in' });
+    return openCh(from, 0, applyOpen, { d: co.d ?? 0.5, ease: 'power2.in' });
   };
   root.power = (on, po = {}) => {
     const from = powered ? 1 : 0; powered = !!on;
-    return H.drive(from, on ? 1 : 0, paintPower, { d: po.d ?? 0.4, ease: 'power1.inOut' });
+    return powerCh(from, on ? 1 : 0, v => { lights.pw = v; paintLights(); }, { d: po.d ?? 0.4, ease: 'power1.inOut' });
   };
   root.activity = (ao = {}) => {
     const d = ao.d ?? 2, rate = ao.rate ?? 3;
-    const rnd = S.rand((ao.seed ?? o.seed ?? 9) * 131 + 7);
-    const lights = [root.actLed, ...root.leds];
-    const ev = lights.map(() => { const out = []; let t = rnd() * 0.3; while (t < d - 0.2) { out.push(t); t += 0.08 + rnd() * 2 / rate; } return out; });
-    const base = powered ? 1 : 0;
+    const rnd = S.rand((ao.seed ?? o.seed ?? 9) * 131 + 7 + lights.blinks.length * 17);
+    const n = 1 + root.leds.length;
+    const ev = Array.from({ length: n }, () => { const out = []; let t = rnd() * 0.3; while (t < d - 0.2) { out.push(t); t += 0.08 + rnd() * 2 / rate; } return out; });
+    const slot = new Uint8Array(n);
+    lights.blinks.push(slot);
     return H.drive(0, d, t => {
-      lights.forEach((l, i) => {
+      for (let i = 0; i < n; i++) {
         let on = 0;
-        for (const t0 of ev[i]) { const dt = t - t0; if (dt < 0) break; if (dt < 0.09) on = 1; }
-        if (i === 0) { l.setAttribute('fill', on ? S.tone('compute') : '#4a3a1c'); root.actGlow.setAttribute('opacity', on ? 0.9 : 0); }
-        else { l.setAttribute('fill', on ? S.tone('compute') : S.tone('helps')); l.setAttribute('opacity', on ? 1 : (0.12 + 0.43 * base).toFixed(3)); }
-      });
-      if (t >= d) { root.actLed.setAttribute('fill', '#4a3a1c'); root.actGlow.setAttribute('opacity', 0); paintPower(base); }
+        if (t < d) for (const t0 of ev[i]) { const dt = t - t0; if (dt < 0) break; if (dt < 0.09) on = 1; }
+        slot[i] = on;
+      }
+      paintLights();
     }, { d, ease: 'none' });
   };
-  let glowPlan = 0;
+  let glowPlan = 0, glowTone = 'helps';
+  const base0 = tone === 'neutral' ? '#ffffff' : tone, so0 = tone === 'neutral' ? 0.26 : 0.75;
+  const paintGlow = (v, tn) => {
+    root.glowEl.setAttribute('stroke', S.tone(tn));
+    root.glowEl.setAttribute('filter', `url(#glow-${H.GRAD.includes(tn) ? tn : 'helps'})`);
+    root.glowEl.setAttribute('opacity', v.toFixed(3));
+    root.outline.setAttribute('stroke', H.mix(S, base0, tn, v));
+    root.outline.setAttribute('stroke-opacity', H.lerp(so0, 0.95, v).toFixed(3));
+  };
   root.glow = (go = {}) => {
-    const from = glowPlan; glowPlan = 1;
-    const tn = go.tone || 'helps';
-    return H.drive(from, 1, v => {
-      root.glowEl.setAttribute('stroke', S.tone(tn));
-      root.glowEl.setAttribute('filter', `url(#glow-${H.GRAD.includes(tn) ? tn : 'helps'})`);
-      root.glowEl.setAttribute('opacity', v.toFixed(3));
-      root.outline.setAttribute('stroke', H.mix(S, tone === 'neutral' ? '#ffffff' : tone, tn, v));
-      root.outline.setAttribute('stroke-opacity', H.lerp(tone === 'neutral' ? 0.2 : 0.75, 0.95, v).toFixed(3));
-    }, { d: go.d ?? 0.5 });
+    const from = glowPlan, tn = go.tone || 'helps'; glowPlan = 1; glowTone = tn;
+    return glowCh(from, 1, v => paintGlow(v, tn), { d: go.d ?? 0.5 });
   };
   root.unglow = (go = {}) => {
-    const from = glowPlan; glowPlan = 0;
-    return H.drive(from, 0, v => {
-      root.glowEl.setAttribute('opacity', v.toFixed(3));
-      root.outline.setAttribute('stroke-opacity', H.lerp(tone === 'neutral' ? 0.2 : 0.75, 0.95, v).toFixed(3));
-    }, { d: go.d ?? 0.5 });
+    const from = glowPlan, tn = glowTone; glowPlan = 0;
+    return glowCh(from, 0, v => paintGlow(v, tn), { d: go.d ?? 0.5 });
   };
-  let spinAngle = 0;
+  let spinAngle = 0, spinVis = 0;
+  const showSpinner = (to, d) => { const from = spinVis; spinVis = to; return visCh(from, to, v => root.spinnerG.setAttribute('opacity', v.toFixed(3)), { d }); };
   const turn = (deg, d, ease) => {
     if (!root.spinnerRot) return gsap.timeline();
     const a0 = spinAngle; spinAngle += deg;
     const { x: sx, y: sy } = root.spinnerAt;
     const t = gsap.timeline();
-    t.fromTo(root.spinnerG, { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0);
-    t.add(H.drive(a0, a0 + deg, a => H.xf(root.spinnerRot, sx, sy, 1, 1, 0, 0, a), { d, ease }), 0);
+    if (!spinVis) t.add(showSpinner(1, 0.2), 0);
+    t.add(angCh(a0, a0 + deg, a => H.xf(root.spinnerRot, sx, sy, 1, 1, 0, 0, a), { d, ease }), 0);
     return t;
   };
   root.spin = (so = {}) => { const d = so.d ?? 2; return turn(360 * (so.turns ?? Math.max(1, Math.round(d * 0.8))), d, 'none'); };
   root.tick = (so = {}) => turn(360, so.d ?? 0.6, 'power2.inOut');
-  root.halt = (ho = {}) => (root.spinnerG ? gsap.to(root.spinnerG, { opacity: 0, duration: ho.d ?? 0.3 }) : gsap.timeline());
+  root.halt = (ho = {}) => (root.spinnerG && spinVis ? showSpinner(0, ho.d ?? 0.3) : gsap.timeline());
   root.port = (side, gap = 0) => {
     if (side === 'left') return { x: x0 - gap, y: cy };
     if (side === 'right') return { x: x0 + w + gap, y: cy };
@@ -1232,19 +1285,35 @@ function libRack(S, o = {}, parent) {
   root.labelEl = lab.el; root.subEl = lab.sub; root.labelG = lab.g;
 
   let powered = o.on !== false;
-  const paintPower = v => root.units.forEach(u => u.led && u.led.setAttribute('fill', H.mix(S, '#1d3a33', 'helps', v)));
+  const powerCh = H.channel(), hiCh = H.channel();
+  const blinks = [];
+  const paintPower = v => root.units.forEach(u => u !== root.hero && u.led && u.led.setAttribute('fill', H.mix(S, '#1d3a33', 'helps', v)));
+  const paintAct = () => root.units.forEach((u, i) => { if (u !== root.hero && u.act) u.act.setAttribute('fill', blinks.some(b => b[i]) ? S.tone('compute') : '#4a3a1c'); });
   paintPower(powered ? 1 : 0);
-  root.power = (on, po = {}) => { const from = powered ? 1 : 0; powered = !!on; return H.drive(from, on ? 1 : 0, paintPower, { d: po.d ?? 0.4 }); };
+  root.power = (on, po = {}) => {
+    const from = powered ? 1 : 0; powered = !!on;
+    const t = gsap.timeline();
+    t.add(powerCh(from, on ? 1 : 0, paintPower, { d: po.d ?? 0.4 }), 0);
+    if (root.hero) t.add(root.hero.power(on, po), 0);
+    return t;
+  };
   root.blink = (bo = {}) => {
     const d = bo.d ?? 2, rate = bo.rate ?? 2.5;
-    const rnd = S.rand((bo.seed ?? o.seed ?? 4) * 53 + 1);
+    const rnd = S.rand((bo.seed ?? o.seed ?? 4) * 53 + 1 + blinks.length * 29);
     const ev = root.units.map(() => { const out = []; let t = rnd() * 0.5; while (t < d - 0.15) { out.push(t); t += 0.1 + rnd() * 2 / rate; } return out; });
-    return H.drive(0, d, t => root.units.forEach((u, i) => {
-      let on = 0;
-      for (const t0 of ev[i]) { const dt = t - t0; if (dt < 0) break; if (dt < 0.1) on = 1; }
-      if (t >= d) on = 0;
-      if (u.act) u.act.setAttribute('fill', on ? S.tone('compute') : '#4a3a1c');
-    }), { d, ease: 'none' });
+    const slot = new Uint8Array(root.units.length);
+    blinks.push(slot);
+    const t = gsap.timeline();
+    t.add(H.drive(0, d, tt => {
+      root.units.forEach((u, i) => {
+        let on = 0;
+        if (tt < d) for (const t0 of ev[i]) { const dt = tt - t0; if (dt < 0) break; if (dt < 0.1) on = 1; }
+        slot[i] = on;
+      });
+      paintAct();
+    }, { d, ease: 'none' }), 0);
+    if (root.hero) t.add(root.hero.activity({ d, rate, seed: (bo.seed ?? 4) + 3 }), 0);
+    return t;
   };
   root.fill = (fo = {}) => {
     const ord = root.units.map((_, i) => ((fo.from || 'bottom') === 'bottom' ? nU - 1 - i : i));
@@ -1255,14 +1324,14 @@ function libRack(S, o = {}, parent) {
     const u = root.units[i];
     const tn = ho.tone || 'helps';
     const from = hiPlan; hiPlan = 1;
-    return H.drive(from, 1, v => {
+    return hiCh(from, 1, v => {
       root.hiEl.setAttribute('x', H.f2(u.cx - (uw + 8) / 2)); root.hiEl.setAttribute('y', H.f2(u.cy - (G.uh + 8) / 2));
       root.hiEl.setAttribute('stroke', S.tone(tn));
       root.hiEl.setAttribute('filter', `url(#glow-${H.GRAD.includes(tn) ? tn : 'helps'})`);
       root.hiEl.setAttribute('opacity', v.toFixed(3));
     }, { d: ho.d ?? 0.4 });
   };
-  root.unhighlight = (ho = {}) => { const from = hiPlan; hiPlan = 0; return H.drive(from, 0, v => root.hiEl.setAttribute('opacity', v.toFixed(3)), { d: ho.d ?? 0.4 }); };
+  root.unhighlight = (ho = {}) => { const from = hiPlan; hiPlan = 0; return hiCh(from, 0, v => root.hiEl.setAttribute('opacity', v.toFixed(3)), { d: ho.d ?? 0.4 }); };
   root.port = (side, gap = 0) => {
     if (side === 'left') return { x: x0 - gap, y: cy };
     if (side === 'right') return { x: x0 + w + gap, y: cy };
@@ -1295,10 +1364,15 @@ _libHW.rackGeom = function (w, nU) {
  *     building = rows > 1     draw the building: walls, roof line, rooftop units with fans,
  *     label = 'data centre'   (building only; null for none), labelSize = auto (≈ 3% of the building width, ≥ 28),
  *     fans = racks ÷ 2        rooftop fans, tone = 'neutral' (rack tint),
- *     hero = null             {row, rack, unit}: that unit is drawn as a full libServer (.hero),
+ *     hero = null             {row, rack, unit}: that unit is drawn as a full libServer (.hero), built with
+ *                             heroOpts = {} (any libServer options: gpus, label, spinner, badge…),
+ *     heroAt = null           {x, y, w}: place the whole hall so the hero unit is centred on (x, y) and w wide
+ *                             (rackW then follows from w); the scene's server IS dc.hero, and the racks and
+ *                             building around it (.racksG, .buildingG) can be hidden until the pull-back,
  *     detail = auto           batched unit detail 'full' | 'lite' | 'min' (from the unit width),
  *     blinkers = 40           how many activity lights can blink (seeded subset), seed = 2}
- * Returns <g> (root) with .hero, .fans[], .building {x,y,w,h} (or null), .labelEl, and
+ * Returns <g> (root) with .hero, .racksG (all batched racks), .buildingG (walls, roof, fans; or none), .floor
+ *   (aisle line, no building), .fans[], .building {x,y,w,h} (or null), .labelEl, and
  *   .rackBox(row, rack) → {x, y, w, h, cx, cy}, .unitBox(row, rack, unit) → {x, y, w, h, cx, cy}
  *   (targets for fx.cam), anchors .cx .cy .w .h .l .r .t .b (the whole drawing, building included)
  * Helpers (return tweens/timelines):
@@ -1309,25 +1383,32 @@ _libHW.rackGeom = function (w, nU) {
  *   const dc = libDataCentre(S, { x: 960, y: 560, rows: 3, racks: 10, units: 10, rackW: 440, hero: { row: 1, rack: 4, unit: 5 } });
  *   const u = dc.unitBox(1, 4, 5);
  *   S.add(S.fx.cam({ x: u.cx, y: u.cy, scale: 1, d: 0.01 }), 0);          // start close on the hero server
- *   S.add(S.fx.cam({ x: dc.cx, y: dc.cy, scale: 1700 / dc.w, d: 1.5 }), 'b3');   // pull back to the hall
+ *   S.add(S.fx.cam({ x: dc.cx, y: dc.cy, scale: 1000 / dc.h, d: 1.6 }), 'b3');   // pull back to the hall
+ *   S.set(dc.labelEl, { autoAlpha: 0 }, 0); S.add(S.fx.in(dc.labelEl), 'b3+1.7');   // label once the camera settles
+ * The label is sized for the pulled-back view (≈ 3% of the building width); in a pull-back hide it until the
+ * camera settles, or it is huge and off-screen on the way out.
  */
 function libDataCentre(S, o = {}, parent) {
   const H = _libHW; H.defs();
   const nR = o.rows ?? 1, nK = o.racks ?? 8, nU = o.units ?? 8;
-  const rw = o.rackW ?? 120;
+  const hero = o.hero;
+  const at = hero && o.heroAt;
+  const rw = at && at.w ? at.w / 0.81 : (o.rackW ?? 120);      // a unit is 0.81 × the rack width
   const G = H.rackGeom(rw, nU);
   const gapX = o.gapX ?? rw * 0.16, gapY = o.gapY ?? G.h * 0.35;
   const RW = nK * rw + (nK - 1) * gapX, RH = nR * G.h + (nR - 1) * gapY;
-  const cx = o.x ?? 960, cy = o.y ?? 540;
-  const X0 = cx - RW / 2, Y0 = cy - RH / 2;
+  const uw = rw - 2 * G.f - 2 * G.side;
+  let X0, Y0;
+  if (at) {        // place the hall so the hero unit's centre lands on (heroAt.x, heroAt.y)
+    X0 = at.x - (hero.rack * (rw + gapX) + G.f + G.side + uw / 2);
+    Y0 = at.y - (hero.row * (G.h + gapY) + G.cap + G.pad + hero.unit * (G.uh + G.ug) + G.uh / 2);
+  } else { X0 = (o.x ?? 960) - RW / 2; Y0 = (o.y ?? 540) - RH / 2; }
   const root = S.g(null, parent);
   const tone = o.tone || 'neutral';
-  const uw = rw - 2 * G.f - 2 * G.side;
   const detail = o.detail || (uw >= 240 ? 'full' : uw >= 90 ? 'lite' : 'min');
   const rackBox = (r, k) => { const x = X0 + k * (rw + gapX), y = Y0 + r * (G.h + gapY); return { x, y, w: rw, h: G.h, cx: x + rw / 2, cy: y + G.h / 2 }; };
   const unitBox = (r, k, u) => { const b = rackBox(r, k); const x = b.x + G.f + G.side, y = b.y + G.cap + G.pad + u * (G.uh + G.ug); return { x, y, w: uw, h: G.uh, cx: x + uw / 2, cy: y + G.uh / 2 }; };
   root.rackBox = rackBox; root.unitBox = unitBox;
-  const hero = o.hero;
   const isHero = (r, k, u) => hero && hero.row === r && hero.rack === k && hero.unit === u;
 
   // ---- building
@@ -1335,17 +1416,18 @@ function libDataCentre(S, o = {}, parent) {
   let bx = X0, by = Y0, bw = RW, bh = RH;
   root.fans = [];
   if (building) {
-    const P = Math.max(rw * 0.7, RW * 0.05);
+    const P = rw * 0.35 + RW * 0.04;
     bx = X0 - P; bw = RW + 2 * P;
-    const roofH = Math.max(rw * 0.9, RH * 0.12);
+    const roofH = Math.max(rw * 0.45, RH * 0.1);
     by = Y0 - P - roofH; bh = RH + 2 * P + roofH;
     const swB = Math.max(2, bw * 0.0025);
     const bg = S.g(null, root);
-    S.rect({ x: bx, y: by + roofH, w: bw, h: bh - roofH, r: swB * 3, fill: '#0a1020', fillOpacity: 0.85, stroke: '#ffffff', strokeOpacity: 0.22, sw: swB }, bg);
+    root.buildingG = bg;
+    S.rect({ x: bx, y: by + roofH, w: bw, h: bh - roofH, r: swB * 3, fill: 'url(#hw-hall)', stroke: '#ffffff', strokeOpacity: 0.24, sw: swB }, bg);
     // roof: parapet band and rooftop units with fans
     S.rect({ x: bx - swB * 3, y: by + roofH - swB * 6, w: bw + swB * 6, h: swB * 6, r: swB * 2, fill: '#1a2440', stroke: '#ffffff', strokeOpacity: 0.22, sw: swB * 0.8 }, bg);
     const nf = o.fans ?? Math.max(2, Math.round(nK / 2));
-    const fu = Math.min(roofH * 0.82, bw / (nf * 1.6));
+    const fu = Math.min(roofH * 0.75, bw / (nf * 1.8), rw * 0.55);
     for (let i = 0; i < nf; i++) {
       const fx = bx + (i + 0.5) * bw / nf, fy = by + roofH - swB * 6 - fu * 0.5;
       S.rect({ x: fx - fu * 0.62, y: fy - fu * 0.5, w: fu * 1.24, h: fu, r: fu * 0.08, fill: '#141d33', stroke: '#ffffff', strokeOpacity: 0.18, sw: swB * 0.7 }, bg);
@@ -1357,7 +1439,12 @@ function libDataCentre(S, o = {}, parent) {
     H.ignore(S.path({ d: fl, stroke: '#ffffff', strokeOpacity: 0.1, sw: swB }, bg));
     root.building = { x: bx, y: by, w: bw, h: bh, roofH };
     H.ignore(bg);
-  } else root.building = null;
+  } else {
+    root.building = null;
+    let fl = '';
+    for (let r = 0; r < nR; r++) { const yb = Y0 + r * (G.h + gapY) + G.h; fl += `M${H.f2(X0 - rw * 0.2)},${H.f2(yb + 1)}H${H.f2(X0 + RW + rw * 0.2)}`; }
+    root.floor = H.ignore(S.path({ d: fl, stroke: '#ffffff', strokeOpacity: 0.12, sw: Math.max(1.5, rw / 80) }, root));
+  }
 
   // ---- racks, batched
   let cab = '', inner = '', units = '', ears = '', bays = '', vents = '', leds = '', caps = '';
@@ -1378,6 +1465,7 @@ function libDataCentre(S, o = {}, parent) {
     }
   }
   const rg = H.ignore(S.g(null, root));
+  root.racksG = rg;
   S.path({ d: cab, fill: '#111a2e', stroke: tone === 'neutral' ? '#ffffff' : tone, strokeOpacity: tone === 'neutral' ? 0.16 : 0.6, sw: Math.max(1, rw / 120) }, rg);
   S.path({ d: inner, fill: '#060a14' }, rg);
   S.path({ d: caps, fill: '#060a14' }, rg);
@@ -1401,7 +1489,7 @@ function libDataCentre(S, o = {}, parent) {
   root.hiEl = H.ignore(S.rect({ x: 0, y: 0, w: rw + 12, h: G.h + 12, r: G.r + 4, stroke: 'helps', sw: Math.max(2.5, rw / 60), opacity: 0, filter: 'url(#glow-helps)' }, root));
   if (hero) {
     const ub = unitBox(hero.row, hero.rack, hero.unit);
-    root.hero = libServer(S, { x: ub.cx, y: ub.cy, w: ub.w, h: ub.h, seed: o.seed ?? 2, ...(o.heroOpts || {}) }, root);
+    root.hero = libServer(S, { seed: o.seed ?? 2, ...(o.heroOpts || {}), x: ub.cx, y: ub.cy, w: ub.w, h: ub.h }, root);
   }
   // ---- label
   if (building && o.label !== null) {
@@ -1409,36 +1497,43 @@ function libDataCentre(S, o = {}, parent) {
     root.labelEl = S.text(o.label ?? 'data centre', { x: bx, y: by - ls * 0.9, size: ls, weight: 650, color: 'ink', family: 'display' }, root);
   }
 
+  const blinks = [], fanCh = H.channel(), hiCh = H.channel();
+  const amb = S.tone('compute');
+  const paintAct = () => root.actLeds.forEach((l, i) => l.setAttribute('fill', blinks.some(b => b[i]) ? amb : '#4a3a1c'));
   root.blink = (bo = {}) => {
     const d = bo.d ?? 2, rate = bo.rate ?? 2;
-    const r2 = S.rand((bo.seed ?? o.seed ?? 2) * 71 + 3);
+    const r2 = S.rand((bo.seed ?? o.seed ?? 2) * 71 + 3 + blinks.length * 37);
     const ev = root.actLeds.map(() => { const out = []; let t = r2() * 0.8; while (t < d - 0.15) { out.push(t); t += 0.12 + r2() * 2 / rate; } return out; });
-    const amb = S.tone('compute');
-    return H.drive(0, d, t => root.actLeds.forEach((l, i) => {
-      let on = 0;
-      for (const t0 of ev[i]) { const dt = t - t0; if (dt < 0) break; if (dt < 0.12) on = 1; }
-      if (t >= d) on = 0;
-      l.setAttribute('fill', on ? amb : '#4a3a1c');
-    }), { d, ease: 'none' });
+    const slot = new Uint8Array(root.actLeds.length);
+    blinks.push(slot);
+    return H.drive(0, d, t => {
+      root.actLeds.forEach((l, i) => {
+        let on = 0;
+        if (t < d) for (const t0 of ev[i]) { const dt = t - t0; if (dt < 0) break; if (dt < 0.12) on = 1; }
+        slot[i] = on;
+      });
+      paintAct();
+    }, { d, ease: 'none' });
   };
   let fanAngle = 0;
   root.spinFans = (so = {}) => {
     const d = so.d ?? 2, deg = 360 * (so.turns ?? Math.max(1, d * 0.7));
     const a0 = fanAngle; fanAngle += deg;
-    return H.drive(a0, a0 + deg, a => root.fans.forEach(f => H.xf(f.rotor, f.cx, f.cy, 1, 1, 0, 0, a)), { d, ease: so.ease || 'none' });
+    return fanCh(a0, a0 + deg, a => root.fans.forEach(f => H.xf(f.rotor, f.cx, f.cy, 1, 1, 0, 0, a)), { d, ease: so.ease || 'none' });
   };
   let hiPlan = 0;
   root.highlightRack = (r, k, ho = {}) => {
     const b = rackBox(r, k), tn = ho.tone || 'helps';
     const from = hiPlan; hiPlan = 1;
-    return H.drive(from, 1, v => {
+    return hiCh(from, 1, v => {
       root.hiEl.setAttribute('x', H.f2(b.x - 6)); root.hiEl.setAttribute('y', H.f2(b.y - 6));
       root.hiEl.setAttribute('stroke', S.tone(tn));
       root.hiEl.setAttribute('filter', `url(#glow-${H.GRAD.includes(tn) ? tn : 'helps'})`);
       root.hiEl.setAttribute('opacity', v.toFixed(3));
     }, { d: ho.d ?? 0.4 });
   };
-  const L = building ? bx : X0, T = building ? by : Y0, Wd = building ? bw : RW, Hd = building ? bh : RH;
+  const lblH = root.labelEl ? (o.labelSize ?? Math.round(Math.max(28, bw * 0.03))) * 1.5 : 0;
+  const L = building ? bx : X0, T = (building ? by : Y0) - lblH, Wd = building ? bw : RW, Hd = (building ? bh : RH) + lblH;
   Object.assign(root, { cx: L + Wd / 2, cy: T + Hd / 2, w: Wd, h: Hd, l: L, r: L + Wd, t: T, b: T + Hd, racksBox: { x: X0, y: Y0, w: RW, h: RH } });
   return root;
 }
@@ -1453,7 +1548,11 @@ function libDataCentre(S, o = {}, parent) {
  * emoji (fluent:laptop / fluent:mobile-phone) for very small uses.
  *
  * o: {kind = 'laptop' | 'phone', x = 960, y = 540 (centre of the device), w = 320 (laptop) / 150 (phone),
- *     style = 'drawn' | 'icon', screen = 'chat' | 'blank' | 'off' (dark until .wake),
+ *     style = 'drawn'           'drawn' (default: in the film's palette, with every helper) | 'icon' (the
+ *                               full-colour Fluent emoji; off-palette, so only for tiny uses; helpers limited
+ *                               to ping / sleep / wake / port),
+ *     screen = 'chat'           screen content: 'chat' (a tiny conversation, decorative) | 'blank',
+ *     on = true                 screen lit at build (false: dark until .wake),
  *     chip = false              (laptop) a small amber chip on the deck: "one small chip, inside"; .chip,
  *     badge = null              {icon | text, tone}, at the top-right corner,
  *     label = null, sub = null, labelSize = 30}
@@ -1493,7 +1592,7 @@ function libDevice(S, o = {}, parent) {
   }
 
   let glass, lidFront, lidBack, hingeY, L = {};
-  const screenOn = o.screen !== 'off';
+  const screenOn = o.on !== false && o.screen !== 'off';
   if (kind === 'phone') {
     const w = o.w ?? 150, h = Math.round(w * 2.02), r = w * 0.17;
     const x0 = cx - w / 2, y0 = cy - h / 2, sw = Math.max(1.5, w / 80);
@@ -1543,7 +1642,7 @@ function libDevice(S, o = {}, parent) {
     S.path({ d: `M${H.f2(cx - frontW / 2)},${H.f2(hingeY + deckD)} H${H.f2(cx + frontW / 2)} V${H.f2(hingeY + deckD + lip * 0.4)} Q${H.f2(cx + frontW / 2)},${H.f2(hingeY + deckD + lip)} ${H.f2(cx + frontW / 2 - lip)},${H.f2(hingeY + deckD + lip)} H${H.f2(cx - frontW / 2 + lip)} Q${H.f2(cx - frontW / 2)},${H.f2(hingeY + deckD + lip)} ${H.f2(cx - frontW / 2)},${H.f2(hingeY + deckD + lip * 0.4)} Z`, fill: '#121a2e', stroke: '#ffffff', strokeOpacity: 0.18, sw }, root.deck);
     H.ignore(S.path({ d: `M${H.f2(cx - w * 0.07)},${H.f2(hingeY + deckD + 0.5)} Q${H.f2(cx)},${H.f2(hingeY + deckD + lip * 0.75)} ${H.f2(cx + w * 0.07)},${H.f2(hingeY + deckD + 0.5)}`, stroke: '#ffffff', strokeOpacity: 0.16, sw: 1 }, root.deck));
     if (o.chip) {
-      const cs = Math.max(18, deckD * 0.5);
+      const cs = Math.max(18, deckD * 0.6);
       const chipHolder = S.g(null, root.deck);
       root.chip = libChip(S, { x: cx, y: hingeY + deckD * 0.42, size: cs, label: null, seed: 21 }, chipHolder);
       H.xf(chipHolder, cx, hingeY + deckD * 0.42, 1, 0.72);    // a little perspective: it lies on the deck
@@ -1575,7 +1674,7 @@ function libDevice(S, o = {}, parent) {
   cp.appendChild(cr);
   const contentG = S.g({ 'clip-path': `url(#${cid})`, opacity: screenOn ? 1 : 0 }, lidFront);
   root.screen = S.g(null, contentG);
-  if ((o.screen || 'chat') === 'chat') {
+  if ((o.screen === 'off' ? 'chat' : (o.screen || 'chat')) === 'chat') {
     const cg = H.ignore(S.g(null, root.screen));
     const u = glass.w / 100;
     const gx = glass.x, gy = glass.y + (kind === 'phone' ? glass.h * 0.12 : glass.h * 0.08);
@@ -1588,6 +1687,7 @@ function libDevice(S, o = {}, parent) {
     const lines = kind === 'phone' ? [0.62, 0.7, 0.5, 0.66, 0.4] : [0.66, 0.72, 0.58, 0.44];
     lines.forEach((f, i) => S.rect({ x: gx + 16 * u, y: ay + i * bh * 0.55, w: glass.w * f, h: Math.max(2, bh * 0.2), r: 2, fill: '#ffffff', fillOpacity: 0.32 }, cg));
   }
+  H.ignore(S.rect({ x: glass.x, y: glass.y, w: glass.w, h: glass.h, r: glass.r, fill: 'url(#hw-sheen)', opacity: 0.7 }, lidFront));   // a glass reflection
   const pingEl = H.ignore(S.rect({ x: glass.x, y: glass.y, w: glass.w, h: glass.h, r: glass.r, fill: 'struct', opacity: 0 }, lidFront));
   if (kind === 'phone') {
     H.ignore(S.rect({ x: cx - L.w * 0.15, y: glass.y + L.w * 0.04, w: L.w * 0.3, h: L.w * 0.075, r: L.w * 0.0375, fill: '#05080f' }, lidFront));
@@ -1603,13 +1703,16 @@ function libDevice(S, o = {}, parent) {
   root.labelEl = lab.el; root.subEl = lab.sub; root.labelG = lab.g;
 
   // ---- helpers
+  // the screen's light = planned power (sleep / wake) × how open the lid is (close / open)
   let on = screenOn ? 1 : 0;
-  const paintScreen = v => { lightEl.setAttribute('opacity', v.toFixed(3)); contentG.setAttribute('opacity', v.toFixed(3)); };
-  root.sleep = (so = {}) => { const from = on; on = 0; return H.drive(from, 0, paintScreen, { d: so.d ?? 0.4 }); };
-  root.wake = (so = {}) => { const from = on; on = 1; return H.drive(from, 1, paintScreen, { d: so.d ?? 0.4 }); };
+  const live = { scr: on, lid: 0 };
+  const scrCh = H.channel(), lidCh = H.channel(), pingCh = H.channel();
+  const paintScreen = () => { const v = live.scr * (1 - H.clamp(live.lid * 2, 0, 1)); lightEl.setAttribute('opacity', v.toFixed(3)); contentG.setAttribute('opacity', v.toFixed(3)); };
+  root.sleep = (so = {}) => { const from = on; on = 0; return scrCh(from, 0, v => { live.scr = v; paintScreen(); }, { d: so.d ?? 0.4 }); };
+  root.wake = (so = {}) => { const from = on; on = 1; return scrCh(from, 1, v => { live.scr = v; paintScreen(); }, { d: so.d ?? 0.4 }); };
   root.ping = (po = {}) => {
     const tn = S.tone(po.tone || 'struct');
-    return H.drive(0, 1, p => { pingEl.setAttribute('fill', tn); pingEl.setAttribute('opacity', (0.32 * Math.sin(Math.PI * p)).toFixed(3)); }, { d: po.d ?? 0.6, ease: 'none' });
+    return pingCh(0, 1, p => { pingEl.setAttribute('fill', tn); pingEl.setAttribute('opacity', (0.32 * Math.sin(Math.PI * p)).toFixed(3)); }, { d: po.d ?? 0.6, ease: 'none' });
   };
   void tonePing;
   let lidPlan = 0;   // 0 open, 1 closed
@@ -1622,17 +1725,17 @@ function libDevice(S, o = {}, parent) {
     lidFront.setAttribute('opacity', sF < 0.02 ? 0 : 1);
     H.xf(lidBack, cx, hingeY, 1, Math.min(-0.001, sB));
     lidBack.setAttribute('opacity', v > 0.8 ? 1 : 0);
-    paintScreen(on * (1 - H.clamp(v * 2, 0, 1)));
+    live.lid = v; paintScreen();
   };
   root.close = (co = {}) => {
     if (kind !== 'laptop') return root.sleep(co);
     const from = lidPlan; lidPlan = 1;
-    return H.drive(from, 1, applyLid, { d: co.d ?? 0.7, ease: 'power2.in' });
+    return lidCh(from, 1, applyLid, { d: co.d ?? 0.7, ease: 'power2.in' });
   };
   root.open = (oo = {}) => {
     if (kind !== 'laptop') return root.wake(oo);
     const from = lidPlan; lidPlan = 0;
-    return H.drive(from, 0, applyLid, { d: oo.d ?? 0.7, ease: 'power2.out' });
+    return lidCh(from, 0, applyLid, { d: oo.d ?? 0.7, ease: 'power2.out' });
   };
 
   const bw = bb.r - bb.l, bh2 = bb.b - bb.t;
