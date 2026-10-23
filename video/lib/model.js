@@ -195,6 +195,36 @@ var _libModel = (function () {
       onStart: go, onUpdate: go, onReverseComplete: () => apply(0),
     });
   }
+  /** scale e by s about (cx, cy), written straight to its transform attribute (no bbox lookups, so a frame is
+   *  identical however it is reached). Only for elements nothing else transforms. */
+  function scaleTo(e, cx, cy, s) {
+    if (Math.abs(s - 1) < 1e-4) e.removeAttribute('transform');
+    else e.setAttribute('transform', `matrix(${s.toFixed(5)},0,0,${s.toFixed(5)},${(cx * (1 - s)).toFixed(3)},${(cy * (1 - s)).toFixed(3)})`);
+  }
+  const centre = e => [e.__scx ?? e.cx, e.__scy ?? e.cy];
+  /** pop els in: fade up while scaling from `from` to 1 about each one's centre (.cx .cy). Hidden until it runs
+   *  (immediate: false leaves them as they are until then). o: from 0.5, d 0.45, ease 'back.out(2)', stagger 0 */
+  function pop(els, o = {}) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
+    const tl = gsap.timeline();
+    const from = o.from ?? 0.5, d = o.d ?? 0.45, st = o.stagger ?? 0, ease = gsap.parseEase(o.ease || 'back.out(2)');
+    list.forEach((e, i) => {
+      const [cx, cy] = centre(e), at = (o.order ? o.order[i] : i) * st;
+      tl.fromTo(e, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.55, ease: 'power1.out', immediateRender: o.immediate !== false }, at);
+      tl.add(drive(d, p => scaleTo(e, cx, cy, from + (1 - from) * ease(p))), at);
+    });
+    return tl;
+  }
+  /** scale els from a to b about their centres over d (seek-safe) */
+  function scaleBy(els, a, b, d, easeName) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean), ease = gsap.parseEase(easeName || 'power2.out');
+    return drive(d, p => list.forEach(e => { const [cx, cy] = centre(e); scaleTo(e, cx, cy, a + (b - a) * ease(p)); }));
+  }
+  /** a brief scale pulse about the centre (seek-safe) */
+  function pulse(els, amp = 1.1, d = 0.45) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
+    return drive(d, p => list.forEach(e => { const [cx, cy] = centre(e); scaleTo(e, cx, cy, 1 + (amp - 1) * Math.sin(Math.PI * p)); }));
+  }
   /** while this tween runs (d s), els carry data-audit="ignore": copies in flight overlap on purpose (seek-safe) */
   function inFlight(els, d) {
     const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
@@ -239,18 +269,20 @@ var _libModel = (function () {
   }
   /** a small soft chip (amber product, blue result): <g> with .label; hidden */
   function chip(S, text, o, parent) {
-    const g = S.g(null, parent);
+    const outer = S.g(null, parent);
+    const g = S.g(null, outer);
     const size = o.size ?? 24, h = o.h ?? 46;
     const w = Math.max(o.minW ?? h * 1.3, S.measure(text, { size, family: 'mono', weight: 600 }) + 30);
     const x = o.x - w / 2, y = o.y - h / 2, tone = o.tone || 'compute';
     S.rect({ x, y, w, h, r: Math.min(14, h / 2), fill: BASE }, g);
     S.rect({ x, y, w, h, r: Math.min(14, h / 2), fill: `url(#card-${GRAD.includes(tone) ? tone : 'compute'})`, stroke: tone, strokeOpacity: 0.9, sw: 2 }, g);
-    if (text !== '') g.label = S.text(text, { x: o.x, y: o.y + 1, size, family: 'mono', weight: 600, anchor: 'middle', color: o.color || 'ink' }, g);
-    Object.assign(g, { cx: o.x, cy: o.y, w, h });
-    hide(g);
-    return g;
+    if (text !== '') outer.label = S.text(text, { x: o.x, y: o.y + 1, size, family: 'mono', weight: 600, anchor: 'middle', color: o.color || 'ink' }, g);
+    Object.assign(g, { cx: o.x, cy: o.y });
+    Object.assign(outer, { cx: o.x, cy: o.y, w, h, inner: g });
+    hide(outer);
+    return outer;
   }
-  return { BASE, GRAD, MINUS, clamp, f2, isEll, num, parse, hide, mix, idx, textTone, skin, cell, cellText, overlay, flash, paint, relabel, drive, inFlight, ignoreFrom, tick, plan, fadeTo, rr, hatch, chip };
+  return { BASE, GRAD, MINUS, clamp, f2, isEll, num, parse, hide, mix, idx, textTone, skin, cell, cellText, overlay, flash, paint, relabel, drive, inFlight, ignoreFrom, tick, plan, fadeTo, rr, hatch, chip, scaleTo, pop, scaleBy, pulse };
 })();
 
 /* ------------------------------------------------------------------ libNum */
@@ -438,8 +470,7 @@ function libVector(S, o = {}, parent) {
     if (po.from === 'center') { const m = (items.length - 1) / 2; items = items.map((e, i) => [e, Math.abs(i - m)]).sort((a, b) => a[1] - b[1]).map(e => e[0]); }
     const tl = gsap.timeline();
     const st = po.stagger ?? 0.06;
-    tl.fromTo(items, { autoAlpha: 0, scale: po.scale ?? 0.5, transformOrigin: '50% 50%' },
-      { autoAlpha: 1, scale: 1, duration: po.d ?? 0.45, ease: po.ease || 'back.out(2)', stagger: st, transformOrigin: '50% 50%' }, 0);
+    tl.add(M.pop(items, { from: po.scale ?? 0.5, d: po.d ?? 0.45, ease: po.ease || 'back.out(2)', stagger: st }), 0);
     tl.add(M.inFlight(items, (po.d ?? 0.45) + st * (items.length - 1)), 0);
     if (decor.childNodes.length) tl.fromTo(decor, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: 'power1.out' }, Math.min(0.3, st * items.length * 0.5));
     return tl;
@@ -657,7 +688,7 @@ function libMatVec(S, o = {}, parent) {
     const tl = gsap.timeline();
     const st = io.stagger ?? 0.03;
     tl.add(g.input.pop({ stagger: 0.06 }), 0);
-    tl.fromTo(g.cells, { autoAlpha: 0, scale: 0.6, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: io.d ?? 0.55, ease: 'back.out(1.8)', stagger: { each: st, grid: [rows, cols], from: 'start' }, transformOrigin: '50% 50%' }, 0.15);
+    tl.add(M.pop(g.cells, { from: 0.6, d: io.d ?? 0.55, ease: 'back.out(1.8)', stagger: st, order: g.cells.map(c => c.r + c.c) }), 0.15);
     tl.add(M.inFlight(g.cells, (io.d ?? 0.55) + st * (rows + cols)), 0.15);
     tl.add(g.output.pop({ stagger: 0.05 }), 0.35);
     const extra = [g.WLabel, ...g.counterEls.map(c => c.g)].filter(Boolean);
@@ -723,7 +754,9 @@ function libMatVec(S, o = {}, parent) {
       const cp = M.chip(S, M.num(pv, nf), { x: colCx(j), y: laneY, h: pch, size: size - 2, minW: Math.min(cw - 6, pch * 1.6), color: M.textTone(pv, 'compute', o) }, front);
       cp.v = pv;
       const dy = wc.cy - laneY;
-      tl.fromTo(cp, { autoAlpha: 0, scale: 0.4, x: 0, y: dy, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, x: 0, y: dy, duration: 0.3 / sp, ease: 'back.out(2.4)', immediateRender: false }, t + 0.26 / sp);
+      tl.set(cp, { y: dy }, t + 0.26 / sp);
+      tl.add(M.pop(cp.inner, { from: 0.4, d: 0.3 / sp, ease: 'back.out(2.4)', immediate: false }), t + 0.26 / sp);
+      tl.fromTo(cp, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15 / sp, immediateRender: false }, t + 0.26 / sp);
       tl.fromTo(cp, { y: dy }, { y: 0, duration: 0.45 / sp, ease: 'power2.inOut', immediateRender: false }, t + 0.5 / sp);
       tl.add(M.inFlight(cp, 0.72 / sp), t + 0.25 / sp);
       bump(tl, t + 0.26 / sp, { mul: 1, mac: 1, ops: 1 });
@@ -745,7 +778,7 @@ function libMatVec(S, o = {}, parent) {
     const C = P.chips && P.chips.row === i ? P.chips : null;
     if (!C || !g.acc) return tl;
     if (!P.accOn) {
-      tl.fromTo(g.acc, { autoAlpha: 0, scale: 0.8, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.3 / sp, ease: 'back.out(2)', immediateRender: false }, 0);
+      tl.add(M.pop(g.acc, { from: 0.8, d: 0.3 / sp, immediate: false }), 0);
       P.accOn = true;
     }
     accLabel('0', tl, 0.05 / sp, 0.25 / sp);
@@ -757,7 +790,8 @@ function libMatVec(S, o = {}, parent) {
       tl.fromTo(cp, { y: 0 }, { y: -lift, duration: d * 0.32, ease: 'power2.out', immediateRender: false }, t);
       tl.fromTo(cp, { x: 0 }, { x: dx, duration: d * 0.6, ease: 'power2.inOut', immediateRender: false }, t + d * 0.18);
       tl.fromTo(cp, { y: -lift }, { y: 0, duration: d * 0.25, ease: 'power2.in', immediateRender: false }, t + d * 0.75);
-      tl.fromTo(cp, { autoAlpha: 1, scale: 1 }, { autoAlpha: 0, scale: 0.7, duration: d * 0.12, immediateRender: false }, t + d * 0.92);
+      tl.fromTo(cp, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.12, immediateRender: false }, t + d * 0.92);
+      tl.add(M.scaleBy(cp.inner, 1, 0.7, d * 0.12), t + d * 0.92);
       tl.add(M.inFlight(cp, d * 1.05), t);
       if (k < C.plus.length && C.plus[k]) tl.fromTo(C.plus[k], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 / sp, immediateRender: false }, t);
       sum = Math.round((sum + (M.parse(cp.v) || 0)) * 1e6) / 1e6;
@@ -776,7 +810,8 @@ function libMatVec(S, o = {}, parent) {
     const cp = M.chip(S, shown ? M.num(val, nf) : '', { x: accX, y: laneY, h: ch - 8, size, tone: 'struct', minW: cw - 10, color: M.textTone(val, 'struct', o) }, front);
     const oc = g.output.cells[i];
     const dy = oc.cy - laneY, d = 0.55 / sp;
-    tl.fromTo(cp, { autoAlpha: 0, scale: 0.8, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.18 / sp, immediateRender: false }, 0);
+    tl.add(M.pop(cp.inner, { from: 0.8, d: 0.18 / sp, immediate: false }), 0);
+    tl.fromTo(cp, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12 / sp, immediateRender: false }, 0);
     tl.fromTo(cp, { y: 0 }, { y: dy, duration: d, ease: 'power3.inOut', immediateRender: false }, 0.05 / sp);
     tl.fromTo(cp, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.15 / sp, immediateRender: false }, 0.05 / sp + d);
     tl.add(M.inFlight(cp, 0.25 / sp + d), 0);
@@ -813,8 +848,10 @@ function libMatVec(S, o = {}, parent) {
       const shown = showOut(ri) && val !== null && val !== undefined;
       tl.add(g.output.set(ri, shown ? val : null, { d: 0.3 / sp, tone: 'struct' }), ta + 0.08 / sp);
       tl.add(M.flash(S, [oc], { tone: 'compute', d: 0.4 / sp, hold: 0 }), ta + 0.08 / sp);
-      runCounters(tl, t0, { mul: cols, add: cols, mac: cols, ops: 2 * cols }, cols * st);
+      // parallel rows share one counter run (several tweens writing one text would race when seeking)
+      if (!parallel) runCounters(tl, t0, { mul: cols, add: cols, mac: cols, ops: 2 * cols }, cols * st);
     });
+    if (parallel) { const k = list.length * cols; runCounters(tl, 0.15, { mul: k, add: k, mac: k, ops: 2 * k }, cols * st); }
     return tl;
   };
   g.run = (ro = {}) => {
@@ -1437,7 +1474,7 @@ function libAttention(S, o = {}, parent) {
   const P = { weights: o.weights ? o.weights.slice() : null, labels: [] };
   g.in = (io = {}) => {
     const tl = gsap.timeline();
-    tl.fromTo(g.tokens, { autoAlpha: 0, scale: 0.5, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: io.d ?? 0.5, ease: 'back.out(2.2)', stagger: io.stagger ?? 0.08, transformOrigin: '50% 50%' }, 0);
+    tl.add(M.pop(g.tokens, { from: 0.5, d: io.d ?? 0.5, ease: 'back.out(2.2)', stagger: io.stagger ?? 0.08 }), 0);
     tl.add(M.inFlight(g.tokens, (io.d ?? 0.5) + (io.stagger ?? 0.08) * n), 0);
     const extra = [...(g.badges || []), g.queryLabelEl].filter(Boolean);
     if (extra.length) tl.fromTo(extra, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, stagger: 0.03 }, (io.stagger ?? 0.08) * n);
@@ -1449,7 +1486,7 @@ function libAttention(S, o = {}, parent) {
     list.forEach((a, k) => {
       tl.fromTo(a, { opacity: 0.55, drawSVG: '0%' }, { opacity: 0.55, drawSVG: '100%', duration: ao.d ?? 0.7, ease: 'power2.inOut', immediateRender: false }, k * (ao.stagger ?? 0.08));
     });
-    tl.add(S.fx.pulse(g.tokens[q], { scale: 1.06, d: 0.4 }), 0);
+    tl.add(M.pulse(g.tokens[q], 1.06, 0.4), 0);
     return tl;
   };
   g.weigh = (ws, wo = {}) => {
@@ -1513,7 +1550,7 @@ function libAttention(S, o = {}, parent) {
       }, { ease: 'power1.inOut' }), st);
     });
     const tq = g.tokens[q];
-    tl.add(S.fx.pulse(tq, { scale: 1.12, d: 0.45 }), d * 0.92);
+    tl.add(M.pulse(tq, 1.12, 0.45), d * 0.92);
     if (bo.into && tq.setState) tl.add(tq.setState(bo.into, { d: 0.4 }), d * 0.9);
     return tl;
   };
@@ -1526,7 +1563,8 @@ function libAttention(S, o = {}, parent) {
       if (tk.setState) tl.add(tk.setState('dim', { d }), k * 0.06);
       else tl.add(M.fadeTo(tk, 0.3, d), k * 0.06);
     });
-    tl.fromTo(g.wall, { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 100%' }, { autoAlpha: 1, scaleY: 1, transformOrigin: '50% 100%', duration: d, ease: 'power3.out', immediateRender: false }, 0.1);
+    const wy1 = +g.wall.getAttribute('y1'), wy2 = +g.wall.getAttribute('y2');
+    tl.fromTo(g.wall, { autoAlpha: 1, attr: { y1: wy2 } }, { autoAlpha: 1, attr: { y1: wy1 }, duration: d, ease: 'power3.out', immediateRender: false }, 0.1);
     tl.fromTo(g.wallLabel, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: d * 0.8, immediateRender: false }, 0.3);
     return tl;
   };
@@ -1657,6 +1695,7 @@ function libAttentionGrid(S, o = {}, parent) {
     S.rect({ x: lx - tw / 2 - 16, y: ly - 22, w: tw + 32, h: 44, r: 12, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.18, sw: 1.5 }, ml);
     S.text(text, { x: lx, y: ly + 1, size: 26, anchor: 'middle', color: 'muted', weight: 650 }, ml);
     M.hide(ml);
+    ml.cx = lx; ml.cy = ly;
     g.maskLabel = ml;
   }
   g.rowFrame = S.rect({ x: x0 - 6, y: y0 - 6, w: Wd + 12, h: ch + 12, r: 12, stroke: 'compute', sw: 3 }, front);
@@ -1680,7 +1719,10 @@ function libAttentionGrid(S, o = {}, parent) {
     const ov = sized ? square(cl) : M.overlay(S, cl, tone, 'lit');
     const target = sized ? 1 : tone === 'compute' ? M.f2(0.1 + 0.9 * M.clamp(cl.score)) : 0.7;
     const from = M.plan(ov, 'op', target, 0);
-    if (sized && !from) tl.fromTo(ov, { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' }, { opacity: target, scale: 1, duration: d * 1.3, ease: 'back.out(1.8)', transformOrigin: '50% 50%', immediateRender: false }, at);
+    if (sized && !from) {
+      tl.fromTo(ov, { opacity: 0 }, { opacity: target, duration: d * 0.8, ease: 'power1.out', immediateRender: false }, at);
+      tl.add(M.drive(d * 1.3, p => M.scaleTo(ov, cl.cx, cl.cy, 0.4 + 0.6 * gsap.parseEase('back.out(1.8)')(p))), at);
+    }
     else tl.fromTo(ov, { opacity: from }, { opacity: target, duration: d, ease: 'power2.out', immediateRender: false }, at);
     P.lit.add(ov);
   };
@@ -1688,7 +1730,7 @@ function libAttentionGrid(S, o = {}, parent) {
     const tl = gsap.timeline();
     const d = io.d ?? 0.6;
     tl.fromTo(labG, { autoAlpha: 0 }, { autoAlpha: 1, duration: d }, 0);
-    tl.fromTo(g.cells.flat(), { autoAlpha: 0, scale: 0.7, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: d * 0.7, ease: 'back.out(1.8)', stagger: { each: 0.02, grid: [n, n], from: 'start' }, transformOrigin: '50% 50%' }, 0.1);
+    tl.add(M.pop(g.cells.flat(), { from: 0.7, d: d * 0.7, ease: 'back.out(1.8)', stagger: 0.02 }), 0.1);
     tl.add(M.inFlight(g.cells.flat(), d * 0.7 + 0.02 * n * n), 0.1);
     return tl;
   };
@@ -1719,7 +1761,7 @@ function libAttentionGrid(S, o = {}, parent) {
     const d = mo.d ?? 0.9;
     const st = d * 0.6 / Math.max(1, n - 1);
     g.maskBands.forEach((bg, k) => tl.fromTo(bg, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.4, ease: 'power1.out', immediateRender: false }, k * st));
-    if (g.maskLabel) tl.fromTo(g.maskLabel, { autoAlpha: 0, scale: 0.9, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)', immediateRender: false }, d * 0.7);
+    if (g.maskLabel) tl.add(M.pop(g.maskLabel, { from: 0.9, d: 0.4, immediate: false }), d * 0.7);
     // the masked cells sit under the hatching (and the label's plate) from here on: not layout any more
     const under = [];
     for (let r = 0; r < n; r++) for (let c = r + 1; c < n; c++) under.push(g.cells[r][c]);
