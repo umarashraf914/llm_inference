@@ -45,7 +45,7 @@
         },
         {
           "id": "b4",
-          "say": "Same shape out as in, so each layer's output feeds the next. That makes depth, the number of layers, possible at all. Ours has eighty, each with its own weights: eighty rounds of the same kind of refinement.",
+          "say": "Same shape out as in, so each layer's output feeds the next. That makes depth, the number of layers, possible. Ours has eighty, each with its own weights: eighty rounds of the same kind of refinement.",
           "show": "The camera pulls back; the panel shrinks into a slab. On 'feeds the next', a second slab slides on top, the out-bars of the first plugging into its underside, and a small plug icon clicks at the join, then a third and a fourth. On 'depth', a vertical bracket labelled 'depth' runs up the tower, and a grey range tag appears: '60 to 100+ in large models'. On 'eighty', the tower fast-forwards to 80 slabs, counter 4 to 80. On 'its own weights', every slab flickers a different weight-grid texture. Bars climbing the tower grow richer as they rise."
         }
       ]
@@ -86,16 +86,16 @@
       "figs": [
         92
       ],
-      "visual": "One continuous shot. Left third: one token pill 'cat' with its tall blue vector bar. To its right, three grey-blue weight tiles. Matrix names are typeset everywhere in this chapter as W with a subscript: W_Q, W_K, W_V, later W_O. Right side: three output bars. The Query bar is exactly as tall as the input bar; the Key and Value bars are visibly shorter, an eighth of the height (the reason comes in scene 9). Later the board recomposes into a 5 by 5 score grid at centre: rows are the tokens asking, columns the tokens asked, both labelled 'the cat sat down it'. When the grid arrives, the three output bars shrink into a small inset at the top right and stay there; at the end of the scene they return to centre. Vectors blue, scoring arithmetic amber, the cache teal.",
+      "visual": "One continuous shot. Left third: one token pill 'cat' with its tall blue vector bar. To its right, three grey-blue weight tiles. Matrix names are typeset everywhere in this chapter as W with a subscript: W_Q, W_K, W_V, later W_O. Right side: three output bars. The Query bar is exactly as tall as the input bar; the Key and Value bars are visibly shorter, an eighth of the height (the reason comes in scene 9). Position is never added to the input bar: in b1 a small grey tag with a rotation glyph marks it as worked into the Query and Key outputs as they are made, the same glyph used for position later in the film. Later the board recomposes into a 5 by 5 score grid at centre: rows are the tokens asking, columns the tokens asked, both labelled 'the cat sat down it'. When the grid arrives, the three output bars shrink into a small inset at the top right and stay there; at the end of the scene they return to centre. Vectors blue, scoring arithmetic amber, the cache teal.",
       "beats": [
         {
           "id": "b1",
-          "say": "Inside attention, each token's vector is multiplied by three weight matrices: W Q, W K and W V, the query, key and value matrices. Out come three vectors.",
-          "show": "The 'cat' bar sits left. On 'three weight matrices', three tiles slide in. Their labels type on exactly as spoken: 'W_Q', 'W_K', 'W_V'; on 'the query, key and value matrices', a small grey word appears under each: 'query', 'key', 'value'. On 'Out come', the bar is copied three times and each copy passes through one tile, emerging on the right: a full-height bar from W_Q, two short bars from W_K and W_V. Grey caption: 'one vector, three projections'."
+          "say": "Inside attention, each token's vector is multiplied by three weight matrices: W Q, W K and W V, for query, key and value. Out come three vectors, with position worked into the query and key.",
+          "show": "The 'cat' bar sits left. On 'three weight matrices', three tiles slide in. Their labels type on exactly as spoken: 'W_Q', 'W_K', 'W_V'; on 'for query, key and value', a small grey word appears under each: 'query', 'key', 'value'. On 'Out come', the bar is copied three times and each copy passes through one tile, emerging on the right: a full-height bar from W_Q, two short bars from W_K and W_V. On 'position', a small grey tag 'position worked in here' with a tiny rotation glyph touches the Query and Key outputs only, never the Value, then fades. Grey caption: 'one vector, three projections'."
         },
         {
           "id": "b2",
-          "say": "The query: what this token is looking for. The key: what it offers others. The value: what it contributes when matched. These are the very keys and values kept in the cache, the server's running record.",
+          "say": "The query: what this token is looking for. The key: what it offers others. The value: what it contributes when matched. These very keys and values are kept in the cache, the server's running record.",
           "show": "The grey words under the tiles and the caption fade. Each output bar gets its label as spoken, with an icon: 'Query' with a magnifying glass, sub-label 'what it seeks'; 'Key' with a key, 'what it offers'; 'Value' with a small parcel, 'what it contributes'. On 'kept in the cache', a small teal shelf labelled 'the cache' slides in at the right edge and ghost copies of the Key and Value bars glide onto it. On 'running record', a second line appears under the shelf's label: 'running record'. Then the shelf dims and stays."
         },
         {
@@ -121,7 +121,7 @@
       "figs": [
         94
       ],
-      "visual": "Same grammar as the weighted-average scene, now with tokens. Top-left: a blue token pill 'it' with a magnifying-glass query icon and label 'this token asks'. Left column below: four token pills stacked, 'the', 'cat', 'sat', 'down', each with a key icon. They stay fixed. To their right, horizontal amber bars drawn to scale, length proportional to weight, numbers at the bar ends. Bottom centre: a blue box 'the blended result'. Top band, written on in b5 only: the two-line headline 'Attention is a weighted average' / 'of the other tokens'.",
+      "visual": "Same grammar as the weighted-average scene, now with tokens. Top-left: a blue token pill 'it' with a magnifying-glass query icon and label 'this token asks'. Left column below: four token pills stacked, 'the', 'cat', 'sat', 'down', each with a key icon. They stay fixed. To their right, horizontal amber bars drawn to scale, length proportional to share, numbers at the bar ends. Bottom centre: a blue box 'the blended result'. Top band, written on in b5 only: the two-line headline 'Attention is a weighted average' / 'over the tokens so far'.",
       "beats": [
         {
           "id": "b1",
@@ -135,8 +135,8 @@
         },
         {
           "id": "b3",
-          "say": "Softmax turns these into weights: point oh five, point six two, point two eight, point oh five. Together, one.",
-          "show": "A small 'softmax' label sweeps down the column. Each score morphs into its weight as spoken while its amber bar grows to scale: '0.05' short, '0.62' long, '0.28' medium, '0.05' short. Under the bars: 'how much each counts'. On 'Together, one', a sum ticks up to '= 1.00'."
+          "say": "Softmax, from the very start, turns these into shares: point oh five, point six two, point two eight, point oh five. Together, one.",
+          "show": "A small 'softmax' label sweeps down the column. Each score morphs into its share as spoken while its amber bar grows to scale: '0.05' short, '0.62' long, '0.28' medium, '0.05' short. Under the bars: 'how much each counts'. On 'Together, one', a sum ticks up to '= 1.00'."
         },
         {
           "id": "b4",
@@ -145,8 +145,8 @@
         },
         {
           "id": "b5",
-          "say": "Attention is a weighted average of the other tokens: the query asks, the keys set the weights, the values get averaged. These weights are illustrative; adding to one is not.",
-          "show": "On 'weighted average of the other tokens', the two-line headline writes on across the top band. The 'softmax' label and the 'own score: left out' tag have already faded. Three role tags land as spoken: 'who asks' replaces 'this token asks' on the 'it' pill, 'how much each counts' brightens under the bars, 'what is averaged' pins onto the blended result. On 'illustrative', the corner tag brightens; on 'adding to one', '= 1.00' glows white and holds."
+          "say": "Attention is a weighted average over the tokens so far: the query asks, the keys set the shares, the values get averaged. These shares are illustrative; adding to one is not.",
+          "show": "On 'weighted average over the tokens so far', the two-line headline writes on across the top band. The 'softmax' label and the 'own score: left out' tag have already faded. Three role tags land as spoken: 'who asks' replaces 'this token asks' on the 'it' pill, 'how much each counts' brightens under the bars, 'what is averaged' pins onto the blended result. On 'illustrative', the corner tag brightens; on 'adding to one', '= 1.00' glows white and holds."
         }
       ]
     },
@@ -156,27 +156,27 @@
       "figs": [
         95
       ],
-      "visual": "Top half first: two rows of token pills, 'the river bank' and 'my savings bank', with the two 'bank' pills vertically aligned on the right. Then the bottom half: a strip of small blue token pills, the conversation so far, growing left to right, newest pill glowing at the right end. A dashed outline bracket 'context length' of fixed width sits over the strip. The strip starts short, well inside the bracket, so the count of tokens looked at grows; only in b3 does the strip reach the bracket's width, after which the bracket travels with the newest token and the oldest pills fall out.",
+      "visual": "Top half first: two rows of token pills, 'the river bank' and 'the savings bank', with the two 'bank' pills vertically aligned on the right. Then the bottom half: a strip of small blue token pills, the prompt so far, growing left to right, newest pill glowing at the right end. A dashed outline bracket 'context length' of fixed width sits over the strip. The strip starts short, well inside the bracket, so the count of tokens looked at grows; only in b3 does the strip reach the bracket's width, after which the bracket travels with the newest token and the oldest pills fall out.",
       "beats": [
         {
           "id": "b1",
           "say": "Meaning depends on what came before. Bank after river is not bank after savings, because attention blends in a different neighbour.",
-          "show": "Row 'the river bank' fades in with a water-wave icon above 'bank'; row 'my savings bank' with a coin icon. The two 'bank' pills start identical blue. On 'blends in a different neighbour', a curved thread draws from each 'bank' back to 'river' and to 'savings', and each bank pill gains a stripe in its neighbour's colour, so they no longer match. Label between the rows: 'same token, different result'."
+          "show": "Row 'the river bank' fades in with a water-wave icon above 'bank'; row 'the savings bank' with a coin icon. The two 'bank' pills start identical blue. On 'blends in a different neighbour', a curved thread draws from each 'bank' back to 'river' and to 'savings', and each bank pill gains a stripe in its neighbour's colour, so they no longer match. Label between the rows: 'same token, different result'."
         },
         {
           "id": "b2",
-          "say": "Context is everything the model can see right now: the conversation so far plus the newest token. Each new token looks at all of it.",
-          "show": "The rows drift up and fade. Bottom half: a short strip of 12 pills builds; over it a blue bracket 'the conversation so far'; the rightmost pill glows, labelled 'newest token'. Two-line header: 'Context:' / 'everything the model can see'. The dashed 'context length' outline sits much wider than the strip, mostly empty. On 'looks at all of it', thin amber threads fan from the newest pill back to every pill; a counter beside it reads 'looks at: 12'. Two more pills arrive; each time the fan redraws and the counter steps to 13, then 14."
+          "say": "Context, met earlier, is everything the model can see right now: the whole prompt so far plus the newest token. Each new token looks at all of it.",
+          "show": "The rows drift up and fade. Bottom half: a short strip of 12 pills builds; over it a blue bracket 'the prompt so far'; the rightmost pill glows, labelled 'newest token'. Two-line header: 'Context:' / 'everything the model can see'. The dashed 'context length' outline sits much wider than the strip, mostly empty. On 'looks at all of it', thin amber threads fan from the newest pill back to every pill; a counter beside it reads 'looks at: 12'. Two more pills arrive; each time the fan redraws and the counter steps to 13, then 14."
         },
         {
           "id": "b3",
-          "say": "Context length is how many tokens attention can look across. Past it, the earliest fall out and can influence nothing.",
-          "show": "Pills now arrive quickly until the strip fills the dashed outline; on 'context length' the outline turns solid with its label. The outline holds 20 pill slots, with a grey tag 'schematic'; the counter stops at 'looks at: 20' and stays there. On 'fall out', each new pill pushes in at the right, the bracket slides right with it, and the leftmost pills drop below the strip and turn grey, tagged 'out of reach'; no amber thread ever reaches them."
+          "say": "Context length, the window's size, is how many tokens attention can look across. Past it, the earliest fall out and can influence nothing.",
+          "show": "Pills now arrive quickly until the strip fills the dashed outline; on 'context length' the outline turns solid with its label, and on 'window's size' a grey second line writes on under the label: 'the window'. The outline holds 20 pill slots, with a grey tag 'schematic'; the counter stops at 'looks at: 20' and stays there. On 'fall out', each new pill pushes in at the right, the bracket slides right with it, and the leftmost pills drop below the strip and turn grey, tagged 'out of reach'; no amber thread ever reaches them."
         },
         {
           "id": "b4",
-          "say": "A long conversation is not just a longer input, but more work per token. Context length is not a storage limit: it is a recurring cost.",
-          "show": "On 'more work per token', the amber fan pulses once for every new token. Two lines at centre: 'not a storage limit' greys and slides aside; 'a recurring cost' holds in white, the fan pulsing faintly behind it."
+          "say": "A long conversation is not just a longer input, but more work per token. Context length is not only a storage limit: it is a recurring cost.",
+          "show": "On 'more work per token', the amber fan pulses once for every new token. Two lines at centre: 'not only a storage limit' greys and slides aside; 'a recurring cost' holds in white, the fan pulsing faintly behind it."
         }
       ]
     },
@@ -196,8 +196,8 @@
         },
         {
           "id": "b2",
-          "say": "Everything so far invites it: fixed weights, an embedding computed once. Why multiply twice?",
-          "show": "Two small grey ticks appear beside the chain as spoken: 'weights fixed after training', 'embedding computed once'. Grey tag: 'a reasonable reading'. On 'Why multiply twice?', a question mark settles over the slabs."
+          "say": "Everything so far invites it: fixed weights, an embedding looked up once. Why multiply twice?",
+          "show": "Two small grey ticks appear beside the chain as spoken: 'weights fixed after training', 'embedding looked up once'. Grey tag: 'a reasonable reading'. On 'Why multiply twice?', a question mark settles over the slabs."
         },
         {
           "id": "b3",
@@ -338,7 +338,7 @@
         },
         {
           "id": "b4",
-          "say": "Suppose W Q, W K and W V existed once for the whole model. Seventy-nine of eighty copies vanish, six point six billion weights, leaving sixty-three point nine billion: over six billion short.",
+          "say": "Suppose W Q, W K and W V existed once for the whole model. Seventy-nine of eighty copies vanish, six point six billion weights, leaving just under sixty-four billion: over six billion short.",
           "show": "A dashed grey ledger slides in on the right, titled 'if Q, K, V existed once'. Line: 'W_Q + W_K + W_V = 83.9 M per layer'. On 'Seventy-nine of eighty', amber '× 79 removed = 6.63 B' and the line strikes through. Its total runs from '70.55 B' down to '63.9 B'. On 'six billion short', a grey gap bar spans from '63.9 B' to '70 B', labelled 'over 6 B missing'."
         },
         {
@@ -380,7 +380,7 @@
         103,
         104
       ],
-      "visual": "One shot that ends on the whole model. Left: the 80-slab stack with five token columns rising out of its top. A path runs left to right: 'final vector' (a tall blue bar, '8,192 numbers'), the output-projection matrix (tall, blue-grey), an amber strip 'score every token' ('about 128,000 numbers'), a small share chart, and one token pill 'pick one' ('1 token'). Header: 'From a vector to a word'. Each station's small size label shows only while that station is active, so no more than five labels are ever on screen. In b3 the whole trip is redrawn as a straight path 'embedding lookup' to '80 layers' to 'output projection' to 'pick one', with a bracket 'one forward pass' over the straight path only and a separate return arrow 'append, go round again'. Ends on one layer's seven tiles beside the stack and the parameter count, which stays blue with an amber outline.",
+      "visual": "One shot that ends on the whole model. Left: the 80-slab stack with five token columns rising out of its top. A path runs left to right: 'final vector' (a tall blue bar, '8,192 numbers'), the output-projection matrix (tall, blue-grey), an amber strip 'score every token' ('about 128,000 numbers'), a small share chart, and one token pill 'pick one' ('1 token'). Header: 'From a vector to a word'. Each station's small size label shows only while that station is active, so no more than five labels are ever on screen. In b3 the whole trip is redrawn as a straight path 'embedding lookup' to '80 layers' to 'output projection' to 'pick one', with a bracket 'one forward pass' over the straight path only and a separate return arrow 'append, go round again'. Ends on the parameter count alone, '70.6 B parameters', blue with an amber outline, as the numerator of a fraction bar with a blank denominator and a '×' slot: the frame the next chapter opens on.",
       "beats": [
         {
           "id": "b1",
@@ -399,8 +399,8 @@
         },
         {
           "id": "b4",
-          "say": "Seven matrices a layer, six in the classic design, times sixty to a hundred layers: these learned weights are the model. Everything else divides by their count and size, or multiplies against them.",
-          "show": "The path fades; the stack moves to centre. Beside it, the seven tiles of one layer reappear unlabelled, with one group label '7 per layer' and a grey note '6 in the classic design'. Beside the stack: 'times 60 to 100 layers'. On 'are the model', a white caption: 'the weights are the model'. On 'divides by', tiles and stack collapse into one blue number with an amber outline, '70.6 B parameters'. It settles as the numerator of a fraction bar with a blank denominator, a '×' slot waiting beside it. Hold."
+          "say": "Seven matrices a layer, six in the classic design, times sixty to over a hundred layers: these learned weights are the model. Everything else divides by their count and size, or multiplies against them.",
+          "show": "The path fades; the stack moves to centre. Beside it, the seven tiles of one layer reappear unlabelled, with one group label '7 per layer' and a grey note '6 in the classic design'. Beside the stack: 'times 60 to 100+ layers'. On 'are the model', a white caption: 'the weights are the model'. On 'divides by', tiles and stack collapse into one blue number with an amber outline, '70.6 B parameters'. It settles as the numerator of a fraction bar with a blank denominator, a '×' slot waiting beside it. Hold."
         }
       ]
     }
@@ -437,12 +437,12 @@
       "result": "[0.051, 0.62, 0.278, 0.051]"
     },
     {
-      "claim": "fig 94 attention weights 0.05 + 0.62 + 0.28 + 0.05 = 1.00",
+      "claim": "fig 94 attention shares 0.05 + 0.62 + 0.28 + 0.05 = 1.00 (the atlas calls them 'weights'; the film says 'shares', as in ch01 softmax and ch10, because 'weight' means a parameter)",
       "python": "round(0.05+0.62+0.28+0.05,2)",
       "result": "1.0"
     },
     {
-      "claim": "cat's weight 0.62 = 62 percent, the's weight 0.05 = 5 percent",
+      "claim": "cat's share 0.62 = 62 percent, the's share 0.05 = 5 percent",
       "python": "print(0.62*100, 0.05*100)",
       "result": "62.0 5.0"
     },
@@ -537,7 +537,7 @@
       "result": "83886080 6627000320"
     },
     {
-      "claim": "what-if: 70.55 B - 6.63 B = 63.93 B ('sixty-three point nine billion'), the same as recounting from scratch",
+      "claim": "what-if: 70.55 B - 6.63 B = 63.93 B, shown as 63.9 B and spoken 'just under sixty-four billion' so the spoken 'seventy point six' minus 'six point six' adds up as heard; the same as recounting from scratch",
       "python": "print((80*855638016+2*128256*8192) - 79*(8192*8192+2*8192*1024))",
       "result": "63925387264"
     },
@@ -585,6 +585,16 @@
       "claim": "s09 b4 ledger as displayed: 67.1 + 8.4 + 8.4 + 67.1 = 151.0; s10 b1: 151.0 + 704.6 = 855.6",
       "python": "print(round(67.1+8.4+8.4+67.1,1), round(151.0+704.6,1))",
       "result": "151.0 855.6"
+    },
+    {
+      "claim": "spoken what-if, as heard: seventy point six minus six point six = 64.0, and the exact 63.925 B is just under sixty-four billion; still over six billion short of the advertised 70 B",
+      "python": "e=(80*855638016+2*128256*8192-79*(8192*8192+2*8192*1024))/1e9; print(round(70.6-6.6,1), e, round(70-e,3))",
+      "result": "64.0 63.925387264 6.075"
+    },
+    {
+      "claim": "layer range: atlas fig 96 says '60 to over 100', fig 104 'sixty to a hundred'; the film uses '60 to 100+' / 'sixty to over a hundred' in both places (s01 tag, s12 narration) so they match; ours, 80, sits inside it",
+      "python": "print(60 <= 80 <= 100)",
+      "result": "True"
     }
   ]
 }

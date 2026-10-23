@@ -191,6 +191,11 @@
       "result": "3.35 0.33872598584428715"
     },
     {
+      "claim": "s02 b3 'ninety-nine percent': on the H100, decode's bus time is 1 - 0.14 ms / 41.8 ms = 99.66% of each token (the 0.34% gauge's complement); on the H200 it is 99.51%, so the callback to ch00 and ch06 holds on either chip",
+      "python": "print((1-(140e9/989e12)/(140e9/3.35e12))*100, (1-(140e9/989e12)/(140e9/4.8e12))*100)",
+      "result": "99.66127401415571 99.51466127401416"
+    },
+    {
       "claim": "Same sliver as the 30 ms thesis bar from ch05: 0.1 / 30 = 0.33%",
       "python": "0.1/30*100",
       "result": "0.33333333333333337"
