@@ -71,8 +71,8 @@
         },
         {
           "id": "b5",
-          "say": "That chain comes from the mask, not the hardware. This triangle is the whole reason the two phases differ.",
-          "show": "Tags 'one shot' and 'one row at a time' fade. On 'the mask', the hatched half of the small grid at left pulses grey and a thin grey arrow draws from it to Decode's chain-link icons. On 'not the hardware', a small chip icon with idle grey cores fades in beside Decode, labelled 'not the hardware'. On 'whole reason', the Prefill and Decode triangles pulse together and a key phrase fades in centred beneath them: 'the triangle: why the phases differ'."
+          "say": "That chain is in the work itself, not the hardware. This triangle is the whole reason the two phases differ.",
+          "show": "Tags 'one shot' and 'one row at a time' fade. On 'the work itself', the lit triangle of the small grid at left pulses blue and a thin grey arrow draws from it to Decode's chain-link icons. On 'not the hardware', a small chip icon with idle grey cores fades in beside Decode, labelled 'not the hardware'. On 'whole reason', the Prefill and Decode triangles pulse together and a key phrase fades in centred beneath them: 'the triangle: why the phases differ'."
         }
       ]
     },
@@ -143,32 +143,32 @@
       "figs": [
         136
       ],
-      "visual": "Left half: the GPU package illustration, compute die in the middle, HBM stacks around it, a wide bus between them. One HBM stack is enlarged; inside it a region outlined teal and labelled 'KV cache' holds rows of paired tiles, one row per token, each a small K tile and V tile. Right half, top: a panel 'Each decode step' with three boxes in a row joined by arrows: amber 'compute one K and V', teal 'append to cache', coral 'read the whole cache'. Right half, lower: a small counter area used in b3, then a row of four server-rack icons along the bottom, then, in b4, the staircase silhouette from scene 1 (rows of pills with coral arcs and 'reads' tags). Coral particles always mean the cache being read. The idea the motion makes visible: each step creates one new entry, adds it to the end, and then reads everything that has accumulated, so the computing stops growing but the reading does not.",
+      "visual": "Left half: the GPU package illustration, compute die in the middle, HBM stacks around it, a wide bus between them. One HBM stack is enlarged; inside it a region outlined teal and labelled 'KV cache' holds a stack of thin coral slabs, one per token, each split into a 'K' half and a 'V' half, as in chapter 4's cache stack. Right half, top: a panel 'Each decode step' with three boxes in a row joined by arrows: amber 'compute one K and V', teal 'append to cache', coral 'read the whole cache'. Right half, lower: a small counter area used in b3, then a row of four server-rack icons along the bottom, then, in b4, the staircase silhouette from scene 1 (rows of pills with coral arcs and 'reads' tags). Coral particles always mean the cache being read. The idea the motion makes visible: each step creates one new entry, adds it to the end, and then reads everything that has accumulated, so the computing stops growing but the reading does not.",
       "beats": [
         {
           "id": "b1",
           "say": "The running record from earlier is exactly this: every token's keys and values, in a dedicated region of H B M.",
-          "show": "GPU package fades in. On 'running record', a grey sticky-note icon labelled 'the running record' appears over the package and splits into rows of K and V tile pairs. On 'H B M', the camera pushes into one HBM stack; the rows settle into a region that outlines teal and is labelled 'KV cache', six rows already in it, and the sticky-note label fades."
+          "show": "GPU package fades in. On 'running record', chapter 4's coral slab stack with its notepad icon appears over the package, labelled 'the running record', and each slab splits into a K half and a V half. On 'H B M', the camera pushes into one HBM stack; the slabs settle into a region that outlines teal and is labelled 'KV cache', six slabs already in it, and the notepad icon and its label fade."
         },
         {
           "id": "b2",
           "say": "Each decode step now computes only the new token's key and value, appends them, and reads the whole cache for attention.",
-          "show": "Camera eases back so package and cache region are both visible; the panel 'Each decode step' draws on top right, unlit. On 'computes', the amber box lights and one K and V pair appears on the die. On 'appends', the pair slides along the bus into the next empty row and the teal box lights. On 'reads', coral particles stream from every row of the cache back to the die and the coral box lights."
+          "show": "Camera eases back so package and cache region are both visible; the panel 'Each decode step' draws on top right, unlit. On 'computes', the amber box lights and one new coral slab, split K and V, appears on the die. On 'appends', the slab slides along the bus onto the top of the stack and the teal box lights. On 'reads', coral particles stream from every slab of the cache back to the die and the coral box lights."
         },
         {
           "id": "b3",
           "say": "Nothing earlier is recomputed: each key and value is made once, so that work goes from quadratic to linear. Every serving system does this; it is why decode is practical at all.",
-          "show": "The three-box loop runs three more times, faster each time, the cache gaining a row per pass. On 'made once', lower right: a teal counter 'K and V computed: 1,000' beside an amber '499,500' that is struck through. On 'quadratic to linear', the tag 'K and V work: quadratic → linear' appears under them. On 'Every serving system', counter and tag fade; four small server-rack icons slide in along the bottom, only the first carrying a teal 'KV cache' badge, and a grey tag 'obvious once seen'."
+          "show": "The three-box loop runs three more times, faster each time, the cache gaining a slab per pass. On 'made once', lower right: a teal counter 'K and V computed: 1,000' beside an amber '499,500' that is struck through. On 'quadratic to linear', the tag 'K and V work: quadratic → linear' appears under them. On 'Every serving system', counter and tag fade; four small server-rack icons slide in along the bottom, only the first carrying a teal 'KV cache' badge, and a grey tag 'obvious once seen'."
         },
         {
           "id": "b4",
           "say": "But every token still reads the whole cache: the staircase from the start, each step reading more than the last.",
-          "show": "Racks and their tags fade. On 'reads the whole cache', the coral box pulses and the coral read stream thickens as more rows accumulate. On 'staircase', the scene 1 staircase silhouette fades in lower right with its coral arcs; a fourth and fifth row add themselves in step with the cache's new rows. Coral tag: 'reads: still growing'."
+          "show": "Racks and their tags fade. On 'reads the whole cache', the coral box pulses and the coral read stream thickens as more slabs accumulate. On 'staircase', the scene 1 staircase silhouette fades in lower right with its coral arcs; a fourth and fifth row add themselves in step with the cache's new slabs. Coral tag: 'reads: still growing'."
         },
         {
           "id": "b5",
-          "say": "A caching trick that solves one problem and creates the one that dominates everything downstream: the reason every other optimisation ahead exists.",
-          "show": "The scene dims except the cache region and its coral stream. Key phrase centred: 'solves one problem, creates the next'. On 'every other optimisation', a small grey line fades in beneath it: 'why every later fix exists'."
+          "say": "A caching trick that solves one problem and creates the one that dominates everything downstream: why so many optimisations ahead exist.",
+          "show": "The scene dims except the cache region and its coral stream. Key phrase centred: 'solves one problem, creates the next'. On 'so many optimisations', a small grey line fades in beneath it: 'why so many later fixes exist'."
         }
       ]
     },
@@ -178,12 +178,12 @@
       "figs": [
         137
       ],
-      "visual": "Two horizontal lanes on the left two-thirds; on the right, a model block drawn as a tall stack of thin layer slabs that both lanes feed. Top lane, header 'What you might picture', subline 'the whole text, fed in again': nine blue token pills and an ellipsis, label 'all 1,032 tokens, every step'. Bottom lane, header 'What actually happens', subline 'one token, plus the cache': nine dashed-outline pills, each with a tiny K and V tile, and one solid amber pill at the right end; label 'already in the cache, not recomputed'. Between the lanes, from b2: two bars drawn to scale. Teal threads from the amber pill back to the dashed pills mean reused, not recomputed. The idea the motion makes visible: the text grows, but only one token enters the model per step.",
+      "visual": "Two horizontal lanes on the left two-thirds; on the right, a model block drawn as a tall stack of thin layer slabs that both lanes feed. Top lane, header 'The loop as first drawn', subline 'the whole text, fed in again', as in chapters 1 and 2: nine blue token pills and an ellipsis, label 'all 1,032 tokens, every step'. Bottom lane, header 'What actually happens', subline 'one token, plus the cache': nine dashed-outline pills, each with a tiny K and V tile, and one solid amber pill at the right end; label 'already in the cache, not recomputed'. Between the lanes, from b2: two bars drawn to scale. Teal threads from the amber pill back to the dashed pills mean reused, not recomputed. The idea the motion makes visible: the text grows, but only one token enters the model per step.",
       "beats": [
         {
           "id": "b1",
-          "say": "One correction most people need. Do all one thousand and thirty-two tokens of the weather chat re-enter the model every step?",
-          "show": "Model block draws on the right. Top lane builds: nine blue pills, ellipsis, label 'all 1,032 tokens, every step'. On 're-enter the model', a small step counter ticks 1, 2, 3; on each tick the whole row streams into the model block. A grey question mark hangs at the lane's right end."
+          "say": "One correction to the loop as first drawn. Do all one thousand and thirty-two tokens of the weather chat re-enter the model every step?",
+          "show": "Model block draws on the right. On 'as first drawn', the top lane's header writes on and the lane builds: nine blue pills, ellipsis, label 'all 1,032 tokens, every step'. On 're-enter the model', a small step counter ticks 1, 2, 3; on each tick the whole row streams into the model block. A grey question mark hangs at the lane's right end."
         },
         {
           "id": "b2",
@@ -204,7 +204,7 @@
         138,
         140
       ],
-      "visual": "Top band: an equation in a bar with a thin white outline, set on two lines: 'cache per token =' / '2 × layers × KV heads × head dim × bytes'. Terms land one at a time, each with a small grey label beneath. In this scene only '2' and '× layers' land; the rest are blank slots. Lower left: the natural picture from chapter 8 (struck through there as 'tempting, but wrong'), an 'embedding' box with a single block of three tiles 'Q', 'K', 'V' above it and one arrow carrying it up a stack of layers. Lower right: two stacks of eighty thin layer slabs side by side, the left one dimmer and labelled 'earlier token', the right one brighter and labelled 'new token'; every slab holds its own small K and V tile pair. The idea the motion makes visible: the layers term exists only because every layer makes and keeps its own key and value.",
+      "visual": "Top band: an equation in a bar with a thin white outline, set on two lines: 'cache per token =' / '2 × layers × KV heads × head dim × bytes'. Terms land one at a time, each with a small grey label beneath. In this scene only '2' and '× layers' land; the rest are blank slots. Lower left: the natural picture from chapter 8, in its dashed grey outlines (struck through there as 'tempting, but wrong'): 'embedding', arrow, 'W_Q, W_K, W_V', arrow, three pills 'Q', 'K', 'V' carried unchanged up a column of dashed layer slabs. Lower right: two stacks of eighty thin layer slabs side by side, the left one dimmer and labelled 'earlier token', the right one brighter and labelled 'new token'; every slab holds its own small K and V tile pair. The idea the motion makes visible: the layers term exists only because every layer makes and keeps its own key and value.",
       "beats": [
         {
           "id": "b1",
@@ -214,11 +214,11 @@
         {
           "id": "b2",
           "say": "In the natural picture from earlier, query, key and value are made once and carried up: no layers term. But every layer makes its own, from its own input and weights.",
-          "show": "Lower left, the natural picture redraws: 'embedding', the one Q, K, V block, one arrow up the stack. On 'no layers term', a teal tag 'no layers term' appears under it and '× layers' in the equation flickers grey. On 'every layer makes its own', the natural picture is crossed out and dims; lower right, the two stacks of eighty slabs draw upward, each slab growing its own K and V pair in a slightly different shade of blue. Tag '× 80'."
+          "show": "Lower left, the natural picture redraws as in chapter 8: 'embedding', 'W_Q, W_K, W_V', the three Q, K, V pills floating up the dashed slabs. On 'no layers term', a teal tag 'no layers term' appears under it and '× layers' in the equation flickers grey. On 'every layer makes its own', the natural picture is crossed out and dims; lower right, the two stacks of eighty slabs draw upward, each slab growing its own K and V pair in a slightly different shade of blue. Tag '× 80'."
         },
         {
           "id": "b3",
-          "say": "All eighty are kept: layer forty needs an earlier token's layer-forty key, not its layer-one key. Made once, the cache would be eighty times smaller, and most of this series would not exist.",
+          "say": "All eighty are kept: layer forty needs an earlier token's layer-forty key, not its layer-one key. Made once, the cache would be eighty times smaller, and much of this series would not exist.",
           "show": "On 'layer forty', a query arrow runs from the new token's slab 40 straight across to the earlier token's slab-40 K tile, which lights. The earlier stack's slab-1 K tile greys out with a small cross and the label 'wrong layer'. On 'eighty times smaller', '× layers' glows coral and gains the value '80' beneath, and a grey ghost of one stack collapses to a single slab, tag '÷ 80'. Key phrase lower centre: 'every layer keeps its own'."
         }
       ]
@@ -269,7 +269,7 @@
         },
         {
           "id": "b3",
-          "say": "So every technique that shrinks the cache attacks another term: fewer heads, narrower heads, or fewer bytes per number. Knowing which makes the rest of the series easier to follow.",
+          "say": "So every technique that shrinks the cache attacks another term: fewer heads, narrower heads, or fewer bytes per number. Knowing which makes the series ahead easier to follow.",
           "show": "Three teal arrows draw up from below, one per phrase: 'fewer heads' to 'KV heads', 'narrower heads' to 'head dim', 'fewer bytes' to 'bytes'. On 'Knowing which', the bars fade and the labelled equation sits alone in the centre, with '320 KB, decomposed' beneath it."
         }
       ]
@@ -314,8 +314,8 @@
         },
         {
           "id": "b2",
-          "say": "On an H one hundred, weights alone allow about twenty-four tokens a second. Add a hundred-thousand-token cache, and each step reads a hundred and seventy-three gigabytes: about nineteen. Illustrative, but the direction is general.",
-          "show": "Readout fills: '3.35 TB/s ÷ 140 GB ≈ 24 tokens/s'. On 'a hundred-thousand-token cache', the cache block grows to '33 GB'; the denominator becomes '140 + 33 = 173 GB' and the result counter drops from 24 to 19, the particle stream per token visibly longer. Grey tag 'illustrative: one request, H100'. On 'general', a small slider beside the readout: as the cache block grows the number falls, as it shrinks the number rises."
+          "say": "On our what-if H one hundred, weights alone allow about twenty-four tokens a second. Add a hundred-thousand-token cache, and each step reads a hundred and seventy-three gigabytes: about nineteen. Illustrative, but the direction is general.",
+          "show": "Readout fills: '3.35 TB/s ÷ 140 GB ≈ 24 tokens/s'. On 'a hundred-thousand-token cache', the cache block grows to '33 GB'; the denominator becomes '140 + 33 = 173 GB' and the result counter drops from 24 to 19, the particle stream per token visibly longer. Grey tag 'illustrative: one request, what-if H100'. On 'general', a small slider beside the readout: as the cache block grows the number falls, as it shrinks the number rises."
         },
         {
           "id": "b3",
@@ -420,6 +420,11 @@
       "claim": "fig 141 (added, illustrative, one request on an H100): with a 100,000-token cache each step reads 140 + 32.8 = 172.8 GB, about 173, and the ceiling falls to 19.4, about 19 tokens a second",
       "python": "print(140+327680*1e5/1e9, 3.35e12/(140e9+327680*1e5))",
       "result": "172.768 19.39016484534173"
+    },
+    {
+      "claim": "fig 141 (what-if framing): one H100 holds 80 GB, so the 140 GB model already needs two (ch06_s08, ch12_s03 tag 'H100: a what-if, needs 2 chips'); with a 100,000-token cache each step reads 172.8 GB, more than even two H100s' 160 GB, so the narration says 'our what-if H one hundred' and the tag 'what-if H100'",
+      "python": "print(2*80, 140+327680*1e5/1e9, 140+327680*1e5/1e9 > 2*80)",
+      "result": "160 172.768 True"
     }
   ]
 }

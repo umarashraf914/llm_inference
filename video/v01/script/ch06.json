@@ -111,7 +111,7 @@
         {
           "id": "b3",
           "say": "Eight bits make a byte, and a weight takes two, enough for useful accuracy. That's why seventy billion weights make the hundred and forty gigabytes.",
-          "show": "The readout lifts off the trace and becomes blue cells. On 'Eight bits', one cell first, label '1 bit = one yes-or-no', then on 'a byte' the row grows to eight cells reading 0 1 0 1 0 1 0 1, a bracket draws under it 'one byte', and a small grey counter doubles beside it to '256 patterns'. On 'takes two', two coral blocks slide together: '1 weight = 2 bytes = 16 bits', small grey '65,536 patterns'. Each label dims as the next lands. On 'That's why', the bit and byte labels fade and the bottom band brings back the equation from earlier whole, '70 billion weights × 2 bytes = 140 GB', with a small grey note '1 GB = 1 billion bytes'; on 'seventy billion', the '× 2 bytes' term is outlined in white, the answer to the earlier 'why two'. A coral file icon '140 GB' drops toward a tiny amber chip outline, bounces off, and settles into a large coral memory block: tag 'only fits in the memory'."
+          "show": "The readout lifts off the trace and becomes blue cells. On 'Eight bits', one cell first, label '1 bit = one yes-or-no', then on 'a byte' the row grows to eight cells reading 0 1 0 1 0 1 0 1, a bracket draws under it 'one byte', and a small grey counter doubles beside it to '256 patterns'. On 'takes two', two coral blocks slide together: '1 weight = 2 bytes = 16 bits', small grey '65,536 patterns'. Each label dims as the next lands. On 'That's why', the bit and byte labels fade and the bottom band brings back the equation from earlier whole, '70 billion weights × 2 bytes = 140 GB', with a small grey note '1 GB = 1 billion bytes'; on 'seventy billion', the '× 2 bytes' term is outlined in white, answering the earlier 'why two: later' tag; no new text. A coral file icon '140 GB' drops toward a tiny amber chip outline, bounces off, and settles into a large coral memory block: tag 'only fits in the memory'."
         },
         {
           "id": "b4",
@@ -195,8 +195,8 @@
         },
         {
           "id": "b2",
-          "say": "They're independent. A container ship takes weeks, carrying a town's goods. Add a second, and the goods double, not the weeks. A motorbike courier is the reverse.",
-          "show": "The lanes slide down and dim. Left: the container ship stacked with crates, tags 'latency: weeks' in grey and 'bandwidth: huge' in coral. On 'Add a second', an identical ship slides in behind the first; on 'the goods double', 'bandwidth: huge' becomes 'bandwidth: ×2', and on 'not the weeks', 'latency: weeks' pulses once, unchanged. Right, on 'motorbike courier': the motorbike with one parcel, tags 'latency: minutes' and 'bandwidth: tiny'. Caption: 'independent · more ships, same weeks'."
+          "say": "They're independent. A container ship takes weeks, carrying a town's goods. A second doubles the goods, not the weeks. A motorbike courier is the reverse.",
+          "show": "The lanes slide down and dim. Left: the container ship stacked with crates, tags 'latency: weeks' in grey and 'bandwidth: huge' in coral. On 'A second', an identical ship slides in behind the first; on 'doubles the goods', 'bandwidth: huge' becomes 'bandwidth: ×2', and on 'not the weeks', 'latency: weeks' pulses once, unchanged. Right, on 'motorbike courier': the motorbike with one parcel, tags 'latency: minutes' and 'bandwidth: tiny'. Caption: 'independent · more ships, same weeks'."
         },
         {
           "id": "b3",
@@ -320,8 +320,8 @@
         },
         {
           "id": "b4",
-          "say": "Each term has a ceiling. Pins switch only so fast before high and low blur. Only so many connections fit under a stack. And the package holding the stacks has edges. So memory is hard to make much faster.",
-          "show": "The result line and the stack tag dim. A dashed ceiling line drops over each coral card on its phrase. On 'switch only so fast': over card 1, a tiny voltage trace whose clean high and low edges smear together, tag 'signal integrity'. On 'connections fit under a stack': over card 2, the dense field of dots under one stack, tag 'only so many fit'. On 'the package holding the stacks': over card 3, the package outline with stacks crowding the edges; on 'has edges', tag 'package edges'. On 'hard to make much faster', the three dashed ceilings flash together and a small grey tag lands under the cards: 'why memory is hard to speed up'."
+          "say": "Each term has a ceiling. Pins switch only so fast before high and low blur. Only so many connections fit under a stack. And the package holding the stacks has edges. So memory is hard to speed up.",
+          "show": "The result line and the stack tag dim. A dashed ceiling line drops over each coral card on its phrase. On 'switch only so fast': over card 1, a tiny voltage trace whose clean high and low edges smear together, tag 'signal integrity'. On 'connections fit under a stack': over card 2, the dense field of dots under one stack, tag 'only so many fit'. On 'the package holding the stacks': over card 3, the package outline with stacks crowding the edges; on 'has edges', tag 'package edges'. On 'hard to speed up', the three dashed ceilings flash together and a small grey tag lands under the cards: 'why memory is hard to speed up'."
         },
         {
           "id": "b5",
