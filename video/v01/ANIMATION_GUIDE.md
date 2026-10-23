@@ -57,7 +57,9 @@ V.scene('ch05_s02', S => {
 | `'b3+0.4'`, `'b3-0.2'` | offset in seconds |
 | `'b3>'`, `'b3>-0.5'` | end of beat b3 |
 | `'b3@0.5'` | halfway through b3 |
-| `'b3~seventy'` | when the word "seventy…" is spoken in b3 (prefix match, ±0.2 s estimate) |
+| `'b3~seventy'` | when the word "seventy…" is spoken in b3 (first word with that prefix, ±0.2 s estimate) |
+| `'b3~every time'` | the first place the consecutive words "every… time…" are spoken (use a phrase when the first word repeats) |
+| `'b3~weight#2'` | the second occurrence of "weight…" in b3 |
 | `'end-1.5'`, `4.2` | seconds from scene start |
 
 Land a visual on the word it illustrates; start motion 0.1–0.3 s *before* the word

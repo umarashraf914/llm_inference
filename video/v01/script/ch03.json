@@ -26,7 +26,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "The model does not run on your laptop. Your question crosses the network to a server in a building somewhere, and the answer comes back.",
+          "say": "The model does not run on your laptop. Your question crosses the network to a server, and the answer comes back.",
           "show": "Laptop left, server right, the dashed line with the globe between them. On 'crosses the network', a small blue pill “your question” leaves the laptop and slides along the line, through the globe, to the server. On 'comes back', a smaller blue pill “answer” returns along the same line to the laptop. Both pills fade at the end of the beat."
         },
         {
@@ -36,13 +36,13 @@
         },
         {
           "id": "b3",
-          "say": "It sits in a data centre, a warehouse of servers, powered and cooled day and night. Everything ahead happens inside one, in a fraction of a second.",
-          "show": "Both cards fade. The camera pulls back (1.5 s): the server becomes one unit in a rack, the rack one of a long aisle, the aisle one of many inside a warehouse outline labelled “data centre”. On 'powered', a lightning-bolt icon and a power line attach to the building; on 'cooled', a fan icon on its roof turns; on 'day and night', a small sun and moon arc overhead. On 'inside one', the camera pushes back in to a single server at centre, with the laptop and line small at far left. A blue question pill arrives; a stopwatch icon above the server starts and stops almost at once, labelled “a fraction of a second”."
+          "say": "It sits in a data centre, a warehouse of servers, powered and cooled day and night. Almost everything ahead happens inside one server, in a fraction of a second.",
+          "show": "Both cards fade. The camera pulls back (1.5 s): the server becomes one unit in a rack, the rack one of a long aisle, the aisle one of many inside a warehouse outline labelled “data centre”. On 'powered', a lightning-bolt icon and a power line attach to the building; on 'cooled', a fan icon on its roof turns; on 'day and night', a small sun and moon arc overhead. On 'inside one server', the camera pushes back in to a single server at centre, with the laptop and line small at far left. A blue question pill arrives; a stopwatch icon above the server starts and stops almost at once, labelled “a fraction of a second”."
         },
         {
           "id": "b4",
-          "say": "Shared, always on, and paid for by the hour. That is production.",
-          "show": "The stopwatch label fades. Three tags stamp in under the server, one per phrase: “shared” with a people icon, “always on” with a power icon, “paid by the hour” with a clock and coin icon. On 'production', the word “production” lands above the server in white, 56 px. Everything holds to the end of the scene."
+          "say": "Shared by many, always on, and paid for by the hour. That is production.",
+          "show": "The stopwatch label fades. Three tags stamp in under the server, one per phrase, the first on 'Shared by many': “shared” with a people icon, “always on” with a power icon, “paid by the hour” with a clock and coin icon. On 'production', the word “production” lands above the server in white, 56 px. Everything holds to the end of the scene."
         }
       ]
     },
@@ -52,21 +52,21 @@
       "figs": [
         17
       ],
-      "visual": "One large rounded panel fills the centre (about x 160 to 1760, y 260 to 760), titled “The stack a request passes through” at its top left; the title fades after beat 1. Inside, four cards in a left-to-right row, Router, Scheduler, Memory manager, Kernels, joined by short arrows. Orchestration is drawn as an inner frame wrapping all four, its label along the frame's bottom edge, so there are five parts. A counter at the panel's top right reads “5 parts”. A small blue request pill travels along the row as each card is introduced, so the stack reads as the path one request takes. Cards are blue except Kernels, which is amber because it is the only one doing arithmetic. Each card's sub-label shows only while it is being spoken about and then fades, so at most the five names and one sub-label are visible at once.",
+      "visual": "One large rounded panel fills the centre (about x 160 to 1760, y 260 to 760), titled “The stack a request passes through” at its top left; the title fades after beat 1. Inside, four cards in a left-to-right row, Router, Scheduler, Memory manager, Kernels, joined by short arrows. Orchestration is drawn as an inner frame wrapping all four, its label along the frame's bottom edge, so there are five parts. A counter at the panel's top right reads “5 parts”. A small blue request pill travels along the row as each card is introduced, so the stack reads as the path one request takes. Cards are blue except Kernels, which is amber because it is the only one doing arithmetic. Each card's sub-label shows only while it is being spoken about and then fades, so at most the five names and one sub-label are visible at once. The “5 parts” counter and the “batch” tray label fade at the start of beat 2, once all five cards are named; the tray itself stays, unlabelled.",
       "beats": [
         {
           "id": "b1",
           "say": "Your request passes through five pieces of software, each solving a different problem. A router picks the machine. A scheduler batches it with other people's requests, to run together.",
-          "show": "The panel draws with its title. Five empty card outlines sketch in, four in the row and one as the inner frame; on 'five pieces', the counter “5 parts” appears. The blue request pill waits at the panel's left edge. On 'router', the panel title fades and card 1 fills blue, “Router”, with a signpost icon and sub “which machine”; three tiny server icons fan out to its right and an arrow picks the middle one. On 'scheduler', the Router sub-label fades and card 2 fills blue, “Scheduler”, with a calendar-clock icon and sub “batch with others”; the pill moves in, five more blue pills in slightly different shades drop in beside it on 'other people's requests', and on 'run together' all six snap into one tray labelled “batch”."
+          "show": "The panel draws with its title. Five empty card outlines sketch in, four in the row and one as the inner frame; on 'five pieces', the counter “5 parts” appears. The blue request pill waits at the panel's left edge. On 'router', the panel title fades and card 1 fills blue, “Router”, with a signpost icon and sub “which machine”; three tiny server icons fan out to its right and an arrow picks the middle one. On 'scheduler', the Router sub-label fades and card 2 fills blue, “Scheduler”, with a calendar-clock icon and sub “batch with others”; the pill moves in, seven more blue pills in slightly different shades drop in beside it on 'other people's requests', and on 'run together' all eight snap into one tray labelled “batch” (the same eight-pill tray returns in the crowd scene)."
         },
         {
           "id": "b2",
           "say": "A memory manager decides which weights sit on which chip. Kernels, small programs on the chip, do the arithmetic. Orchestration wires it all together.",
-          "show": "Earlier sub-labels fade. On 'memory manager', card 3 fills blue, “Memory manager”, sub “which weights, which chip”; below it two small chip icons with coral memory stacks, and coral weight tiles slide into their slots. On 'kernels', card 4 fills amber, “Kernels”, sub “the actual arithmetic”; inside it, in miniature, the picture from the multiply-and-add scene of the first chapter replays: five inputs times five weights, summed into one output, 0.8. On 'arithmetic' the miniature tiles into a dense grid that blurs with speed. On 'orchestration', the inner frame takes a faint blue tint and shows “Orchestration”, sub “wiring it together”; the connector arrows brighten left to right in sequence."
+          "show": "The “5 parts” counter and the “batch” label fade; the eight-pill tray stays under the Scheduler card, unlabelled. Earlier sub-labels fade. On 'memory manager', card 3 fills blue, “Memory manager”, sub “which weights, which chip”; below it two small chip icons with coral memory stacks, and coral weight tiles slide into their slots. On 'kernels', card 4 fills amber, “Kernels”, sub “the actual arithmetic”; inside it, in miniature, the five-row multiply-and-add picture from scene ch01_s03, beat b4 replays: five inputs times five weights (0.13, −0.7, 0.02, 1.44, −0.3), summed into one output, 0.8. On 'arithmetic' the miniature tiles into a dense grid that blurs with speed. On 'orchestration', the inner frame takes a faint blue tint and shows “Orchestration”, sub “wiring it together”; the connector arrows brighten left to right in sequence."
         },
         {
           "id": "b3",
-          "say": "Only one of the five does arithmetic. The other four exist because arithmetic is not what makes inference hard. You will see why each exists.",
+          "say": "Only one of the five does arithmetic. The other four exist because arithmetic is not the hard part. You will see why each exists.",
           "show": "Sub-labels fade. On 'only one of the five', Kernels stays bright amber while the other four dim to grey outlines. The takeaway band rises: “1 of 5 does arithmetic”. On 'why each exists', the four dimmed parts relight one at a time, each with a small question mark that turns into a tick."
         }
       ]
@@ -86,18 +86,18 @@
         },
         {
           "id": "b2",
-          "say": "Big cloud companies are spending around seven hundred billion dollars on it this year. One provider alone serves over twenty trillion tokens a day.",
-          "show": "The left tile keeps only its title and “≈ ⅔”. Centre tile, title “Hyperscaler AI capex”, sub “the biggest cloud companies”: small data-centre building icons stack row by row while a counter runs from “$0” to “$700 billion” on 'seven hundred billion dollars'. Then the centre sub-label fades and the right tile builds, title “One API's daily volume”: on 'twenty trillion', a counter rolls up to “20 trillion+” with “tokens per day” beneath; a second ticker under it spins and settles on “over 230 million per second”."
+          "say": "Big cloud companies are spending around seven hundred billion dollars on A I this year. One provider alone serves over twenty trillion tokens a day.",
+          "show": "The left tile keeps only its title and “≈ ⅔”. Centre tile, title “Big cloud firms' AI spending”, sub “buildings, power, machines” (this is building spending on A I as a whole, not the cost of inference): small data-centre building icons stack row by row while a counter runs from “$0” to “$700 billion” on 'seven hundred billion dollars'. Then the centre sub-label fades and the right tile builds, title “One provider's daily volume”: on 'twenty trillion', a counter rolls up to “20 trillion+” with “tokens per day” beneath; a second ticker under it spins and settles on “over 230 million per second”."
         },
         {
           "id": "b3",
           "say": "At that scale, every decision, from chip layout to memory tiers to scheduling, collapses into one number. Cost per token.",
-          "show": "The three tiles shrink into the top band, keeping only their headline numbers. Three thin grey lines draw downward, one per phrase, labelled “chip layout”, “memory hierarchy”, “scheduling policy”, and on 'one number' converge into a white-bordered card at centre: “cost per token”. The three line labels fade once the card lands."
+          "show": "The three tiles shrink into the top band, keeping only their headline numbers. Three thin grey lines draw downward, one per phrase, labelled with the spoken words, “chip layout”, “memory tiers”, “scheduling”, and on 'one number' converge into a white-bordered card at centre: “cost per token”. The three line labels fade once the card lands."
         },
         {
           "id": "b4",
-          "say": "Inference overtaking training is a recent inversion. The projections are uncertain; the direction is not. Serving is where the money now goes.",
-          "show": "On 'recent inversion', a balance icon left of the card tips from a pan labelled “training” to a pan labelled “inference”. On 'uncertain', a grey stamp “estimates and projections” lands across the three top tiles. On 'Serving is where', the takeaway band rises: “serving is where the money goes”. “cost per token” stays lit to the end."
+          "say": "Inference overtaking training is a recent inversion. These numbers are uncertain estimates; the direction is not. Serving is where the money now goes.",
+          "show": "On 'recent inversion', a balance icon left of the card tips from a pan labelled “training” to a pan labelled “inference”. On 'uncertain estimates', a grey stamp “estimates and projections” lands across the three top tiles. On 'Serving is where', the takeaway band rises: “serving is where the money goes”. “cost per token” stays lit to the end."
         }
       ]
     },
@@ -107,7 +107,7 @@
       "figs": [
         19
       ],
-      "visual": "Top two thirds: a field where small blue squares, each one a conversation, pop in at seeded random positions and moments, then drift down along converging arrows into one box at bottom centre, “one set of machines”, drawn as three server icons inside a single outline. Heading “Production traffic: everyone at once” at the top (y about 150, starting right of x 440). In beat 3 the batch tray enlarges into the middle of the frame as eight lanes running left to right on a time axis, one lane per conversation in the batch; later in the same beat the lanes morph into a dot plot. The long request is violet, as a contrast; waiting is grey hatching. The idea: many unpredictable arrivals share one set of machines, which is both the economic win and the reason the worst case matters.",
+      "visual": "Top two thirds: a field where small blue squares, each one a conversation, pop in at seeded random positions and moments, then drift down along converging arrows into one box at bottom centre, “one set of machines”, drawn as three server icons inside a single outline. Heading “Production traffic: everyone at once” at the top (y about 150, starting right of x 440). In beat 3 the batch tray enlarges into the middle of the frame as eight lanes running left to right on a time axis, one lane per conversation in the batch; later in the same beat the lanes morph into a dot plot. The long request is violet, as a contrast; waiting is grey hatching. The scene ends, at the close of beat 4, on the crowd field alone, frozen and dimmed, which is the frame the next scene opens on. The idea: many unpredictable arrivals share one set of machines, which is both the economic win and the reason the worst case matters.",
       "beats": [
         {
           "id": "b1",
@@ -117,17 +117,17 @@
         {
           "id": "b2",
           "say": "That crowd makes the economics work. Run together, each conversation costs less, and much of this film explains why.",
-          "show": "Squares near the box group into a tray of eight, the same “batch” tray from the software stack, and enter together. A small meter beside the box labelled “cost per token” ticks downward as each fuller tray goes in (schematic, no numbers)."
+          "show": "Squares near the box group into a tray of eight, the same eight-pill “batch” tray from the software stack (shown here as squares), and enter together. A small meter beside the box labelled “cost per token” ticks downward as each fuller tray goes in (schematic, no numbers)."
         },
         {
           "id": "b3",
-          "say": "But one slow request in the shared batch holds back everyone's next token. So the measurements near the end judge the worst case, not the average.",
-          "show": "The field and its heading dim. The tray grows into eight lanes across the middle, left to right, axis labelled “time”. In step, every lane emits a small blue next-token pill, then another. On 'one slow request', lane 3 turns violet and its step stretches into a long bar labelled “long request”. On 'holds back', the next pill of every other lane stalls, and each of the seven lanes grows a grey hatched segment; one label, “waiting”, sits on the first of them. On 'So the measurements', the lanes morph into a dot plot on a horizontal axis labelled “time to answer”, tagged “schematic”. Thirty dots cluster at the left; two sit far to the right. A tick labelled “average” lands inside the cluster. On 'worst case', a second tick labelled “worst case” lands at the far-right dots and brightens, and “average” dims."
+          "say": "But one slow request in a batch holds back everyone's next token. Averages hide rare delays, so the measurements near the film's end judge the worst case.",
+          "show": "The field and its heading dim. The tray grows into eight lanes across the middle, left to right, axis labelled “time”. In step, every lane emits a small blue next-token pill, then another. On 'one slow request', lane 3 turns violet and its step stretches into a long bar labelled “long request”. On 'holds back', the next pill of every other lane stalls, and each of the seven lanes grows a grey hatched segment; one label, “waiting”, sits on the first of them. On 'Averages hide', the lanes morph into a dot plot on a horizontal axis labelled “time to answer”, tagged “schematic”. Thirty dots cluster at the left; two sit far to the right. A tick labelled “average” lands inside the cluster, where the two far dots barely move it. On 'worst case', a second tick labelled “worst case” lands at the far-right dots and brightens, and “average” dims."
         },
         {
           "id": "b4",
           "say": "Add one word to production: concurrent. Shared, concurrent, and paid for, unlike running a model once on your own machine.",
-          "show": "The dot plot dims. On 'concurrent', the word “concurrent” stamps at top centre, brightest; on the repeat, “shared” and “paid for” stamp either side of it. On 'your own machine', a small inset at bottom right shows a laptop with a single user, labelled “once, on your own machine”, then greys out."
+          "show": "The dot plot dims. On 'concurrent', the word “concurrent” stamps at top centre, brightest; on the repeat, “shared” and “paid for” stamp either side of it. On 'your own machine', a small inset at bottom right shows a laptop with a single user, labelled “once, on your own machine”, then greys out. In the last second of the beat the three stamps, the dimmed dot plot and the inset fade away, and the crowd field from beat 1 returns, its squares frozen and dimmed, without its heading; the scene ends on that frame."
         }
       ]
     },
@@ -137,17 +137,17 @@
       "figs": [
         20
       ],
-      "visual": "First frame: a rebuilt copy of the previous scene's crowd field (same seeded squares, frozen and dimmed), so the cut reads as continuous; the camera zooms on one square, which unfolds into the main panel. Upper left (x 440 to 1100, y 160 to 520): an envelope-style panel “What arrives at the server” with three compartments. Upper right (about x 1350 to 1750): a coral block “model” (the weights) with a small dashed box beside it labelled “remembers:”. Lower half, from beat 3: a ladder of horizontal bars, one row per conversation turn, row labels in a column at x 96 to 270, every bar starting from one baseline at x 300 and drawn to scale at 0.6 px per token (turn 1 = 12 px, turn 2 = 144 px, turn 3 = 276 px, turn 10 = 1,200 px, ending at x 1500). Earlier conversation in mid blue, each turn's new question as a bright blue segment at the right end, values to the right of each bar. The idea: a request carries the whole history every time, so it grows turn after turn.",
+      "visual": "First frame: a rebuilt copy of the previous scene's crowd field (same seeded squares, frozen and dimmed), so the cut reads as continuous; the camera zooms on one square, which unfolds into the main panel. Upper left (x 440 to 1100, y 160 to 520): an envelope-style panel “What arrives at the server” with three compartments. Upper right (about x 1350 to 1750), from beat 2, not before: a coral block “model” (the weights) with a small dashed box beside it labelled “remembers:”. In beat 1 the panel title fades once the first compartment fills, so the three compartments and the two spinner labels are the only text. Lower half, from beat 3: a ladder of horizontal bars, one row per conversation turn, row labels in a column at x 96 to 270, every bar starting from one baseline at x 300 and drawn to scale at 0.6 px per token (turn 1 = 12 px, turn 2 = 144 px, turn 3 = 276 px, turn 10 = 1,200 px, ending at x 1500). Earlier conversation in mid blue, each turn's new question as a bright blue segment at the right end, values to the right of each bar. The idea: a request carries the whole history every time, so it grows turn after turn.",
       "beats": [
         {
           "id": "b1",
-          "say": "One request carries the conversation so far, the new question, and a few settings, like how random the draw should be.",
-          "show": "On 'One request', the camera zooms on one square; it unfolds into the panel “What arrives at the server”. Compartments fill on each phrase: “the conversation so far” (blue, left), “the new question” (bright blue, right), and below them, full width, “settings: how long, how random, when to stop” (grey) with ruler, spinner and stop-sign icons. On 'how random the draw', the spinner from the first chapter slides in beside the settings strip, slices to scale: cat 268 degrees labelled “cat 74.5%”, dog 89 degrees labelled “dog 24.8%”, two hairline slivers. It spins once and lands on dog."
+          "say": "One request carries the conversation so far, the new question, and settings, like how random the draw should be.",
+          "show": "On 'One request', the camera zooms on one square; it unfolds into the panel “What arrives at the server”. The upper right stays empty. Compartments fill on each phrase, and the panel title fades as the first one fills: “the conversation so far” (blue, left), “the new question” (bright blue, right), and below them, full width, “settings: how long, how random, when to stop” (grey) with ruler, spinner and stop-sign icons. On 'how random the draw', the sampling spinner from scene ch01_s08 (beats b2 and b3) slides in beside the settings strip, slices to scale: cat 268 degrees labelled “cat 74.5%”, dog 89 degrees labelled “dog 24.8%”, two hairline slivers. It spins once and lands on dog."
         },
         {
           "id": "b2",
           "say": "The surprise: the whole conversation is re-sent every time, because the model remembers nothing between requests. That is called stateless.",
-          "show": "The spinner fades. On 're-sent every time', the whole panel folds into one parcel and travels into the model block. On 'remembers nothing', the dashed box beside the model visibly empties and reads “remembers: nothing”. On 'stateless', the word “stateless” appears under the model in white."
+          "show": "The spinner fades, and the coral block “model” draws in at upper right with its dashed box “remembers:”. On 're-sent every time', the whole panel folds into one parcel and travels into the model block. On 'remembers nothing', the dashed box beside the model visibly empties and reads “remembers: nothing”. On 'stateless', the word “stateless” appears under the model in white."
         },
         {
           "id": "b3",
@@ -156,8 +156,8 @@
         },
         {
           "id": "b4",
-          "say": "So a long conversation means a long input every turn, which later explains why one cost keeps growing: a hardware problem, not bookkeeping.",
-          "show": "Ghost rows for later turns extend past the right edge of the frame and fade. On 'one cost keeps growing', a small upward arrow with a “?” appears beside the ladder, to be answered later. On 'hardware problem', the takeaway band rises: “conversation length → hardware problem”."
+          "say": "So a long conversation means a long input every turn. Length becomes a hardware problem, not bookkeeping, and later explains a growing cost.",
+          "show": "Ghost rows for later turns extend past the right edge of the frame and fade. On 'hardware problem', the takeaway band rises: “conversation length → hardware problem”. On 'growing cost', a small upward arrow with a “?” appears beside the ladder, to be answered later."
         }
       ]
     },
@@ -171,7 +171,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Services also put their own text at the start, the system prompt, where whoever runs them says how the assistant should behave.",
+          "say": "Services also put their own text first, the system prompt, where whoever runs them says how the assistant should behave.",
           "show": "Upper left: a building icon labelled “operator”; beside it a document card titled “system prompt” with one grey line of example text, “You are a helpful assistant…”. The card's title brightens on 'the system prompt'."
         },
         {
@@ -198,37 +198,37 @@
         22,
         23
       ],
-      "visual": "Beats 1 and 2: two tall question cards side by side across the upper half, left “Does it reach the context?”, right “Does it cross the network from your device?”, both blue. From beat 3 both cards shrink away and the frame splits. Left third (x 96 to 620): three shelves stacked top to bottom, each a card with an icon: a laptop (your device), a server with a person badge (the server, for you), a server with a globe badge (the server, for everyone). Each shelf's title shows while it is spoken about, then shrinks to its icon badge, leaving icons and pills. Right two thirds (x 700 to 1824): a horizontal strip “one assembled prompt” into which pills fly from the shelves. Far right, from beat 5: the small “model / remembers: nothing” block from the stateless scene, and below it a server icon with a teal-outlined tray “kept work”. In beats 5 and 6 the strip lifts and two more strips stack beneath it for comparison; comparison strips use the same colour-coded pills without text, keyed to the labelled top strip. Pills blue, the reusable prefix teal. The idea: where text is stored varies, where it ends up never does, and its order is chosen so that requests share the longest possible beginning.",
+      "visual": "Beats 1 and 2: two tall question cards side by side across the upper half, left “Does it reach the context?”, right “Does it cross the network from your device?”, both blue. From beat 3 both cards shrink away and the frame splits. Left third (x 96 to 620): three shelves stacked top to bottom, each a card with an icon: a laptop (your device), a server with a person badge (the server, for you), a server with a globe badge (the server, for everyone). Each shelf's title shows while it is spoken about, then shrinks to its icon badge, leaving icons and pills. Right two thirds (x 700 to 1824): a horizontal strip “one assembled prompt” into which pills fly from the shelves. Far right, from beat 5: the small “model / remembers: nothing” block from the stateless scene, and below it a server icon with a teal-outlined tray “kept work”. In beats 5 and 6 the strip lifts and two more strips stack beneath it for comparison (in beat 6 the model block and tray fade out, freeing the right edge so the longer “your next turn” strip can run to x 1800); comparison strips use the same colour-coded pills without text, keyed to the labelled top strip. Pills blue, the reusable prefix teal. The idea: where text is stored varies, where it ends up never does, and its order is chosen so that requests share the longest possible beginning.",
       "beats": [
         {
           "id": "b1",
-          "say": "Two questions get confused. Does this text reach the context? For the system prompt and everything like it, yes, every turn. The architecture forces it.",
-          "show": "Left card draws: title “Does it reach the context?”, sub “always yes, every turn”. Three small pills sit inside it, “system prompt”, “tool definitions”, “loaded skill”, each getting a tick in turn. On 'forces it', the sub swaps to “forced by the architecture”."
+          "say": "Two questions get confused. Does the system prompt reach the context? Yes, every turn, as do the tools and skills coming next. The architecture forces it.",
+          "show": "Left card draws: title “Does it reach the context?”, sub “always yes, no exceptions”. Three small pills sit inside it, “system prompt”, “tool definitions”, “loaded skill”; on 'Yes', “system prompt” gets a tick; on 'tools' and 'skills' the other two pills tick in turn (no extra labels: the next two scenes teach them). On 'forces it', the sub swaps to “forced by the architecture”."
         },
         {
           "id": "b2",
           "say": "Does it cross the network from your device? That varies. It is a product decision about storage.",
-          "show": "The left card dims and its three pills collapse into a single tick. The right card draws: title “Does it cross the network from your device?”, sub “that varies”, with a small network-line icon that flickers between solid and dashed. On 'product decision', the sub swaps to “product decision: where it is stored”."
+          "show": "The left card dims and its three pills collapse into a single tick labelled “already settled”. The right card draws: title “Does it cross the network from your device?”, sub “that varies”, with a small network-line icon that flickers between solid and dashed. On 'product decision', the sub swaps to “product decision: where it is stored”, and the left card, already settled, fades out completely, leaving this as the only question on screen."
         },
         {
           "id": "b3",
-          "say": "Three places. Your device, like a developer's system prompt, sent with every call. The server, for you, like project files or custom instructions, your standing notes. Or the server, for everyone, like the provider's prompt.",
-          "show": "Both cards shrink and fade. Shelves draw top to bottom, one per phrase. Shelf 1, laptop icon, title “On your device”, pill “developer's system prompt”; on 'every call', a dashed network line runs right from the laptop and a copy of the pill rides it out three times. Shelf 2, server with person badge, title “On the server, for you”, pills “project files” and “custom instructions”. Shelf 3, server with globe badge, title “On the server, for everyone”, pill “provider's system prompt”; as it lands, a small crossed-out arrow appears between the laptop and this pill, labelled “never sent by you”. Each shelf title shrinks to its icon once the next shelf starts."
+          "say": "Three places. Your device, like a developer's system prompt, sent with every call. The server, for you, like project files or custom instructions. Or the server, one copy for everyone, like the provider's prompt.",
+          "show": "Both cards shrink and fade. Shelves draw top to bottom, one per phrase. Shelf 1, laptop icon, title “On your device”, pill “developer's system prompt”; on 'every call', a dashed network line runs right from the laptop and a copy of the pill rides it out three times. Shelf 2, server with person badge, title “On the server, for you”, pills “project files” and “custom instructions”. Shelf 3, server with globe badge, title “On the server, for everyone”, sub “one copy, shared by all” on 'one copy', pill “provider's system prompt”; as it lands, a small crossed-out arrow appears between the laptop and this pill, labelled “never sent by you”. Each shelf title shrinks to its icon once the next shelf starts."
         },
         {
           "id": "b4",
-          "say": "All three are glued into one prompt, in a fixed order: most shared first, then yours, the conversation, your newest message. Same destination, same cost to read in. Only the storage varies.",
-          "show": "On the right, the strip “one assembled prompt” draws; its title fades once the first pill lands. Pills fly in, one per phrase, landing left to right: “provider's system prompt” leaves shelf 3, “your instructions” leaves shelf 2, then “conversation so far”, then “newest message”. A grey arrow under the strip: “most shared → most specific”. On 'same destination', the arrow label fades and the developer's pill from shelf 1 ghosts over the first slot at exactly the same length, and a small label reads “same tokens, same work”. On 'only the storage varies', three thin arrows run from the three shelf icons into the one strip, the ghost and its label fade, and the takeaway band rises: “storage varies, destination never does”."
+          "say": "All three are glued into one prompt, in a fixed order: most shared first, then yours, the conversation, your newest message. A developer's prompt or the provider's: same destination, same cost. Only the storage varies.",
+          "show": "On the right, the strip “one assembled prompt” draws; its title fades once the first pill lands. Pills fly in, one per phrase, landing left to right: “provider's system prompt” leaves shelf 3, “your instructions” leaves shelf 2, then “conversation so far”, then “newest message”. A grey arrow under the strip: “most shared → most specific”. On 'A developer's prompt', the arrow label fades and the developer's pill from shelf 1 ghosts over the first slot at exactly the same length; on 'same destination', a small label reads “same tokens, same work”. On 'only the storage varies', three thin arrows run from the three shelf icons into the one strip, the ghost and its label fade, and the takeaway band rises: “storage varies, destination never does”."
         },
         {
           "id": "b5",
-          "say": "The order matters. The model remembers nothing, but the server may briefly keep work already done on text it has seen. The next chapter shows what.",
-          "show": "The arrow label, the takeaway and the shelf arrows fade. The strip lifts and is labelled “your request”. On 'remembers nothing', the small model block with “remembers: nothing” appears at the far right. On 'briefly keep work', below it a server icon fills its teal-outlined tray “kept work” with a faint teal copy of the strip's first pills, a small clock on the tray. On 'next chapter', the tray gains a small tag “→ next chapter”."
+          "say": "The order matters. The model remembers nothing, but the server may briefly keep a running record of work done on text it has seen. The next chapter shows what.",
+          "show": "The arrow label, the takeaway and the shelf arrows fade. The strip lifts and is labelled “your request”. On 'remembers nothing', the small model block with “remembers: nothing” appears at the far right. On 'running record', below it a server icon fills its teal-outlined tray “kept work” with a faint teal copy of the strip's first pills, a small clock on the tray. On 'next chapter', the tray gains a small tag “→ next chapter”."
         },
         {
           "id": "b6",
           "say": "It reuses that work only for a beginning identical token for token, called a prefix. Most shared first makes the prefix longest. Newest first, and nothing matches.",
-          "show": "The model block and tray dim. Pill text stays only on the top strip. A second strip, “a stranger's request”, slides in under the first: same first pill, different later ones, colour-coded pills without text. On 'token for token', a teal highlight sweeps from the left across both strips and stops exactly where they first differ, at the end of the provider's system prompt; label over the teal: “prefix”. On 'most shared first', a third strip, “your next turn”, appears; teal sweeps through provider prompt, your instructions and conversation, stopping at the new message. On 'newest first', every strip reshuffles so its newest message jumps to the front, every teal highlight collapses to zero width, and a grey label reads “nothing matches”; then the strips snap back and the teal returns."
+          "show": "The model block and tray fade out. Pill text stays only on the top strip, “your request”. A second strip, “a stranger's request”, slides in under the first: same first pill, different later ones, colour-coded pills without text. On 'token for token', a teal highlight sweeps from the left across both strips and stops on both exactly where they first differ, at the end of the provider's system prompt; label over the teal: “prefix”. On 'most shared first', the “prefix” label fades, the stranger's strip dims (keeping its short teal) and its label fades, and a third strip, “your next turn”, appears under it, longer than the top strip and running to x 1800: provider prompt, your instructions, conversation so far, your previous newest message, the answer to it, then a new message. A second teal sweep runs along “your request” and “your next turn” together. On “your request” it now covers the full length, because every token of it is repeated at the start of your next turn. On “your next turn” it covers everything through the old message and the answer, and stops only at the new message. A small teal tag sits at the end of that strip: “matches further”. On 'newest first', every strip reshuffles so its newest message jumps to the front, every teal highlight collapses to zero width, and a grey label reads “nothing matches”; then the strips snap back and the teal returns."
         }
       ]
     },
@@ -242,7 +242,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "A tool is something the model can ask to have done. Its description, meaning its name, inputs and output, is text in the context. Its code never is.",
+          "say": "A tool is something the model can ask to have done. Its description, its name, inputs and output, is text in the context. Its code never is.",
           "show": "Heading: “For a tool, two very different things exist”. A wrench icon at centre splits into two cards. Left “The description” with three short lines, “name: get_weather”, “arguments (inputs): city”, “returns: temperature”; on 'text in the context', it shrinks to a pill and drops into the blue context strip. Right “The implementation”, a code-file icon and “the code that actually runs”; on 'never is', a vertical wall draws between it and the strip, labelled “never enters the context”."
         },
         {
@@ -252,12 +252,12 @@
         },
         {
           "id": "b3",
-          "say": "The code can live anywhere, even in a plugin, a bundle of tools and skills. The model never sees a line, only enough description to call it.",
-          "show": "On 'anywhere', the code card slides onto a server icon and a copy onto a laptop icon. On 'a plugin', a box labelled “plugin” wraps three small wrench icons and one puzzle-piece icon, and its code stays behind the same wall. On 'never sees a line', a crossed-out eye icon appears over the code side of the wall. On 'enough description', the description pill in the strip gets a soft highlight and the label “enough to call it”."
+          "say": "The code can live anywhere, even in a plugin, a bundle of tools. The model never sees a line, only enough description to call it.",
+          "show": "On 'anywhere', the code card slides onto a server icon and a copy onto a laptop icon. On 'a plugin', a box labelled “plugin” wraps three small wrench icons (tools only for now; skills join it in the next scene), and its code stays behind the same wall. On 'never sees a line', a crossed-out eye icon appears over the code side of the wall. On 'enough description', the description pill in the strip gets a soft highlight and the label “enough to call it”."
         },
         {
           "id": "b4",
-          "say": "A long description costs tokens every turn. A thousand lines of code cost none. That distinction makes tools affordable: the expensive part is documentation, not behaviour.",
+          "say": "A long description costs tokens every turn. A thousand lines of code cost none. That makes tools affordable: the expensive part is documentation, not behaviour.",
           "show": "Two meters appear side by side in the upper centre, where the cards were. Left, “long description”: a token counter that steps up on each tick of “turn 1, 2, 3”. Right, “1,000 lines of code”: counter fixed at “0 tokens”, in teal, on 'cost none'. On 'documentation, not behaviour', the takeaway band rises: “cost: documentation, not behaviour”; the description pill glows and the code card stays dim behind its wall."
         }
       ]
@@ -288,7 +288,7 @@
         {
           "id": "b4",
           "say": "Load only the one you need: twelve hundred plus two thousand is thirty-two hundred, twenty-five times less. Plugins work the same way.",
-          "show": "The “40 × 30” equation and its tag fade. On 'twelve hundred plus two thousand', on the row under the 80,000 block (y 790), a thin teal bar draws to the same scale, 25.6 px, as “1,200 + 2,000 = 3,200” builds beside it. On 'twenty-five times less', a bracket compares the two bars: “25× smaller”. On 'plugins', the plugin box from the tools scene returns at upper right, wrapping a few puzzle-piece pills and one wrench pill, with two labels: “catalogue: cheap”, “contents: on demand”."
+          "show": "The “40 × 30” equation and its tag fade. On 'twelve hundred plus two thousand', on the row under the 80,000 block (y 790), a thin teal bar draws to the same scale, 25.6 px, as “1,200 + 2,000 = 3,200” builds beside it. On 'twenty-five times less', a bracket compares the two bars: “25× smaller”. On 'plugins', the plugin box from the tools scene returns at upper right, its wrench pills now joined by a few puzzle-piece pills, so it reads as a bundle of tools and skills, with two labels: “catalogue: cheap”, “contents: on demand”."
         },
         {
           "id": "b5",
@@ -303,27 +303,27 @@
       "figs": [
         27
       ],
-      "visual": "A horizontal bar chart drawn to scale, 2,000 tokens = 500 px. Four rows at y about 300, 380, 460 and 540: labels right-aligned in a column ending at x 400, bars from a common baseline at x 420 (the longest ends at x 920), values to the right of each bar. Rows in the assembled order from the three-places scene, most shared first: provider's system prompt (globe badge), tool definitions, your custom instructions (person badge), one loaded skill. In beat 2 the labels fade and the bars slide end to end into one stacked bar, re-anchored at x 140 and y 680, 1,187.5 px long, ending at x 1,327.5. A dashed ghost on its own line below it (y 750), from x 1,327.5 to 1,627.5 (300 px), shows a 40-skill catalogue this setup does not list. A 5 px bright blue sliver for the user's 20-token question sits just right of the stacked bar, at x 1,336. In beat 3 a context-window outline appears in the lower band (y 860), the same scale as the skills scene, 1,600 px = 200,000 tokens from x 160 to 1760, where the 4,750-token preamble is 38 px; the turn counter and a small coin stack sit at top right. Bars blue. The idea: the preamble in front of your first word dwarfs what you type, and you pay for all of it every turn.",
+      "visual": "A horizontal bar chart drawn to scale, 2,000 tokens = 500 px. Four rows at y about 300, 380, 460 and 540: labels right-aligned in a column ending at x 400, bars from a common baseline at x 420 (the longest ends at x 920), values to the right of each bar. Rows in the assembled order from the three-places scene, most shared first: provider's system prompt (globe badge), tool definitions, your custom instructions (person badge), one loaded skill. In beat 2 the labels fade and the bars slide end to end into one stacked bar, re-anchored at x 140 and y 680, 1,187.5 px long, ending at x 1,327.5. A dashed ghost on its own line below it (y 750), from x 1,327.5 to 1,627.5 (300 px), shows a 40-skill catalogue this setup does not list; it is on screen exactly while 'before any catalogue' is spoken. A 5 px bright blue sliver for the user's 20-token question sits just right of the stacked bar, at x 1,336. In beat 3 a context-window outline appears in the lower band (y 860), the same scale as the skills scene, 1,600 px = 200,000 tokens from x 160 to 1760, where the 4,750-token preamble is 38 px; the turn counter and a small coin stack sit at top right. Bars blue. The idea: the preamble in front of your first word dwarfs what you type, and you pay for all of it every turn.",
       "beats": [
         {
           "id": "b1",
           "say": "Now total the preamble, everything in front of your first word: the provider's prompt, tool definitions, your custom instructions, one loaded skill.",
-          "show": "Heading “What sits in front of your first word”, with a small tag “the preamble” on 'the preamble'; the heading fades as the first row grows, the tag stays. Each row grows on its phrase, with its value: “provider's system prompt”, globe badge, 500 px, “2,000”; “tool definitions”, 112.5 px, “450”; “your custom instructions”, person badge, 75 px, “300”; “one loaded skill”, 500 px, “2,000”."
+          "show": "Heading in two lines, “What sits in front of your first word” / “and who put it there”, with a small tag “the preamble” on 'the preamble'; the heading fades as the first row grows, the tag stays, and the globe and person badges on the rows carry the “who”. Each row grows on its phrase, with its value: “provider's system prompt”, globe badge, 500 px, “2,000”; “tool definitions”, 112.5 px, “450”; “your custom instructions”, person badge, 75 px, “300”; “one loaded skill”, 500 px, “2,000”."
         },
         {
           "id": "b2",
-          "say": "Four thousand seven hundred and fifty tokens, nearly two hundred and forty times a twenty-token question.",
-          "show": "A rule line draws. The row labels fade and the four bars slide end to end, keeping their values, into the stacked bar at x 140, labelled “total 4,750 tokens” as its counter runs. For a moment the dashed ghost line below it shows, with its label beneath it, “+1,200 if 40 skills were listed”, then fades. On 'two hundred and forty', the 5 px bright blue sliver appears just right of the total, labelled below it “your question ≈ 20”, and a bracket above both reads “≈ 240×”."
+          "say": "Four thousand seven hundred and fifty tokens, before any catalogue, nearly two hundred and forty times a twenty-token question.",
+          "show": "A rule line draws. The row labels fade and the four bars slide end to end, keeping their values, into the stacked bar at x 140, labelled “total 4,750 tokens” as its counter runs. On 'before any catalogue', the dashed ghost line below it shows, with its label beneath it, “+1,200 if 40 skills were listed”; it holds for that whole clause, then fades. On 'two hundred and forty', the 5 px bright blue sliver appears just right of the total, labelled below it “your question ≈ 20”, and a bracket above both reads “≈ 240×”."
         },
         {
           "id": "b3",
-          "say": "None of it is in your message, yet every turn it fills your window, and you pay to have it read in, then looked back over for each answer token.",
-          "show": "A counter “turn 1, 2, 3…” ticks at top right. In the lower band the context-window outline draws, “context window: 200,000 tokens”; on each tick the preamble's 38 px block re-fills its left end and a coin drops onto the small stack beside the counter. On 'read in', a sweep runs left to right across the stacked bar. On 'looked back over', answer tokens appear one by one right of the question sliver; for each, a faint arc reaches back over the whole preamble. Small label: “attention, later”."
+          "say": "None of it is in your message, yet every turn it counts against your window, and you pay for reading it in, then looking back over it for each answer token.",
+          "show": "A counter “turn 1, 2, 3…” ticks at top right. On 'counts against your window', the context-window outline draws in the lower band, “context window: 200,000 tokens”, mostly empty; on each tick the preamble's 38 px block re-fills only its left end, a small slice, and a coin drops onto the small stack beside the counter. On 'reading it in', a sweep runs left to right across the stacked bar. On 'looking back over', answer tokens appear one by one right of the question sliver; for each, a faint arc reaches back over the whole preamble. Small label: “attention, later”."
         },
         {
           "id": "b4",
-          "say": "These figures are illustrative; the shape is not. Where it is stored is invisible to you. Token count is not, and the preamble is almost always the largest thing in the request.",
-          "show": "The turn counter, the window outline, the coin stack and “attention, later” fade. On 'illustrative', a grey stamp “illustrative” lands across the chart. On 'where it is stored', the globe and person badges on the stacked bar pulse once and the caption “storage: invisible to you” appears under the bar; on 'token count', a second caption stacks under it, “token count: not”. The preamble bar stays dominant, the tiny question sliver at its end."
+          "say": "These figures are illustrative; the shape is not. Storage is invisible to you. Token count is not, and the preamble is almost always the largest thing in the request.",
+          "show": "The turn counter, the window outline, the coin stack and “attention, later” fade. On 'illustrative', a grey stamp “illustrative” lands across the chart. On 'Storage', the globe and person badges on the stacked bar pulse once and the caption “storage: invisible to you” appears under the bar; on 'token count', a second caption stacks under it, “token count: not”. The preamble bar stays dominant, the tiny question sliver at its end."
         }
       ]
     }
@@ -423,6 +423,16 @@
       "claim": "preamble against a 20-token question: 4,750 / 20 = 237.5, said 'nearly two hundred and forty times', shown '≈ 240×'",
       "python": "4750/20",
       "result": "237.5"
+    },
+    {
+      "claim": "s10 says the preamble 'counts against your window', not 'fills' it: 4,750 of a 200,000-token window is 2.4%, which is why its block is only 38 of 1,600 px",
+      "python": "4750/200000*100",
+      "result": "2.375"
+    },
+    {
+      "claim": "s07 b6 'your next turn' matches further than a stranger's request: with Example B's shapes (CHAPTER_NOTES), a 770-token preamble + 7-token question + 7-token answer is all reused next turn, hit 784, and only the new message is processed",
+      "python": "770+7+7",
+      "result": "784"
     }
   ]
 }

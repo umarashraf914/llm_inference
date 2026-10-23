@@ -21,17 +21,17 @@
       "figs": [
         109
       ],
-      "visual": "Dark stage. Top-left corner throughout: a small GPU package illustration (compute die with HBM stacks beside it) and a coral bus, label '140 GB per pass'. The rest of the frame holds two wide rounded blue lanes, one above the other: top 'Prefill', bottom 'Decode'. In each lane the left half holds a row of token pills and the right half holds the model as a compact vertical stack of about ten thin blue layer slabs. One shared grey tag '80 layers' sits at the right edge between the two stacks. Prompt tokens are solid blue pills 't1' to 't8'; answer tokens are blue pills with a white outline, from 't9'. Slabs flash amber while they do arithmetic on a passing token. The idea the motion makes visible: in the top lane all eight pills climb the stack together, once; in the bottom lane one pill climbs, a new pill pops out of the top, and the loop runs again, one full pass per token.",
+      "visual": "Dark stage. Top-left corner throughout: a small GPU package illustration (compute die with HBM stacks beside it) and a coral bus, label '140 GB per pass'. The rest of the frame holds two wide rounded blue lanes, one above the other: top 'Prefill', bottom 'Decode'. Each lane's subtitle later writes on after its title on the same line, so title and subtitle read as one label. In each lane the left half holds a row of token pills and the right half holds the model as a compact vertical stack of about ten thin blue layer slabs. One shared grey tag '80 layers' sits at the right edge between the two stacks. Prompt tokens are solid blue pills 't1' to 't8'; answer tokens are blue pills with a white outline, from 't9'. Slabs flash amber while they do arithmetic on a passing token. The idea the motion makes visible: in the top lane all eight pills climb the stack together, once; in the bottom lane one pill climbs, a new pill pops out of the top, and the loop runs again, one full pass per token.",
       "beats": [
         {
           "id": "b1",
-          "say": "Every forward pass, all hundred and forty gigabytes of weights cross the bus. A request spends its passes in two very different phases.",
+          "say": "Every forward pass, all hundred and forty gigabytes cross the bus. A request's passes come in two very different phases.",
           "show": "The GPU package fades up top-left; coral particles stream along its bus under '140 GB per pass'. On 'two very different phases', both empty lanes draw on with their titles 'Prefill' and 'Decode' only."
         },
         {
           "id": "b2",
-          "say": "First, prefill, reading the prompt in. Here, eight tokens climb the eighty layers together, every position through every layer, in parallel.",
-          "show": "Top lane subtitle writes on: 'the whole prompt at once'. On 'eight tokens', pills 't1' to 't8' slide into the left half one after another; a small grey note under them: 'real prompts: thousands'. The slab stack and the shared '80 layers' tag draw on. On 'together', all eight pills lift as one front and climb; each slab flashes amber as the front passes, bottom to top. Caption under the row: 'every position, every layer, in parallel'."
+          "say": "First, prefill, reading the prompt in. All eight tokens climb the eighty layers together, in parallel.",
+          "show": "The top lane's title extends: 'Prefill · the whole prompt at once'. On 'eight tokens', pills 't1' to 't8' slide into the left half one after another; a small grey note under them: 'real prompts: thousands'. The slab stack and the shared '80 layers' tag draw on. On 'together', all eight pills lift as one front and climb; each slab flashes amber as the front passes, bottom to top. Caption under the row: 'every position, every layer, in parallel'."
         },
         {
           "id": "b3",
@@ -40,13 +40,13 @@
         },
         {
           "id": "b4",
-          "say": "Then decode: each new token pays for its own full trip through all eighty layers, again and again, until the stop token or a length limit.",
-          "show": "The top lane's caption and 'ready to generate' tag dim to 40%. Bottom lane subtitle writes on: 'one token at a time'. 't9' drops into the bottom lane's row and climbs its stack alone, every slab flashing for this one pill; 't10' pops out of the top. On 'again and again', 't10' climbs and 't11' appears, then 't11' climbs and 't12' appears; a small counter in the lane corner reads 'passes: 1, 2, 3'. On 'stop token', a grey pill 'stop' pops out and the slabs go dark; a small ruler icon 'length limit' sits beside it."
+          "say": "Then decode: each new token pays for its own full trip through the model, again and again, until a stop token or length limit.",
+          "show": "The top lane's caption 'every position, every layer, in parallel', the note 'real prompts: thousands' and the 'ready to generate' tag fade out; the top lane's title line, pills and stack stay. The bottom lane's title extends: 'Decode · one token at a time'. 't9' drops into the bottom lane's row and climbs its stack alone, every slab flashing for this one pill; 't10' pops out of the top. On 'again and again', 't10' climbs and 't11' appears, then 't11' climbs and 't12' appears; a small counter in the lane corner reads 'passes: 1, 2, 3'. On 'stop token', a grey pill 'stop' pops out and the slabs go dark; a small ruler icon 'length limit' sits beside it."
         },
         {
           "id": "b5",
           "say": "Same chip, same weights, same code. What differs is how many tokens share each load of the weights.",
-          "show": "The small captions and tags from beats 2 to 4 fade out; titles, pills and stacks stay. On 'Same chip, same weights, same code', one grey line appears between the lanes: 'same chip · same weights · same code'. On 'each load', a single coral pulse leaves the HBM icon and enters both stacks: in the top lane it fans into eight thin lines, label '1 load : 8 tokens'; in the bottom lane it reaches one pill, label '1 load : 1 token'. The grey line is replaced by white 'how many tokens share each load'."
+          "show": "The 'passes' counter, the 'length limit' tag, the '80 layers' tag and the '140 GB per pass' label fade out; the two title lines, pills and stacks stay. On 'Same chip, same weights, same code', one grey line appears between the lanes: 'same chip · same weights · same code'. On 'each load', a single coral pulse leaves the HBM icon and enters both stacks: in the top lane it fans into eight thin lines, label '1 load : 8 tokens'; in the bottom lane it reaches one pill, label '1 load : 1 token'. The grey line is replaced by white 'how many tokens share each load'."
         }
       ]
     },
@@ -56,22 +56,22 @@
       "figs": [
         110
       ],
-      "visual": "Left two-thirds: two rows of pills. Top row, heading 'Prefill: the prompt already exists': eight solid blue pills 't1' to 't8'. Bottom row, heading 'Decode: each waits for the last': an outlined pill 't9', then dashed empty slots 't10', 't11', 't12'. Right third: a square grid of about two thousand tiny grey dots, the GPU's arithmetic units, labelled 'thousands of workers', with a grey corner tag 'schematic'. Dots turn amber when they are given work. The idea the motion makes visible: work that already exists can be handed out all at once and fills the grid; work that waits on a result not yet produced arrives one thin slice at a time, and most of the grid sits idle however big it is.",
+      "visual": "Left two-thirds: two rows of pills. Top row, heading 'Prefill: the prompt already exists': eight solid blue pills 't1' to 't8'. Bottom row, heading 'Decode: each waits for the last': an outlined pill 't9', then dashed empty slots 't10', 't11', 't12'. Right third: a square grid of about two thousand tiny grey dots, the GPU's arithmetic units, labelled 'thousands of workers', with a grey corner tag 'schematic'. Dots turn amber when they are given work. Under the grid, from beat 3, a thin time strip 'time →' with two rows, small grey row labels 'prefill' and 'decode'. The idea the motion makes visible: one token's work does spread across the whole grid, so the difference is in time, not space. Prefill's eight tokens arrive at once and keep the grid busy in one unbroken stretch; decode's tokens arrive one link at a time, each flashing across the grid and then leaving it dark while it waits for the next link, so eight tokens take eight separate rounds with idle gaps between.",
       "beats": [
         {
           "id": "b1",
-          "say": "Why can only prefill run in parallel? Not the model, not the hardware. The prompt already exists, every token known up front, so nothing waits.",
-          "show": "Header at top: 'Why one runs in parallel and one cannot'. Both rows fade up dimmed; the grid fades up on the right, all grey. On 'Not the model, not the hardware', two grey tags appear and are struck through: 'the model', 'the hardware'. On 'already exists', the top row's eight pills brighten at the same instant and a tag appears: 'all eight together'. The grid stays grey for now."
+          "say": "Why can only prefill run in parallel? Not the model, not the hardware. Every prompt token is known up front, so nothing waits.",
+          "show": "Header at top: 'Why one runs in parallel and one cannot'. Both rows fade up dimmed; the grid fades up on the right, all grey. On 'Not the model, not the hardware', two grey tags appear and are struck through: 'the model', 'the hardware'. On 'known up front', the top row's eight pills brighten at the same instant and a tag appears: 'all eight together'. The grid stays grey for now."
         },
         {
           "id": "b2",
-          "say": "In decode, the next token does not exist until the one before it is chosen. That is a chain.",
-          "show": "On 'does not exist', the dashed 't10' slot gets a small hourglass icon. On 'chosen', 't9' flashes and 't10' fills in solid; the hourglass moves on to 't11', which fills only after 't10' flashes. On 'chain', chain-link icons draw between successive pills and a tag appears: 'each waits on the one before'."
+          "say": "You met this earlier: in decode, no token exists until the one before it is chosen. A chain.",
+          "show": "The header and the two struck tags fade out. On 'You met this earlier', a small grey callback chip slides in at the bottom-left: 'earlier: token nine needs token eight'. On 'no token exists', the dashed 't10' slot gets a small hourglass icon. On 'chosen', 't9' flashes and 't10' fills in solid; the hourglass moves on to 't11', which fills only after 't10' flashes. On 'A chain', chain-link icons draw between successive pills; no extra tag, since the row heading already says it. The callback chip fades."
         },
         {
           "id": "b3",
-          "say": "A G P U's thousands of workers can share out independent work, but never a chain, however many sit idle. That one distinction drives every difference.",
-          "show": "The camera eases toward the grid. On 'independent work', eight arrows draw at once from the top row and the whole grid turns amber together. Grid resets to grey. On 'never a chain', the bottom row feeds it one link at a time: the work for 't9' lights a thin scatter of dots spread across the whole grid and goes dark, then the same for 't10', then 't11'; most dots stay grey throughout, tag 'idle: nothing to give them'. On 'one distinction', the grid dims and the rows get labels: top 'known in advance', bottom 'not known yet'."
+          "say": "A G P U's thousands of workers can share out independent work, never a chain, however many sit idle. That one distinction drives every difference.",
+          "show": "The 'all eight together' tag fades. The camera eases toward the grid and the time strip draws under it. On 'independent work', eight arrows draw at once from the top row; the whole grid turns amber and stays amber for one unbroken stretch while the strip's 'prefill' row fills with one solid amber bar. Grid resets to grey. On 'never a chain', the bottom row feeds it one link at a time: the work for 't9' flashes amber across the whole grid, then the grid goes dark while 't10' is chosen; then 't10' flashes across it and it goes dark again, then 't11'. The strip's 'decode' row fills with short amber ticks separated by long grey gaps, running well past the end of the prefill bar. On 'sit idle', a tag lands over the grey gaps: 'idle: nothing to give them'. On 'one distinction', the grid, its two labels, the time strip and the idle tag dim away, and the rows get labels: top 'known in advance', bottom 'not known yet'."
         }
       ]
     },
@@ -82,27 +82,32 @@
         111,
         112
       ],
-      "visual": "Centre-left: a weight matrix of 4 rows by 6 columns, 24 blue tiles (weights at rest are blue). Along its top edge, one cell above each column, the token's vector: 6 blue input cells, label 'the token'. Grey edge labels: 'columns = inputs' along the top, 'rows = outputs' down the left. To the right of the matrix: an output column of 4 empty blue cells, 'the output'. Top band: the sum for row one, built term by term. Right third: an amber instruction card with a chip icon, 'multiply-accumulate', assembled during the scene. Bottom band: two amber counters, 'multiply-accumulates' and 'operations', both at 0. A tile flashes amber at the instant its multiply-accumulate happens, then settles to dim blue with a small '1'. The idea the motion makes visible: each term is one fused instruction counted as two operations, and every tile lights exactly once.",
+      "visual": "Centre-left: a weight matrix of 4 rows by 6 columns, 24 blue tiles (weights at rest are blue). Along its top edge, one cell above each column, the token's vector: 6 blue input cells, label 'the token'. Grey edge labels: 'columns = inputs' along the top, 'rows = outputs' down the left. To the right of the matrix: an output column of 4 empty blue cells, 'the output'. Top-left corner, from beat 1: a small grey callback chip 'earlier: 2 operations per weight' with the '2' in amber. Top band: the sum for row one, built term by term. Right third: an amber instruction card with a chip icon, 'multiply-accumulate', assembled during the scene. Bottom band: two amber counters, 'multiply-accumulates' and 'operations', both at 0. A tile flashes amber at the instant its multiply-accumulate happens, then settles to dim blue with a small '1'. The idea the motion makes visible: the '2' the viewer was handed earlier is explained, each term is one fused instruction counted as two operations, and every tile lights exactly once.",
       "beats": [
         {
           "id": "b1",
-          "say": "What does one token cost? Take a four-by-six weight matrix and one token's six inputs. Row one's output is weight one times input one, plus weight two times input two, and so on.",
-          "show": "The matrix draws tile by tile, grey tag '24 weights'. The six input cells settle along its top edge; 'columns = inputs' and 'rows = outputs' fade in. On 'Row one', row 1 brightens. The top band builds as each term is spoken: 'y =', 'w1·x1', '+ w2·x2', '+ …', each w a small square blue tile chip (a weight) and each x a round blue cell chip (an input). The letters stay on screen; the voice says the words."
+          "say": "Earlier, each token cost two operations per weight. Why two?",
+          "show": "The grey callback chip fades in at centre: 'earlier: 2 operations per weight', the '2' in amber. On 'Why two?', a small amber question mark pops beside the '2'. The chip then shrinks into the top-left corner, where it stays for the rest of the scene."
         },
         {
           "id": "b2",
-          "say": "Each term is one instruction, a multiply-accumulate, counted as two operations because it makes two results, a product and a new total. That is the only source of the two.",
-          "show": "The term 'w1·x1' lifts out: amber tag 'one multiply'; its product drops into a small running-total box 'y' that goes from 0 to a value; amber tag 'one addition'. The two tags slide right and fuse into the amber card 'multiply-accumulate'. On 'two results', two ghost outputs appear on the card: '× → product' and '+ → new total', bracketed '= 2 operations'. On 'only source', the '2' pulses."
+          "say": "Take a four-by-six weight matrix and one token's six inputs. Row one's output is weight one times input one, plus weight two times input two, and so on.",
+          "show": "The matrix draws tile by tile, grey tag '24 weights'. The six input cells settle along its top edge; 'columns = inputs' and 'rows = outputs' fade in. On 'Row one', row 1 brightens. The top band builds as each term is spoken: 'y =', 'w1·x1', '+ w2·x2', '+ …', each w a small square blue tile chip (a weight) and each x a round blue cell chip (an input). The letters stay on screen; the voice says the words."
         },
         {
           "id": "b3",
-          "say": "Every weight lands in exactly one term of one output. Not once per layer or per head. Once. Twenty-four weights, forty-eight operations: twice the cells, for any shape.",
-          "show": "Row by row, six blue pulses drop from the input cells into the row's tiles; each tile flashes amber as its pulse lands, the products sweep right into that row's output cell, and the row settles dim with a '1' on every tile. The counters run 6, 12, 18, 24 and 12, 24, 36, 48. On 'Not once per layer or per head', two grey phrases appear and are struck through, 'once per layer' and 'once per head'; on 'Once', 'once' stays, bold white. On 'twice the cells', bottom-band line: 'operations = 2 × cells'."
+          "say": "Each term is one instruction, a multiply-accumulate, counted as two operations for its two results, a product and a new total. That is the only source of the two.",
+          "show": "The term 'w1·x1' lifts out: amber tag 'one multiply'; its product drops into a small running-total box 'y' that goes from 0 to a value; amber tag 'one addition'. The two tags slide right and fuse into the amber card 'multiply-accumulate'. On 'two results', two ghost outputs appear on the card: '× → product' and '+ → new total', bracketed '= 2 operations'. On 'only source', the '2' on the card pulses together with the amber '2' in the corner chip, and the chip's question mark disappears."
         },
         {
           "id": "b4",
-          "say": "And the rule is exact: with one input vector, no weight can be used twice in one token's pass.",
-          "show": "A second, dashed input row ghosts in above the first with a grey question mark, 'a second input?', then fades with a cross. Two grey tags drift past and are struck through: 'fudge factor', 'rule of thumb'. Final tag under the grid: 'one input vector: every weight used once'."
+          "say": "Every weight lands in exactly one term of one output. Not once per layer or per head. Once. Twenty-four weights, forty-eight operations: twice the cells, for any shape.",
+          "show": "The top-band sum and the card's two ghost outputs fade; the card keeps only 'multiply-accumulate = 2 operations'. Row by row, six blue pulses drop from the input cells into the row's tiles; each tile flashes amber as its pulse lands, the products sweep right into that row's output cell, and the row settles dim with a '1' on every tile. The counters run 6, 12, 18, 24 and 12, 24, 36, 48. On 'Not once per layer or per head', two grey phrases appear and are struck through, 'once per layer' and 'once per head'; on 'Once', 'once' stays, bold white, and the two struck phrases fade. On 'twice the cells', bottom-band line: 'operations = 2 × cells'."
+        },
+        {
+          "id": "b5",
+          "say": "So twice the weights is exact, not a rule of thumb: with one input vector, no weight is used twice in one token's pass.",
+          "show": "On 'exact', the line 'operations = 2 × cells' glows and gains a small white tag 'exact'. On 'not a rule of thumb', two grey tags drift past and are struck through: 'fudge factor', 'rule of thumb'. On 'one input vector', a second, dashed input row ghosts in above the first with a grey question mark, 'a second input?', then fades with a cross. Final tag under the grid: 'one input vector: every weight used once'."
         }
       ]
     },
@@ -112,7 +117,7 @@
       "figs": [
         113
       ],
-      "visual": "Left half: a blue nested panel 'one layer: all matrix multiplies' holding blue matrix tiles: top row 'query', 'key', 'value', 'combine'; bottom row 'feed-forward 1', 'feed-forward 2', and a 'gate' tile that slides in. Right half: a tall stack of 80 thin blue slabs with thin 'embedding' and 'output head' slabs capping the bottom and top. Bottom band: the formula in amber, built term by term. The idea the motion makes visible: a rule that holds tile by tile survives every sum, so one advertised number prices the whole pass.",
+      "visual": "Left half: a blue nested panel 'one layer: all matrix multiplies' holding blue matrix tiles: top row 'query', 'key', 'value', 'combine'; bottom row 'feed-forward 1', 'feed-forward 2', and a 'gate' tile that slides in. Right half: a tall stack of 80 thin blue slabs with thin 'embedding' and 'output projection' slabs capping the bottom and top. Bottom band: the formula in amber, built term by term. The idea the motion makes visible: a rule that holds tile by tile survives every sum, so one advertised number prices the whole pass.",
       "beats": [
         {
           "id": "b1",
@@ -121,13 +126,13 @@
         },
         {
           "id": "b2",
-          "say": "Add them all, plus the embedding table and output head: operations per token are twice the parameter count.",
-          "show": "On 'Add them all', the tiles merge into one slab, label 'one layer: 855.6 M weights', which copies into the stack at the right while a counter runs 1 to 80; each slab carries a small amber '× 2'. The 'embedding' and 'output head' slabs cap the ends, and the stack is labelled '70 billion parameters'. On 'twice the parameter count', the formula builds: 'operations per token', '=', '2', '×', 'parameter count'."
+          "say": "Add them all, plus the embedding table and output projection: operations per token are twice the parameter count.",
+          "show": "On 'Add them all', the tiles merge into one slab, label 'one layer: 855.6 M weights', which copies into the stack at the right while a counter runs 1 to 80; each slab carries a small amber '× 2'. The 'embedding' and 'output projection' slabs cap the ends: the output projection slab gets an amber '× 2', the embedding slab a small grey '?' that is resolved later. The stack is labelled '70 billion parameters'. On 'twice the parameter count', the formula builds: 'operations per token', '=', '2', '×', 'parameter count'."
         },
         {
           "id": "b3",
-          "say": "Holding matrix by matrix, it survives the sum: the one number every model advertises prices a forward pass, with nothing else about the architecture needed.",
-          "show": "On 'matrix by matrix', the small amber '× 2' tags ripple up the stack from bottom to top, and the formula glows once; grey tag 'holds matrix by matrix'. On 'advertises', a price-tag icon swings onto the stack reading '70B'."
+          "say": "Holding matrix by matrix, it survives the sum: the one number every model advertises prices a forward pass on its own.",
+          "show": "On 'matrix by matrix', the small amber '× 2' tags ripple up the stack from bottom to top, the embedding slab's grey '?' staying put, and the formula glows once; grey tag 'holds matrix by matrix'. On 'advertises', a price-tag icon swings onto the stack reading '70B'; on 'on its own', a grey tag under it: 'nothing else about the architecture'."
         }
       ]
     },
@@ -137,32 +142,32 @@
       "figs": [
         115
       ],
-      "visual": "Upper half: an attention close-up. Left: one blue query pill 'q' for the newest token. To its right a row of blue key pills 'k' and beneath it a row of blue value pills 'v', one pair per earlier token; both rows can extend rightward. Lower half: a cost chart, bars drawn to scale on a linear axis, corner note 'bars to scale'. A wide amber reference bar '140 billion · the weights' anchors it; three amber attention bars for contexts 2,048, 8,192 and 128,000 grow against it. The scale is chosen so the longest bar, 2.4 times the reference, just fits. The idea the motion makes visible: this work uses no stored weight, so the rule cannot see it, and it grows with context until it outweighs the weights.",
+      "visual": "Upper half: an attention close-up. Left: one blue query pill 'q' for the newest token. To its right a row of blue key pills 'k' and beneath it a row of blue value pills 'v', one pair per earlier token; both rows can extend rightward. Lower half: a cost chart, bars drawn to scale on a linear axis, corner note 'bars to scale'. A wide amber reference bar '140 billion · the weights' anchors it; three amber attention bars for contexts 2,048, 8,192 and 128,000 grow against it. The scale is chosen so the longest bar, 2.4 times the reference, just fits. The idea the motion makes visible: this work uses no stored weight, so the rule cannot see it, and it grows with context until it outweighs the weights; two small corrections then nudge the count in opposite directions, shown by arrow direction.",
       "beats": [
         {
           "id": "b1",
-          "say": "Every rule has a boundary. Attention scores the newest query against every key, then blends the values by the shares: two multiplies that use none of the stored weights.",
-          "show": "Header: 'What the rule does not count'. 'q' fades up at left with six 'k' and six 'v' pills beside it. On 'every key', amber pulses run from 'q' to each 'k' and a small score appears above each. A 'softmax' tag turns the scores into shares; on 'blends', the shares flow into the 'v' pills, which pour into one blended output pill. Two amber cards appear: 'query × keys' and 'shares × values'. On 'none of the stored weights', a subheader writes on: 'two multiplies, no stored weights'."
+          "say": "Every rule has a boundary. Attention scores the newest query against every key, then blends the values by the shares.",
+          "show": "Header: 'What the rule does not count'. 'q' fades up at left with six 'k' and six 'v' pills beside it. On 'every key', amber pulses run from 'q' to each 'k' and a small score appears above each. A 'softmax' tag turns the scores into shares; on 'blends', the shares flow into the 'v' pills, which pour into one blended output pill. Two amber cards appear: 'query × keys' and 'shares × values'."
         },
         {
           "id": "b2",
-          "say": "The blending weights you met earlier are not parameters from the file. Like queries and keys, they are made on the fly from your tokens: activations, which the rule never counts.",
-          "show": "On 'not parameters', a short grey tag lands on the shares: 'computed, not stored'. On 'made on the fly', grey tags appear under 'q', 'k' and 'v': 'made from your tokens'. On 'activations', the two cards merge into one: 'activation × activation'. A small weight-tile icon appears beside it and gets a cross: 'no parameter involved'."
+          "say": "Queries, keys, values and shares are made on the fly from your tokens: activations, not weights. That is real work the rule never counts.",
+          "show": "The 'softmax' tag and the small scores fade. On 'made on the fly', one grey bracket spans the q, k and v pills with a single tag 'made from your tokens'. On 'activations', the two cards merge into one: 'activation × activation'. On 'not weights', a small weight-tile icon appears beside it and gets a cross: 'no parameter involved'. On 'real work', the merged card glows amber and a subheader writes on under the header: 'real work, never counted'."
         },
         {
           "id": "b3",
-          "say": "So this cost grows with context instead. For every earlier token, sixty-four heads score and blend a hundred and twenty-eight numbers each, in eighty layers: about two point six million operations.",
-          "show": "On 'grows with context', the key and value rows extend rightward, pill after pill. An amber equation builds beside them on the spoken numbers: 'scores 64 × 128 = 8,192', '+ blend 8,192', '× 2 ops = 32,768 per layer', '× 80 layers = 2.6 million per context token'."
+          "say": "So this cost grows with the context's length, not the model's size. Per earlier token, sixty-four heads each score and blend a hundred and twenty-eight numbers, two operations apiece, in eighty layers: about two point six million operations.",
+          "show": "The bracket tag, the merged card and 'no parameter involved' fade; header and subheader stay. On 'context's length', the key and value rows extend rightward, pill after pill, and a grey tag appears: 'grows with context, not model size'. An amber equation builds beside the rows, one term per spoken number: on 'sixty-four heads', '64 heads'; on 'a hundred and twenty-eight numbers', it completes as 'scores 64 × 128 = 8,192' and '+ blend 8,192' lands beneath; on 'two operations apiece', '× 2 ops = 32,768 per layer'; on 'eighty layers', '× 80 layers'; on 'two point six million', '= 2.6 million per context token'."
         },
         {
           "id": "b4",
-          "say": "Against each new token's hundred and forty billion, about two thousand tokens of context add four percent, a rounding error. Eight thousand, fifteen. A hundred and twenty-eight thousand, two hundred and forty percent, and the rule stops being useful.",
-          "show": "The close-up fades out; the header stays. On 'hundred and forty billion', the reference bar '140 billion · the weights' draws on. On 'about two thousand', a thin bar 'context 2,048' grows to '5.4 bn · +4%', grey tag 'rounding error'. On 'Eight thousand', 'context 8,192' grows to '21.5 bn · +15%'. On 'a hundred and twenty-eight thousand', 'context 128,000' grows past the reference until it is 2.4 times its length: '335.5 bn · +240%', amber tag '2.4 × the weights'. On 'stops being useful', the reference bar's label dims."
+          "say": "Against the weights' hundred and forty billion, about two thousand tokens of context add four percent, a rounding error. At eight thousand tokens, fifteen percent. At a hundred and twenty-eight thousand tokens, two hundred and forty percent, and the rule stops being useful.",
+          "show": "The close-up, the equation, the 'grows with context' tag and the subheader fade out; the header stays. On 'hundred and forty billion', the reference bar '140 billion · the weights' draws on. On 'about two thousand', a thin bar 'context 2,048' grows to '5.4 bn · +4%', grey tag 'rounding error'. On 'At eight thousand tokens', 'context 8,192' grows to '21.5 bn · +15%' and the 'rounding error' tag fades. On 'At a hundred and twenty-eight thousand tokens', 'context 128,000' grows past the reference until it is 2.4 times its length: '335.5 bn · +240%', amber tag '2.4 × the weights'. On 'stops being useful', the reference bar's label dims."
         },
         {
           "id": "b5",
-          "say": "Two smaller corrections. The embedding table, one and a half percent of the parameters, is counted but barely read. Softmax and normalisation, small rescaling steps, add a little uncounted work.",
-          "show": "Two small chips appear under the chart. On 'embedding table': 'embedding table ≈ 1.5% of parameters' with a grey down-arrow tag 'counted, but one row read'. On 'Softmax and normalisation': 'softmax + normalisation' with a small amber up-arrow tag 'uncounted: adds a little'."
+          "say": "Two smaller corrections. The embedding table, one and a half percent of the parameters, is counted, yet a lookup multiplies nothing: an overcount. Softmax and normalisation, small rescaling steps, add a little back.",
+          "show": "Two small chips appear under the chart. On 'embedding table': 'embedding table ≈ 1.5% of parameters', beside a small copy of the embedding slab from earlier whose grey '?' turns to '0 multiplies'; on 'overcount', a grey down-arrow tag 'counted, never multiplied'. On 'Softmax and normalisation': 'softmax + normalisation' with a small amber up-arrow tag 'uncounted: adds a little'. The two arrows point opposite ways."
         },
         {
           "id": "b6",
@@ -182,12 +187,12 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Run it. Seventy billion parameters, times two: a hundred and forty billion operations per token. The bytes: the same count, times two bytes per weight, a hundred and forty gigabytes.",
+          "say": "Run the rule on our model. Seventy billion parameters, times two: a hundred and forty billion operations per token. The bytes: the same count times two bytes, a hundred and forty gigabytes.",
           "show": "The card '70 billion parameters' sits centre-left. On 'times two', the amber line builds: '× 2', '= 140 billion operations', grey note '1.4 × 10¹¹'. On 'The bytes', the coral line builds beneath: '× 2 bytes (16-bit)', '= 140 GB', grey note '140 billion bytes'."
         },
         {
           "id": "b2",
-          "say": "One parameter count gives both. Worth knowing by heart. The two twos are unrelated, one from the multiply-accumulate, one from sixteen bits, and merely match.",
+          "say": "One parameter count gives both, worth knowing by heart. The two twos are unrelated, one from the multiply-accumulate, one from sixteen bits.",
           "show": "The two lines stretch into equal bars, amber 'Operations · 2 × N' over coral 'Bytes, at 16 bits · N × 2'; the 'N' in both highlights blue and a thin blue bracket joins them. On 'worth knowing by heart', a small grey tag 'works for any model'. On 'unrelated', the amber '2' gets a tag 'multiply-accumulate = 2 ops' and the coral '2' a tag '16 bits = 2 bytes'; between them, grey 'unrelated, same number'."
         },
         {
@@ -197,13 +202,13 @@
         },
         {
           "id": "b4",
-          "say": "Divide the H one hundred's compute rate by its bandwidth: in the time one byte arrives, it could do about two hundred and ninety-five operations. Decode offers one.",
+          "say": "Divide the H one hundred's compute rate by its bandwidth: while one byte arrives, it could do about two hundred and ninety-five operations. Decode offers one.",
           "show": "The card and bars on the left dim to 30%, leaving the white '1 operation per byte' box bright. Right third: the H100 spec card. On 'compute rate', amber line '989 trillion ops / second'; on 'bandwidth', coral line '3.35 trillion bytes / second'; the division builds beneath: '989 ÷ 3.35 ≈ 295'. A short pipe runs from a memory icon to a chip icon: one coral byte travels along it while an amber counter on the chip side ticks from 0 to 295. On 'Decode offers one', the pipe fades and two boxes take its place: 'chip needs ≈ 295 per byte' and 'decode offers 1'."
         },
         {
           "id": "b5",
-          "say": "At best, a third of one percent of the arithmetic is busy: the thirty-millisecond puzzle's figure, now read off the spec sheet.",
-          "show": "A strip of 295 tiny squares spans the bottom band; one lights amber, the rest stay grey. Label: '1 of 295 ≈ 0.34%'. On 'thirty-millisecond puzzle', a small grey callback chip slides in beside it: 'earlier: 0.1 ms of 30 ms'. Hold."
+          "say": "At best, a third of one percent of the arithmetic is busy: under one percent, as the thirty-millisecond puzzle found.",
+          "show": "The H100 spec card, its division and the two boxes dim to 30%; the white '1 operation per byte' box stays bright. A strip of 295 tiny squares spans the bottom band; one lights amber, the rest stay grey. Label: '1 of 295 ≈ 0.34%', small grey 'H100'. On 'under one percent', the label gains a white '< 1%'. On 'thirty-millisecond puzzle', a small grey callback chip slides in beside it: 'earlier: under 1%', with a smaller second line 'H200: 1 of 206 ≈ 0.5%'. Hold."
         }
       ]
     },
@@ -214,32 +219,37 @@
         117,
         118
       ],
-      "visual": "Top third: two thin lanes. Bottom lane 'Decode: one load, one token', top lane 'Prefill: one load, thousands of tokens'. At the left of each, an identical coral box 'load once' with an HBM stack icon and a toll-gate icon that stamps '140 GB'. An arrow leads right: in decode to a single blue token tile; in prefill it fans into a long row of tiles out to '2,000 tokens'. Weight tiles are blue at rest, coral while travelling, and flash amber at each multiply-accumulate. Lower two-thirds, from beat 3: the amortise ladder, a title band 'amortise: spread a fixed cost over more work', a formula box, and four rows with coral bars drawn to scale on a linear axis, corner note 'bars to scale'. The idea the motion makes visible: an identical toll, a payoff differing by thousands, and the per-token share shrinking in exact proportion to how many tokens share the read.",
+      "visual": "Top third: two thin lanes. Bottom lane 'Decode: one load, one token', top lane 'Prefill: one load, thousands of tokens'. At the left of each, an identical coral box 'load once' with an HBM stack icon and a toll-gate icon that stamps '140 GB'. An arrow leads right: in decode to a single blue token tile; in prefill it fans into a long row of tiles out to '2,000 tokens'. Each lane has its own small amber counter, 'uses of this weight', at its right end. Weight tiles are blue at rest, coral while travelling, and flash amber at each multiply-accumulate. Lower two-thirds, from beat 4: the amortise ladder, a title band 'amortise: spread a fixed cost over more work', a formula box, and four rows with coral bars drawn to scale on a linear axis, corner note 'bars to scale'. The idea the motion makes visible: an identical toll, a payoff differing by thousands, and the per-token share shrinking in exact proportion to how many tokens share the read.",
       "beats": [
         {
           "id": "b1",
           "say": "In decode, one token means one input vector: each weight arrives, does one multiply-accumulate, and is done. In a two-thousand-token prefill, it does two thousand.",
-          "show": "The decode lane draws first: coral particles flow from 'load once' to the single tile; one weight tile rides along in coral, flashes amber once at the tile, and fades. Tag: '1 input vector'. The prefill lane draws: the same coral flow fans into the row of tiles; one weight tile glides along the row, flashing amber at each, while an amber counter 'uses of this weight' runs 1 to 2,000."
+          "show": "The decode lane draws first: coral particles flow from 'load once' to the single tile; one weight tile rides along in coral, flashes amber once at the tile, and fades, while the decode lane's 'uses of this weight' counter ticks 0 to 1. A short tag '1 input vector' shows under the tile, then fades as the prefill lane draws: the same coral flow fans into the row of tiles; one weight tile glides along the row, flashing amber at each, while the prefill lane's 'uses of this weight' counter runs 1 to 2,000."
         },
         {
           "id": "b2",
-          "say": "Same toll, a payoff thousands of times larger. Is decode slow because the model is large? True, but beside the point: both phases move the same bytes. What changes is the work each byte does.",
-          "show": "Both toll gates stamp '140 GB' at the same moment; badge between the lanes: '× 2,000'. On 'because the model is large', a thought-bubble icon floats in: 'slow because the model is large', gets a tick, then a grey tag 'misses the point'. On 'the work each byte does', the bubble fades and the two 'uses of this weight' counters pulse: '2,000' and '1'."
+          "say": "The bus pays the same toll in both phases, a hundred and forty gigabytes. Prefill's payoff is thousands of times larger.",
+          "show": "On 'same toll', both toll gates stamp '140 GB' at the same moment and the coral flow in both lanes pulses together. On 'thousands of times larger', a badge appears between the lanes, '× 2,000', and the two lanes' 'uses of this weight' counters pulse: '2,000' and '1'."
         },
         {
           "id": "b3",
-          "say": "Spreading a fixed cost over more work is amortising, as with the start-up load. It is just division: a hundred and forty gigabytes, over the tokens sharing the read.",
-          "show": "The lanes shrink into a thin dimmed strip along the top edge. Below it, the ladder's title band draws: 'amortise: spread a fixed cost over more work'. On 'just division', the formula box builds term by term: 'cost per token', '=', '140 GB' in coral, '÷', 'tokens sharing the read' in blue; small grey tag 'amortise = divide'."
+          "say": "Is decode slow because the model is large? True, but beside the point: what changes is the work each byte does.",
+          "show": "On 'because the model is large', a thought-bubble icon floats in: 'slow because the model is large', gets a tick, then a grey tag 'misses the point'. On 'the work each byte does', the bubble and its tag fade and the two counters pulse again: '2,000' and '1'."
         },
         {
           "id": "b4",
-          "say": "One token carries it all. Ten carry fourteen gigabytes each. Two thousand, seventy megabytes. The read never changes; the share falls in exact proportion.",
-          "show": "Row '1 token': full-width coral bar '140 GB'. Row '10 tokens': a tenth of the width, '14 GB'. Row '200 tokens': a sliver, '0.7 GB'. Row '2,000 tokens': a hairline, '0.07 GB', grey '= 70 MB'. On 'never changes', an identical small coral chip '140 GB' appears at the left of every row; teal '÷ 10' arrows draw between rows 1 and 2 and rows 3 and 4."
+          "say": "Amortising, which you met with the start-up load and will meet constantly, means spreading a fixed cost over more work. It is just division: a hundred and forty gigabytes over the tokens sharing the read.",
+          "show": "The lanes shrink into a thin dimmed strip along the top edge; the '× 2,000' badge fades. Below it, the ladder's title band draws: 'amortise: spread a fixed cost over more work'. On 'start-up load', a small grey callback chip slides in at its right end, 'earlier: the start-up load', and fades after a moment. On 'just division', the formula box builds term by term: 'cost per token', '=', '140 GB' in coral, '÷', 'tokens sharing the read' in blue; small grey tag 'amortise = divide'."
         },
         {
           "id": "b5",
-          "say": "Prefill sits at the bottom. Decode sits at the top, stuck on its own with one token per read. That is the structural fact of language model inference: decode has nobody to share the cost with.",
-          "show": "A teal tag 'prefill: spread across thousands' slides onto the '2,000 tokens' row. A coral tag 'decode' slides onto the '1 token' row and a small padlock icon clicks shut beside it. On 'nobody to share the cost with', the decode row sits under a soft spotlight while the rest dims, and a white line settles beneath it: 'nobody to share it with'."
+          "say": "One token carries it all. Ten carry fourteen gigabytes each. Two thousand tokens, seventy megabytes each. The read never changes; the share falls in exact proportion.",
+          "show": "Row '1 token': full-width coral bar '140 GB'. On 'Ten', row '10 tokens': a tenth of the width, '14 GB'. Row '200 tokens' follows without narration: a sliver, '0.7 GB'. On 'Two thousand tokens', row '2,000 tokens': a hairline, '0.07 GB', grey '= 70 MB'. On 'never changes', an identical small coral chip '140 GB' appears at the left of every row; teal '÷ 10' arrows draw between rows 1 and 2 and rows 3 and 4."
+        },
+        {
+          "id": "b6",
+          "say": "Prefill sits at the bottom; decode, one token per read, is stuck at the top. That is the structural fact of inference: decode has nobody to share the cost with.",
+          "show": "On 'Prefill sits at the bottom', a teal tag 'prefill: spread across thousands' slides onto the '2,000 tokens' row. On 'stuck at the top', a coral tag 'decode' slides onto the '1 token' row and a small padlock icon clicks shut beside it. On 'nobody to share the cost with', the decode row sits under a soft spotlight while the rest dims, and a white line settles beneath it: 'nobody to share it with'."
         }
       ]
     },
@@ -249,27 +259,32 @@
       "figs": [
         116
       ],
-      "visual": "Left 60%: a table for four storage widths, built row by row. Row labels: '32-bit' and '16-bit' with a small grey tag 'floating point', '8-bit' and '4-bit' with a small grey tag 'integer'. Columns: 'bytes / weight' as coral blocks (4, 2, 1, half a block), 'model' in coral, 'operations' in amber reading '140 bn' in every row, and 'ops per byte' as an amber bar drawn to scale. Right 40%: empty until beat 3, then a batching mini-diagram at the top (one coral 'read' arrow fanning out to three user icons) above a teal column 'tokens per read to reach 295' that lines up with the table rows. Grey footnote under the table from beat 3: '16-bit arithmetic, H100; weights only'. The idea the motion makes visible: the amber column never moves; only the coral shrinks, and the sharing needed shrinks with it.",
+      "visual": "Left 60%: a table for four storage widths, built row by row. Row labels: '32-bit' and '16-bit' with a small grey tag 'floating point', '8-bit' and '4-bit' with a small grey tag 'integer'. Columns: 'bytes / weight' as coral blocks (4, 2, 1, half a block), 'model' in coral, 'operations' in amber reading '140 bn' in every row, and 'ops per byte' as an amber bar drawn to scale. Right 40%: empty until beat 3, then a batching mini-diagram at the top (one coral 'read' arrow fanning out to three user icons) above a teal column 'tokens per read to reach 295' that lines up with the table rows. Grey footnote under the table from beat 4: '16-bit arithmetic, H100; weights only'. The idea the motion makes visible: the amber column never moves; only the coral shrinks, and the sharing needed shrinks with it.",
       "beats": [
         {
           "id": "b1",
-          "say": "That one per byte holds only at sixteen bits. Store weights in thirty-two, and the bytes double: half an operation per byte.",
+          "say": "Decode's one operation per byte holds only at sixteen bits. At thirty-two bits, the bytes double: half an operation per byte.",
           "show": "Header: 'The coincidence is specific to 16 bits'. The table frame draws with only the '16-bit' row filled: two coral blocks, '140 GB', '140 bn', a short amber bar '1 per byte'. On 'thirty-two', the '32-bit' row slides in above: four coral blocks, '280 GB', '140 bn', a bar half the length, '0.5 per byte'."
         },
         {
           "id": "b2",
-          "say": "Eight-bit integers give two per byte, four-bit, four. The operations never move. Fewer bits, called quantization, only shrink the bytes.",
+          "say": "Eight-bit integers give two per byte, four-bit, four. The operations never move. Storing weights in fewer bits, called quantization, only shrinks the bytes.",
           "show": "Row '8-bit': one coral block, '70 GB', '140 bn', bar twice the 16-bit length, '2 per byte'. Row '4-bit': half a block, '35 GB', '140 bn', bar four times as long, '4 per byte'. On 'never move', the amber '140 bn' column flashes in all four rows while the coral column steps down. Side tag: 'quantization: fewer bits per weight'."
         },
         {
           "id": "b3",
-          "say": "Batching, many users' tokens sharing each read, multiplies it again. At the chip's sixteen-bit arithmetic rate, reaching two hundred and ninety-five takes that many tokens per read. Thirty-two-bit weights need twice as many, eight-bit half, four-bit a quarter.",
-          "show": "The 'bytes / weight' and 'model' columns dim to 30%. Right side: the batching mini-diagram draws, teal label 'batching: tokens share one read'; the 16-bit bar stretches as a counter '× tokens sharing' runs 1, 2, 3. The teal column opens beside the table and the grey footnote appears. On 'that many tokens per read', the 16-bit cell fills '295'; on 'twice as many' the 32-bit cell fills '590', on 'half' the 8-bit cell '148', on 'a quarter' the 4-bit cell '74': a descending ramp that mirrors the coral blocks."
+          "say": "Batching, many users' tokens sharing each read, multiplies operations per byte by the number sharing.",
+          "show": "The 'bytes / weight' and 'model' columns dim to 30%. Right side: the batching mini-diagram draws, one coral 'read' arrow fanning out to three user icons, teal label 'batching: tokens share one read'. On 'multiplies', the 16-bit row's amber bar stretches as a counter '× tokens sharing' runs 1, 2, 3, the bar doubling then tripling."
         },
         {
           "id": "b4",
-          "say": "That balance point is the next chapter's ridge. One rule for operations, one for bytes: their ratio decides whether a chip waits on maths or on memory. For one user's decode, it is one.",
-          "show": "The teal column header glows, grey tag 'the ridge: next chapter'. The table dims. Three centred lines build: amber 'operations = 2 × parameters', coral 'bytes = parameters × bytes per weight', white 'their ratio: maths or memory?'. On 'it is one', a white box '1' lands beside the last line."
+          "say": "At sixteen bits, reaching the chip's two hundred and ninety-five operations per byte takes two hundred and ninety-five tokens per read. Thirty-two-bit weights need twice as many, eight-bit half, four-bit a quarter.",
+          "show": "The 16-bit bar settles back to '1 per byte'. The teal column 'tokens per read to reach 295' opens beside the table and the grey footnote appears: '16-bit arithmetic, H100; weights only'. On 'two hundred and ninety-five tokens per read', the 16-bit cell fills '295'; on 'twice as many', the 32-bit cell fills '590'; on 'half', the 8-bit cell '148'; on 'a quarter', the 4-bit cell '74': a descending ramp that mirrors the coral blocks."
+        },
+        {
+          "id": "b5",
+          "say": "That balance point is the next chapter's ridge. The payoff of the whole derivation: one rule for operations, one for bytes, and their ratio decides whether a chip waits on maths or memory. For one user's decode, it is one.",
+          "show": "The teal column header glows, grey tag 'the ridge: next chapter'. On 'payoff', the table and the batching diagram dim. Three centred lines build: on 'one rule for operations', amber 'operations = 2 × parameters'; on 'one for bytes', coral 'bytes = parameters × bytes per weight'; on 'their ratio', white 'their ratio: maths or memory?'. On 'it is one', a white box '1' lands beside the last line."
         }
       ]
     }
@@ -311,32 +326,32 @@
       "result": "295.2238805970149"
     },
     {
-      "claim": "added: at 1 op per byte, at best 1 / 295 of the arithmetic is in use = 0.34%, 'about a third of one percent'",
+      "claim": "added: at 1 op per byte, at best 1 / 295 of the arithmetic is in use = 0.34%, 'At best, a third of one percent of the arithmetic is busy' (H100)",
       "python": "print(1/(989/3.35)*100)",
       "result": "0.3387259858442872"
     },
     {
-      "claim": "added callback: 1/295 is exactly the H100 per-token ratio from ch06/ch11 (0.14 ms of arithmetic in 41.8 ms of reading), and matches ch05's thirty-millisecond puzzle, 0.1 ms of 30 ms ('a third of one percent'), which the on-screen chip 'earlier: 0.1 ms of 30 ms' recalls",
-      "python": "c=140e9/989e12*1e3; m=140e9/3.35e12*1e3; print(round(c,4), round(m,2), c/m*100, 0.1/30*100)",
-      "result": "0.1416 41.79 0.33872598584428715 0.33333333333333337"
+      "claim": "H100 and H200 kept separate. At 1 op per byte the H100 (989 / 3.35 = 295 ops per byte) keeps at best 1/295 = 0.339% of its arithmetic busy, said as 'a third of one percent'. ch05's thirty-millisecond puzzle is the H200 case: 0.1416 ms of arithmetic in 29.17 ms of reading = 0.485% (989 / 4.8 = 206, so 1 of 206), which ch05 told the viewer is 'nearer half a percent' once 0.14 ms is not rounded to 0.1 ms (0.1 / 30 = 0.33%). The two are not equated: narration says 'under one percent, as the thirty-millisecond puzzle found'; on screen '1 of 295 ≈ 0.34%' (H100) and the callback chip 'earlier: under 1%' / 'H200: 1 of 206 ≈ 0.5%'",
+      "python": "print(round(100/(989/3.35),3), round(989/4.8,1), round(100/(989/4.8),3), round(140e9/989e12*1e3,4), round(140e9/4.8e12*1e3,2), round(0.1/30*100,2))",
+      "result": "0.339 206.0 0.485 0.1416 29.17 0.33"
     },
     {
-      "claim": "fig 115 added derivation, walked in narration: per context token per layer, scores 64 heads × 128 = 8,192 MACs, blend 8,192 MACs, × 2 ops = 32,768 ('about thirty-three thousand'); × 80 layers = 2.6 million",
+      "claim": "fig 115 added derivation, walked in narration: per context token, 64 heads each score 128 numbers (8,192 multiply-accumulates) and blend 128 numbers (8,192), 'two operations apiece' gives 32,768 per layer (on screen '× 2 ops = 32,768 per layer'); × 80 layers = 2.6 million ('about two point six million operations')",
       "python": "print(64*128, 2*64*128*2, 2*64*128*2*80)",
       "result": "8192 32768 2621440"
     },
     {
-      "claim": "fig 115: context 2,048 → 4 × 8,192 × 80 × 2,048 = 5.4 GFLOP, 3.8% of 140 billion ('four percent')",
+      "claim": "fig 115: context 2,048 → 4 × 8,192 × 80 × 2,048 = 5.4 GFLOP, 3.8% of 140 billion ('about two thousand tokens of context add four percent')",
       "python": "f=4*8192*80*2048; print(f, f/1e9, f/140e9*100)",
       "result": "5368709120 5.36870912 3.8347922285714287"
     },
     {
-      "claim": "fig 115: context 8,192 → 21.5 GFLOP, 15.3% of 140 billion ('fifteen')",
+      "claim": "fig 115: context 8,192 → 21.5 GFLOP, 15.3% of 140 billion ('At eight thousand tokens, fifteen percent')",
       "python": "f=4*8192*80*8192; print(f, f/1e9, f/140e9*100)",
       "result": "21474836480 21.47483648 15.339168914285715"
     },
     {
-      "claim": "fig 115: context 128,000 → 335.5 GFLOP, +240% of 140 billion, 2.4 × the weights' work ('more than twice'); also the bar-length ratio in the chart",
+      "claim": "fig 115: context 128,000 → 335.5 GFLOP, +240% of 140 billion ('At a hundred and twenty-eight thousand tokens, two hundred and forty percent'); 2.4 × the weights' work, on screen '2.4 × the weights' and the bar-length ratio in the chart",
       "python": "f=4*8192*80*128000; print(f, f/1e9, f/140e9*100, f/140e9)",
       "result": "335544320000 335.54432 239.67451428571428 2.3967451428571427"
     },
@@ -344,6 +359,11 @@
       "claim": "fig 115: embedding table 128,256 × 8,192 = 1.05 billion parameters = 1.5% of 70 billion (70B shape, per the chapter-notes correction)",
       "python": "print(128256*8192, 128256*8192/70e9*100)",
       "result": "1050673152 1.5009616457142856"
+    },
+    {
+      "claim": "fig 115 correction direction: the embedding table's 1.05 billion parameters are counted by the rule as 2 × 1.05 billion = 2.1 billion operations that a lookup never performs (ch07: a lookup is zero floating-point operations), an overcount of 1.5% of 140 billion, pulling opposite to attention; softmax and normalisation add a little back",
+      "python": "e=128256*8192; print(2*e, round(2*e/140e9*100,2))",
+      "result": "2101346304 1.5"
     },
     {
       "claim": "fig 117: a 2,000-token prompt gives every weight 2,000 multiply-accumulates (one per token); decode gives 1; payoff ratio × 2,000",
@@ -356,7 +376,7 @@
       "result": "[140.0, 14.0, 0.7, 0.07]"
     },
     {
-      "claim": "fig 118 added: 0.07 GB = 70 MB; and ten times the tokens gives a tenth of the cost (140 → 14, 0.7 → 0.07)",
+      "claim": "fig 118 added: 0.07 GB = 70 MB ('Two thousand tokens, seventy megabytes each'); and ten times the tokens gives a tenth of the cost (140 → 14, 0.7 → 0.07)",
       "python": "print(0.07*1000, 140/14, 0.7/0.07)",
       "result": "70.0 10.0 9.999999999999998"
     },
@@ -366,7 +386,7 @@
       "result": "[4.0, 2.0, 1.0, 0.5]"
     },
     {
-      "claim": "fig 116 table added: model size at 70 billion weights = 280, 140, 70, 35 GB ('twice the size' at 32 bits)",
+      "claim": "fig 116 table added: model size at 70 billion weights = 280, 140, 70, 35 GB ('At thirty-two bits, the bytes double')",
       "python": "print([70e9*b/8/1e9 for b in (32,16,8,4)])",
       "result": "[280.0, 140.0, 70.0, 35.0]"
     },
@@ -376,12 +396,12 @@
       "result": "[0.5, 1.0, 2.0, 4.0]"
     },
     {
-      "claim": "fig 116 table: tokens that must share one read to reach 295 ops per byte = 295.2 ÷ ops per byte = 590.4, 295.2, 147.6, 73.8 → said as 590, 295, about 148, 74. Assumes the arithmetic stays at the H100's dense 16-bit rate (989 TFLOP/s) with narrow weights widened on arrival; on-screen footnote '16-bit arithmetic, H100; weights only'",
+      "claim": "fig 116 table: tokens that must share one read to reach 295 ops per byte = 295.2 ÷ ops per byte = 590.4, 295.2, 147.6, 73.8 → on screen 590, 295, 148, 74; narration says 'two hundred and ninety-five tokens per read' and 'twice as many', 'eight-bit half', 'four-bit a quarter'. Assumes the arithmetic stays at the H100's dense 16-bit rate (989 TFLOP/s) with narrow weights widened on arrival; on-screen footnote '16-bit arithmetic, H100; weights only'",
       "python": "r=989/3.35; print([r/(2/(b/8)) for b in (32,16,8,4)])",
       "result": "[590.4477611940298, 295.2238805970149, 147.61194029850745, 73.80597014925372]"
     },
     {
-      "claim": "RECONCILED figs 109/110 numbering: fig 109 numbers the prompt t0-t7 with decode starting at t8, fig 110 numbers it t1-t8 with t9 next. The film's pills use one numbering in both scenes: an 8-token prompt t1-t8, the first answer token t9 drawn at the end of prefill, decode's chain t9 → t10 → t11. The narration drops token numbers ('the next token does not exist until the one before it has been chosen') so it cannot clash with ch04's spoken 'token nine needs token eight'",
+      "claim": "RECONCILED figs 109/110 numbering: fig 109 numbers the prompt t0-t7 with decode starting at t8, fig 110 numbers it t1-t8 with t9 next. The film's pills use one numbering in both scenes: an 8-token prompt t1-t8, the first answer token t9 drawn at the end of prefill, decode's chain t9 → t10 → t11. The narration drops token numbers ('in decode, no token exists until the one before it is chosen') so it cannot clash with ch04's spoken 'token nine needs token eight', which the s02 callback chip quotes",
       "python": "print(len(range(1,9)), 8+1, 8+2)",
       "result": "8 9 10"
     },
@@ -391,7 +411,7 @@
       "result": "6 7 560"
     },
     {
-      "claim": "CLARIFIED fig 117 wording: the atlas says 'every byte pulled is used in roughly 2,000 multiply-accumulates'; precisely, every weight (2 bytes) is used in 2,000 MACs with a 2,000-token prompt, i.e. 2,000 × 2 ops / 2 bytes = 2,000 ops per byte (the figure ch12 places on the roofline). The film says 'each arriving weight' and keeps 'thousands of times larger'",
+      "claim": "CLARIFIED fig 117 wording: the atlas says 'every byte pulled is used in roughly 2,000 multiply-accumulates'; precisely, every weight (2 bytes) is used in 2,000 MACs with a 2,000-token prompt, i.e. 2,000 × 2 ops / 2 bytes = 2,000 ops per byte (the figure ch12 places on the roofline). The film says 'each weight arrives, does one multiply-accumulate, and is done. In a two-thousand-token prefill, it does two thousand' and keeps 'thousands of times larger'",
       "python": "print(2000*2/2)",
       "result": "2000.0"
     }

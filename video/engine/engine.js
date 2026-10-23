@@ -180,15 +180,21 @@
       beats: timing.beats || [],
       t(spec) { return timeSpec(S, spec); },
       /** estimated time a word is spoken inside a beat (phoneme-weighted estimate, about ±0.2 s) */
+      // 'b3~weight' = first spoken word starting with "weight"; 'b3~every time' = the phrase (each word a
+      // prefix match, consecutive); 'b3~weight#2' = its second occurrence in the beat.
       word(bid, w) {
         const b = S.beat(bid);
-        const want = w.toLowerCase().replace(/[^a-z0-9.,']/g, '');
-        const words = b.words || [];
-        for (const x of words) {
-          const k = x.w.toLowerCase().replace(/[^a-z0-9.,']/g, '');
-          if (k === want || k.startsWith(want)) return x.start;
+        const norm = x => x.toLowerCase().replace(/[^a-z0-9.,']/g, '').replace(/[.,]+$/, '');
+        let nth = 1;
+        const occ = w.match(/^(.*)#(\d+)$/);
+        if (occ) { w = occ[1]; nth = parseInt(occ[2], 10); }
+        const want = w.trim().split(/\s+/).map(norm).filter(Boolean);
+        const words = (b.words || []).map(x => ({ k: norm(x.w), start: x.start }));
+        let seen = 0;
+        for (let i = 0; i + want.length <= words.length; i++) {
+          if (want.every((t, j) => words[i + j].k === t || words[i + j].k.startsWith(t)) && ++seen === nth) return words[i].start;
         }
-        warnings.push(`word '${w}' not found in ${bid}; using beat start`);
+        warnings.push(`word '${w}'${nth > 1 ? ' #' + nth : ''} not found in ${bid}; using beat start`);
         return b.start;
       },
       add(anim, at) { tl.add(anim, timeSpec(S, at)); return anim; },
