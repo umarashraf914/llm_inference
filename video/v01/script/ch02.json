@@ -20,8 +20,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "One turn of that loop takes about thirty milliseconds, three hundredths of a second.",
-          "show": "The panel is on screen from the first frame; the stopwatch with its '?' fades in above its top right. On 'One turn', copies of the nine pills flow into the coral box and its tiles light top to bottom; the '?' becomes '0 ms' and the stopwatch starts. On 'thirty milliseconds', a new blue pill '.' pops into 'one new token' and the stopwatch stops at '30 ms'; a small grey tag under it reads 'slowed down', since the turn took about two seconds of screen time. On 'three hundredths', a grey line writes under the reading: '= 0.03 s'."
+          "say": "One turn of the generate loop, draw included, takes about thirty milliseconds, three hundredths of a second.",
+          "show": "The panel is on screen from the first frame; the stopwatch with its '?' fades in above its top right. On 'One turn', copies of the nine pills flow into the coral box and its tiles light top to bottom; the '?' becomes '0 ms' and the stopwatch starts. On 'the generate loop', the panel's title glows once. On 'draw included', as the last tiles light, the small spinner from ch01's sampling scene flickers once at the left edge of 'one new token'. On 'thirty milliseconds', a new blue pill '.' pops into 'one new token' and the stopwatch stops at '30 ms'; a small grey tag under it reads 'slowed down', since the turn took about two seconds of screen time. On 'three hundredths', a grey line writes under the reading: '= 0.03 s'."
         },
         {
           "id": "b2",
@@ -30,13 +30,13 @@
         },
         {
           "id": "b3",
-          "say": "That is the target, and not an arbitrary one: roughly the slowest pace that still feels responsive.",
-          "show": "The 'slowed 4×' tag fades and the chat window fades out, its job done. On 'the target', a white check-circle icon and the label 'the target' land just right of the counter, left edge at (1640, 480). On 'not an arbitrary one', a grey label writes in the bottom band, centred at (960, 760): 'not arbitrary'. On 'roughly the slowest pace', a white label lands beneath it, centred at (960, 830): 'rule of thumb: slowest that still feels responsive'. The ruler keeps its 30 ms beat throughout; the counter's '33' glows once on 'responsive'."
+          "say": "That is the target, and not an arbitrary one: roughly the slowest pace that still reads smoothly.",
+          "show": "The 'slowed 4×' tag fades and the chat window fades out, its job done. On 'the target', a white check-circle icon and the label 'the target' land just right of the counter, left edge at (1640, 480). On 'not an arbitrary one', a grey label writes in the bottom band, centred at (960, 760): 'not arbitrary'. On 'roughly the slowest pace', a white label lands beneath it, centred at (960, 830): 'rule of thumb: slowest that still reads smoothly'. The ruler keeps its 30 ms beat throughout; the counter's '33' glows once on 'smoothly'."
         },
         {
           "id": "b4",
-          "say": "In a few minutes, you will derive it from two numbers on a chip's specification sheet.",
-          "show": "The panel, ruler, counter, check-circle and labels fade to 20%. The stopwatch's '30 ms' lifts off, enlarges and settles centre top (960, 290) as a white stamp '≈ 30 ms per token', with a small grey line under it: 'the number this film is about'. On 'derive it', ch00's spec-sheet card slides up beneath it (x 700-1220, y 400-800): header 'chip spec sheet' and six grey placeholder lines. On 'two numbers', two of the lines brighten; on 'specification sheet', they resolve exactly as in ch00: amber 'operations per second: ?' and coral 'bytes per second: ?'. No chip-and-model riffle here; ch00 already played it. Hold."
+          "say": "Soon you will derive it from the model's size and a chip's specification sheet.",
+          "show": "The panel, ruler, counter, check-circle and labels fade to 20%. The stopwatch's '30 ms' lifts off, enlarges and settles centre top (960, 290) as a white stamp '≈ 30 ms per token', with a small grey line under it: 'the number this film is about'. On 'derive it', ch00's spec-sheet card slides up beneath it (x 700-1220, y 400-800): header 'chip spec sheet' and six grey placeholder lines. On 'the model's size', the coral 'run the whole model' box in the faded panel brightens briefly, then dims back. On 'specification sheet', two of the lines brighten and resolve exactly as in ch00: amber 'operations per second: ?' and coral 'bytes per second: ?'. No chip-and-model riffle here; ch00 already played it. Hold."
         }
       ]
     },
@@ -95,8 +95,8 @@
         },
         {
           "id": "b3",
-          "say": "A fixed cost stops mattering once spread over enough work. That is amortising, and it comes back often. The rest of this film is about a cost that refuses to spread.",
-          "show": "The counter and the lower third dim to 30%. On 'a fixed cost', a teal label lands above the timeline: 'fixed cost ÷ lots of work → tiny'; on 'amortising', the word 'amortising' writes under it in teal; on 'comes back often', a small grey tag settles just right of the word: 'first of many'. On 'refuses to spread', the teal labels and the tag dim and the camera pushes in on the timeline's right end: three consecutive ticks grow into blue token pills, each topped by its own coral block as wide as the load block was before it shrank (180 px), labelled '140 GB': the same bytes the load moved, now apparently paid again by every token. A '?' sits above the row with the label 'paid again, every token?'."
+          "say": "A fixed cost stops mattering once spread over enough work. That is amortising, and it comes back often. Next comes a cost that, one token at a time, refuses to spread.",
+          "show": "The counter and the lower third dim to 30%. On 'a fixed cost', a teal label lands above the timeline: 'fixed cost ÷ lots of work → tiny'; on 'amortising', the word 'amortising' writes under it in teal; on 'comes back often', a small grey tag settles just right of the word: 'first of many'. On 'Next comes a cost', the teal labels and the tag dim and the camera pushes in on the timeline's right end. On 'one token at a time', three consecutive ticks grow into blue token pills, one after another, each topped by its own coral block as wide as the load block was before it shrank (180 px), labelled '140 GB': the same bytes the load moved, now apparently paid again by every token. On 'refuses to spread', a '?' settles above the row with the label 'paid again, every token?'."
         }
       ]
     },
@@ -203,7 +203,7 @@
       "result": "33.333333333333336"
     },
     {
-      "claim": "'at least as fast as you read': at a common estimate of 250 words a minute and ~1.5 tokens per word (ch01), reading is ≈ 6 tokens/s, ≈ 160 ms per token; 33 tokens/s is ≈ 5× that, so the claim holds with room to spare. Because real reading is that much slower, s01 shows no eye icon or reading-pace marker, which would make 33 look far above 'the slowest pace that still feels responsive' (a rule of thumb, kept on screen as one). Estimate, not from the atlas",
+      "claim": "'at least as fast as you read': at a common estimate of 250 words a minute and ~1.5 tokens per word (ch01), reading is ≈ 6 tokens/s, ≈ 160 ms per token; 33 tokens/s is ≈ 5× that, so the claim holds with room to spare. Because real reading is that much slower, s01 shows no eye icon or reading-pace marker, which would make 33 look far above 'the slowest pace that still reads smoothly' (a rule of thumb, kept on screen as one; fig 11's 'responsive to a reader', worded as reading pace so 'responsive' stays with the first-token pause, as in ch17 and fig 143). Estimate, not from the atlas",
       "python": "250/60*1.5, 1000/(250/60*1.5), (1000/30)/(250/60*1.5)",
       "result": "6.25 160.0 5.333333333333334"
     },

@@ -26,13 +26,13 @@
       "beats": [
         {
           "id": "b1",
-          "say": "The model does not run on your laptop. Your question crosses the network to a server, and the answer comes back.",
+          "say": "A service like that does not run on your laptop. Your question crosses the network to a server, and the answer comes back.",
           "show": "Laptop left, server right, the dashed line with the globe between them. On 'crosses the network', a small blue pill “your question” leaves the laptop and slides along the line, through the globe, to the server. On 'comes back', a smaller blue pill “answer” returns along the same line to the laptop. Both pills fade at the end of the beat."
         },
         {
           "id": "b2",
-          "say": "Your laptop has one small chip. The server has a few G P U chips, built for this work, and never switches off.",
-          "show": "On 'one small chip', the card under the laptop fades in, “Your laptop” / “one small chip, on when opened”, and a single small chip icon pulses once inside the laptop. On 'a few G P U chips', the server opens like a drawer: four small GPU package illustrations draw in one by one, each an amber compute die flanked by coral memory stacks, and the matching card fades in under it, “A server” / “a few GPUs, always on”. On 'never switches off', the server LED glows steady while the laptop lid closes, goes dark, and reopens."
+          "say": "Your laptop has one small chip. The server has a few G P Us, big chips built for this work, and never switches off.",
+          "show": "On 'one small chip', the card under the laptop fades in, “Your laptop” / “one small chip, on when opened”, and a single small chip icon pulses once inside the laptop. On 'a few G P Us', the server opens like a drawer and the matching card fades in under it, “A server” / “a few GPUs, always on”; on 'big chips built for this work', four small GPU package illustrations draw in one by one, each an amber compute die flanked by coral memory stacks. On 'never switches off', the server LED glows steady while the laptop lid closes, goes dark, and reopens."
         },
         {
           "id": "b3",
@@ -57,16 +57,16 @@
         {
           "id": "b1",
           "say": "Your request passes through five pieces of software, each solving a different problem. A router picks the machine. A scheduler batches it with other people's requests, to run together.",
-          "show": "The panel draws with its title. Five empty card outlines sketch in, four in the row and one as the inner frame; on 'five pieces', the counter “5 parts” appears. The blue request pill waits at the panel's left edge. On 'router', the panel title fades and card 1 fills blue, “Router”, with a signpost icon and sub “which machine”; three tiny server icons fan out to its right and an arrow picks the middle one. On 'scheduler', the Router sub-label fades and card 2 fills blue, “Scheduler”, with a calendar-clock icon and sub “batch with others”; the pill moves in, seven more blue pills in slightly different shades drop in beside it on 'other people's requests', and on 'run together' all eight snap into one tray labelled “batch” (the same eight-pill tray returns in the crowd scene)."
+          "show": "The panel draws with its title. Five empty card outlines sketch in, four in the row and one as the inner frame; on 'five pieces', the counter “5 parts” appears. The blue request pill waits at the panel's left edge. On 'router', the panel title fades and card 1 fills blue, “Router”, with a signpost icon and sub “which machine”; three tiny server icons fan out to its right and an arrow picks the middle one. On 'scheduler', the Router sub-label fades and card 2 fills blue, “Scheduler”, with a queue icon and sub “batch with others”; the pill moves in, seven more blue pills in slightly different shades drop in beside it on 'other people's requests', and on 'run together' all eight snap into one tray labelled “batch” (the same eight-pill tray returns in the crowd scene)."
         },
         {
           "id": "b2",
-          "say": "A memory manager decides which weights sit on which chip. Kernels, small programs on the chip, do the arithmetic. Orchestration wires it all together.",
-          "show": "The “5 parts” counter and the “batch” label fade; the eight-pill tray stays under the Scheduler card, unlabelled. Earlier sub-labels fade. On 'memory manager', card 3 fills blue, “Memory manager”, sub “which weights, which chip”; below it two small chip icons with coral memory stacks, and coral weight tiles slide into their slots. On 'kernels', card 4 fills amber, “Kernels”, sub “the actual arithmetic”; inside it, in miniature, the five-row multiply-and-add picture from scene ch01_s03, beat b4 replays: five inputs times five weights (0.13, −0.7, 0.02, 1.44, −0.3), summed into one output, 0.8. On 'arithmetic' the miniature tiles into a dense grid that blurs with speed. On 'orchestration', the inner frame takes a faint blue tint and shows “Orchestration”, sub “wiring it together”; the connector arrows brighten left to right in sequence."
+          "say": "A memory manager decides which weights go in which chip's memory. Kernels, small programs on the chip, do the arithmetic. Orchestration wires it all together.",
+          "show": "The “5 parts” counter and the “batch” label fade; the eight-pill tray stays under the Scheduler card, unlabelled. Earlier sub-labels fade. On 'memory manager', card 3 fills blue, “Memory manager”, sub “which weights, which memory”; below it two small chip icons, each an amber die with coral memory stacks beside it, and on 'which chip's memory' coral weight tiles slide into the memory stacks, never onto the amber dies. On 'kernels', card 4 fills amber, “Kernels”, sub “the actual arithmetic”; inside it, in miniature, the five-row multiply-and-add picture from scene ch01_s03, beat b4 replays: five inputs times five weights (0.13, −0.7, 0.02, 1.44, −0.3), summed into one output, 0.8. On 'arithmetic' the miniature tiles into a dense grid that blurs with speed. On 'orchestration', the inner frame takes a faint blue tint and shows “Orchestration”, sub “wiring it together”; the connector arrows brighten left to right in sequence."
         },
         {
           "id": "b3",
-          "say": "Only one of the five does arithmetic. The other four exist because arithmetic is not the hard part. You will see why each exists.",
+          "say": "Only one of the five does arithmetic. The other four exist because arithmetic is not the hard part. This series shows why each exists.",
           "show": "Sub-labels fade. On 'only one of the five', Kernels stays bright amber while the other four dim to grey outlines. The takeaway band rises: “1 of 5 does arithmetic”. On 'why each exists', the four dimmed parts relight one at a time, each with a small question mark that turns into a tick."
         }
       ]
@@ -198,12 +198,12 @@
         22,
         23
       ],
-      "visual": "Beats 1 and 2: two tall question cards side by side across the upper half, left “Does it reach the context?”, right “Does it cross the network from your device?”, both blue. From beat 3 both cards shrink away and the frame splits. Left third (x 96 to 620): three shelves stacked top to bottom, each a card with an icon: a laptop (your device), a server with a person badge (the server, for you), a server with a globe badge (the server, for everyone). Each shelf's title shows while it is spoken about, then shrinks to its icon badge, leaving icons and pills. Right two thirds (x 700 to 1824): a horizontal strip “one assembled prompt” into which pills fly from the shelves. Far right, from beat 5: the small “model / remembers: nothing” block from the stateless scene, and below it a server icon with a teal-outlined tray “kept work”. In beats 5 and 6 the strip lifts and two more strips stack beneath it for comparison (in beat 6 the model block and tray fade out, freeing the right edge so the longer “your next turn” strip can run to x 1800); comparison strips use the same colour-coded pills without text, keyed to the labelled top strip. Pills blue, the reusable prefix teal. The idea: where text is stored varies, where it ends up never does, and its order is chosen so that requests share the longest possible beginning.",
+      "visual": "Beats 1 and 2: two tall question cards side by side across the upper half, left “Does it reach the context?”, right “Does it cross the network from your device?”, both blue. From beat 3 both cards shrink away and the frame splits. Left third (x 96 to 620): three shelves stacked top to bottom, each a card with an icon: a laptop (your device), a server with a person badge (the server, for you), a server with a globe badge (the server, for everyone). Each shelf's title shows while it is spoken about, then shrinks to its icon badge, leaving icons and pills. Right two thirds (x 700 to 1824): a horizontal strip “one assembled prompt” into which pills fly from the shelves. Far right, from beat 5: the small “model / remembers: nothing” block from the stateless scene, and below it a server icon with a short stack of thin coral slabs “kept work”, the same coral slab stack the next chapter uses for the cache. In beats 5 and 6 the strip lifts and two more strips stack beneath it for comparison (in beat 6 the model block and slab stack fade out, freeing the right edge so the longer “your next turn” strip can run to x 1800); comparison strips use the same colour-coded pills without text, keyed to the labelled top strip. Pills blue, the reusable prefix teal. The idea: where text is stored varies, where it ends up never does, and its order is chosen so that requests share the longest possible beginning.",
       "beats": [
         {
           "id": "b1",
-          "say": "Two questions get confused. Does the system prompt reach the context? Yes, every turn, as do the tools and skills coming next. The architecture forces it.",
-          "show": "Left card draws: title “Does it reach the context?”, sub “always yes, no exceptions”. Three small pills sit inside it, “system prompt”, “tool definitions”, “loaded skill”; on 'Yes', “system prompt” gets a tick; on 'tools' and 'skills' the other two pills tick in turn (no extra labels: the next two scenes teach them). On 'forces it', the sub swaps to “forced by the architecture”."
+          "say": "Two questions get confused. Does the system prompt reach the context? Yes, every turn, as do tool definitions and any loaded skill, coming next. The architecture forces it.",
+          "show": "Left card draws: title “Does it reach the context?”, sub “always yes, no exceptions”. Three small pills sit inside it, “system prompt”, “tool definitions”, “loaded skill”; on 'Yes', “system prompt” gets a tick; on 'tool definitions' and 'any loaded skill' the other two pills tick in turn (no extra labels: the next two scenes teach them). On 'forces it', the sub swaps to “forced by the architecture”."
         },
         {
           "id": "b2",
@@ -223,12 +223,12 @@
         {
           "id": "b5",
           "say": "The order matters. The model remembers nothing, but the server may briefly keep a running record of work done on text it has seen. The next chapter shows what.",
-          "show": "The arrow label, the takeaway and the shelf arrows fade. The strip lifts and is labelled “your request”. On 'remembers nothing', the small model block with “remembers: nothing” appears at the far right. On 'running record', below it a server icon fills its teal-outlined tray “kept work” with a faint teal copy of the strip's first pills, a small clock on the tray. On 'next chapter', the tray gains a small tag “→ next chapter”."
+          "show": "The arrow label, the takeaway and the shelf arrows fade. The strip lifts and is labelled “your request”. On 'remembers nothing', the small model block with “remembers: nothing” appears at the far right. On 'running record', below it a server icon grows a short stack of thin coral slabs “kept work”, one slab per pill at the strip's start, a small clock beside it. On 'next chapter', the stack gains a small tag “→ next chapter”."
         },
         {
           "id": "b6",
           "say": "It reuses that work only for a beginning identical token for token, called a prefix. Most shared first makes the prefix longest. Newest first, and nothing matches.",
-          "show": "The model block and tray fade out. Pill text stays only on the top strip, “your request”. A second strip, “a stranger's request”, slides in under the first: same first pill, different later ones, colour-coded pills without text. On 'token for token', a teal highlight sweeps from the left across both strips and stops on both exactly where they first differ, at the end of the provider's system prompt; label over the teal: “prefix”. On 'most shared first', the “prefix” label fades, the stranger's strip dims (keeping its short teal) and its label fades, and a third strip, “your next turn”, appears under it, longer than the top strip and running to x 1800: provider prompt, your instructions, conversation so far, your previous newest message, the answer to it, then a new message. A second teal sweep runs along “your request” and “your next turn” together. On “your request” it now covers the full length, because every token of it is repeated at the start of your next turn. On “your next turn” it covers everything through the old message and the answer, and stops only at the new message. A small teal tag sits at the end of that strip: “matches further”. On 'newest first', every strip reshuffles so its newest message jumps to the front, every teal highlight collapses to zero width, and a grey label reads “nothing matches”; then the strips snap back and the teal returns."
+          "show": "The model block and slab stack fade out. Pill text stays only on the top strip, “your request”. A second strip, “a stranger's request”, slides in under the first: same first pill, different later ones, colour-coded pills without text. On 'token for token', a teal highlight sweeps from the left across both strips and stops on both exactly where they first differ, at the end of the provider's system prompt; label over the teal: “prefix”. On 'most shared first', the “prefix” label fades, the stranger's strip dims (keeping its short teal) and its label fades, and a third strip, “your next turn”, appears under it, longer than the top strip and running to x 1800: provider prompt, your instructions, conversation so far, your previous newest message, the answer to it, then a new message. A second teal sweep runs along “your request” and “your next turn” together. On “your request” it now covers the full length, because every token of it is repeated at the start of your next turn. On “your next turn” it covers everything through the old message and the answer, and stops only at the new message. A small teal tag sits at the end of that strip: “matches further”. On 'newest first', every strip reshuffles so its newest message jumps to the front, every teal highlight collapses to zero width, and a grey label reads “nothing matches”; then the strips snap back and the teal returns."
         }
       ]
     },
@@ -268,7 +268,7 @@
       "figs": [
         25
       ],
-      "visual": "Top band (y about 200 to 330): a row of eight pills, each a puzzle-piece icon with a numeral 1 to 8 for skills 1 to 8, under a heading. Middle band (y about 420 to 640): skill 2 unfolds there into a tall document block. Lower band: the blue context strip, x 160 to 1760, y 720, 36 px tall, schematic until beat 3. In beat 3 that same strip becomes, in place, the outlined context-window bar drawn to scale: 200,000 tokens = 1,600 px, so 80,000 = 640 px, 20,000 = 160 px, 3,200 = 25.6 px. Comparison rows sit under it, the teal 3,200 bar at y 790 and the 20,000-token chat at y 850, each labelled to its right; y above 900 stays free for the takeaway band. Also in beat 3 the row of eight reflows into a grid of forty pills in the upper half (a re-layout, not a camera zoom, so the bar's scale holds). Pills and token blocks blue; the on-demand saving teal. The idea: a cheap catalogue is always present, the expensive contents only when needed, and the arithmetic forces it.",
+      "visual": "Top band (y about 200 to 330): a row of eight pills, each a puzzle-piece icon with a numeral 1 to 8 for skills 1 to 8, under a heading. Middle band (y about 420 to 640): skill 2 unfolds there into a tall document block. Lower band: the blue context strip, x 160 to 1760, y 720, 36 px tall, schematic until beat 3. In beat 3 that same strip becomes, in place, the outlined context-window bar drawn to scale: 200,000 tokens = 1,600 px, so 80,000 = 640 px, 2,000 = 16 px, 3,200 = 25.6 px. Comparison rows sit under it, the teal 3,200 bar at y 790 and the 2,000-token ten-turn chat at y 850, each labelled to its right; y above 900 stays free for the takeaway band. Also in beat 3 the row of eight reflows into a grid of forty pills in the upper half (a re-layout, not a camera zoom, so the bar's scale holds). Pills and token blocks blue; the on-demand saving teal. The idea: a cheap catalogue is always present, the expensive contents only when needed, and the arithmetic forces it.",
       "beats": [
         {
           "id": "b1",
@@ -293,7 +293,7 @@
         {
           "id": "b5",
           "say": "That is progressive disclosure, forced by arithmetic: every skill fully loaded would cost more of the window than the conversation.",
-          "show": "The plugin box fades. The takeaway band rises: “progressive disclosure”. On 'than the conversation', on the row at y 850 a blue block draws to the same scale, 160 px, “a long chat: 20,000 tokens”, tagged “illustrative”, and the 640 px block of 80,000 flashes beside it."
+          "show": "The plugin box fades. The takeaway band rises: “progressive disclosure”. On 'than the conversation', on the row at y 850 a blue block draws to the same scale, 16 px, “ten turns of chat: 2,000 tokens”, tagged “illustrative”, and the 640 px block of 80,000 flashes beside it."
         }
       ]
     },
@@ -395,9 +395,14 @@
       "result": "6"
     },
     {
-      "claim": "context-window bar at 1,600 px for 200,000 tokens: 80,000 = 640 px, 3,200 = 25.6 px, 1,200 = 9.6 px, a 20,000-token chat = 160 px, the 4,750-token preamble = 38 px",
-      "python": "[1600*x/200000 for x in (200000,80000,3200,1200,20000,4750)]",
-      "result": "[1600.0, 640.0, 25.6, 9.6, 160.0, 38.0]"
+      "claim": "context-window bar at 1,600 px for 200,000 tokens: 80,000 = 640 px, 3,200 = 25.6 px, 1,200 = 9.6 px, the 2,000-token ten-turn chat = 16 px, the 4,750-token preamble = 38 px",
+      "python": "[1600*x/200000 for x in (200000,80000,3200,1200,2000,4750)]",
+      "result": "[1600.0, 640.0, 25.6, 9.6, 16.0, 38.0]"
+    },
+    {
+      "claim": "s09 b5's chat is s05's ten-turn conversation, 2,000 tokens: forty skills fully loaded are 40 times it, and the 4,750-token preamble is 2.4 times it, consistent with s10 b4 'the preamble is almost always the largest thing'",
+      "python": "(80000/2000, 4750/2000)",
+      "result": "(40.0, 2.375)"
     },
     {
       "claim": "illustrative preamble: 2,000 + 450 + 300 + 2,000 = 4,750 tokens (same total in any order)",

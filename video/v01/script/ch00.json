@@ -35,8 +35,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Making one token takes a staggering amount of arithmetic, about a hundred billion multiplications and additions.",
-          "show": "On 'Making', the stamp shrinks and drops to (960, 790) as the label '≈ 30 ms per token'. At the same time the bar outline draws outward from the centre to full width, and the dimension line draws beneath it. The 'one token' pill pops in above the right end. On 'arithmetic', the chip icon appears, and an amber counter appears to its right (left edge x 380, y 380, 64 px mono) with a flickering '× +' glyph. On 'a hundred billion', the counter runs from 0 to '≈ 100,000,000,000'. A grey label settles under it, left-anchored at (380, 450): 'multiplications and additions'."
+          "say": "Making one token takes a staggering amount of arithmetic, a hundred and forty billion multiplications and additions.",
+          "show": "On 'Making', the stamp shrinks and drops to (960, 790) as the label '≈ 30 ms per token'. At the same time the bar outline draws outward from the centre to full width, and the dimension line draws beneath it. The 'one token' pill pops in above the right end. On 'arithmetic', the chip icon appears, and an amber counter appears to its right (left edge x 380, y 380, 64 px mono) with a flickering '× +' glyph. On 'a hundred and forty billion', the counter runs from 0 to '140,000,000,000', the same figure the operation tally reaches later in the film. A grey label settles under it, left-anchored at (380, 450): 'multiplications and additions'."
         },
         {
           "id": "b2",
@@ -116,14 +116,14 @@
       "result": "5.470000000000001 9.116666666666669 3.71"
     },
     {
-      "claim": "'About a hundred billion multiplications and additions' is the round power of ten for 70e9 weights x 2 = 140 billion operations (log10 = 11.15, so about 10^11); ch05 explains the rounding",
+      "claim": "'A hundred and forty billion multiplications and additions' = 70e9 weights x 2 = 140 billion operations, the count ch05 shows on its tally ('140,000,000,000') and ch10 derives. Its log10 is 11.15, which ch05 rounds to about 10^11 for the tenth of a millisecond. (This replaces 'about a hundred billion', the only place the film said it, whose counter read '≈ 100,000,000,000'.)",
       "python": "import math; print(70e9*2, math.log10(70e9*2))",
       "result": "140000000000.0 11.146128035678238"
     },
     {
-      "claim": "About 10^11 operations at about 10^15 operations per second = 10^-4 s = 0.1 ms, 'about a tenth of a millisecond' (a peak-rate capability, hence 'could get through')",
-      "python": "1e11/1e15, 1e11/1e15*1e3",
-      "result": "0.0001 0.1"
+      "claim": "140 billion operations, rounded as in ch05 to about 10^11, at about 10^15 operations per second = 10^-4 s = 0.1 ms, 'about a tenth of a millisecond' (a peak-rate capability, hence 'could get through'). Unrounded, 1.4e11 / 1e15 = 0.14 ms, which ch05 also calls about a tenth of a millisecond",
+      "python": "1e11/1e15, 1e11/1e15*1e3, 140e9/1e15*1e3",
+      "result": "0.0001 0.1 0.13999999999999999"
     },
     {
       "claim": "Arithmetic share of the 30 ms: 0.1 / 30 = 0.33%, 'under one percent'",
@@ -199,6 +199,11 @@
       "claim": "Chapter length after the edit (re-measured audio): 16.57 + 35.23 + 19.37 = 71.2 s, inside the 60-100 s target",
       "python": "print(round(16.566666666666666+35.233333333333334+19.366666666666667,2))",
       "result": "71.17"
+    },
+    {
+      "claim": "Re-timing estimate after the s02 b1 count edit ('about a hundred billion' -> 'a hundred and forty billion'): across the film's eight measured 'hundred ... billion' spans with 'and forty', 'hundred' to 'billion' averages 1.073 s, against 0.499 s here, and 'about' took 0.382 s. So b1 grows by about 0.19 s; the absolute s02 times quoted above move later by that much until the audio is re-measured, the intervals the storyboard relies on are unchanged, and the chapter is about 71.4 s, still inside 60-100 s",
+      "python": "print(round(1.073-0.499-0.382,2), round(16.566666666666666+35.233333333333334+0.19+19.366666666666667,1))",
+      "result": "0.19 71.4"
     }
   ]
 }

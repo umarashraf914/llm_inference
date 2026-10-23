@@ -18,12 +18,12 @@
       "figs": [
         84
       ],
-      "visual": "One continuous shot on the dark canvas. Top band: one short heading that changes per beat. Centre: a row of eight blue number cells, 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2, which becomes the top row of a 4 × 8 blue grid. In b2 a copy of that row floats to the left third and the grid glides to the right third. In b3 the camera pulls back and the grid becomes one tile in a wall of 560 small tiles, 20 columns × 28 rows, filling as a counter runs. Blue and grey only: no amber until the multiply in b3. The idea the motion makes visible: a vector is a row, a matrix is rows stacked, and a model is a pile of such grids.",
+      "visual": "One continuous shot on the dark canvas. Top band: a faint grey echo of the previous chapter's closing line, 'data movement is expensive', for the first sentence only, then one short heading that changes per beat. Centre: a row of eight blue number cells, 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2, which becomes the top row of a 4 × 8 blue grid. In b2 a copy of that row floats to the left third and the grid glides to the right third. In b3 the camera pulls back and the grid becomes one tile in a wall of 560 small tiles, 20 columns × 28 rows, filling as a counter runs. Blue and grey only: no amber until the multiply in b3. The idea the motion makes visible: a vector is a row, a matrix is rows stacked, and a model is a pile of such grids.",
       "beats": [
         {
           "id": "b1",
-          "say": "A vector is a list of numbers, like these eight. A matrix is a grid of them, four rows of eight.",
-          "show": "Heading: 'a vector: a list of numbers'. On 'list of numbers', eight blue cells pop in left to right across the centre, 0.15 s apart, showing 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2. On 'grid of them', the heading changes to 'a matrix: a grid of numbers' and that row becomes the grid's top row. Three more rows of eight cells then drop in beneath it, one on each of the words 'rows', 'of' and 'eight' in 'four rows of eight'; grey label under the grid: '4 × 8 = 32 numbers'."
+          "say": "To see what actually moves, two words first. A vector is a list of numbers, like these eight. A matrix is a grid of them, four rows of eight.",
+          "show": "The canvas opens empty except for a faint grey echo of the previous chapter's closing line in the top band, 'data movement is expensive'. On 'two words first', it fades. On 'A vector', the heading 'a vector: a list of numbers' appears. On 'list of numbers', eight blue cells pop in left to right across the centre, 0.15 s apart, showing 0.4, -1.2, 0.0, 0.9, 0.3, -0.5, 1.1, 0.2. On 'grid of them', the heading changes to 'a matrix: a grid of numbers' and that row becomes the grid's top row. Three more rows of eight cells then drop in beneath it, one on each of the words 'rows', 'of' and 'eight' in 'four rows of eight'; grey label under the grid: '4 × 8 = 32 numbers'."
         },
         {
           "id": "b2",
@@ -32,7 +32,7 @@
         },
         {
           "id": "b3",
-          "say": "A model is a few hundred such grids. Running it means multiplying vectors by them: multiply and add, nothing else.",
+          "say": "A model is a few hundred such grids. Running it means multiplying vectors by them: multiply and add, almost nothing else.",
           "show": "On 'a few hundred', both tags fade and the camera pulls back: the grid shrinks into the top-left tile of a wall that fills row by row, 20 columns × 28 rows = 560 tiles, while a counter beside it runs to '~560' with the tag 'our 70B model'. On 'multiplying vectors by them', the left vector slides into the wall and a soft amber pulse ripples across the tiles, the first amber in the chapter. On 'multiply and add', the heading changes to 'one operation: multiply and add', in amber."
         }
       ]
@@ -58,7 +58,7 @@
         {
           "id": "b3",
           "say": "Every row does the same, filling the output vector: the multiply-and-add from the very start.",
-          "show": "On 'Every row', the ghost input copies itself onto rows 2, 3 and 4 and all three run the same move together at triple speed, amber chips flashing in parallel because no row waits for another; their totals drop into 'out' cells 2 to 4, which fill blue (values not shown). The counter reaches 20 and 20. On 'from the very start', a small inset of the chapter-one picture, five inputs times five weights feeding one 'add' into one output, fades in at top left, tagged 'one row = this'."
+          "show": "On 'Every row', the ghost input copies itself onto rows 2, 3 and 4 and all three run the same move together at triple speed, amber chips flashing in parallel because no row waits for another; their totals drop into 'out' cells 2 to 4, which fill blue (values not shown). The counter reaches 20 and 20. On 'from the very start', a small inset of the chapter-one picture, five inputs times five weights converging into the amber 'add them up' box and the blue 'one output' box showing 0.8, fades in at top left, tagged 'one row = this'."
         },
         {
           "id": "b4",
@@ -82,8 +82,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "But you type text. The tokeniser first cuts it into tokens, on average a little smaller than words. Common words are one token, rare words several.",
-          "show": "On 'you type text', the three cards and their titles fade in, the white sentence types on inside the Text card, and the two arrows draw on. On 'tokeniser', the sentence slides along arrow 1 and snaps into five blue pills in the Tokens card: 'the', 'quick', 'brown', 'fox', 'jumps'. On 'smaller than words', a grey sublabel fades in under the Tokens card: '500 words → 600–800 tokens (1.2–1.6 per word)'. On 'rare words several', the white word 'unbelievably' drops in below and splits into three pills, 'un', 'believ', 'ably', tagged 'illustrative split'."
+          "say": "But you type text. The tokeniser first cuts it into the tokens you met earlier, on average a little smaller than words.",
+          "show": "On 'you type text', the three cards and their titles fade in, the white sentence types on inside the Text card, and the two arrows draw on. On 'tokeniser', the sentence slides along arrow 1 and snaps into five blue pills in the Tokens card: 'the', 'quick', 'brown', 'fox', 'jumps'. On 'met earlier', a quick recall of the earlier example: the white word 'unbelievably' drops in below and splits into three pills, 'un', 'believ', 'ably', tagged 'illustrative split, as before'. On 'smaller than words', a grey sublabel, also a recall, fades in under the Tokens card: '500 words → 600–800 tokens (1.2–1.6 per word)'."
         },
         {
           "id": "b2",
@@ -152,7 +152,7 @@
         },
         {
           "id": "b4",
-          "say": "Multiply and gather cost completely different things, operations against memory reads, which matters from here on. A habit worth keeping: several steps are written as a multiply and done as something much cheaper.",
+          "say": "Multiply and gather cost different things, operations against memory reads, which matters from here on. A habit worth keeping: several steps are written as a multiply and done as something cheaper.",
           "show": "At the start, the struck card and counter fade out. On 'Multiply and gather', an amber cost card with a calculator icon rises at bottom left, 'multiply: counted in operations', and a coral card with a memory-chip icon rises beside it, 'gather: counted in memory reads'. On 'operations', the amber card pulses once; on 'memory reads', the coral card pulses once. On 'habit worth keeping', everything dims except one centred line: 'written as a multiply, done as something cheaper'."
         }
       ]
@@ -182,8 +182,8 @@
         },
         {
           "id": "b4",
-          "say": "Zero operations in. Out, one multiply and one add per weight, two point one billion, from a table exactly the same size.",
-          "show": "At the start, the '+16.4 KB' tag and the '128,256 × 8,192 × 2 bytes' term fade. On 'Zero operations in', a teal '0 operations' lands under the left table. On 'Out', the token counter fades and the slow sweep stops. On 'one multiply and one add per weight', the small amber term '1 multiply + 1 add per weight' appears under the right table; on 'two point one billion', an amber counter beneath it runs from 0 to '2.10 billion operations'. On 'exactly the same size', both shape tags return under the titles, '128,256 × 8,192' each, and a small white tag 'same size' appears between the tables."
+          "say": "Zero operations in. Out, one multiply and one add per weight, two point one billion operations, from a table exactly the same size.",
+          "show": "At the start, the '+16.4 KB' tag and the '128,256 × 8,192 × 2 bytes' term fade. On 'Zero operations in', a teal '0 operations' lands under the left table. On 'Out', the token counter fades and the slow sweep stops. On 'one multiply and one add per weight', the small amber term '1 multiply + 1 add per weight' appears under the right table; on 'two point one billion operations', an amber counter beneath it runs from 0 to '2.10 billion operations'. On 'exactly the same size', both shape tags return under the titles, '128,256 × 8,192' each, and a small white tag 'same size' appears between the tables."
         },
         {
           "id": "b5",
@@ -248,6 +248,11 @@
       "claim": "running total shown on screen for that row (s02.b2): 0 -> 0.2 -> -0.1 -> -0.1 -> 0.8 -> 0.5, i.e. 5 multiplications (counter after b1) and 5 additions into a total starting at 0 (counter after b2)",
       "python": "import itertools; x=[0.4,-1.2,0.0,0.9,0.3]; w=[0.5,0.25,-0.7,1.0,-1.0]; t=[round(v,4) for v in itertools.accumulate(a*b for a,b in zip(x,w))]; print(t, len(x), len(t))",
       "result": "[0.2, -0.1, -0.1, 0.8, 0.5] 5 5"
+    },
+    {
+      "claim": "on screen (s02.b3 inset): the chapter-one example, inputs 2, 1, 5, 1, 1 times weights 0.13, -0.7, 0.02, 1.44, -0.3, adds up to 0.8 in the 'one output' box, as in ch01_s03.b4",
+      "python": "x=[2,1,5,1,1]; w=[0.13,-0.7,0.02,1.44,-0.3]; print(round(sum(a*b for a,b in zip(x,w)),4))",
+      "result": "0.8"
     },
     {
       "claim": "'~560' matrices on screen for the 70B example (narration keeps the atlas's 'a few hundred'): 80 layers x 7 per layer (4 attention + 3 feed-forward, as fig 100 counts them) = 560, plus the two vocabulary tables = 562. The tile wall is 20 x 28 = 560 tiles",

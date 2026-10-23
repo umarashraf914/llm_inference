@@ -46,8 +46,8 @@
         },
         {
           "id": "b5",
-          "say": "This film is about the second box. Almost every confusing claim about cost or speed is really about the wrong box.",
-          "show": "On 'second', the inference panel brightens and scales up about 4%. The training panel dims to 0.25 and takes a grey tag 'finished before we begin'. On 'confusing', the inference fact labels fade, leaving only their icons, as the training panel's already are. The text left on screen is 'Training', 'finished before we begin', 'Inference' and the takeaway. Bottom band takeaway: 'cost or speed? check which phase'."
+          "say": "Our subject is the second, inference. Almost every confusing claim about cost or speed is about the wrong one of the two.",
+          "show": "On 'second', the inference panel brightens and scales up about 4%. The training panel dims to 0.25 and takes a grey tag 'finished before we begin'. On 'confusing', the inference fact labels fade, leaving only their icons, as the training panel's already are. The text left on screen is 'Training', 'finished before we begin', 'Inference' and the takeaway. Bottom band takeaway: 'cost or speed? training or inference?'."
         }
       ]
     },
@@ -172,13 +172,13 @@
         },
         {
           "id": "b3",
-          "say": "So a two-hundred-word answer, about three hundred tokens, means running the whole seventy-billion-parameter model about three hundred times.",
-          "show": "On 'two', the panel title, the return-arrow label and the counter's label 'model runs' fade out; the count itself stays. Below the panel (y≈860), an equation builds term by term: '200 words' on 'two', then '× ~1.5 tokens per word' and '≈ 300 tokens' on 'three'. On 'times', the loop speeds into a blur, the counter runs to 300, and a small label appears on the coral box: '70 billion weights, every turn'. Text on screen: the three box names, the equation and that label."
+          "say": "So a five-hundred-token answer, a few hundred words, means running the whole seventy-billion-parameter model five hundred times.",
+          "show": "On the first 'five', the panel title, the return-arrow label and the counter's label 'model runs' fade out; the count itself stays. Below the panel (y≈860), an equation builds term by term: '500 tokens' on that first 'five', then '÷ 1.2–1.6 tokens per word' and '≈ 310–420 words' on 'few hundred words'. On 'times', the loop speeds into a blur, the counter runs to 500, and a small label appears on the coral box: '70 billion weights, every turn'. Text on screen: the three box names, the equation and that label."
         },
         {
           "id": "b4",
           "say": "This loop is the shape of the entire problem. Almost everything difficult about inference comes from repeating the whole model for every token.",
-          "show": "The loop slows and holds on one turn. The equation and the '70 billion' label fade, leaving the three box names and the number '300'. On 'token', the return arrow glows. Bottom band takeaway: 'the whole model, once per token'."
+          "show": "The loop slows and holds on one turn. The equation and the '70 billion' label fade, leaving the three box names and the number '500'. On 'token', the return arrow glows. Bottom band takeaway: 'the whole model, once per token'."
         }
       ]
     },
@@ -212,7 +212,7 @@
         },
         {
           "id": "b5",
-          "say": "The most common misconception is that a model picks a word. It produces a hundred and twenty-eight thousand numbers, and something else picks.",
+          "say": "A very common misconception is that a model picks a word. It produces a hundred and twenty-eight thousand numbers, and something else picks.",
           "show": "The histogram dims to 0.3. On 'misconception', the phrase 'the model picks a word' appears at centre; on 'produces', it is struck through. Under it, '≈ 128,000 scores out' appears on 'numbers' and 'something else picks' on 'something'. The dashed '?' slot in the top band stays empty, blinking."
         }
       ]
@@ -320,9 +320,9 @@
       "result": "(720.0, 960.0)"
     },
     {
-      "claim": "A 200-word answer is about 300 tokens: 1.5 tokens per word gives 300, inside the 240-320 range implied by fig 6's 1.2-1.6",
-      "python": "(200*1.2, 200*1.5, 200*1.6)",
-      "result": "(240.0, 300.0, 320.0)"
+      "claim": "CHANGE from fig 7: the atlas's '200-word answer, about 300 tokens, about 300 model runs' becomes a 500-token answer, so the film's 300 keeps its one meaning (ch00, ch05, ch18) and the example matches ch04's five-hundred-token answer. At fig 6's 1.2-1.6 tokens per word, 500 tokens is 312.5 to 416.7 words, shown as '≈ 310–420 words' ('a few hundred words'); one model run per token gives 500 runs",
+      "python": "(500/1.6, 500/1.2, round(500/1.6,-1), round(500/1.2,-1))",
+      "result": "(312.5, 416.6666666666667, 310.0, 420.0)"
     },
     {
       "claim": "CORRECTION fig 8: atlas says 'and 127,996 more', which assumes a 128,000-token vocabulary; the film's model has 128,256 tokens, so 4 shown leaves 128,252 more. Narration says 'about a hundred and twenty-eight thousand'; the screen says '≈ 128,000 scores out'.",
