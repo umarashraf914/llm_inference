@@ -61,7 +61,7 @@
         },
         {
           "id": "b3",
-          "say": "You met the chain earlier: no token exists until the one before is chosen. Under the mask, each new row only looks back, never changing the rows above.",
+          "say": "You met the chain earlier: no token exists until the one before is chosen. Under the mask, each new row only looks back, never changing those above.",
           "show": "Header subline fades. The big grid slides into the left third and shrinks; its labels, column note and 'masked' fade, leaving only the coloured cells. Right side: mini-grid 'Decode' draws empty and lights row 1. On 'no token exists', an amber token pill drops out of row 1's right end, slides down with a small chain-link icon and becomes row 2's label; only then does row 2 light. On 'only looks back', row 2's lit cells glow under columns 1 and 2. On 'never changing', small teal padlocks settle on row 1's cells and stay."
         },
         {
@@ -162,7 +162,7 @@
         },
         {
           "id": "b4",
-          "say": "But every token still reads the whole cache: the staircase from the start, each step reading a little more than the last.",
+          "say": "But every token still reads the whole cache: the staircase from the start, each step reading more than the last.",
           "show": "Racks and their tags fade. On 'reads the whole cache', the coral box pulses and the coral read stream thickens as more rows accumulate. On 'staircase', the scene 1 staircase silhouette fades in lower right with its coral arcs; a fourth and fifth row add themselves in step with the cache's new rows. Coral tag: 'reads: still growing'."
         },
         {
@@ -218,7 +218,7 @@
         },
         {
           "id": "b3",
-          "say": "And all eighty are kept: layer forty needs an earlier token's layer-forty key, not its layer-one key. Made once, the cache would be eighty times smaller, and most of this series would not exist.",
+          "say": "All eighty are kept: layer forty needs an earlier token's layer-forty key, not its layer-one key. Made once, the cache would be eighty times smaller, and most of this series would not exist.",
           "show": "On 'layer forty', a query arrow runs from the new token's slab 40 straight across to the earlier token's slab-40 K tile, which lights. The earlier stack's slab-1 K tile greys out with a small cross and the label 'wrong layer'. On 'eighty times smaller', '× layers' glows coral and gains the value '80' beneath, and a grey ghost of one stack collapses to a single slab, tag '÷ 80'. Key phrase lower centre: 'every layer keeps its own'."
         }
       ]
@@ -264,7 +264,7 @@
         },
         {
           "id": "b2",
-          "say": "That eightfold cut is grouped-query attention, already built in. Nothing cuts the layers, because the layers are the model.",
+          "say": "That eightfold cut is grouped-query attention, already built in. Nothing cuts the layers, because they are the model.",
           "show": "The '64' turns back to '8', now teal. A solid coral bar grows out of the ghost's left end to one-eighth of its length, labelled '8 KV heads: 320 KB per token'; the ghost outline stays as the 64-head reference, and a teal tag 'grouped-query attention: ÷ 8' sits between the two bar ends. On 'Nothing cuts the layers', a padlock settles onto the '80', label 'that is the model'."
         },
         {
