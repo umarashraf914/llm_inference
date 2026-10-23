@@ -25,12 +25,12 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Every forward pass, all hundred and forty gigabytes cross the bus. A request's passes come in two very different phases.",
-          "show": "The GPU package fades up top-left; coral particles stream along its bus under '140 GB per pass'. On 'two very different phases', both empty lanes draw on with their titles 'Prefill' and 'Decode' only."
+          "say": "Every forward pass makes that trip. A request's passes come in two very different phases.",
+          "show": "The GPU package fades up top-left; on 'that trip', coral particles stream along its bus under '140 GB per pass'. On 'two very different phases', both empty lanes draw on with their titles 'Prefill' and 'Decode' only."
         },
         {
           "id": "b2",
-          "say": "First, prefill, reading the prompt in. All eight tokens climb the eighty layers together, in parallel.",
+          "say": "First, prefill, reading the prompt in. Eight tokens climb the eighty layers together, in parallel.",
           "show": "The top lane's title extends: 'Prefill · the whole prompt at once'. On 'eight tokens', pills 't1' to 't8' slide into the left half one after another; a small grey note under them: 'real prompts: thousands'. The slab stack and the shared '80 layers' tag draw on. On 'together', all eight pills lift as one front and climb; each slab flashes amber as the front passes, bottom to top. Caption under the row: 'every position, every layer, in parallel'."
         },
         {
@@ -60,13 +60,13 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Why can only prefill run in parallel? Not the model, not the hardware. Every prompt token is known up front, so nothing waits.",
-          "show": "Header at top: 'Why one runs in parallel and one cannot'. Both rows fade up dimmed; the grid fades up on the right, all grey. On 'Not the model, not the hardware', two grey tags appear and are struck through: 'the model', 'the hardware'. On 'known up front', the top row's eight pills brighten at the same instant and a tag appears: 'all eight together'. The grid stays grey for now."
+          "say": "Why can only prefill run in parallel? Timing. Every prompt token is known up front, so nothing waits.",
+          "show": "Header at top: 'Why one runs in parallel and one cannot'. Both rows fade up dimmed; the grid fades up on the right, all grey. On 'Timing', one grey tag writes on under the header: 'same model, same chip: the difference is timing'. On 'known up front', the top row's eight pills brighten at the same instant and a tag appears: 'all eight together'. The grid stays grey for now."
         },
         {
           "id": "b2",
           "say": "You met this earlier: in decode, no token exists until the one before it is chosen. A chain.",
-          "show": "The header and the two struck tags fade out. On 'You met this earlier', a small grey callback chip slides in at the bottom-left: 'earlier: token nine needs token eight'. On 'no token exists', the dashed 't10' slot gets a small hourglass icon. On 'chosen', 't9' flashes and 't10' fills in solid; the hourglass moves on to 't11', which fills only after 't10' flashes. On 'A chain', chain-link icons draw between successive pills; no extra tag, since the row heading already says it. The callback chip fades."
+          "show": "The header and the timing tag fade out. On 'You met this earlier', a small grey callback chip slides in at the bottom-left: 'earlier: each token needs the one before'. On 'no token exists', the dashed 't10' slot gets a small hourglass icon. On 'chosen', 't9' flashes and 't10' fills in solid; the hourglass moves on to 't11', which fills only after 't10' flashes. On 'A chain', chain-link icons draw between successive pills; no extra tag, since the row heading already says it. The callback chip fades."
         },
         {
           "id": "b3",
@@ -82,22 +82,22 @@
         111,
         112
       ],
-      "visual": "Centre-left: a weight matrix of 4 rows by 6 columns, 24 blue tiles (weights at rest are blue). Along its top edge, one cell above each column, the token's vector: 6 blue input cells, label 'the token'. Grey edge labels: 'columns = inputs' along the top, 'rows = outputs' down the left. To the right of the matrix: an output column of 4 empty blue cells, 'the output'. Top-left corner, from beat 1: a small grey callback chip 'earlier: 2 operations per weight' with the '2' in amber. Top band: the sum for row one, built term by term. Right third: an amber instruction card with a chip icon, 'multiply-accumulate', assembled during the scene. Bottom band: two amber counters, 'multiply-accumulates' and 'operations', both at 0. A tile flashes amber at the instant its multiply-accumulate happens, then settles to dim blue with a small '1'. The idea the motion makes visible: the '2' the viewer was handed earlier is explained, each term is one fused instruction counted as two operations, and every tile lights exactly once.",
+      "visual": "Centre-left: a weight matrix of 4 rows by 6 columns, 24 blue tiles (weights at rest are blue). Along its top edge, one cell above each column, the token's vector: 6 blue input cells, label 'the token'. Grey edge labels: 'columns = inputs' along the top, 'rows = outputs' down the left. To the right of the matrix: an output column of 4 empty blue cells, 'the output'. Top-left corner, from beat 1: a small grey callback chip 'earlier: 2 operations per weight' with the '2' in amber. Top band: the sum for row one, built term by term. Right third: an amber instruction card with a chip icon, 'multiply-accumulate', assembled during the scene. Bottom band: two amber counters, 'multiply-accumulates' and 'operations', both at 0. A tile flashes amber at the instant its multiply-accumulate happens, then settles to dim blue with a small '1'. The idea the motion makes visible: the '2' the viewer met earlier is revisited and shown to be exact: each term is one fused instruction counted as two operations, and every tile lights exactly once.",
       "beats": [
         {
           "id": "b1",
-          "say": "Earlier, each token cost two operations per weight. Why two?",
-          "show": "The grey callback chip fades in at centre: 'earlier: 2 operations per weight', the '2' in amber. On 'Why two?', a small amber question mark pops beside the '2'. The chip then shrinks into the top-left corner, where it stays for the rest of the scene."
+          "say": "Earlier, each weight cost two operations, a multiply and an add. Exact, or a rule of thumb?",
+          "show": "The grey callback chip fades in at centre: 'earlier: 2 operations per weight', the '2' in amber. On 'Exact', a small amber question mark pops beside the '2'. The chip then shrinks into the top-left corner, where it stays for the rest of the scene."
         },
         {
           "id": "b2",
-          "say": "Take a four-by-six weight matrix and one token's six inputs. Row one's output is weight one times input one, plus weight two times input two, and so on.",
+          "say": "Back to the row-by-row multiply: a four-by-six matrix and one token's six inputs. Row one's output is weight one times input one, plus weight two times input two, and so on.",
           "show": "The matrix draws tile by tile, grey tag '24 weights'. The six input cells settle along its top edge; 'columns = inputs' and 'rows = outputs' fade in. On 'Row one', row 1 brightens. The top band builds as each term is spoken: 'y =', 'w1·x1', '+ w2·x2', '+ …', each w a small square blue tile chip (a weight) and each x a round blue cell chip (an input). The letters stay on screen; the voice says the words."
         },
         {
           "id": "b3",
           "say": "Each term is one instruction, a multiply-accumulate, counted as two operations for its two results, a product and a new total. That is the only source of the two.",
-          "show": "The term 'w1·x1' lifts out: amber tag 'one multiply'; its product drops into a small running-total box 'y' that goes from 0 to a value; amber tag 'one addition'. The two tags slide right and fuse into the amber card 'multiply-accumulate'. On 'two results', two ghost outputs appear on the card: '× → product' and '+ → new total', bracketed '= 2 operations'. On 'only source', the '2' on the card pulses together with the amber '2' in the corner chip, and the chip's question mark disappears."
+          "show": "The term 'w1·x1' lifts out: amber tag 'one multiply'; its product drops into a small running-total box 'y' that goes from 0 to a value; amber tag 'one addition'. The two tags slide right and fuse into the amber card 'multiply-accumulate'. On 'two results', two ghost outputs appear on the card: '× → product' and '+ → new total', bracketed '= 2 operations'. On 'only source', the '2' on the card pulses together with the amber '2' in the corner chip."
         },
         {
           "id": "b4",
@@ -106,8 +106,8 @@
         },
         {
           "id": "b5",
-          "say": "So twice the weights is exact, not a rule of thumb: with one input vector, no weight is used twice in one token's pass.",
-          "show": "On 'exact', the line 'operations = 2 × cells' glows and gains a small white tag 'exact'. On 'not a rule of thumb', two grey tags drift past and are struck through: 'fudge factor', 'rule of thumb'. On 'one input vector', a second, dashed input row ghosts in above the first with a grey question mark, 'a second input?', then fades with a cross. Final tag under the grid: 'one input vector: every weight used once'."
+          "say": "Exact, then, not a rule of thumb: with one input vector, no weight is used twice in a token's pass.",
+          "show": "On 'Exact, then', the line 'operations = 2 × cells' glows and gains a small white tag 'exact', and the corner chip's question mark turns into a small white tick. On 'not a rule of thumb', two grey tags drift past and are struck through: 'fudge factor', 'rule of thumb'. On 'one input vector', a second, dashed input row ghosts in above the first with a grey question mark, 'a second input?', then fades with a cross. Final tag under the grid: 'one input vector: every weight used once'."
         }
       ]
     },
@@ -131,7 +131,7 @@
         },
         {
           "id": "b3",
-          "say": "Holding matrix by matrix, it survives the sum: the one number every model advertises prices a forward pass on its own.",
+          "say": "The rule holds matrix by matrix, so it survives the sum: the one number every model advertises prices a forward pass on its own.",
           "show": "On 'matrix by matrix', the small amber '× 2' tags ripple up the stack from bottom to top, the embedding slab's grey '?' staying put, and the formula glows once; grey tag 'holds matrix by matrix'. On 'advertises', a price-tag icon swings onto the stack reading '70B'; on 'on its own', a grey tag under it: 'nothing else about the architecture'."
         }
       ]
@@ -248,8 +248,8 @@
         },
         {
           "id": "b6",
-          "say": "Prefill sits at the bottom; decode, one token per read, is stuck at the top. That is the structural fact of inference: decode has nobody to share the cost with.",
-          "show": "On 'Prefill sits at the bottom', a teal tag 'prefill: spread across thousands' slides onto the '2,000 tokens' row. On 'stuck at the top', a coral tag 'decode' slides onto the '1 token' row and a small padlock icon clicks shut beside it. On 'nobody to share the cost with', the decode row sits under a soft spotlight while the rest dims, and a white line settles beneath it: 'nobody to share it with'."
+          "say": "Prefill sits at the bottom; decode, one token per read, is stuck at the top. The structural fact of inference: one request's decode has nobody to share the cost with.",
+          "show": "On 'Prefill sits at the bottom', a teal tag 'prefill: spread across thousands' slides onto the '2,000 tokens' row. On 'stuck at the top', a coral tag 'decode, one request' slides onto the '1 token' row and a small padlock icon clicks shut beside it. On 'nobody to share the cost with', the decode row sits under a soft spotlight while the rest dims, and a white line settles beneath it: 'nobody to share it with'."
         }
       ]
     },
@@ -401,7 +401,7 @@
       "result": "[590.4477611940298, 295.2238805970149, 147.61194029850745, 73.80597014925372]"
     },
     {
-      "claim": "RECONCILED figs 109/110 numbering: fig 109 numbers the prompt t0-t7 with decode starting at t8, fig 110 numbers it t1-t8 with t9 next. The film's pills use one numbering in both scenes: an 8-token prompt t1-t8, the first answer token t9 drawn at the end of prefill, decode's chain t9 → t10 → t11. The narration drops token numbers ('in decode, no token exists until the one before it is chosen') so it cannot clash with ch04's spoken 'token nine needs token eight', which the s02 callback chip quotes",
+      "claim": "RECONCILED figs 109/110 numbering: fig 109 numbers the prompt t0-t7 with decode starting at t8, fig 110 numbers it t1-t8 with t9 next. The film's pills use one numbering in both scenes: an 8-token prompt t1-t8, the first answer token t9 drawn at the end of prefill, decode's chain t9 → t10 → t11. The narration drops token numbers ('in decode, no token exists until the one before it is chosen') so it cannot clash with ch04's spoken 'token nine needs token eight' (there, both are answer tokens). The s02 callback chip paraphrases ch04 without numbers, 'earlier: each token needs the one before', since here t8 is a prompt token",
       "python": "print(len(range(1,9)), 8+1, 8+2)",
       "result": "8 9 10"
     },

@@ -221,6 +221,6 @@ V.scene('ch01_s01', S => {
   S.add(fx.dim([train, trainTitle, f1.g, f2.g, f3.g, inArrow], { to: 0.25 }), 'b5~second');
   const finished = S.pill('finished before we begin', { x: P.lx + P.w / 2, y: P.y + P.h + 52, h: 46, size: 24, tone: 'neutral', style: 'outline' });
   S.add(fx.in(finished, { from: 'up', d: 0.5 }), 'b5~second+0.3');
-  const take = S.takeaway('cost or speed? first ask: which box?', { tone: 'struct' });
+  const take = S.takeaway('cost or speed? training or inference?', { tone: 'struct' });
   S.add(fx.in(take, { from: 'up', d: 0.6 }), 'b5~confusing+0.4');
 });
