@@ -941,9 +941,11 @@
         return t;
       },
       /** Camera move: centre the view on (x, y) at a zoom. */
+      // Camera moves go through xform (explicit translate + scale, planned in call order), so a frame is
+      // the same whether it is reached by playing or by seeking. Call fx.cam in time order within a scene.
       cam(o = {}) {
         const sc = o.scale ?? 1, x = o.x ?? W / 2, y = o.y ?? H / 2;
-        return gsap.to(S.camera, { x: W / 2 - x * sc, y: H / 2 - y * sc, scale: sc, transformOrigin: '0 0', duration: o.d ?? 1.4, ease: o.ease || 'power2.inOut' });
+        return S.fx.xform(S.camera, { x: W / 2 - x * sc, y: H / 2 - y * sc, s: sc, ox: 0, oy: 0 }, { d: o.d ?? 1.4, ease: o.ease || 'power2.inOut' });
       },
     };
   }

@@ -6,11 +6,19 @@ V.scene('ch01_s01', S => {
   const GX = 960, GY = 470;
 
   // ---------------------------------------------------------------- the endless field (for the pull-back)
-  // A pattern of tiles aligned exactly with the 40-tile grid, so pulling back reveals "more of the same".
-  const defs = S.el('defs', null, S.layers.back);
-  const pat = S.el('pattern', { id: 'ch01s01-field', width: 110, height: 76, patternUnits: 'userSpaceOnUse', x: GX - 544, y: GY - 146 }, defs);
-  S.rect({ x: 0, y: 0, w: 98, h: 64, r: 10, fill: 'struct', fillOpacity: 0.34 }, pat);
-  const field = S.rect({ x: -16000, y: -11000, w: 32000, h: 22000, fill: 'url(#ch01s01-field)', opacity: 0 }, S.layers.back);
+  // Tiles on the same 110 x 76 lattice as the 40-tile grid, so pulling back reveals "more of the same".
+  // One <path> of chamfered rectangles, not a <pattern>: Chromium drops pattern fills at deep zoom-out.
+  // It covers the whole view at the widest camera (scale 0.12 → 16,000 x 9,000 units), minus the grid itself.
+  const FW = 110, FH = 76, TW = 98, TH = 64, CH = 9;
+  const fx0 = GX - 544, fy0 = GY - 146;                 // top-left tile of the grid
+  let fd = '';
+  for (let r = -62; r <= 64; r++) for (let c = -75; c <= 84; c++) {
+    if (r >= 0 && r < 4 && c >= 0 && c < 10) continue;
+    const x = fx0 + c * FW, y = fy0 + r * FH;
+    fd += `M${x + CH},${y}h${TW - 2 * CH}l${CH},${CH}v${TH - 2 * CH}l${-CH},${CH}h${-(TW - 2 * CH)}l${-CH},${-CH}v${-(TH - 2 * CH)}z`;
+  }
+  const field = S.path({ d: fd, fill: 'struct', fillOpacity: 0.34 }, S.layers.back);
+  field.setAttribute('opacity', 0);
   field.setAttribute('data-audit', 'ignore');
 
   // ---------------------------------------------------------------- b1: a trained model is a file

@@ -29,7 +29,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "So what fills the coral ninety-nine percent? Start with the chip.",
+          "say": "What fills the coral ninety-nine percent? Start with the chip.",
           "show": "The 30 ms bar fades up centre on an empty canvas: 1,500 px wide, the 5 px amber sliver labelled 'arithmetic, under 1%', and the coral '?' name tag from the previous chapter fading back onto the coral remainder. No title, no teal arrows. On 'the coral ninety-nine percent', the coral part pulses once and the '?' tag brightens. On 'Start with the chip', the bar shrinks to the top-right corner and parks there, dimmed, still coral with its '?'. The empty top and bottom bands draw in with the faint divider between them."
         },
         {
@@ -100,7 +100,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "What crosses is bits, single yes-or-no signals, each a voltage on a wire. Ten levels could hold a digit, but telling ten apart, billions of times a second, on a warm chip, is far too hard.",
+          "say": "What crosses is bits, single yes-or-no signals, each a voltage on a wire. Ten voltage levels could hold a digit, but telling ten apart, billions of times a second, on a warm chip, is far too hard.",
           "show": "Left half: the trace steps between ten levels; readout above it '7 2 9 4'. On 'a warm chip', a thermometer icon at the top warms from blue to orange and the trace picks up a jitter. The level meant to be 7 sags into the band for 6; the readout's '7' turns grey, is struck through and becomes '6'. It happens again to the 4."
         },
         {
@@ -225,7 +225,7 @@
         },
         {
           "id": "b2",
-          "say": "Give the H one hundred our thirty milliseconds, a figure from the faster H two hundred. Three point three five terabytes a second, times thirty milliseconds, is about a hundred gigabytes.",
+          "say": "Give the H one hundred our thirty milliseconds, the faster H two hundred's figure. Three point three five terabytes a second, times thirty milliseconds, is about a hundred gigabytes.",
           "show": "Grey tag at the top: 'what-if: the 30 ms came from the H200'. A coral pipe labelled '3.35 TB/s' pours into a tall bucket. A stopwatch above runs from '0' to '0.03 s = 30 ms' and the flow stops when it does. The equation builds beneath: '3.35 TB/s × 0.03 s = 100.5 GB'. The bucket's fill line is labelled '≈ 100 GB'."
         },
         {
@@ -280,13 +280,13 @@
         },
         {
           "id": "b2",
-          "say": "Pretend the model fits on one H one hundred. Its arithmetic takes about a seventh of a millisecond. Reading the weights, forty-two milliseconds.",
+          "say": "Pretend the model fits on one H one hundred. A token's arithmetic takes about a seventh of a millisecond. Reading the weights, forty-two milliseconds.",
           "show": "On 'Pretend', grey tag 'one token · H100 · if it fitted'. A time axis from 0 to 45 ms draws under the cards. On 'a seventh of a millisecond', the amber lane appears: '140 billion ops ÷ 989 trillion/s ≈ 0.14 ms', its bar a sliver at the far left. On 'Reading the weights', the coral lane grows from the left to almost the full width: '140 GB ÷ 3.35 TB/s ≈ 41.8 ms'. A small coral tag rides on it: 'moving the weights', the same name as the coral bar from earlier."
         },
         {
           "id": "b3",
-          "say": "They overlap: while one slice of weights is multiplied, the next is on its way. The slower one sets the pace and leaves the other idle, here the arithmetic. Forty-two milliseconds, not an average of twenty-one.",
-          "show": "On 'one slice of weights is multiplied', the coral lane splits into slices, each drawn faintly as a block of weight tiles, and the amber work redistributes as a tiny amber tick under the end of each slice, ticks and slices advancing together. On 'The slower one sets the pace', a white vertical marker 'token done ≈ 42 ms' drops at the end of the coral lane, and a small grey tag between the cards reads 'slower one sets the pace'. On 'leaves the other idle, here the arithmetic', the amber card greys out with a small hourglass icon and tag 'idle, waiting'. On 'not an average', a dashed ghost marker at '≈ 21 ms · average' appears at 630 px, then a grey strike-through crosses it out."
+          "say": "They overlap: while one slice of weights is multiplied, the next is fetched. The slower one sets the pace, leaving the other idle, here the arithmetic. Forty-two milliseconds, not an average of twenty-one.",
+          "show": "On 'one slice of weights is multiplied', the coral lane splits into slices, each drawn faintly as a block of weight tiles, and the amber work redistributes as a tiny amber tick under the end of each slice, ticks and slices advancing together. On 'The slower one sets the pace', a white vertical marker 'token done ≈ 42 ms' drops at the end of the coral lane, and a small grey tag between the cards reads 'slower one sets the pace'. On 'leaving the other idle, here the arithmetic', the amber card greys out with a small hourglass icon and tag 'idle, waiting'. On 'not an average', a dashed ghost marker at '≈ 21 ms · average' appears at 630 px, then a grey strike-through crosses it out."
         },
         {
           "id": "b4",
@@ -310,7 +310,7 @@
         },
         {
           "id": "b2",
-          "say": "Bandwidth is a product of three. The memory comes in stacks, towers of layers, wired to the chip through pins: rate per pin, times pins per stack, times stacks.",
+          "say": "Bandwidth is a product of three. The memory comes in stacks, towers of memory layers, wired to the chip through pins: rate per pin, times pins per stack, times stacks.",
           "show": "The compute tag dims. Right edge: the package zooms in and its grey 'generic GPU' tag changes to the blue label 'H100 · 80 GB'; coral towers of thin layers sit around the amber die, one site grey. A pointer labels one tower 'stack'; grey tag 'H100: 5 active stacks'. On 'pins', a close-up shows a dense field of fine connections under one stack. On 'rate per pin, times pins per stack, times stacks', the three coral cards build left to right with '×' between them."
         },
         {
@@ -365,7 +365,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Two computer architects, Wulf and McKee, named the memory wall in nineteen ninety-five, more than twenty years before the transformer, the design today's language models use.",
+          "say": "Two computer architects, Wulf and McKee, named the memory wall in nineteen ninety-five, more than twenty years before the transformer, the design behind today's language models.",
           "show": "The timeline draws left to right. At '1995', the blue card lands: 'Wulf and McKee, 1995', with the paper icon and small title 'Hitting the Memory Wall'. On 'the transformer', a blue pill lands at '2017': 'the transformer'. A bracket spans 1995 to 2017, label '22 years'."
         },
         {
@@ -400,7 +400,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Every decision in production inference, and every paper in this series, takes one line as given. If you remember one thing, make it this. Everything after is working out what it implies.",
+          "say": "Every decision in production inference, and every paper in this series, takes one line as given. If you remember one thing, make it this. The rest is working out what it implies.",
           "show": "On 'Every decision', the four recap tiles slide up from the bottom edge in a row, then dim. On 'every paper in this series', a small stack of paper icons slides in at the end of the row and dims with the tiles. On 'one line', two empty card outlines draw themselves in the centre, amber on the left, coral on the right. On 'remember one thing', a soft glow builds behind them. Nothing else moves."
         },
         {
@@ -418,9 +418,9 @@
       "result": "2073600"
     },
     {
-      "claim": "Fig 70 reconciled: atlas says 'millions of small multiplications with no dependencies' for one vector-by-matrix multiply; per token, at one multiplication per weight, that is about seventy billion, half of the 140 billion operations from ch05. They are independent only within one multiply (a batch); the 80 layers run in sequence, so the narration says 'in huge batches where none waits on another', not that the whole token is free of dependencies",
+      "claim": "Fig 70 reconciled: atlas says 'millions of small multiplications with no dependencies' for one vector-by-matrix multiply; per token, at one multiplication per weight, that is about seventy billion, half of the 140 billion operations from ch05. They are independent only within one multiply (a batch); the 80 layers run in sequence, about 875 million multiplications each, every layer waiting for the one before, so the narration says 'in huge batches where none waits on another', not that the whole token is free of dependencies",
       "python": "140e9/2, 70e9/80",
-      "result": "PENDING"
+      "result": "70000000000.0 875000000.0"
     },
     {
       "claim": "Fig 70 storyboard: the drawn grid of 48 x 12 squares clears 576 tiles per step (schematic)",
@@ -430,7 +430,7 @@
     {
       "claim": "Fig 71 (consistency with ch02 s02 and CHAPTER_NOTES): H100 on-chip storage is 132 SMs x (256 KB registers + 256 KB L1/shared) + 50 MB L2 = 0.12 GB; 140 GB is about 1,150 times that, said as 'about a thousandth of the model', on screen '≈ 0.1 GB in all · ≈ 1/1,000'",
       "python": "(132*(256+256)*1024 + 50*1024**2)/1e9, 140e9/(132*(256+256)*1024 + 50*1024**2)",
-      "result": "PENDING"
+      "result": "0.121634816 1150.9862439385777"
     },
     {
       "claim": "Fig 73 (added, on screen): eight bits form 256 patterns",
@@ -490,7 +490,7 @@
     {
       "claim": "Fig 77 (added worked example): one token's arithmetic on an H100, 140 billion ops / 989 TFLOP/s = 0.14 ms, said as 'about a seventh of a millisecond' (1/7 ms = 0.143 ms)",
       "python": "140e9/989e12*1e3, 1/7",
-      "result": "PENDING"
+      "result": "0.14155712841253792 0.14285714285714285"
     },
     {
       "claim": "Fig 77 (added worked example): with the lanes overlapping, the token takes the larger time, 41.8 ms (sum would be 41.9, the average about 21, which is wrong)",
@@ -508,7 +508,7 @@
       "result": "0.989"
     },
     {
-      "claim": "Fig 80 (added): the 140 GB model against the H100's 80 GB capacity needs at least two chips",
+      "claim": "Fig 80 (added, now narrated in s08.b4 so s09.b2's 'pretend it fits' has a setup): the 140 GB model against the H100's 80 GB capacity needs at least two chips",
       "python": "140/80, -(-140//80)",
       "result": "1.75 2"
     },
