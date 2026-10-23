@@ -92,7 +92,7 @@ def main(argv):
                 print(h)
         return 0
     ids = set()
-    for f in list(VIDEO.glob("*/scenes/*.js")) + [VIDEO / "engine" / "engine.js"]:
+    for f in list(VIDEO.glob("*/scenes/*.js")) + list(VIDEO.glob("lib/*.js")) + [VIDEO / "engine" / "engine.js"]:
         ids |= set(ID_RE.findall(f.read_text()))
     out, missing = {}, []
     for i in sorted(ids):

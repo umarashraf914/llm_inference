@@ -16,7 +16,8 @@
 <div id="bg"></div>
 <svg id="film" xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
 <script>
-  // ?film=v01&scene=ch05_s02 loads ../v01/scenes/ch05_common.js (if present) then ../v01/scenes/ch05_s02.js.
+  // ?film=v01&scene=ch05_s02 loads the shared library (../lib/, files listed in ../lib/manifest.json),
+  // then ../v01/scenes/ch05_common.js (if present), then ../v01/scenes/ch05_s02.js.
   // The renderer then calls V.load(sceneId, timing).
   const q = new URLSearchParams(location.search);
   function load(src, optional) {
@@ -31,7 +32,10 @@
   const film = q.get('film'), scene = q.get('scene');
   if (film && scene && !scene.endsWith('_title')) {
     const ch = scene.split('_')[0];
-    load(`../${film}/scenes/${ch}_common.js`, true)
+    fetch('../lib/manifest.json', { cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : []), () => [])
+      .then(files => files.reduce((p, f) => p.then(() => load(`../lib/${f}`)), Promise.resolve()))
+      .then(() => load(`../${film}/scenes/${ch}_common.js`, true))
       .then(() => load(`../${film}/scenes/${scene}.js`))
       .then(() => { window.__chapterLoaded = true; }, () => { window.__chapterLoaded = 'error'; });
   } else {
