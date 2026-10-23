@@ -1,0 +1,413 @@
+{
+  "chapter": "ch18",
+  "title": "Where that leaves us",
+  "kicker": "18 · Where that leaves us",
+  "figs": [
+    146,
+    147
+  ],
+  "scenes": [
+    {
+      "id": "ch18_s01",
+      "name": "two speed limits",
+      "figs": [
+        146
+      ],
+      "visual": "Dark canvas, one continuous composition in three horizontal bands that fill in turn. Top band (y 90–230): the bar from the thirty-millisecond puzzle, rebuilt exactly: a coral bar 1,500 px long from x=210 to x=1710, labelled '30 ms per token' at its left end, with a 5 px amber sliver at its start labelled '0.1 ms arithmetic' and a grey tag at its right end '× 300'. Middle band (y 290–600), two panels. Left panel, heading 'two hardware numbers': a GPU package illustration (compute die with HBM stacks beside it, joined by a bus) labelled 'H100', with two spec rows under it, amber 'peak compute: 989 trillion ops/s' and coral 'bandwidth: 3.35 TB/s'. Right panel, heading 'one property of the workload': a blue token pill 'one token · batch 1', two rows under it, amber '140 billion ops' and coral '140 GB', and a white-outlined result chip '1 op per byte'. Bottom band (y 660–1000): two horizontal lanes on one shared logarithmic axis titled 'tokens per second (log scale)', ticks 1, 10, 100, 1,000, 10,000 and 100,000 at x = 260, 560, 860, 1,160, 1,460 and 1,760 (300 px per power of ten). Upper lane amber, 'arithmetic's limit'; lower lane coral, 'memory's limit'. Nothing clears in this scene; finished elements dim to 40% when they stop being the subject. The idea the motion makes visible: the puzzle's factor of three hundred is the distance between two speed limits, one set by the chip's arithmetic and one by its memory, and the chip is held to the lower one.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Right at the start, there was a puzzle. The arithmetic for one token takes about a tenth of a millisecond. The token itself takes about thirty milliseconds. A factor of three hundred, with more than ninety-nine percent of the time spent on something other than mathematics. Now you can take that apart.",
+          "show": "Top band builds on the spoken words. On 'a tenth of a millisecond', the 5 px amber sliver appears at x=210 with its label '0.1 ms arithmetic'. On 'about thirty', the coral bar sweeps right to x=1710, labelled '30 ms per token'. On 'three hundred', the grey tag '× 300' clicks on at its right end. On 'ninety-nine percent', a grey label appears under the coral part: '99%: not arithmetic'. On 'take that apart', the whole top band shrinks to 60% scale, slides up to y 50–130 and dims to 60%, where it stays for the rest of the scene."
+        },
+        {
+          "id": "b2",
+          "say": "It takes just two numbers from the chip's specification sheet. How fast it computes: on an H one hundred, nine hundred and eighty-nine trillion operations a second. And how fast its memory delivers: three point three five terabytes a second.",
+          "show": "Left panel fades in with its heading 'two hardware numbers' and the GPU package labelled 'H100'. On 'how fast it computes', the compute die glows amber and the row 'peak compute: 989 trillion ops/s' writes on in amber. On 'how fast its memory delivers', the HBM stacks glow coral, a short burst of coral particles runs across the bus into the die, and the row 'bandwidth: 3.35 TB/s' writes on in coral."
+        },
+        {
+          "id": "b3",
+          "say": "And one property of the work. Making one token, for a single request alone on the chip, costs a hundred and forty billion operations, and moves a hundred and forty billion bytes. One operation for every byte.",
+          "show": "Right panel fades in with its heading 'one property of the workload'. A blue token pill drops in, 'one token · batch 1'. On 'a hundred and forty billion operations', an amber row writes on: '2 × 70 billion = 140 billion ops'. On 'a hundred and forty billion bytes', a coral row: '70 billion × 2 bytes = 140 GB'. On 'one operation for every byte', the two '140's slide together, strike through each other with a white line, and collapse into the white-outlined chip '1 op per byte'."
+        },
+        {
+          "id": "b4",
+          "say": "Now two divisions, one for each side of the chip. The arithmetic's speed limit is peak compute, over operations per token. Nine hundred and eighty-nine trillion, over a hundred and forty billion. About seven thousand tokens a second, a little over a tenth of a millisecond each.",
+          "show": "Bottom band: the log axis draws on left to right with its title and its six ticks. On 'peak compute, over operations per token', the amber spec row in the left panel and the amber row in the right panel each send a thin amber line down to the upper lane, where the label 'arithmetic's limit = peak ÷ ops per token' writes on. On 'about seven thousand', the amber bar sweeps from x=260 to x=1415 and takes the end tag '≈ 7,064 tokens/s · 0.14 ms each'."
+        },
+        {
+          "id": "b5",
+          "say": "The memory's speed limit is bandwidth, over bytes per token. Three point three five terabytes a second, over a hundred and forty gigabytes. About twenty-four tokens a second. Forty-two milliseconds each.",
+          "show": "The two coral rows send thin coral lines down to the lower lane, labelled 'memory's limit = bandwidth ÷ bytes per token'. On 'about twenty-four', the coral bar grows from x=260 and stops at x=674, far short of the amber bar above it; end tag '≈ 24 tokens/s · 41.8 ms each'."
+        },
+        {
+          "id": "b6",
+          "say": "A chip can only go as fast as the lower limit. Performance is set by whichever runs out first, never by an average. So the memory decides. Divide one limit by the other, and you get two hundred and ninety-five. Round it, as the puzzle did, and there is the factor of three hundred.",
+          "show": "On 'the lower limit', a white vertical line drops from the top of the bottom band at x=674, the end of the coral bar, and the part of the amber bar to the right of it dims to 25%: the chip only gets as far as the memory allows. On 'divide one limit by the other', a white bracket spans the gap from x=674 to x=1415 and its label counts up from '× 1' to '× 295'. On 'the factor of three hundred', the '× 300' tag in the dimmed top band brightens, drops down beside the bracket label, and a grey '≈' slides between them: '× 295 ≈ × 300'. On 'as the puzzle did', small grey tags under the top-band bar read '0.1 ms was 0.14' and '30 ms was 41.8 on this chip'."
+        }
+      ]
+    },
+    {
+      "id": "ch18_s02",
+      "name": "the gap is one division",
+      "figs": [
+        146
+      ],
+      "visual": "Continues the same composition after a slow camera push. The two lanes from the previous scene compress to half height at the bottom of the frame (y 820–1000) and dim to 50%, keeping the white gap bracket '× 295'. The two panels shrink into the left and right edges of the middle band. Centre stage (y 220–600) an equation builds term by term, the main object of the scene: amber 'peak' over coral 'bandwidth', bracketed as 'the ridge', then '÷', then a white '1 op per byte' labelled 'decode', then '= 295 ≈ 300', all under a grey heading 'the factor of 300'. A small side card at the right edge (x 1500–1840, y 250–450) is used twice: first for the H200 time, then for a second model. The idea the motion makes visible: the gap is the chip's ridge divided by what the workload offers, and swapping the model leaves it untouched.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "And you have met two hundred and ninety-five before. It is the ridge: peak compute over bandwidth, the operations per byte the chip needs to keep busy. Divide it by the one operation per byte that decode offers, and that is the whole gap.",
+          "show": "Equation builds centre stage. On 'peak compute over bandwidth', amber 'peak' lifts out of the left panel's spec row and coral 'bandwidth' out of the row beneath, stacking as a fraction; a bracket under it writes on, 'the ridge = 295 ops per byte'. On 'one operation per byte that decode offers', the white chip '1 op per byte' flies in from the right panel and lands after a '÷', labelled 'decode'. On 'the whole gap', '= 295 ≈ 300' writes on, and the grey heading above the equation appears: 'the factor of 300'. Down in the compressed lanes, the '× 295' bracket pulses in sync."
+        },
+        {
+          "id": "b2",
+          "say": "The thirty milliseconds itself is the memory division again, on a newer chip. An H two hundred reads four point eight terabytes a second. A hundred and forty gigabytes, divided by that, is twenty-nine point two milliseconds.",
+          "show": "The side card writes on at right. On 'H two hundred', the 'H100' label on the shrunken GPU in the left panel flips to 'H200' and its coral spec row flips to '4.8 TB/s'; the side card reads '140 GB ÷ 4.8 TB/s'. On 'twenty-nine point two', it completes '= 29.2 ms' and a stopwatch icon beside it shows '≈ 30 ms'. Then the GPU label flips back to 'H100' and its row back to '3.35 TB/s'."
+        },
+        {
+          "id": "b3",
+          "say": "And it works for any model. Take a smaller one, eight billion parameters. At two bytes each, sixteen gigabytes. On the H one hundred, that is about four point eight milliseconds a token, about two hundred and nine tokens a second.",
+          "show": "The side card clears and is reused. In the right panel the token pill gains a model tag that flips from '70B' to '8B'; its rows recompute to '16 billion ops' and '16 GB', and the result chip stays '1 op per byte'. The side card writes on: '8 billion × 2 bytes = 16 GB', then '16 GB ÷ 3.35 TB/s = 4.8 ms'. In the compressed lanes the coral bar slides right from x=674 to x=956, tag '≈ 209 tokens/s'."
+        },
+        {
+          "id": "b4",
+          "say": "But its arithmetic shrinks in exactly the same proportion. Both limits move together, and the gap between them is still two hundred and ninety-five. The gap belongs to the chip, and to one operation per byte. Not to the size of the model.",
+          "show": "On 'shrinks in exactly the same proportion', the amber bar slides right by the same 283 px, from x=1415 to x=1697, tag '≈ 61,800 tokens/s'. The white gap bracket travels with the two bar ends and still reads '× 295'. On 'belongs to the chip', the 'ridge' bracket in the equation pulses; on 'one operation per byte', the '1 op per byte' term pulses; on 'not to the size of the model', the '8B' tag gets a grey strike-through and the equation stays unchanged."
+        },
+        {
+          "id": "b5",
+          "say": "So the gap between what the arithmetic implies and what the chip delivers is not a mystery. It is a division. Two hardware numbers, and one property of the workload.",
+          "show": "The lanes and side card fade out; the model tag returns to '70B'. The equation rises to the centre of the frame and two brackets write on beneath it: one under 'peak' and 'bandwidth' reading 'two hardware numbers', one under '1 op per byte' reading 'one property of the workload'. On 'not a mystery', the dimmed top-band bar from the puzzle fades out entirely. Hold on the equation."
+        }
+      ]
+    },
+    {
+      "id": "ch18_s03",
+      "name": "the chain, in five links",
+      "figs": [
+        146
+      ],
+      "visual": "New composition. Top-left heading 'The chain, in five links'. Left 55% of the frame (x 120–1000): five link cards stacked vertically, each about 120 px tall with 36 px gaps, blue outlines, a small numbered circle '1' to '5' at the left of each, and a chain-link icon (two interlocking rings) joining each card to the one below. The cards' text, in white: '1 compute outgrows bandwidth', '2 a forward pass streams every weight', '3 prefill amortises, decode does not', '4 the KV cache adds to the bill', '5 goodput is what is actually sold'. Right 40% (x 1060–1840): a workbench area with a faint grid, where each link's arithmetic is built term by term; when a link is done its result shrinks into a small chip pinned to the right end of that link's card and the workbench clears. Chip colours follow meaning: amber for operations, coral for bytes and memory, teal for what helps, blue for tokens. The camera drifts down slightly with the active link so it is always near the vertical centre. The idea the motion makes visible: five short statements, each carrying one piece of arithmetic, joined in order into a single explanation of the thirty milliseconds.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now the whole argument, end to end. It is a chain of five links, and each one leads to the next.",
+          "show": "Heading 'The chain, in five links' writes on. Five empty blue link cards fade in down the left, numbered 1 to 5, and the four chain-link icons between them draw on from top to bottom. The workbench grid fades in on the right, empty."
+        },
+        {
+          "id": "b2",
+          "say": "One. Compute outgrows bandwidth. Over a decade, the arithmetic speed of top server chips grew about eighty times, and their memory bandwidth about seventeen. Eighty over seventeen is about four point seven. Today an H one hundred needs about two hundred and ninety-five operations for every byte, just to keep busy.",
+          "show": "Card 1 fills with 'compute outgrows bandwidth'. Workbench: a small schematic chart with x labels '2012' and '2022'; on 'eighty times' an amber line climbs to '× 80', on 'seventeen' a coral line climbs to '× 17'; grey tag 'schematic curves, real endpoints'. On 'four point seven', '80 ÷ 17 ≈ 4.7' writes on beneath. On 'two hundred and ninety-five', the chart fades and '989 ÷ 3.35 = 295 ops per byte' writes on, amber over coral. It shrinks into card 1's chip: 'needs 295 ops/byte'."
+        },
+        {
+          "id": "b3",
+          "say": "Two. A forward pass streams every weight. Making one token means one trip through all eighty layers, and every one of the seventy billion weights crosses the bus. At two bytes each, a hundred and forty gigabytes, for a hundred and forty billion operations. One operation per byte.",
+          "show": "Card 2 fills with 'a forward pass streams every weight'. Workbench: the GPU package illustration. On 'crosses the bus', a dense coral stream runs from the HBM stacks into the die while a coral counter runs from 0 to '140 GB'; on 'a hundred and forty billion operations', an amber counter beside it runs to '140 billion ops'. On 'one operation per byte', the two counters collapse into card 2's chip: '1 op per byte'."
+        },
+        {
+          "id": "b4",
+          "say": "Three. Prefill amortises, decode does not. When a two-thousand-token prompt is read in, one read of the weights is shared by all two thousand tokens. Seventy megabytes each, and two thousand operations per byte.",
+          "show": "Card 3 fills with 'prefill amortises, decode does not'. Workbench, top half: a single coral read-stream leaves an HBM stack and fans out into a block of 2,000 tiny blue token pills, all lighting at once. On 'seventy megabytes each', '140 GB ÷ 2,000 = 70 MB per token' writes on; on 'two thousand operations per byte', a teal tag: 'prefill: 2,000 ops/byte'."
+        },
+        {
+          "id": "b5",
+          "say": "Making the answer, each read serves a single token. So decode is stuck at one operation per byte, nearly three hundred times short of the ridge. Its ceiling is bandwidth over bytes per token: about twenty-four tokens a second on an H one hundred, however clever the code.",
+          "show": "Workbench, bottom half: a coral read-stream of the same width feeds one lone blue pill; coral tag 'decode: 1 op/byte'. A small roofline thumbnail appears beside it: log axes, the ridge marked '295', a teal dot far right at '2,000', a coral dot far left at '1', and a bracket between the coral dot and the ridge, '≈ 300× short'. On 'twenty-four tokens a second', '3.35 TB/s ÷ 140 GB ≈ 24 tokens/s' writes on and shrinks into card 3's chip: 'ceiling ≈ 24 tokens/s'."
+        },
+        {
+          "id": "b6",
+          "say": "Four. The K V cache adds to the bill. Every token in the conversation keeps a key and a value in every layer. Two, times eighty, times eight, times a hundred and twenty-eight, times two bytes. About three hundred and twenty kilobytes for every token.",
+          "show": "Card 4 fills with 'the KV cache adds to the bill'. Workbench: the cache formula builds term by term, each term landing on its spoken number with a small grey label under it: '2' (key + value), '× 80' (layers), '× 8' (KV heads), '× 128' (head width), '× 2 bytes'. On 'three hundred and twenty kilobytes', '= 327,680 bytes ≈ 320 KB per token' writes on in coral."
+        },
+        {
+          "id": "b7",
+          "say": "Hold a hundred thousand tokens, and that is thirty-three gigabytes more to read on every step. A hundred and seventy-three gigabytes per token in all. For that one long conversation, the ceiling falls from about twenty-four tokens a second to about nineteen.",
+          "show": "Below the formula, a coral bar drawn to scale, 'weights 140 GB', gets a second coral segment appended, 33/140 of its length, 'cache 33 GB', with a bracket over both: 'about 173 GB per token'. On 'the ceiling falls', '3.35 TB/s ÷ 173 GB ≈ 19 tokens/s' writes on, with a grey tag 'one long conversation, illustrative'. The result shrinks into card 4's chip: 'ceiling 24 → 19 tokens/s'."
+        },
+        {
+          "id": "b8",
+          "say": "Five. Goodput is what is actually sold. Throughput counts every token made. Goodput counts only the tokens that arrive inside the promised wait. Multiply throughput by the share that arrived in time.",
+          "show": "Card 5 fills with 'goodput is what is actually sold'. Workbench: a white counter at the top spins fast, labelled 'throughput: all tokens per second'. Below it a teal funnel icon labelled 'inside the latency target?'; small blue tokens pour into it and those that pass drop into a teal counter labelled 'goodput'. On 'multiply', the line writes on under the funnel: 'goodput = throughput × share on time'."
+        },
+        {
+          "id": "b9",
+          "say": "Pack thousands of requests into one huge, slow batch, and the counter looks superb. But if every user stares at a blank screen for forty seconds, every one of those tokens missed its target for time to first token. The share is zero, and so is goodput.",
+          "show": "A crowd of user icons appears beside the funnel, each with an hourglass reading '40 s' and an empty chat window. On 'missed its target for time to first token', all the tokens bounce off the funnel and turn grey; the share in the equation reads '0%' and the teal goodput counter drops to '0', while the white throughput counter keeps spinning. The result shrinks into card 5's chip: 'only tokens in time count'."
+        },
+        {
+          "id": "b10",
+          "say": "Five sentences, and between them they explain the thirty milliseconds. Every link is a division or a multiplication you can now do yourself. Nothing in the chain needs anything beyond arithmetic.",
+          "show": "The workbench clears. The camera pulls back so all five cards and their five result chips are in view at once. On 'a division or a multiplication', the '÷' and '×' signs inside the five chips light amber one after another, top to bottom. A small stopwatch reading '30 ms' appears under card 5, joined to it by a sixth chain link. On 'beyond arithmetic', a white line writes on beneath the chain: 'Nothing beyond arithmetic.'"
+        }
+      ]
+    },
+    {
+      "id": "ch18_s04",
+      "name": "the road ahead",
+      "figs": [
+        147
+      ],
+      "visual": "New composition. Top band (y 70–270): the division, large and centred: 'tokens per second = bandwidth ÷ bytes per token'. 'bandwidth' sits in a coral box; 'bytes per token' sits in a coral box that, on cue, splits into two smaller boxes, coral 'bytes per read' divided by blue 'tokens sharing each read'. Lower part of the frame (y 320–1000): a large rounded blue panel titled 'Where the series goes from here', holding eight cards in a 4 × 2 grid, in this order. Row one: 'the accelerator' (a chip icon), 'the code on it' (a code-brackets icon), 'fewer bits' (a row of binary digits icon), 'across many chips' (two chip icons joined by a link). Row two: 'part of itself' (a pie icon with one slice lit), 'serving at scale' (a crowd of user icons), 'idle units in decode' (a sleeping chip icon with a small 'z'), 'one real request' (a route icon). Each card carries a tiny grey tag in its top corner with its video number, '2' to '9'. All eight start dimmed to 30%. As each is named it brightens and a thin line draws from it up to the term of the division it moves, coloured like that term, and the term shows a small arrow: bandwidth up, bytes per read down, tokens sharing each read up. Small number chips beside the terms recall results from earlier. Lines persist, so by the end every card is wired to the division. The idea the motion makes visible: eight different videos, one division, each pulling on one of its terms.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So where does that leave us? With one division. Tokens per second is bandwidth, over bytes per token. And bytes per token is what each read of the weights moves, shared among however many tokens use that read.",
+          "show": "The division writes on term by term at the top: coral 'bandwidth', '÷', coral 'bytes per token', then '= tokens per second'. On 'shared among however many tokens', the 'bytes per token' box splits into coral 'bytes per read' ÷ blue 'tokens sharing each read'. The panel 'Where the series goes from here' fades in below with its eight dimmed cards."
+        },
+        {
+          "id": "b2",
+          "say": "Every video still to come attacks a term of it. First, open up the hardware: what inside the accelerator sets its arithmetic speed and its bandwidth. Then the code that runs on it, the kernels, and how close they come to those limits without moving a byte more than they must.",
+          "show": "On 'open up the hardware', card '2 · the accelerator' brightens and draws a coral line up to 'bandwidth', which shows a small up-arrow. On 'the kernels', card '3 · the code on it' brightens and draws a coral line to 'bytes per read', which shows a small down-arrow."
+        },
+        {
+          "id": "b3",
+          "say": "Then store the weights in fewer bits. Eight bits instead of sixteen halves the hundred and forty gigabytes, and the same bus gives about forty-eight tokens a second.",
+          "show": "Card '4 · fewer bits' brightens; its binary-digits icon shrinks from sixteen digits to eight. A coral line draws to 'bytes per read', and a small chip appears beside that term: '140 → 70 GB · ≈ 48 tokens/s'."
+        },
+        {
+          "id": "b4",
+          "say": "Then split the model across many chips. Two H one hundreds hold a hundred and sixty gigabytes between them, so the model fits, and each one reads only its own seventy. Before the cost of the chips talking to each other, that is about twenty-one milliseconds a token.",
+          "show": "Card '5 · across many chips' brightens and draws a coral line to 'bandwidth'. Beside that term: two small GPU icons, each with a coral half-bar labelled '70 GB', a tag '80 + 80 = 160 GB', then '70 GB ÷ 3.35 TB/s ≈ 21 ms per token', and a grey footnote 'before communication costs'."
+        },
+        {
+          "id": "b5",
+          "say": "Then models that use only part of themselves for each token, so each token reads only a fraction of the weights. Then serving at production scale, where many users share every read. Ten requests sharing one read, and the machine makes about two hundred and forty tokens a second.",
+          "show": "Card '6 · part of itself' brightens and draws a coral line to 'bytes per read'. Card '7 · serving at scale' brightens and draws a blue line to 'tokens sharing each read', which shows an up-arrow and a chip: '× 10 → ≈ 240 tokens/s, all users together'."
+        },
+        {
+          "id": "b6",
+          "say": "Then put decode's idle arithmetic to work. More than ninety-nine percent of it sits waiting, so it can check several tokens of one answer from a single read. And finally, one real request, traced end to end through the whole stack, along the route you saw near the start.",
+          "show": "Card '8 · idle units in decode' brightens; its sleeping chip wakes, and it draws a blue line to 'tokens sharing each read', with a small amber tag '99.7% idle at batch 1'. On 'one real request', card '9 · one real request' brightens; the six-stop route from earlier draws across the bottom of the panel in miniature, 'router → scheduler → prefill → KV transfer → decode → screen', and three lines from card 9 reach all three terms at once."
+        },
+        {
+          "id": "b7",
+          "say": "Every one of them is an attack on the same division. Each later video takes one term and tries to move it. Hold on to that frame, and the whole series reads as a single argument.",
+          "show": "All eight cards are at full brightness, each wired to its term. On 'the same division', the division at the top pulses once and all the lines pulse with it. On 'a single argument', the lines draw together into one bright bundle feeding the division, and a white line writes on under the panel: 'One division. Eight attacks on it.'"
+        }
+      ]
+    },
+    {
+      "id": "ch18_s05",
+      "name": "closing",
+      "figs": [
+        147
+      ],
+      "visual": "Everything clears to the dark canvas: a quiet, spacious ending. Centre, a single blue token pill and a stopwatch, a callback to the film's first picture of tokens streaming out. Then two short lines in two colours. Then the end card: the film's title, the series name, and what comes next. Slow, unhurried motion; long holds.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Thirty milliseconds a token. Not a guess, and not a benchmark. A hundred and forty gigabytes crossing a bus as fast as physics allows, while the arithmetic waits.",
+          "show": "A blue token pill streams in from the left and settles centre while a stopwatch beside it ticks '30 ms'; a second pill follows, then a third, at a steady rhythm, each nudging the last along. On 'a hundred and forty gigabytes crossing a bus', a thin coral stream flows beneath the pills, left to right. On 'the arithmetic waits', a tiny amber dot beside the stream blinks once and then sits still."
+        },
+        {
+          "id": "b2",
+          "say": "Arithmetic is cheap. Data movement is expensive. Everything in this series is working out what that implies.",
+          "show": "The pills and stream fade. Two lines write on, centred, one under the other: amber 'Arithmetic is cheap.' on the first sentence, coral 'Data movement is expensive.' on the second. They hold."
+        },
+        {
+          "id": "b3",
+          "say": "Next, we open up the chip itself. This has been The Memory Wall.",
+          "show": "The two lines rise and shrink away. End card fades in: the title 'The Memory Wall' in large white type at centre, beneath it in grey 'The Engineering Behind LLM Inference · video 1 of 9', and near the bottom a small blue card with a chip icon, 'Next: Inside the GPU'. Hold for three seconds after the last word, then fade to black."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Puzzle bar: 0.1 ms sliver on a 1,500 px bar for 30 ms is 5 px",
+      "python": "0.1/30*1500",
+      "result": "5.0"
+    },
+    {
+      "claim": "Puzzle: more than 99% of the 30 ms is not arithmetic (1 - 0.1/30 = 99.67%)",
+      "python": "1-0.1/30",
+      "result": "0.996667"
+    },
+    {
+      "claim": "Puzzle factor: 30 ms / 0.1 ms = 300",
+      "python": "30/0.1",
+      "result": "300.0"
+    },
+    {
+      "claim": "Ridge on H100: 989 TFLOP/s / 3.35 TB/s = 295 ops per byte",
+      "python": "989e12/3.35e12",
+      "result": "295.223881"
+    },
+    {
+      "claim": "One token: 2 x 70 billion = 140 billion ops",
+      "python": "2*70e9",
+      "result": "140000000000.0"
+    },
+    {
+      "claim": "One token: 70 billion x 2 bytes = 140 GB",
+      "python": "70e9*2",
+      "result": "140000000000.0"
+    },
+    {
+      "claim": "Decode intensity: 140 billion ops / 140 billion bytes = 1 op per byte",
+      "python": "(2*70e9)/(70e9*2)",
+      "result": "1.0"
+    },
+    {
+      "claim": "Arithmetic's limit on H100: 989e12 / 140e9 = about 7,064 tokens/s",
+      "python": "989e12/140e9",
+      "result": "7064.285714"
+    },
+    {
+      "claim": "Arithmetic time per token on H100 = 0.14 ms ('a little over a tenth of a millisecond')",
+      "python": "140e9/989e12*1e3",
+      "result": "0.141557"
+    },
+    {
+      "claim": "Memory's limit on H100: 3.35 TB/s / 140 GB = about 24 tokens/s",
+      "python": "3.35e12/140e9",
+      "result": "23.928571"
+    },
+    {
+      "claim": "Memory time per token on H100 = 41.8 ms ('forty-two milliseconds')",
+      "python": "140e9/3.35e12*1e3",
+      "result": "41.791045"
+    },
+    {
+      "claim": "Ratio of the two speed limits = 295, the factor of 300",
+      "python": "(989e12/140e9)/(3.35e12/140e9)",
+      "result": "295.223881"
+    },
+    {
+      "claim": "Same ratio as times: 41.8 ms / 0.14 ms = 295",
+      "python": "(140e9/3.35e12)/(140e9/989e12)",
+      "result": "295.223881"
+    },
+    {
+      "claim": "Factor = ridge / decode intensity = 295 / 1",
+      "python": "(989e12/3.35e12)/1",
+      "result": "295.223881"
+    },
+    {
+      "claim": "CORRECTION to fig 146 label 'the factor of 300 = bandwidth / bytes per token': bandwidth / bytes per token is a rate, 23.9 tokens/s on an H100 (the decode ceiling), not a dimensionless factor. The film keeps that division as the memory's speed limit and states the factor as (peak / ops per token) / (bandwidth / bytes per token) = (peak / bandwidth) / (ops per byte) = ridge / intensity = 295, i.e. two hardware numbers and one property of the workload, as the figure's prose says.",
+      "python": "(3.35e12/140e9, (989e12/3.35e12)/1)",
+      "result": "(23.928571, 295.223881)"
+    },
+    {
+      "claim": "Log axis 300 px per decade from x=260: memory limit 23.9 tokens/s ends at x=674",
+      "python": "__import__('math').log10(3.35e12/140e9)*300+260",
+      "result": "673.675031"
+    },
+    {
+      "claim": "Log axis: arithmetic limit 7,064 tokens/s ends at x=1415",
+      "python": "__import__('math').log10(989e12/140e9)*300+260",
+      "result": "1414.720477"
+    },
+    {
+      "claim": "The 30 ms: 140 GB / 4.8 TB/s on an H200 = 29.2 ms",
+      "python": "140e9/4.8e12*1e3",
+      "result": "29.166667"
+    },
+    {
+      "claim": "8B model: 8 billion x 2 bytes = 16 GB",
+      "python": "8e9*2/1e9",
+      "result": "16.0"
+    },
+    {
+      "claim": "8B model on H100: 16 GB / 3.35 TB/s = 4.8 ms per token",
+      "python": "16e9/3.35e12*1e3",
+      "result": "4.776119"
+    },
+    {
+      "claim": "8B model on H100: about 209 tokens/s",
+      "python": "3.35e12/16e9",
+      "result": "209.375"
+    },
+    {
+      "claim": "8B model arithmetic limit on H100: about 61,800 tokens/s",
+      "python": "989e12/16e9",
+      "result": "61812.5"
+    },
+    {
+      "claim": "8B model: the gap is still 295 (independent of model size at 1 op per byte)",
+      "python": "(16e9/3.35e12)/(16e9/989e12)",
+      "result": "295.223881"
+    },
+    {
+      "claim": "Log axis: 8B memory limit 209 tokens/s ends at x=956",
+      "python": "__import__('math').log10(3.35e12/16e9)*300+260",
+      "result": "956.277447"
+    },
+    {
+      "claim": "Log axis: 8B arithmetic limit 61,812 tokens/s ends at x=1697",
+      "python": "__import__('math').log10(989e12/16e9)*300+260",
+      "result": "1697.322893"
+    },
+    {
+      "claim": "Both bars shift right by the same 283 px when the model shrinks 70B -> 8B",
+      "python": "300*__import__('math').log10(70/8)",
+      "result": "282.602416"
+    },
+    {
+      "claim": "Link 1: compute x80 vs bandwidth x17 over a decade = 4.7x divergence",
+      "python": "80/17",
+      "result": "4.705882"
+    },
+    {
+      "claim": "Link 3: 140 GB shared by a 2,000-token prompt = 70 MB per token",
+      "python": "140e9/2000/1e6",
+      "result": "70.0"
+    },
+    {
+      "claim": "Link 3: prefill intensity 2,000 x 140 billion ops / 140 billion bytes = 2,000 ops per byte",
+      "python": "2000*140e9/140e9",
+      "result": "2000.0"
+    },
+    {
+      "claim": "Link 4: KV cache per token 2 x 80 x 8 x 128 x 2 = 327,680 bytes, about 320 KB",
+      "python": "2*80*8*128*2",
+      "result": "327680"
+    },
+    {
+      "claim": "Link 4: 100,000 tokens of cache = 33 GB",
+      "python": "327680*1e5/1e9",
+      "result": "32.768"
+    },
+    {
+      "claim": "Link 4: weights + cache = 173 GB per token",
+      "python": "(140e9+327680*1e5)/1e9",
+      "result": "172.768"
+    },
+    {
+      "claim": "Link 4: ceiling falls to about 19 tokens/s for that one conversation",
+      "python": "3.35e12/(140e9+327680*1e5)",
+      "result": "19.390165"
+    },
+    {
+      "claim": "Road ahead: arithmetic idle at batch 1 = 100 - 100/295 = 99.7%",
+      "python": "100-100/(989e12/3.35e12)",
+      "result": "99.661274"
+    },
+    {
+      "claim": "Road ahead: 8-bit weights halve 140 GB to 70 GB",
+      "python": "140e9*1/2/1e9",
+      "result": "70.0"
+    },
+    {
+      "claim": "Road ahead: 3.35 TB/s / 70 GB = about 48 tokens/s",
+      "python": "3.35e12/70e9",
+      "result": "47.857143"
+    },
+    {
+      "claim": "Road ahead: two H100s hold 80 + 80 = 160 GB",
+      "python": "2*80",
+      "result": "160"
+    },
+    {
+      "claim": "Road ahead: each of two H100s reads 70 GB = about 21 ms per token, before communication",
+      "python": "70e9/3.35e12*1e3",
+      "result": "20.895522"
+    },
+    {
+      "claim": "Road ahead: 10 requests sharing one read = about 240 tokens/s in total",
+      "python": "3.35e12*10/140e9",
+      "result": "239.285714"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "chapter": "ch00",
+  "title": "Cold open: thirty milliseconds",
+  "kicker": "00 · Cold open: thirty milliseconds",
+  "figs": [],
+  "scenes": [
+    {
+      "id": "ch00_s01",
+      "name": "an answer, one token every thirty milliseconds",
+      "figs": [],
+      "visual": "Dark canvas, one continuous shot. Upper two thirds, centred: a chat window, a rounded panel about 1,200 px wide and 560 px tall with a thin blue outline (blue = structure). Inside it, top right: a grey user bubble with a small user icon beside it holding the question 'Why is the sky blue?'. Below it, left aligned with a small sparkle icon for the assistant: the answer, which streams in token by token. Each token lands as a faint blue pill and relaxes into plain white text a moment later, so the stream reads as a run of separate pieces settling into prose. The answer text, exactly: 'Sunlight looks white, but it is a mix of every colour. As it passes through the air, tiny gas molecules scatter some of it sideways. They scatter short wavelengths, the blues, far more strongly than long ones, the reds. So blue light reaches your eyes from every direction, and the whole sky glows blue.' Bottom band, y about 900: a thin horizontal metronome track from x=160 to x=1760, with a stopwatch icon at its right end. Every time a token lands in the chat, a small white tick drops onto the track at the same instant, so the track becomes a record of the beat. Nothing clears during the scene; at the end the chat dims and the beat becomes the subject. The idea: an answer is not one thing, it is a rapid, even drumbeat of small pieces, and the gap between beats is about 30 ms.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Ask a chatbot a question and watch the answer. It does not arrive all at once. It streams out, one small piece at a time.",
+          "show": "On 'ask a chatbot', the chat window draws on and the user bubble types in 'Why is the sky blue?'. On 'watch the answer', the sparkle icon pulses. On 'streams out', the answer begins at true speed, about 33 tokens a second, so its first two sentences fill in roughly three seconds, each token flashing as a faint blue pill before settling into white text. Ticks rain onto the bottom track in step, too fast to count."
+        },
+        {
+          "id": "b2",
+          "say": "Each piece is called a token, a word or part of one. And the tokens arrive at a steady beat, about one every thirty milliseconds.",
+          "show": "On 'each piece', the stream freezes and the camera eases in on the third line. The words there separate into blue pills with thin gaps: ' They', ' scatter', ' short', ' wave', 'lengths'. On 'part of one', the two pills 'wave' and 'lengths' glow together, joined by a small bracket labelled 'one word, two tokens' and a grey tag 'illustrative split'. On 'steady beat', the camera eases back out and the stream resumes in slow motion, twenty times slower, one pill every 0.6 s of screen time; each landing drops a tick on the bottom track. Between two consecutive ticks a bracket draws on, labelled '≈ 30 ms'. The stopwatch at the track's right end flicks 0 → 30 ms → 0 with every tick."
+        },
+        {
+          "id": "b3",
+          "say": "Three hundredths of a second, for every token. Keep that number in mind. Everything that follows is about where it comes from.",
+          "show": "The chat window dims to 30% while the slow beat continues. On 'three hundredths of a second', a grey line writes beside the bracket: '30 ms = 0.03 s'. On 'every token', the ticks keep coming, each one flashing its own small '30 ms' bracket. On 'keep that number in mind', the '≈ 30 ms' bracket lifts off the track, enlarges and floats to the centre of the frame, where it becomes a white stamp '≈ 30 ms' with 'per token' beneath it. It holds there into the next scene."
+        }
+      ]
+    },
+    {
+      "id": "ch00_s02",
+      "name": "a sliver of arithmetic",
+      "figs": [],
+      "visual": "One continuous shot. The '≈ 30 ms' stamp from the previous scene unrolls into a single horizontal bar across the centre, drawn to scale: from x=210 to x=1710, 1,500 px standing for 30 ms, so 50 px per millisecond, 80 px tall, thin white outline. A small blue token pill labelled 'one token' sits just past the bar's right end, the thing those 30 ms produce. A stopwatch icon top left reads '30 ms'. Above the bar's left end: a small chip icon with an amber outline, and beside it an amber operation counter with a tiny '× +' glyph. Under the bar: label slots for the two parts. Colour: amber for arithmetic; the rest of the bar stays a neutral flat grey all scene, deliberately unexplained, with a '?' over it. The camera zooms once into the first millisecond and back out. The idea: the arithmetic for a token is real and enormous in count, yet it occupies a 5 px sliver of a 1,500 px bar.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "What fills those thirty milliseconds? Making one token takes a staggering amount of arithmetic, something like a hundred billion multiplications and additions.",
+          "show": "On 'what fills', the stamp unrolls into the empty 1,500 px bar and the 'one token' pill pops in at its right end. On 'arithmetic', the chip icon and the amber counter appear above the bar's left end; the '× +' glyph flickers rapidly. On 'a hundred billion', the counter runs from 0 to '≈ 100,000,000,000', and a grey label settles under it: 'multiplications and additions'."
+        },
+        {
+          "id": "b2",
+          "say": "That sounds like a lot. But a modern data-centre chip gets through all of it in about a tenth of a millisecond.",
+          "show": "On 'a modern data-centre chip', the chip icon brightens. On 'all of it', the counter's digits collapse into a small amber block that drops into the bar's left end. On 'a tenth of a millisecond', the block settles as an amber sliver exactly 5 px wide. The camera zooms tenfold into the first millisecond, where 1 ms now spans 500 px and the sliver is a clear 50 px block, with tick marks '0', '0.1 ms' and '1 ms'. Tag under the sliver: 'arithmetic ≈ 0.1 ms'."
+        },
+        {
+          "id": "b3",
+          "say": "Pull back to scale, and the arithmetic is this sliver at the very start. Less than one percent of the time is mathematics. More than ninety-nine percent is something else.",
+          "show": "On 'pull back', the camera returns to the full bar and the amber block shrinks back to its true 5 px sliver; its tag stays. On 'the very start', a thin pointer marks the sliver. On 'less than one percent', the remaining 1,495 px fills with flat grey from left to right, and the amber tag becomes 'arithmetic: under 1%'. On 'ninety-nine percent', a white label lands under the grey: 'something else: over 99%'. A large soft '?' fades up over the grey."
+        },
+        {
+          "id": "b4",
+          "say": "The chip is not slow, and the model is not badly written. In the time it takes to deliver one token, it could have done the arithmetic for three hundred. So what fills the rest?",
+          "show": "On 'the chip is not slow', the chip icon pulses amber. On 'three hundred', copies of the 5 px amber sliver stamp into the bar one after another, left to right, accelerating, while a counter beside the stopwatch runs 1 → 300 with the label 'tokens of arithmetic'. On 300 the bar is tiled amber exactly to its right end. Then the 299 copies fade back out, leaving the single real sliver at the start. On 'what fills the rest', the grey returns and the '?' over it pulses once."
+        }
+      ]
+    },
+    {
+      "id": "ch00_s03",
+      "name": "two numbers, and a wall",
+      "figs": [],
+      "visual": "Continues seamlessly from the end of the previous scene: the 30 ms bar, its 5 px amber sliver at the left, the grey remainder with its '?', the stopwatch top left. In the first two beats the bar slides down to the lower third and a chip specification sheet slides into the right third: a document card with the header 'chip spec sheet' and six unreadable grey placeholder lines. In the last beat everything except the bar's two parts clears, and the grey 99% gathers itself into a wall. Colour: amber for the calculation line and the sliver, coral for the memory line and the wall, blue for the token pill, white and grey for text. The idea: the film promises a name for the 99% and a way to predict the 30 ms from two hardware numbers, then closes on the title as an image of a token stopped by a wall.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "By the end of this film, that ninety-nine percent will have a name. And you will be able to work out the thirty milliseconds yourself.",
+          "show": "On 'a name', an empty white-outlined name plate with a blinking cursor clips onto the top edge of the grey section; the '?' slides up into it. On 'work out the thirty milliseconds', a small pencil icon draws an underline beneath the stopwatch's '30 ms', and the bar eases down into the lower third."
+        },
+        {
+          "id": "b2",
+          "say": "It takes just two numbers from a chip's specification sheet. How fast it can calculate, and how fast its memory can deliver. For any model, on any chip.",
+          "show": "On 'specification sheet', the spec-sheet card slides in from the right with its six grey placeholder lines. On 'two numbers', two of the lines brighten. On 'how fast it can calculate', the first resolves into amber text 'operations per second: ?'. On 'how fast its memory can deliver', the second resolves into coral text 'bytes per second: ?'. The values stay '?' on purpose. On 'any model, on any chip', a fan of three faint chip icons and three model-file icons of different sizes riffles behind the card and settles."
+        },
+        {
+          "id": "b3",
+          "say": "The memory wall.",
+          "show": "On the first word, the spec sheet, name plate and stopwatch fade out. The grey 99% of the bar slides to centre right and stacks itself upward, brick by brick, into a tall wall about 700 px high and 220 px thick, the bricks warming from grey to coral as they rise. The 5 px amber sliver stays on the floor line at the left, tiny in front of it. A blue token pill glides in from the left along the floor line, passes the sliver, and stops dead against the wall with a small bump. On 'wall', the title writes on in large white type across the upper third: 'The Memory Wall'. Beneath it in smaller grey: 'The Engineering Behind LLM Inference · 1'. Hold for three seconds, then fade to black."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {"claim": "The 30 ms is the H200 division from the film bible: 140 GB / 4.8 TB/s = 29.2 ms, rounded to 'about thirty milliseconds' (derived later, in ch02; only teased here)", "python": "140e9/4.8e12*1e3", "result": "29.166666666666668"},
+    {"claim": "Thirty milliseconds = 0.03 s, 'three hundredths of a second'", "python": "30/1000", "result": "0.03"},
+    {"claim": "One token every 30 ms is about 33 tokens a second (streaming speed shown in s01 b1)", "python": "1/0.03", "result": "33.333333333333336"},
+    {"claim": "Storyboard: the two-sentence answer shown is about 100 tokens, so at 30 ms each it streams in about 3 s", "python": "100*0.03", "result": "3.0"},
+    {"claim": "Storyboard: slow motion at 20x makes the 30 ms gap 0.6 s of screen time", "python": "0.03*20", "result": "0.6"},
+    {"claim": "'A hundred billion multiplications and additions' is the round power of ten for 70e9 weights x 2 = 140 billion operations (log10 = 11.15, so about 10^11); ch05 explains the rounding", "python": "import math; print(70e9*2, math.log10(70e9*2))", "result": "140000000000.0 11.146128035678238"},
+    {"claim": "About 10^11 operations at about 10^15 operations per second = 10^-4 s = 0.1 ms, 'about a tenth of a millisecond'", "python": "1e11/1e15, 1e11/1e15*1e3", "result": "0.0001 0.1"},
+    {"claim": "Arithmetic share of the 30 ms: 0.1 / 30 = 0.33%, 'less than one percent'", "python": "0.1/30, 0.1/30*100", "result": "0.0033333333333333335 0.33333333333333337"},
+    {"claim": "Everything else: 100 - 0.33 = 99.67%, 'more than ninety-nine percent'", "python": "(1-0.1/30)*100", "result": "99.66666666666667"},
+    {"claim": "Robustness of 'more than 99%' with unrounded numbers: 140e9 ops on an H100's 989e12 ops/s = 0.142 ms; against the 29.2 ms H200 token time that is 0.49% arithmetic, 99.51% other. The rounded and unrounded versions both clear 99%", "python": "a=140e9/989e12*1e3; t=140e9/4.8e12*1e3; print(a, a/t*100, 100-a/t*100)", "result": "0.14155712841253792 0.48533872598584427 99.51466127401416"},
+    {"claim": "The chip could have done the arithmetic for 30 / 0.1 = 300 tokens in the time it delivers one", "python": "30/0.1", "result": "300.0"},
+    {"claim": "Storyboard scale: 1,500 px = 30 ms gives 50 px per ms; the 0.1 ms sliver is 5 px; the remainder is 1,495 px", "python": "1500/30, 0.1*1500/30, 1500-0.1*1500/30", "result": "50.0 5.0 1495.0"},
+    {"claim": "Storyboard: 300 copies of the 5 px sliver tile the 1,500 px bar exactly", "python": "300*5", "result": "1500"},
+    {"claim": "Storyboard: a tenfold zoom makes the first millisecond 500 px and the sliver 50 px", "python": "1*50*10, 0.1*50*10", "result": "500 50.0"}
+  ]
+}

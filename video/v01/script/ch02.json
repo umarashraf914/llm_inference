@@ -1,0 +1,441 @@
+{
+  "chapter": "ch02",
+  "title": "Thirty milliseconds, from two numbers",
+  "kicker": "02 · Thirty milliseconds, from two numbers",
+  "figs": [
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "scenes": [
+    {
+      "id": "ch02_s01",
+      "name": "one turn of the loop, thirty milliseconds",
+      "figs": [
+        11
+      ],
+      "visual": "Dark background, one continuous shot. Centre-left at first: the generate loop carried over from the previous chapter, drawn as a cycle of four blue rounded nodes running clockwise: 'text so far' (top), 'run the whole model' (right), 'one new token' (bottom), 'append' (left), joined by arrows. A row of blue token pills sits under the top node. A stopwatch icon sits above the cycle. From beat 4 the cycle shrinks into the top-left corner (still turning slowly) and the centre band becomes a one-second timeline that fills with blue token pills; a small chat window in the bottom band streams text in step with the pills. The idea the motion makes visible: one turn of the loop is one token is about 30 ms, and turns laid end to end become a rate.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here is that loop again. The text so far goes in, the whole model runs, one new token comes out, and it is appended to the end. Then round again. So how long does one turn take?",
+          "show": "The four nodes draw on one by one on 'text so far', 'the whole model runs', 'one new token', 'appended'. Under the top node a row of blue pills reads 'The', 'cat', 'sat', 'on', 'the'. A pulse of white light travels once around the cycle; on 'one new token' a new pill 'mat' pops out of the bottom node and on 'appended' it slides onto the end of the row. On 'round again' the pulse sets off on a second lap. On 'how long', the stopwatch above the cycle fades in at 0."
+        },
+        {
+          "id": "b2",
+          "say": "About thirty milliseconds. That one number is what this whole film is about.",
+          "show": "The stopwatch runs while the pulse makes its lap and stops as the pulse returns to 'text so far', reading '30 ms'. On 'thirty milliseconds' a large white title lands top-centre: '≈ 30 ms per token'."
+        },
+        {
+          "id": "b3",
+          "say": "A millisecond is a thousandth of a second, so thirty milliseconds is three hundredths of a second. A blink of an eye lasts longer than that. Several tokens can arrive while you blink.",
+          "show": "A horizontal number line slides in under the title, '0' to '1 s'. On 'a thousandth', the camera zooms toward 0 and a tiny tick labelled '1 ms' appears. On 'three hundredths', a bracket spans 0 to 0.03 s, labelled '30 ms = 0.03 s'. On 'blink', an eye icon at the right closes and opens while three or four new pills pop out of the loop; grey tag beside the eye: 'a blink ≈ 100–400 ms'."
+        },
+        {
+          "id": "b4",
+          "say": "Now lay the turns end to end. In one second of output, about thirty-three tokens arrive. A two-hundred-word answer, around three hundred tokens, streams out in about nine seconds.",
+          "show": "The cycle shrinks to the top-left corner and keeps turning slowly. The number line becomes a timeline ruler across the centre band, '0' to '1 s', ticks every 100 ms. Blue pills drop onto it one every 30 ms, left to right, while a counter at the right end runs 0 → 33 and settles on '1 second ≈ 33 tokens'. On 'two-hundred-word answer' a thin strip appears beneath: '≈ 300 tokens × 30 ms ≈ 9 s'."
+        },
+        {
+          "id": "b5",
+          "say": "That pace is quick enough that the words seem to flow onto the screen at least as fast as you can read them, which is exactly the target.",
+          "show": "In the bottom band a chat window streams a reply word by word, each word appearing in step with a pill landing on the timeline above. A small eye icon tracks along the text just behind the newest word."
+        },
+        {
+          "id": "b6",
+          "say": "So thirty milliseconds is not an arbitrary figure. It is roughly the slowest a model can generate and still feel responsive to the person reading it.",
+          "show": "Two short labels stack under the '≈ 30 ms per token' title on the spoken phrases: 'not arbitrary', then 'about the slowest that still feels responsive'. The chat window keeps streaming."
+        },
+        {
+          "id": "b7",
+          "say": "And it is not a mystery. In a few minutes you will derive it yourself, from just two numbers, one about the model and one about the chip. The same method works for any model on any chip.",
+          "show": "Timeline, chat window and loop fade to 30%. '30 ms' moves to centre and enlarges. On 'two numbers', two empty cards slide up beneath it side by side with a '÷' between them, each showing a large '?': the left card captioned 'about the model', the right 'about the chip'. They hold to the end of the scene; they return, filled in, later in this chapter."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s02",
+      "name": "a hundred and forty gigabytes, three homes",
+      "figs": [
+        12
+      ],
+      "visual": "One continuous shot. Left two thirds: three horizontal capacity bars, stacked with generous gaps, all starting at the same left edge (x ≈ 160): top 'A disk', middle 'Memory beside the chip', bottom 'The chip itself'. Bars are blue outlines (containers). The model's bytes are one solid coral block built from small weight tiles. The middle bar is exactly as long as the model block (about 1,200 px), so memory and model share one true scale. The disk bar is schematic: it runs off the right edge of the frame. The chip bar is drawn at the same true scale as the memory bar, which makes it about 1 px wide, a hairline, examined through a magnifier. Right third: a narrow panel where definitions and sums build. The idea: one file, three homes of wildly different size, and only the middle one matters while the model is serving.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "First, how big is that file of numbers? Each weight is stored in two bytes. A byte is the basic unit computers count storage in, and a gigabyte is a billion bytes.",
+          "show": "A file icon labelled 'model file' sits top-left. On 'how big', it opens into a grid of small coral weight tiles; one tile enlarges with the tag '2 bytes' and a grey note '16-bit number'. In the right panel two definitions appear one under the other on the spoken words: '1 byte: the unit of storage' and '1 GB = 1,000,000,000 bytes'."
+        },
+        {
+          "id": "b2",
+          "say": "So seventy billion weights, times two bytes each, is a hundred and forty billion bytes. A hundred and forty gigabytes. Hold on to that number. Everything in this chapter turns on it.",
+          "show": "The right panel clears and an equation builds term by term: '70,000,000,000 weights' on 'seventy billion', '× 2 bytes' on 'two bytes', '= 140,000,000,000 bytes' on 'a hundred and forty billion bytes', which then morphs into '= 140 GB'. On '140 GB' the tile grid compresses into one solid coral block labelled '140 GB'."
+        },
+        {
+          "id": "b3",
+          "say": "That file can live in three places. The first is a disk, the drive where the file is kept between runs, like the drive in a laptop, only bigger. It holds far more than this one file needs.",
+          "show": "The top bar 'A disk' draws from the left edge and keeps going off the right edge of the frame, with a small arrow '→ terabytes' at the edge and a grey tag 'not to scale'. Sub-label under it: 'where the file is kept between runs'. A copy of the coral 140 GB block sits at its left end, filling only a small part of it."
+        },
+        {
+          "id": "b4",
+          "say": "The second is the memory beside the chip, where the file sits while the model is being served, kept running to answer requests. Engineers call it H B M, high bandwidth memory. Bandwidth just means how many bytes per second a connection can carry.",
+          "show": "The middle bar 'Memory beside the chip' draws to exactly the length of the coral block. Sub-label: 'where it sits while the service runs'. On 'H B M' a tag 'HBM · high bandwidth memory' attaches to the bar. On 'bandwidth', a short pipe icon appears in the right panel with coral particles flowing through it and the label 'bandwidth = bytes per second'."
+        },
+        {
+          "id": "b5",
+          "say": "It is sized so that the model fits. The third place is the chip itself, where the arithmetic actually happens. And the chip holds almost nothing.",
+          "show": "On 'model fits' the coral block drops into the middle bar and fills it edge to edge; tag 'fits'. On 'the chip itself' the bottom bar draws as a hairline, about 1 px wide, at the left edge, with its label 'The chip itself' to the right of it and a grey tag 'same scale as the memory bar'."
+        },
+        {
+          "id": "b6",
+          "say": "A kilobyte is a thousand bytes. The chip keeps a few hundred kilobytes in each of its many small working areas, around a tenth of a gigabyte in all. That is about a thousandth of the model, which is why, drawn to scale, it is a hairline.",
+          "show": "A magnifier circle swings over the hairline and enlarges it: inside, a grid of many small squares, one labelled 'a few hundred KB each'. In the right panel, on the spoken numbers: '≈ 0.1 GB in all', then '≈ 1/1,000 of the model'. The magnifier stays parked over the hairline."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s03",
+      "name": "disk or memory: load once",
+      "figs": [
+        12
+      ],
+      "visual": "One continuous shot. Two lanes run left to right across the centre. The top lane starts at a drive icon labelled 'disk'; the bottom lane starts at a memory-stack icon labelled 'memory beside the chip'; both end at a small chip icon on the right. Coral particles flow along each lane at a speed that shows its rate, with a 'GB delivered' counter and a stopwatch at the end of each lane. In the last two beats the lanes fold away and the three tier bars from the previous scene return, drawn smaller. The idea: the same 140 GB takes wildly different times from the two places, so the slow copy is done once and never again.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why not read the model straight off the disk whenever it is needed? Speed. A fast drive reads something like seven gigabytes a second, so a hundred and forty gigabytes takes about twenty seconds. Disks vary widely, but think many seconds, not milliseconds.",
+          "show": "Top lane only. Coral particles trickle along it; its counter climbs slowly 0 → 140 GB while its stopwatch runs to '≈ 20 s' (the animation is time-compressed, marked '×10' in grey). Beside the lane: '140 GB ÷ ≈ 7 GB/s ≈ 20 s', and a grey caveat 'disks vary widely'."
+        },
+        {
+          "id": "b2",
+          "say": "From the memory beside the chip, the same hundred and forty gigabytes takes only tens of milliseconds. That is something like five hundred to a thousand times faster.",
+          "show": "The bottom lane lights. On 'tens of milliseconds' the coral particles cross in one dense burst; its counter snaps to 140 GB and its stopwatch reads 'tens of ms'. A bracket joins the two stopwatches: '≈ 500–1,000× faster'."
+        },
+        {
+          "id": "b3",
+          "say": "So the model is loaded once, at start-up, copied from the disk into the memory beside the chip, and then left there for as long as the service runs.",
+          "show": "The lanes fold away and the three tier bars return, smaller, centre-left. On 'copied' the coral 140 GB block slides out of the disk bar and down into the memory bar. Label at the right: 'load once, at start-up'; on 'left there', a second label beneath it: 'stays while the service runs'."
+        },
+        {
+          "id": "b4",
+          "say": "Three tiers, and the middle one is where everything from here on takes place. The disk shows up once, at start-up, and is never mentioned again.",
+          "show": "The disk bar fades to 20% grey with the tag 'start-up only'. The chip hairline stays faint. The memory bar, full of coral, glows; tag beside it: 'where this story happens'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s04",
+      "name": "paid once, spread thin",
+      "figs": [
+        13
+      ],
+      "visual": "One continuous shot. A long horizontal timeline across the centre band, start-up at the left, labelled at its right end first 'hours', later '24 hours'. At the far left a coral block 'load: many seconds'; an arrow; then a long band 'serve: milliseconds per token, for hours', drawn as a run of tiny blue tick marks, one per token. A token counter sits above the timeline. The lower third holds a pair of comparison bars drawn to the same scale. The idea: a one-off cost shrinks to nothing when shared by millions of tokens; then a hint of a different cost that every token pays again.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Picture the life of that service as a timeline. First the load, many seconds of copying. Then the serving, a token every thirty milliseconds or so, for hours on end.",
+          "show": "On 'the load', the coral block 'load: many seconds' draws at the far left. An arrow draws on to its right, then on 'the serving' the long blue band 'serve: milliseconds per token, for hours' unrolls rightward, filling with tiny blue ticks at a steady rhythm."
+        },
+        {
+          "id": "b2",
+          "say": "The load is a real cost, but it is paid once. A machine that has been up for a day has paid it once, and produced millions of tokens. A single stream at thirty milliseconds a token, running all day, is already about two point nine million.",
+          "show": "The camera pulls back until the timeline spans a full day, right end relabelled '24 hours'; the coral load block shrinks to a sliver at the left edge. The token counter runs 0 → 2,880,000. Right panel: '1 day = 86,400 s', then '86,400 s ÷ 0.03 s ≈ 2,880,000 tokens'."
+        },
+        {
+          "id": "b3",
+          "say": "Now share the load out among them. Twenty seconds spread over two point eight eight million tokens is about seven millionths of a second per token. Each token itself takes thirty thousandths. The load has all but vanished.",
+          "show": "Lower third: equation '20 s ÷ 2,880,000 ≈ 0.000007 s per token'. Under it two bars drawn to the same scale: a blue bar '0.030 s per token', 1,000 px long, and beside its start a coral bar 'load share per token' that is a quarter of a pixel, shown as a barely visible dot with a pointer. Grey tag: 'load ≈ 0.02% of each token'."
+        },
+        {
+          "id": "b4",
+          "say": "That is the first example of a pattern that runs through everything ahead. A fixed cost stops mattering once it is spread over enough work. The word for that is amortising, and it will come back.",
+          "show": "A teal label lands above the timeline: 'fixed cost ÷ lots of work → tiny'. Beneath it, smaller, on 'amortising': 'amortising'."
+        },
+        {
+          "id": "b5",
+          "say": "Loading was the easy case, a cost where spreading obviously works. The rest of this film is about a cost that refuses to spread that way. You are about to meet it.",
+          "show": "The teal label dims. At the right end of the timeline the camera zooms in on three consecutive blue token ticks; each one now carries its own small coral block, all the same size, with a '?' above the row and the label 'paid again, every token?'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s05",
+      "name": "every token reads every weight",
+      "figs": [
+        14
+      ],
+      "visual": "One continuous shot. Centre: a GPU package illustration seen from above: the compute die in the middle (amber outline, label 'the chip · does the arithmetic'), two HBM stacks on either side (blue containers filled with coral weight tiles, label 'memory beside the chip · 140 GB'), joined to the die by a wide bus drawn as many parallel lines. Top band: the space where the equation builds. Bottom right: a 'bytes moved this token' counter and a token counter. The idea: the chip cannot keep the weights, so every token drags all 140 GB across the bus, and the formula falls straight out of the picture.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here is that cost. To make one token the whole model runs, so every one of the seventy billion weights gets used. But the weights live in the memory beside the chip, and the chip can hold only about a thousandth of them at once.",
+          "show": "The package fades in. On 'every one of the seventy billion weights', the HBM stacks fill with coral tiles. On 'about a thousandth', a tiny holding area inside the die highlights, labelled '≈ 1/1,000 fits here'."
+        },
+        {
+          "id": "b2",
+          "say": "So for every single token, the full hundred and forty gigabytes must stream across from the memory into the chip, a slice at a time. Each slice is used, then dropped to make room for the next.",
+          "show": "Coral particles flow along the bus into the die in slices. As each slice arrives the die flashes amber for an instant, label 'multiply and add', and the slice fades. The 'bytes moved this token' counter runs 0 → 140 GB; when it reaches 140 GB a blue token pill pops out of the die to the right."
+        },
+        {
+          "id": "b3",
+          "say": "Then the next token begins, and the whole hundred and forty gigabytes crosses again. And again for the token after that. The weights do not stay on the chip between tokens.",
+          "show": "The bytes counter resets to 0 and runs to 140 GB again, faster; a second pill pops out; then a third, faster still. The token counter ticks 1, 2, 3. Label under the package: 'every token: all 140 GB'."
+        },
+        {
+          "id": "b4",
+          "say": "That gives a simple rule. The time per token equals the bytes to read, divided by how many bytes the memory can deliver each second.",
+          "show": "In the top band an equation builds term by term on the spoken words: 'time per token' (white), '=', 'bytes to read' (coral), '÷' on 'divided by', 'bytes read per second' (coral) on 'deliver each second'. Each term gets a short underline as it lands."
+        },
+        {
+          "id": "b5",
+          "say": "The top is a fact about the model, a hundred and forty gigabytes. The bottom is a fact about the chip, the speed of its memory, its bandwidth. Two numbers, one division. It is the same division that gave the disk its twenty seconds.",
+          "show": "The two '?' cards from the start of the chapter fly in beneath the equation and fill: left 'the model · 140 GB' under 'bytes to read', right 'the chip · bandwidth' under 'bytes read per second'. On 'the disk', a small inset in the corner replays '140 GB ÷ 7 GB/s ≈ 20 s'."
+        },
+        {
+          "id": "b6",
+          "say": "Notice what the rule leaves out: the arithmetic. It counts only the reading. As the opening hinted, the multiplying and adding for a token take only around a tenth of a millisecond. You will check that claim yourself a few chapters from now.",
+          "show": "An amber tag appears beside the die: 'arithmetic ≈ 0.1 ms per token', then dims to 40%. The coral bus stays bright. Grey label under the equation: 'counts only the reading'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s06",
+      "name": "three chips, one division",
+      "figs": [
+        14
+      ],
+      "visual": "One continuous shot. The equation 'time per token = 140 GB ÷ bandwidth' persists in the top band. Below it a table of three rows. Left column: chip cards, each a chip icon with name and bandwidth: 'H100 · 3.35 TB/s', 'H200 · 4.8 TB/s', 'B200 · 8 TB/s'. Middle: coral horizontal bars from a common baseline (x ≈ 560), drawn to scale at 20 px per millisecond: 836 px, 583 px, 350 px. To the right of each bar, its value. A faint dashed vertical line marks 30 ms (600 px from the baseline). Grey tag under the bars: 'bars to scale'. A small slot to the right of each card holds that row's worked division. The idea: one division, three chips, and the middle row is the thirty milliseconds.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now the real numbers. Here are three generations of Nvidia's data-centre chips: the H one hundred, the H two hundred and the B two hundred. Their memories deliver three point three five, four point eight and eight terabytes per second. A terabyte is a thousand gigabytes.",
+          "show": "The three chip cards slide in on their names; each bandwidth label appears on its spoken number. Beside each card a short pipe carries coral particles at speeds in the ratio 3.35 : 4.8 : 8. Grey note at the right: '1 TB = 1,000 GB'."
+        },
+        {
+          "id": "b2",
+          "say": "Start with the H one hundred. To keep the units matching, turn its speed into gigabytes. Three point three five terabytes a second is three thousand three hundred and fifty gigabytes a second.",
+          "show": "The H100 row highlights. Beside it a worked line builds: '3.35 TB/s' then, on 'three thousand three hundred and fifty', '= 3,350 GB/s'."
+        },
+        {
+          "id": "b3",
+          "say": "A hundred and forty divided by three thousand three hundred and fifty is about zero point zero four two seconds. That is forty-one point eight milliseconds per token.",
+          "show": "The worked line continues: '140 GB ÷ 3,350 GB/s = 0.0418 s'. On 'forty-one point eight', the H100 bar grows to 836 px and the value '41.8 ms per token' lands at its end."
+        },
+        {
+          "id": "b4",
+          "say": "One honest footnote. An H one hundred holds only eighty gigabytes, so this model does not actually fit on one. Treat that row as a what-if. Splitting a model across chips comes later in the series.",
+          "show": "A small inset beside the H100 card: a blue container labelled '80 GB' and the coral 140 GB block dropping into it, overflowing by three quarters of the container's length (to scale). The inset fades, leaving a grey tag on the H100 row: 'what-if: holds 80 GB'."
+        },
+        {
+          "id": "b5",
+          "say": "Now the H two hundred. A hundred and forty divided by four thousand eight hundred is twenty-nine point two milliseconds. Its memory holds a hundred and forty-one gigabytes, so the model just fits. Round twenty-nine point two up, and there are your thirty milliseconds.",
+          "show": "Worked line: '140 GB ÷ 4,800 GB/s = 0.0292 s'. The H200 bar grows to 583 px, value '29.2 ms per token'. Grey tag on the card: 'holds 141 GB: fits'. On 'round', the whole row gains a white glow and a stamp '≈ 30 ms' snaps onto the dashed 30 ms line just past the bar's end."
+        },
+        {
+          "id": "b6",
+          "say": "And the B two hundred, at eight terabytes per second. A hundred and forty divided by eight thousand is seventeen point five milliseconds.",
+          "show": "Worked line: '140 GB ÷ 8,000 GB/s = 0.0175 s'. The B200 bar grows to 350 px, value '17.5 ms per token'."
+        },
+        {
+          "id": "b7",
+          "say": "So thirty milliseconds is not a guess, and it is not a benchmark someone measured. It is a division. Change the size of the model or the speed of the memory, and the answer moves with it. Halve the bytes, and every one of those times halves.",
+          "show": "Three phrases land under the table one after another: 'not a guess', 'not a benchmark', 'a division'. On 'size of the model' the '140 GB' in the equation pulses; on 'speed of the memory' the 'bandwidth' term pulses. On 'halve the bytes', '140 GB' briefly reads '70 GB' and all three bars shrink to half length (418, 292, 175 px), hold, then spring back to full length as '140 GB' returns."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s07",
+      "name": "two figures that seem to disagree",
+      "figs": [
+        14
+      ],
+      "visual": "One continuous shot. The three-row table from the previous scene, compacted into the lower half, now with a second value column at the right headed 'tokens per second' (empty at first). Top half: two blue quote cards side by side. Left: '≈ 30 ms per token' with '→ ≈ 33 tokens/s' beneath. Right: '≈ 24 tokens per second' with a small grey 'later' tag. Between them a '≠' that flickers. The idea: a time per token and a rate are the same fact seen two ways, and the apparent clash is just two different chips.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Later in this film you will meet a second figure: about twenty-four tokens a second. That seems to clash. Thirty milliseconds a token works out to thirty-three tokens a second, not twenty-four.",
+          "show": "The right quote card lands on 'twenty-four tokens a second'; the left card lands on 'thirty milliseconds a token', its '→ ≈ 33 tokens/s' line writing on at 'thirty-three'. The '≠' between them flickers on 'clash'."
+        },
+        {
+          "id": "b2",
+          "say": "So turn one into the other. Tokens per second is one second divided by the time per token. One second divided by forty-one point eight milliseconds is twenty-three point nine, about twenty-four. That is the H one hundred row.",
+          "show": "A formula writes on between the cards and the table: 'tokens per second = 1 s ÷ time per token'. The H100 row's new column fills: '41.8 ms → 23.9 tokens/s'. On 'the H one hundred row', the right quote card slides down and docks on that row."
+        },
+        {
+          "id": "b3",
+          "say": "On the H two hundred, one second divided by twenty-nine point two milliseconds is about thirty-four. The thirty-three came from rounding to thirty. And the B two hundred manages about fifty-seven.",
+          "show": "The H200 row fills: '29.2 ms → 34.3 tokens/s'; the left quote card slides down and docks on it, its '33' shown briefly beside '34.3' with the grey tag 'rounded from 30 ms'. The B200 row fills: '17.5 ms → 57.1 tokens/s'."
+        },
+        {
+          "id": "b4",
+          "say": "Both figures are right. They are the same division, done on different chips. Noticing a tension like that, and running it down instead of shrugging it off, is exactly the habit that pays off from here on.",
+          "show": "The '≠' morphs into '=' and the line 'same division, different chips' writes on above the table. The table holds, every row now showing both milliseconds per token and tokens per second."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s08",
+      "name": "everything between those two boxes",
+      "figs": [
+        15
+      ],
+      "visual": "One continuous shot, calm and spacious. Two large rounded boxes on one horizontal line: the left box (blue) 'A trained checkpoint' with sub-label 'weights on disk'; the right box (teal) 'A service that responds' with sub-label 'a token every 30 ms'. An arrow joins them. The empty space between the boxes is where the closing word appears. The idea: the whole subject of the film sits in the gap between a file and a responsive service.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Step back and look at the whole thing. On the left, a trained checkpoint. A checkpoint is simply the saved file of weights that training leaves behind, the hundred and forty gigabytes, sitting on a disk.",
+          "show": "The left box draws on: 'A trained checkpoint', then on 'sitting on a disk' its sub-label 'weights on disk'. Inside it, a small drive icon holding the coral 140 GB block."
+        },
+        {
+          "id": "b2",
+          "say": "On the right, a service that responds, a token every thirty milliseconds, streaming out to whoever is asking.",
+          "show": "The right box draws on: 'A service that responds', sub-label 'a token every 30 ms'. A chat bubble beside it streams words at the same 30 ms rhythm as the timeline from the start of the chapter; a user icon sits at the far right."
+        },
+        {
+          "id": "b3",
+          "say": "Training produced the box on the left, and it is finished. Turning it into the box on the right, into something a person can actually talk to, at a price that works, is a discipline of its own.",
+          "show": "A faded grey tag 'training: done' appears behind the left box. On 'turning it into', an arrow draws from the left box to the right box. On 'a price that works', a small price-tag icon settles on the arrow."
+        },
+        {
+          "id": "b4",
+          "say": "And price is tied to speed. Every token costs time on an expensive chip, so on any given chip, the faster the tokens come, the cheaper each one is.",
+          "show": "Above the arrow, a chip icon with a small stopwatch beside it; on 'costs time', the stopwatch runs for one 30 ms tick and a coin icon drops from the price tag. Label: 'chip time per token = cost'."
+        },
+        {
+          "id": "b5",
+          "say": "Why that gap is thirty milliseconds, and not something far smaller, is what the rest of this film explains. Everything between those two boxes is inference.",
+          "show": "On 'thirty milliseconds', '30 ms' glows on the right box. On 'something far smaller', a ghost label '0.1 ms?' flickers beside it and fades. On 'inference', the space between the boxes fills with a soft band and the word 'inference' writes on inside it. Hold for two seconds."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "70 billion weights × 2 bytes = 140,000,000,000 bytes = 140 GB",
+      "python": "70e9*2",
+      "result": "140000000000.0"
+    },
+    {
+      "claim": "30 ms = 0.03 s, three hundredths of a second",
+      "python": "30/1000",
+      "result": "0.03"
+    },
+    {
+      "claim": "one second of output at 30 ms per token ≈ 33 tokens",
+      "python": "1000/30",
+      "result": "33.333333333333336"
+    },
+    {
+      "claim": "a blink (≈ 100–400 ms, common estimate, not from the atlas) spans several 30 ms tokens: 3 to 13",
+      "python": "100/30, 400/30",
+      "result": "3.3333333333333335 13.333333333333334"
+    },
+    {
+      "claim": "a 200-word answer ≈ 300 tokens (ch01, fig 7) × 30 ms ≈ 9 s",
+      "python": "300*0.030",
+      "result": "9.0"
+    },
+    {
+      "claim": "disk: 140 GB at ≈ 7 GB/s (a fast NVMe drive; illustrative) ≈ 20 s, matching atlas fig 106's 'about 20,000 ms'",
+      "python": "140e9/7e9",
+      "result": "20.0"
+    },
+    {
+      "claim": "disk vs memory beside the chip: 20 s against 41.8 ms (H100) and 17.5 ms (B200) ≈ 480× to 1,140×, said as 'five hundred to a thousand times'",
+      "python": "20/(140e9/3.35e12), 20/(140e9/8e12)",
+      "result": "478.57142857142856 1142.8571428571427"
+    },
+    {
+      "claim": "CORRECTION to fig 12 'the chip holds a few hundred kilobytes': true per working unit (an H100 SM has a 256 KB register file + 256 KB L1/shared), but the whole H100 holds 132 × 512 KB + 50 MB L2 ≈ 0.12 GB on chip. Film says both: 'a few hundred kilobytes in each of its many small working areas, around a tenth of a gigabyte in all'",
+      "python": "132*(256+256)*1024 + 50*1024**2",
+      "result": "121634816"
+    },
+    {
+      "claim": "140 GB is ≈ 1,150× the on-chip storage, so the chip holds 'about a thousandth of the model'",
+      "python": "140e9/(132*(256+256)*1024 + 50*1024**2)",
+      "result": "1150.9862439385777"
+    },
+    {
+      "claim": "CORRECTION to fig 12 'bars roughly to scale' (atlas draws the chip bar 60 px against the memory bar's 380 px): at true scale against a 1,200 px memory bar the chip bar is ≈ 1 px, so the film draws it as a hairline under a magnifier and flags the disk bar as not to scale",
+      "python": "1200*(132*(256+256)*1024 + 50*1024**2)/140e9",
+      "result": "1.0425841371428572"
+    },
+    {
+      "claim": "one day of a single stream at 30 ms per token ≈ 2,880,000 tokens ('about two point nine million')",
+      "python": "86400/0.030",
+      "result": "2880000.0"
+    },
+    {
+      "claim": "a 20 s load spread over 2.88 million tokens ≈ 0.000007 s, 'seven millionths of a second' per token",
+      "python": "20/2.88e6",
+      "result": "6.944444444444445e-06"
+    },
+    {
+      "claim": "that load share is ≈ 0.02% of a 30 ms token",
+      "python": "(20/2.88e6)/0.030*100",
+      "result": "0.02314814814814815"
+    },
+    {
+      "claim": "load-share bar against a 1,000 px bar for 30 ms ≈ a quarter of a pixel",
+      "python": "1000*(20/2.88e6)/0.030",
+      "result": "0.2314814814814815"
+    },
+    {
+      "claim": "3.35 / 4.8 / 8 TB/s = 3,350 / 4,800 / 8,000 GB/s",
+      "python": "3.35e12/1e9, 4.8e12/1e9, 8e12/1e9",
+      "result": "3350.0 4800.0 8000.0"
+    },
+    {
+      "claim": "140 GB ÷ 3,350 / 4,800 / 8,000 GB/s in seconds = 0.0418 / 0.0292 / 0.0175 s",
+      "python": "140/3350, 140/4800, 140/8000",
+      "result": "0.041791044776119404 0.029166666666666667 0.0175"
+    },
+    {
+      "claim": "H100: 140 GB ÷ 3.35 TB/s = 41.8 ms per token",
+      "python": "140e9/3.35e12*1e3",
+      "result": "41.791044776119406"
+    },
+    {
+      "claim": "H200: 140 GB ÷ 4.8 TB/s = 29.2 ms per token, the 'thirty milliseconds'",
+      "python": "140e9/4.8e12*1e3",
+      "result": "29.166666666666668"
+    },
+    {
+      "claim": "B200: 140 GB ÷ 8 TB/s = 17.5 ms per token",
+      "python": "140e9/8e12*1e3",
+      "result": "17.5"
+    },
+    {
+      "claim": "bars at 20 px per ms: 836 / 583 / 350 px; 30 ms marker at 600 px",
+      "python": "20*140e9/3.35e12*1e3, 20*140e9/4.8e12*1e3, 20*140e9/8e12*1e3",
+      "result": "835.820895522388 583.3333333333334 350.0"
+    },
+    {
+      "claim": "tokens per second = 1 ÷ time per token: H100 23.9 ('about twenty-four', the later fig 130 figure), H200 34.3, B200 57.1",
+      "python": "1/(140e9/3.35e12), 1/(140e9/4.8e12), 1/(140e9/8e12)",
+      "result": "23.928571428571427 34.285714285714285 57.14285714285714"
+    },
+    {
+      "claim": "the rounded 30 ms gives 33.3 tokens/s, against 34.3 from the exact 29.2 ms; the film says so rather than hiding it",
+      "python": "1/0.030",
+      "result": "33.333333333333336"
+    },
+    {
+      "claim": "H100 holds 80 GB: the 140 GB model needs 1.75 H100s' worth of memory, overflowing one by 75%, so the H100 row is a what-if",
+      "python": "140/80, (140-80)/80",
+      "result": "1.75 0.75"
+    },
+    {
+      "claim": "H200 holds 141 GB (vendor spec): 1 GB to spare over the 140 GB model, 'just fits'",
+      "python": "141-140",
+      "result": "1"
+    },
+    {
+      "claim": "arithmetic per token ≈ 2 × 70e9 ops ÷ 989 TFLOP/s ≈ 0.14 ms, said as 'around a tenth of a millisecond' to match the cold open; derived properly in ch05/ch10",
+      "python": "2*70e9/989e12*1e3",
+      "result": "0.14155712841253792"
+    }
+  ]
+}

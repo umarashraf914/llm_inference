@@ -1,0 +1,56 @@
+/* House style for the motion-graphic films. Colour carries meaning:
+   amber = arithmetic (cheap), coral = bytes (expensive), teal = what helps, blue = structure. */
+:root {
+  --bg0: #060a14;
+  --bg1: #0b1226;
+  --ink: #eef2fb;
+  --muted: #a7b1cc;
+  --faint: #6b7898;
+  --line: #2a3452;
+  --panel: rgba(255, 255, 255, 0.045);
+  --panel-line: rgba(255, 255, 255, 0.11);
+  --compute: #ffb84d;
+  --bytes: #ff6b6b;
+  --helps: #2fd9a7;
+  --struct: #6ea8ff;
+  --violet: #b48cff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--bg0);
+  color: var(--ink);
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 800px at 50% 38%, rgba(40, 62, 120, 0.30), transparent 70%),
+    radial-gradient(900px 700px at 50% 120%, rgba(10, 16, 34, 0.9), transparent 70%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
+
+#film {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+}
+
+#film text { font-kerning: normal; }
+#film .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+#film .display { font-family: 'Inter Display', Inter, sans-serif; }
+#film .tnum { font-variant-numeric: tabular-nums; }
+
+/* debug overlay used by previews */
+#film.debug .safe { display: block; }
+#film .safe { display: none; }

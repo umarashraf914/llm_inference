@@ -1,0 +1,378 @@
+{
+  "chapter": "ch15",
+  "title": "The prefix rule",
+  "kicker": "15 · The prefix rule",
+  "figs": [
+    33,
+    34,
+    35,
+    36,
+    44,
+    45,
+    46
+  ],
+  "scenes": [
+    {
+      "id": "ch15_s01",
+      "name": "two jobs, two moments",
+      "figs": [
+        33
+      ],
+      "visual": "Dark background. Centre band: a long horizontal container labelled “K V cache · on the G P U” (blue outline), holding a row of small coral tiles, one per token; each tile is a stacked pair marked K and V. To the left of the container, a small rounded box labelled “model” (amber). Bottom band: a timeline running left to right with two segments, “turn 1” (a short “read prompt in” block, then a long run of “answer” ticks) and, after a gap marked with a clock icon, “turn 2”. A white playhead moves along the timeline. Two cards fade in over the course of the scene, one in the upper-left quarter and one in the upper-right quarter, mirroring each other. Colours: tokens and prompt bars blue, cache tiles coral, matched part teal, unmatched part amber. Idea the motion makes visible: the same cache does two different things at two different moments; appending happens on every token during an answer, the search happens once, at the start of a request, and only the search can hit or miss. Keep the screen readable: labels from earlier beats dim to about 40% when new ones arrive, so no more than five text items are bright at once; each card's three lines count as one item.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A few minutes ago you met the K V cache. While an answer is being written, each new token works out its own key and value in every layer, and appends them to the end. Nothing is looked up. The cache just grows.",
+          "show": "Cache container centre with twelve coral tiles already in it. The playhead moves through the “answer” part of turn 1. At each tick a blue token pill pops out of the “model” box and a coral tile slides onto the right-hand end of the cache row; the row lengthens tile by tile to twenty. On 'nothing is looked up', the upper-left card draws: “During a turn” / “it grows.” / “One new entry per token, no lookup.”"
+        },
+        {
+          "id": "b2",
+          "say": "When the answer ends, those keys and values do not vanish at once. They stay in the G P U's memory until something else needs the room. How long that tends to be is the next chapter's story.",
+          "show": "A grey pill “stop” drops out of the model box and the playhead leaves turn 1. The timeline gap stretches; the clock icon in it spins once, label “a minute passes”. The cache row stays lit and intact, a small grey tag beside it: “still held, for now”."
+        },
+        {
+          "id": "b3",
+          "say": "Then your next message arrives. Remember, it is a brand new request, carrying the whole conversation again. Before doing any work, the server asks one question. Do I already hold keys and values for the beginning of this prompt?",
+          "show": "On 'next message arrives', a long blue bar, “turn 2: the whole conversation + new words”, flies in from the left and parks directly above the cache row, left-aligned with it. The playhead jumps to the start of turn 2. On 'asks one question', a magnifier icon sweeps slowly from the left end of the bar, comparing it with the cache row beneath. The upper-right card draws: “At the start of a turn” / “it is searched.” / “Either the prompt matches, or it does not.”"
+        },
+        {
+          "id": "b4",
+          "say": "If yes, those tokens skip prefill entirely. Prefill, remember, is the pass that reads the prompt in and works out keys and values for every token. Skipping it is called a cache hit, and a cache that can give hits is what people call warm.",
+          "show": "The magnifier reaches the end of the cache row and stops. The part of the prompt bar above the cache turns teal with the label “hit: skip prefill”; the cache tiles beneath it glow teal. A small word “warm” appears beside the cache container in teal."
+        },
+        {
+          "id": "b5",
+          "say": "Where the server holds nothing, it is a miss, and those tokens must be prefilled. So inside an answer there is no such thing as a cache hit. Nothing to look up, only something to add. The search happens once, when a new request arrives.",
+          "show": "The short tail of the prompt bar that sticks out past the cache row turns amber, label “miss: prefill”. Then the timeline brightens: the many small ticks along turn 1's answer glow coral, labelled “append, append, append”; one single teal tick at the very start of turn 2 is labelled “lookup, once”."
+        },
+        {
+          "id": "b6",
+          "say": "Two jobs, at two different moments. Confusing them makes the word cache do too much work. Growing and being searched are different operations at different times, and only the second one can hit or miss.",
+          "show": "Prompt bar and cache row dim. The two cards slide together to the centre, side by side. A thin teal ring circles only the right card, with a small label beneath it: “only this can hit or miss”."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s02",
+      "name": "what the cache actually holds",
+      "figs": [
+        34
+      ],
+      "visual": "Split screen. Top band heading: “The cache does not hold text, or answers”. Left half: a database icon (a cylinder) with a laptop icon at the far left edge. Right half: the GPU package illustration, an amber compute die flanked by coral H B M stacks, with rows of tiny coral K/V tile pairs visible inside the stacks. Under each half, one label card: left “the words: kept in a database” (blue), right “the keys and values: kept on the G P U” (coral). Mid-scene both halves shrink to icons in the top corners to make room for a size comparison drawn to scale by area: a 2-pixel blue square against a 581-pixel coral square. Idea: text and keys-and-values are different objects, kept in different places, at wildly different cost; the cache exists for the expensive one.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So what exactly does the cache hold? Not text, and not finished answers waiting to be handed out again. The words of your conversation are kept somewhere else entirely, in an ordinary database, the way any app keeps your chat history.",
+          "show": "Heading draws. On 'not text', a blue text pill “What's the weather in Seoul?” drifts towards the GPU on the right and bounces off its edge. On 'ordinary database', the database icon appears at left and the pill, with three more text pills, slides into it. Left label card: “the words: kept in a database”."
+        },
+        {
+          "id": "b2",
+          "say": "For every token the model has processed, it worked out a key and a value in each of its eighty layers. Those are what the cache holds. Later tokens attend to them, and they sit on the G P U, in the memory beside the chip.",
+          "show": "Right half: the GPU package draws. Above it, one blue token pill “bank”. On 'every one of its eighty layers', a thin ladder of 80 small K/V tile pairs rises from the pill, labelled “L1” at the bottom and “L80” at the top. On 'in the memory beside the chip', the ladder folds into one coral tile that slides into an H B M stack. Right label card: “the keys and values: kept on the G P U”."
+        },
+        {
+          "id": "b3",
+          "say": "They are not the token. They are the model's processed form of it, in the context it appeared in. Bank after river, bank after savings: same word, different keys. And producing them is exactly what prefill does.",
+          "show": "Two short pill rows appear above the GPU: “river · bank” and “savings · bank”. Each “bank” pill emits a coral K/V tile; the two tiles carry clearly different stripe patterns, and a small “≠” sits between them. On 'exactly what prefill does', an amber arrow labelled “prefill” draws from a text pill to a tile."
+        },
+        {
+          "id": "b4",
+          "say": "Put sizes on the two. The weather conversation from earlier, one thousand and thirty-two tokens, is about four kilobytes of text. Its keys and values, at about three hundred and twenty kilobytes a token, come to about three hundred and forty megabytes.",
+          "show": "Database and GPU shrink to icons in the top-left and top-right corners; their label cards fade. Lower centre: on 'four kilobytes', a tiny blue square, 2 pixels on a side, appears at left with label “text: 4 KB” and a pointer arrow so it can be found. On 'three hundred and forty megabytes', a coral square grows from the same baseline to 581 pixels on a side, labelled “keys and values: 338 MB”, with a byte counter running 0 → 338,165,760. Small grey note: “drawn to scale by area”."
+        },
+        {
+          "id": "b5",
+          "say": "More than eighty thousand times the size of the text. And they cost the whole model to make, about a hundred and forty billion operations for every token.",
+          "show": "Between the squares: “more than 80,000 ×”. On 'the whole model', an amber counter beside the GPU icon runs to “140 billion operations per token”."
+        },
+        {
+          "id": "b6",
+          "say": "So a cache hit does not save you from sending the text. The text travels with every turn, as you saw earlier. What a hit saves is the server turning that text into keys and values a second time.",
+          "show": "The squares fade. A blue text pill travels from the laptop icon, across to the server side, label “sent every turn”. Then the amber “prefill” arrow from beat 3 reappears, from text to tiles, and a teal stamp lands across it: “skipped on a hit”."
+        },
+        {
+          "id": "b7",
+          "say": "Text is cheap, and travels every turn. Keys and values are expensive, and they are what the cache is for. Hold on to that distinction. It makes everything else in this chapter make sense.",
+          "show": "The two label cards return side by side, centre. Under the left: “cheap · travels every turn” in grey. Under the right: “expensive · what the cache is for” in coral, with a teal outline around the whole right card."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s03",
+      "name": "settled the moment it is made",
+      "figs": [
+        35
+      ],
+      "visual": "Centre band: a row of seven blue token pills, “t1” to “t7”, evenly spaced. Above them, attention arcs drawn as thin curves from earlier pills into token 5. A thin vertical wall just right of t5 blocks anything arriving from the right. Below t5, a coral K/V tile pair that gets a padlock. Right third: a small container labelled “cache”. Bottom band, reserved for the last beat: three small icons in a row. Colours: pills blue, tile coral, “safe to keep” and validity bracket teal, later tokens grey. Idea: because attention only looks back, a token's key and value are fixed forever once made, which is exactly what makes keeping them safe, and it says precisely when a kept one stops being valid.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why is it safe to keep keys and values at all? Line up seven tokens, and pick token five. Its key and value are computed from these five: tokens one to four, and itself.",
+          "show": "Seven pills draw left to right, “t1” to “t7”. On 'pick token five', t5 lifts slightly and brightens. On 'these five', arcs curve from t1, t2, t3 and t4 into t5, and a bracket draws under t1 to t5 with the label “token 5's key and value: from these five”. t6 and t7 dim to grey."
+        },
+        {
+          "id": "b2",
+          "say": "Attention is causal. Each token looks only backwards, at itself and what came before, never ahead. So nothing after token five can affect it. Not token six, not token seven, not anything written later.",
+          "show": "On 'never ahead', a thin wall rises just right of t5, with a small left-pointing one-way arrow icon on top. On 'not token six, not token seven', arcs from t6 and t7 reach towards t5, hit the wall and fade. On 'anything written later', more grey pills “t8”, “t9”, “t10” stream in from the right edge, send arcs, and bounce off the wall too."
+        },
+        {
+          "id": "b3",
+          "say": "So token five's key and value are settled the moment token five is processed. They never change again, no matter how long the conversation runs.",
+          "show": "A coral K/V tile pair pops out beneath t5. On 'settled', a padlock icon clicks shut on it and a small grey label reads “settled”. Grey pills keep streaming in on the right; the locked tile does not flicker."
+        },
+        {
+          "id": "b4",
+          "say": "That is the whole permission for caching. A value that could still change would be unsafe to keep. One that is settled forever is safe to keep, for as long as there is room.",
+          "show": "The locked tile glides right into the “cache” container and a teal tick appears: “safe to keep”. For contrast, a ghost tile whose pattern keeps shifting, labelled “could still change”, approaches the container and is turned away with a grey cross."
+        },
+        {
+          "id": "b5",
+          "say": "It also tells you exactly when a cached value is still valid. When every token before it is the same as it was.",
+          "show": "The bracket under t1 to t4 turns teal; a small “=” flashes under each of those four pills. New bracket label: “still valid while these are unchanged”."
+        },
+        {
+          "id": "b6",
+          "say": "Causality again, now doing a third job. It is why decode has to go one token at a time. It cut the grid of attention scores down to a triangle, about half of it. And here, it is what makes caching sound.",
+          "show": "Bottom band: three small icons appear in turn, each on its phrase. On 'one token at a time', a single-file arrow labelled “decode: one at a time”. On 'a triangle', a small grid with its lower-left triangle shaded, labelled “scores: a triangle”. On 'caching sound', the padlocked tile, labelled “caching: safe”, outlined in teal."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s04",
+      "name": "one changed token poisons the rest",
+      "figs": [
+        36
+      ],
+      "visual": "Two rows of seven token pills, one above the other, columns aligned. Top row, labelled “cached” at its left: t1 to t7, each with a small coral K/V tile tucked beneath it. Bottom row, labelled “arriving”: t1, XX, t3, t4, t5, t6, t7. A vertical white line drops between columns 1 and 2, labelled “differs here”. Thin threads run from each cached tile back to the earlier pills it attended to. Colours: pills blue, valid tiles coral then teal, invalid tiles grey with a crack, tokens to recompute outlined amber. Idea: one change early makes every later cached key and value wrong, even for tokens that did not change, so reuse stops dead at the first difference.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now test that condition. The server holds keys and values for seven tokens. A new prompt arrives that is identical, except for one token, the second.",
+          "show": "Top row draws with its tiles, label “cached”. Bottom row draws, label “arriving”. On 'except for one token', the “XX” pill in column 2 flashes, and the vertical white line drops between columns 1 and 2 with the label “differs here”."
+        },
+        {
+          "id": "b2",
+          "say": "Token one is fine. Nothing comes before it, so its key and value still hold. But look at token three. It has not changed. Same word, same position.",
+          "show": "Column 1: the cached t1 tile turns teal with a small tick. On 'look at token three', both t3 pills brighten and an “=” appears between them."
+        },
+        {
+          "id": "b3",
+          "say": "Yet its key and value were computed in a context that included the old token two. You saw how in the last chapter. From layer two upward, every key carries a blend of the tokens before it.",
+          "show": "A thin thread draws from the cached t3 tile back to the cached t2 pill. On 'a blend of the tokens before it', a stripe in t2's shade appears inside the t3 tile."
+        },
+        {
+          "id": "b4",
+          "say": "With a different token two, the old key and value for token three are simply wrong. The same goes for tokens four, five, six and seven. Every one of them looked back through position two.",
+          "show": "On 'simply wrong', the cached t3 tile cracks and turns grey with a dashed outline. Then the crack runs right: the t4, t5, t6 and t7 tiles crack one after another, each lighting its own thread back to t2 as it goes. Amber counter at right: “recompute: 6 of 7”."
+        },
+        {
+          "id": "b5",
+          "say": "So the match cannot skip over a difference and pick up again. Everything from the first mismatch onward has to be recomputed, identical or not. Strictly, layer one's keys survive, but as you saw, one layer in eighty is not worth the bookkeeping.",
+          "show": "Arriving pills t2 to t7 get amber outlines, label “prefill again”. A dotted teal arrow tries to hop from column 1 over the line to column 3, labelled “skip and resume?”, and is crossed out in grey. Small grey footnote, bottom right: “layer 1 alone: 1.25% of the work”."
+        },
+        {
+          "id": "b6",
+          "say": "That is why it is a prefix rule, a rule about the matching beginning, and not a search for matching pieces. The rule is unforgiving, and it is not a design choice. It follows from what a key and a value are.",
+          "show": "Top band title: “a prefix rule, not a search for pieces”. Column 1 settles as a short teal block, columns 2 to 7 as a longer amber block."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s05",
+      "name": "a cache hit is a prefix match",
+      "figs": [
+        44
+      ],
+      "visual": "Heading top: “What arrives, and what is already held”. Two long horizontal bars across the centre, one above the other, left-aligned. Top bar, labelled “arriving” at its left: four blue segments in different shades, “system”, “tools”, “history”, and a short “new” at the right end. Bottom bar, labelled “cached”: the same three segments filled with a faint coral K/V texture, then an empty dashed slot under “new”. A teal sweep runs along the bars from the left; a vertical white line marks the first difference. Counters sit in a row under the bars. Colours: segments blue, matched teal, prefilled amber. Idea: a real cache hit is just the prefix rule applied to a whole request, and a follow-up question is almost entirely hit.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now scale it up to a real request. On top, the prompt that arrives: the system prompt, the tool definitions, the conversation history, and your new message. Below it, what the server still holds from your last turn.",
+          "show": "Heading draws. The top bar builds segment by segment as each part is named: “system”, “tools”, “history”, “new”. On 'what the server still holds', the bottom bar draws: three matching textured segments and the empty dashed slot under “new”."
+        },
+        {
+          "id": "b2",
+          "say": "The match runs from the front. System prompt, identical. Tools, identical. History, identical. Then your new words, which the server has never seen. The match stops at the first token that differs.",
+          "show": "A teal sweep runs left to right along both bars, pausing with a small tick as each segment is named. On 'never seen', it reaches the dashed slot. On 'stops', it halts there and the vertical white line drops at that boundary, labelled “the first difference”."
+        },
+        {
+          "id": "b3",
+          "say": "Everything to the left is a hit, and is reused. Everything from that point on has to be prefilled. And it cannot resume after a mismatch, because above the first layer a token's keys and values depend on every token before it.",
+          "show": "Left of the line fills teal, label “hit: reused”. The “new” segment fills amber, label “prefill”. A dotted teal arrow tries to leap past the line and fades out."
+        },
+        {
+          "id": "b4",
+          "say": "Put numbers on it. Here is the weather conversation again, arriving as a follow-up a minute after the last turn. One thousand and thirty-two tokens. One thousand and twenty-seven of them match. Only your five new tokens are prefilled.",
+          "show": "Counters appear under the bars: “arriving: 1,032 tokens”. On 'one thousand and twenty-seven', a teal counter runs 0 → 1,027 under the teal part, label “matched”. On 'five new tokens', an amber counter under “new” shows “prefill: 5”."
+        },
+        {
+          "id": "b5",
+          "say": "That is a hit rate, the share of arriving tokens that matched, of ninety-nine point five percent. And almost all of it is text you never wrote: the system prompt, the tool definitions, and the model's own earlier answers.",
+          "show": "A large teal figure to the right: “99.5%”, with a small line beneath: “1,027 ÷ 1,032”. On 'text you never wrote', small grey tags float over the bars: “provider” over system, “tool docs” over tools, “model's answers” over most of history. A tiny “you” tag marks only thin slivers of history and the “new” segment."
+        },
+        {
+          "id": "b6",
+          "say": "Front to back, stopping at the first difference. That one rule explains every warm and cold case still to come.",
+          "show": "Tags fade. The teal sweep replays once quickly from the left to the white line and stops. Caption under the bars: “front to back, stop at the first difference”."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s06",
+      "name": "words in common are not a hit",
+      "figs": [
+        45
+      ],
+      "visual": "Two rows of seven word pills, columns aligned, centre of screen. Top row labelled “cached”: “What”, “is”, “the”, “capital”, “of”, “France”, “?”. Bottom row labelled “arriving”: “Tell”, “me”, “the”, “capital”, “of”, “France”, “please”. Small position numbers 1 to 7 above the columns appear when needed. Below the rows, a wide result box. Colours: pills blue, shared-word links blue, the matched-from-front result white, tokens to prefill amber, the preamble teal. Idea: shared words, even in the same positions, are worth nothing; only an identical beginning counts.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here is where intuition goes wrong. Take two short questions on their own, with nothing in front of them. The server holds, What is the capital of France? The new prompt says, Tell me the capital of France please.",
+          "show": "Top row pills appear one per word as the cached question is spoken, label “cached”. Bottom row pills appear one per word as the new question is spoken, label “arriving”."
+        },
+        {
+          "id": "b2",
+          "say": "Each word here is one token, seven apiece. Now count the words they share. The, capital, of, France. Four of them. They even sit in the same positions, third to sixth.",
+          "show": "On each shared word as spoken, the matching pills in both rows glow and a short vertical link draws between them. Counter at right: “words in common: 4”. On 'same positions', the numbers 1 to 7 appear above the columns and 3, 4, 5, 6 brighten."
+        },
+        {
+          "id": "b3",
+          "say": "It looks like a strong match. Now run the rule. Token one. What, against Tell. Different. The match ends at position zero, before it has even begun. Tokens matched from the front, zero.",
+          "show": "A small comparator caret moves to column 1; “What” and “Tell” flash, with a “≠” between them. A vertical white line drops at the left edge of column 1. On 'zero', the result box below fills: “tokens matched from the front: 0”."
+        },
+        {
+          "id": "b4",
+          "say": "Four words in common, and not one of them helps. Everything shared sits behind that first difference, worthless however much of it there is. In the new prompt, the capital of France follows tell me, not what is. Different context, different keys and values.",
+          "show": "The four vertical links snap. All seven arriving pills take amber outlines, label “prefill”. A thin thread runs from the arriving “capital” back to “Tell me”, and from the cached “capital” back to “What is”, showing the two different contexts."
+        },
+        {
+          "id": "b5",
+          "say": "In a real request, a shared preamble would sit in front of both questions, and that part would still match. You will see that case in the next chapter. Your own seven words would still contribute nothing.",
+          "show": "A long teal segment labelled “shared preamble” slides in front of both rows; the white line moves to sit just after it. The seven arriving pills stay amber. Small label at right: “your words: 0 of 7”."
+        },
+        {
+          "id": "b6",
+          "say": "A cache hit is not about words in common. It is about the sequence being identical from the beginning, in order, with nothing changed. Reusing this work across requests is called prompt caching, and this is the most common misunderstanding about it.",
+          "show": "The preamble slides away. Two short lines in the top band, one after the other: “not: words in common”, struck through in grey, then “identical from the beginning, in order” in teal."
+        },
+        {
+          "id": "b7",
+          "say": "If you take one thing from this chapter, take this. Shared vocabulary counts for nothing. Only a shared beginning counts.",
+          "show": "The rows dim. Centre, two short lines: “shared vocabulary: nothing” in grey, “shared beginning: everything” in teal."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s07",
+      "name": "the whole rule, in one line",
+      "figs": [
+        46
+      ],
+      "visual": "Top centre: a single wide card with a teal border holding the rule on two lines: “compare from token 1,” / “stop at the first difference”. Below it, a workspace for two long prompt bars, each a thin row of many tiny blue token cells. Late in the scene the bars morph into a four-segment assembled-prompt strip with a grey arrow beneath. Colours: hits teal, misses amber, the differing token a white notch. Idea: the rule asks how identical and from where, never how similar, which is why prompts put their stable parts first.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So here is the whole rule, in one line. Compare from token one, and stop at the first difference.",
+          "show": "The rule card draws at top centre, its text writing on as spoken, on two lines: “compare from token 1,” / “stop at the first difference”."
+        },
+        {
+          "id": "b2",
+          "say": "Everything before that point is a hit, and is reused. Everything from that point onward is a miss, and must be prefilled.",
+          "show": "Under the card, a token bar with a white notch about two thirds along. Left of the notch fills teal, label “hit: reused”. From the notch onward fills amber, label “miss: prefill”."
+        },
+        {
+          "id": "b3",
+          "say": "Which means the useful question is never how similar two prompts are. It is how identical, and from where.",
+          "show": "The bar fades. On 'how similar', the words “how similar?” appear centre and are struck through. On 'how identical, and from where', “how identical, and from where?” writes on beneath in teal."
+        },
+        {
+          "id": "b4",
+          "say": "Try it. Two prompts, each one thousand and thirty-two tokens long, identical except for a single token. If that token is the very last, one thousand and thirty-one tokens hit. If it is the very first, not one does.",
+          "show": "Two long bars, each labelled “1,032 tokens”. On 'the very last', the upper bar gets a white notch at its far right end and a teal sweep fills it right up to the notch, counter “1,031 hit”. On 'the very first', the lower bar gets its notch at the far left; the sweep stops at once, and the whole bar fills amber, counter “0 hit · 1,032 prefilled”."
+        },
+        {
+          "id": "b5",
+          "say": "The same similarity, opposite outcomes. Two prompts sharing a long opening and diverging at the end almost all hit. Two prompts differing in the first word, and identical thereafter, get no hit at all.",
+          "show": "Beside the bars: “99.9% hit” next to the upper, “0% hit” next to the lower. Between them, a small grey bracket: “1,031 tokens in common, both times”."
+        },
+        {
+          "id": "b6",
+          "say": "This is why the order of a prompt matters as much as its contents, and why the stable parts belong at the front. It is why the serving system puts the most shared text first, then yours, then the conversation, then your newest message.",
+          "show": "The two bars merge and morph into a four-segment strip: “provider's system prompt”, “your instructions”, “conversation”, “newest message”. A grey arrow beneath: “most stable → most variable”. A teal sweep runs across the first three segments and stops at the newest message, which turns amber."
+        },
+        {
+          "id": "b7",
+          "say": "Everything in the next chapter is this one sentence, applied to a particular case.",
+          "show": "Everything fades except the rule card, which slides to the centre of the screen, brightens and holds."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "CORRECTION (fig 44): the atlas says 906 of 911 tokens match; per CHAPTER_NOTES Example A the film uses 1,027 of 1,032 so warm and cold cases describe the same conversation. Hit rate 1,027 / 1,032 = 99.5% (the atlas's 906 / 911 = 99.45% also rounds to 99.5%).",
+      "python": "print(1027/1032*100, 906/911*100)",
+      "result": "99.51550387596899 99.45115257958288"
+    },
+    {
+      "claim": "Follow-up prefills 1,032 - 1,027 = 5 new tokens",
+      "python": "1032-1027",
+      "result": "5"
+    },
+    {
+      "claim": "KV cache per token = 2 x 80 x 8 x 128 x 2 = 327,680 bytes, 'about three hundred and twenty kilobytes'",
+      "python": "2*80*8*128*2",
+      "result": "327680"
+    },
+    {
+      "claim": "Keys and values for the 1,032-token weather conversation: 1,032 x 327,680 = 338,165,760 bytes = 338 MB, said 'about three hundred and forty megabytes' (using the rounded 320 KB would give 330 MB; the exact 327,680 is used)",
+      "python": "print(1032*327680, 1032*327680/1e6)",
+      "result": "338165760 338.16576"
+    },
+    {
+      "claim": "Keys and values vs text: 338,165,760 / 4,000 bytes = 84,541 times; per token 327,680 / 4 bytes = 81,920 times; said 'more than eighty thousand times'",
+      "python": "print(1032*327680/4000, 327680/4)",
+      "result": "84541.44 81920.0"
+    },
+    {
+      "claim": "Squares drawn to scale by area: side ratio = sqrt(84,541) = 290.8, so a 2 px text square against a 581 px keys-and-values square",
+      "python": "import math; r=1032*327680/4000; print(r, math.sqrt(r), 2*math.sqrt(r))",
+      "result": "84541.44 290.760107304974 581.520214609948"
+    },
+    {
+      "claim": "Text is about 4 bytes per token: 4 KB / 1,032 tokens",
+      "python": "4000/1032",
+      "result": "3.875968992248062"
+    },
+    {
+      "claim": "Making one token's keys and values costs a full forward pass: 2 x 70e9 = 140 billion operations per token",
+      "python": "2*70e9",
+      "result": "140000000000.0"
+    },
+    {
+      "claim": "Fig 36: arriving prompt differs at token 2 of 7: prefix match 1, recompute 6 of 7, of which 5 are identical tokens recomputed anyway",
+      "python": "c=['t1','t2','t3','t4','t5','t6','t7']; r=['t1','XX','t3','t4','t5','t6','t7']; p=next(i for i in range(7) if c[i]!=r[i]); print(p, 7-p, sum(c[i]==r[i] for i in range(p,7)))",
+      "result": "1 6 5"
+    },
+    {
+      "claim": "Layer 1 alone is 1 / 80 = 1.25% of the prefill work (ch14's fig 43), said 'one layer in eighty'",
+      "python": "print(1/80*100, 79/80*100)",
+      "result": "1.25 98.75"
+    },
+    {
+      "claim": "Causal mask keeps n(n+1)/2 of n^2 scores, 'about half' for long prompts (0.571 at 7 tokens, 0.5005 at 1,032)",
+      "python": "print(7*8/2/49, 1032*1033/2/1032**2)",
+      "result": "0.5714285714285714 0.500484496124031"
+    },
+    {
+      "claim": "Fig 45: four words in common (the, capital, of, France), in the same positions 3 to 6; tokens matched from the front = 0",
+      "python": "a='What is the capital of France ?'.split(); b='Tell me the capital of France please'.split(); print([w for w in a if w in b], [i+1 for i in range(7) if a[i]==b[i]], next(i for i in range(7) if a[i]!=b[i]))",
+      "result": "['the', 'capital', 'of', 'France'] [3, 4, 5, 6] 0"
+    },
+    {
+      "claim": "Fig 46 thought experiment: 1,032-token prompts differing in one token; last token differs: 1,031 hit = 99.9%; first token differs: 0 hit, 1,032 prefilled",
+      "python": "print(1031/1032*100, 1032-1031)",
+      "result": "99.90310077519379 1"
+    }
+  ]
+}

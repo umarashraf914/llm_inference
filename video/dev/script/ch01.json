@@ -1,0 +1,123 @@
+{
+ "chapter": "ch01",
+ "title": "What a model is",
+ "kicker": "01 \u00b7 What a model is",
+ "figs": [
+  1,
+  14
+ ],
+ "scenes": [
+  {
+   "id": "ch01_s01",
+   "name": "a model is a file",
+   "figs": [
+    1
+   ],
+   "visual": "",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Start with the thing everyone talks about and almost nobody has looked inside. A trained model is a file.",
+     "show": "file icon appears centre; label 'model.safetensors'"
+    },
+    {
+     "id": "b2",
+     "say": "Open it, and there is nothing else in there. No rules, no instructions, no text. Just a very long list of numbers, each one somewhere between about minus one and plus one.",
+     "show": "file opens into a grid of weight tiles with numbers, cascading in"
+    },
+    {
+     "id": "b3",
+     "say": "Forty are drawn here. A large model has seventy billion of them.",
+     "show": "counter 40 runs to 70,000,000,000"
+    },
+    {
+     "id": "b4",
+     "say": "Each number is called a parameter, or a weight. The two words mean the same thing.",
+     "show": "one tile lifts out with label weight = parameter"
+    }
+   ]
+  },
+  {
+   "id": "ch01_s02",
+   "name": "where thirty milliseconds comes from",
+   "figs": [
+    14
+   ],
+   "visual": "",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Here is where thirty milliseconds comes from. Time per token is the bytes you must read, divided by how many bytes the chip can read each second.",
+     "show": "equation builds"
+    },
+    {
+     "id": "b2",
+     "say": "A hundred and forty gigabytes of weights. On an H one hundred, at three point three five terabytes per second, that is forty-one point eight milliseconds per token.",
+     "show": "row 1"
+    },
+    {
+     "id": "b3",
+     "say": "On an H two hundred, at four point eight terabytes per second, twenty-nine point two. On a B two hundred, at eight, seventeen point five.",
+     "show": "rows 2 and 3"
+    },
+    {
+     "id": "b4",
+     "say": "The middle row lands on twenty-nine milliseconds, which is where the round figure of thirty comes from. It is not a guess. It is a division.",
+     "show": "highlight row 2"
+    }
+   ]
+  },
+  {
+   "id": "ch01_s03",
+   "name": "the bus",
+   "figs": [],
+   "visual": "",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Here is the chip, and here is the memory beside it. Every weight lives over here, in the memory, and the arithmetic happens over there, on the chip.",
+     "show": ""
+    },
+    {
+     "id": "b2",
+     "say": "So for every token, all one hundred and forty gigabytes have to cross this bus, from the memory into the chip. Every single time.",
+     "show": ""
+    },
+    {
+     "id": "b3",
+     "say": "Zoom in, and the arithmetic units are mostly waiting. Put the two numbers on one chart and the reason becomes a picture.",
+     "show": ""
+    },
+    {
+     "id": "b4",
+     "say": "Decode sits at one operation per byte, far to the left of the ridge at two hundred and ninety-five. It can only go as fast as the memory lets it.",
+     "show": ""
+    }
+   ]
+  },
+  {
+   "id": "ch01_s04",
+   "name": "components",
+   "figs": [],
+   "visual": "",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "The model predicts one token, adds it to the text, and runs again, round and round.",
+     "show": ""
+    },
+    {
+     "id": "b2",
+     "say": "Reading a hundred and forty gigabytes takes twenty seconds from a disk, and forty-two milliseconds from the memory beside the chip.",
+     "show": ""
+    },
+    {
+     "id": "b3",
+     "say": "A specification sheet has four lines, and only one of them is an amount.",
+     "show": ""
+    }
+   ]
+  }
+ ],
+ "checks": []
+}

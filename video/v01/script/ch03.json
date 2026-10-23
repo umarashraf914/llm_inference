@@ -1,0 +1,572 @@
+{
+  "chapter": "ch03",
+  "title": "Inside a production request",
+  "kicker": "03 · Inside a production request",
+  "figs": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    27
+  ],
+  "scenes": [
+    {
+      "id": "ch03_s01",
+      "name": "the machine at the other end",
+      "figs": [
+        16
+      ],
+      "visual": "Wide shot on the dark background. Left third: a laptop icon resting on a thin desk line, a small chat bubble on its screen. Right third: a server icon (a rack unit with a status LED). Between them a grey dashed network line with a small globe icon at its midpoint. Each end gets a card beneath it holding a title and two short facts, mirroring each other so the contrast reads at a glance. Mid-scene the camera pulls back from the server out to a whole data-centre building, then pushes back into one server, which stays centred for the closing beats while the laptop shrinks to the far left. Colours: GPU dies amber, their memory stacks coral, request pills blue. The idea the motion makes visible: the model is far away, on hardware that is shared, always on and rented by the hour.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When you type a question into a chat window, where does the model actually run? Not on your laptop. Your question travels over the network to a machine in a building somewhere, and the answer travels back the same way.",
+          "show": "Laptop left, server right, the dashed grey line between them with the globe at its middle. On 'travels over the network', a small blue pill labelled “your question” leaves the laptop and slides along the line, through the globe, to the server. On 'travels back', a smaller blue pill labelled “answer” returns along the same line to the laptop."
+        },
+        {
+          "id": "b2",
+          "say": "Compare the two ends. Your laptop has one small chip, and it is only on when you open it.",
+          "show": "A card fades in under the laptop: title “Your laptop”, lines “one small chip” and “on when you open it”. On 'one small chip', a single small chip icon pulses once inside the laptop. On 'only on when you open it', the laptop lid closes and the screen goes dark for a moment, then reopens."
+        },
+        {
+          "id": "b3",
+          "say": "The machine at the other end is a server. It holds a few G P Us, the specialised chips these models run on, each with the memory beside it that you met a few minutes ago. What makes a G P U special comes later.",
+          "show": "A matching card under the server: title “A server”, first line “a few GPUs”. The server opens like a drawer: inside, four small GPU package illustrations in a row, each an amber compute die flanked by coral memory stacks, drawing in one by one on 'a few G P Us'. On 'the memory beside it', the coral stacks brighten briefly."
+        },
+        {
+          "id": "b4",
+          "say": "And it is always on, in a data centre. That is a warehouse full of these machines, row after row, with the power and the cooling to keep every one of them running, day and night.",
+          "show": "Second card line appears: “always on, in a data centre”; the server LED glows steadily. Both cards fade as the camera pulls back: the server becomes one unit in a rack, the rack one of a long aisle, the aisle one of many inside a warehouse outline labelled “data centre”. On 'power', a lightning-bolt icon and a power line attach to the building; on 'cooling', a fan icon spins on its roof. On 'day and night', a small sun and moon pass overhead."
+        },
+        {
+          "id": "b5",
+          "say": "Everything in the rest of this series is about what happens inside one of those machines, in the fraction of a second after your question arrives.",
+          "show": "Camera pushes back in through one aisle and one rack to one server, which lands centre screen; the laptop and network line are now small at the far left. A blue question pill arrives at the server; a stopwatch icon above it starts and stops almost at once, labelled “a fraction of a second”."
+        },
+        {
+          "id": "b6",
+          "say": "Hold on to that picture, because it is what the word production means here. The hardware is shared by many people, it is always on, and somebody pays for it by the hour. Every constraint ahead makes sense once you see it that way.",
+          "show": "Heading at top centre: “production”. Three tags stamp in under the server, one per phrase: “shared” with a people icon on 'shared by many people', “always on” with a power icon on 'always on', “paid by the hour” with clock and coin icons on 'by the hour'. The tags hold to the end of the scene."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s02",
+      "name": "five layers of the stack",
+      "figs": [
+        17
+      ],
+      "visual": "One large rounded panel fills the centre, titled “The stack a request passes through” at its top left. Inside it four cards sit in a left-to-right row, Router, Scheduler, Memory manager, Kernels, joined by short arrows. Orchestration is drawn last as an inner frame wrapping all four, so there are five layers in all. A small blue request pill travels along the row as each card is introduced, so the stack reads as the path one request takes. Cards are blue except Kernels, which is amber because it is the only one that does arithmetic. Everything persists through the scene; the last beat dims the four cards that do not do arithmetic. To keep text light, each card's sub-label shows only during its own beat and then fades, and the panel title fades after beat 1, leaving the five card names.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Inside that machine, and around it, your request passes through a stack of software. Five layers, each one solving a different problem.",
+          "show": "The panel draws in with its title “The stack a request passes through”. Five empty card outlines sketch in, four in the row and one as the inner frame. A counter at top right reads “5 layers”. The blue request pill waits at the panel's left edge."
+        },
+        {
+          "id": "b2",
+          "say": "First, the router. Thousands of machines could take your request, and the router decides which one.",
+          "show": "Card 1 fills blue: “Router”, sub “which machine”, with a signpost icon. The request pill enters it; three tiny server icons fan out to its right and an arrow picks the middle one on 'which one'. The pill moves on to card 2."
+        },
+        {
+          "id": "b3",
+          "say": "Next, the scheduler. It does not run your request on its own. It groups it with other people's requests so they run together, which is called batching. Why that saves so much is a story for later.",
+          "show": "Card 2 fills blue: “Scheduler”, sub “batch with others”, with a calendar-clock icon. On 'other people's requests', five more blue pills in slightly different shades drop in beside yours; on 'batching', all six snap into one tray labelled “batch” and move on together."
+        },
+        {
+          "id": "b4",
+          "say": "Then the memory manager. It decides which weights, and which pieces of each request, sit in which chip's memory.",
+          "show": "Card 3 fills blue: “Memory manager”, sub “which weights, which chip”. Below it, two small chip icons with coral memory stacks; on 'sit in which chip's memory', coral weight tiles and small blue request blocks slide into slots in the stacks."
+        },
+        {
+          "id": "b5",
+          "say": "Then the kernels. A kernel is a small program that runs on the chip and does the actual arithmetic, the multiply and add you saw at the very start, billions of times over.",
+          "show": "Card 4 fills amber: “Kernels”, sub “the actual arithmetic”. On 'multiply and add', the multiply-and-add picture from the opening chapter flickers inside it in miniature: five inputs times five weights, summed into one output. On 'billions of times over', the miniature tiles into a dense grid that blurs with speed."
+        },
+        {
+          "id": "b6",
+          "say": "And wrapped around all of it is orchestration, the wiring that ties the other four together and keeps them running as one system.",
+          "show": "The inner frame around the four cards takes a faint blue tint and gains its label along the bottom edge: “Orchestration”, sub “wiring it together”. The connector arrows between the cards brighten in sequence, left to right, then loop back to the start."
+        },
+        {
+          "id": "b7",
+          "say": "Notice that only one of these five does arithmetic. The other four exist because arithmetic is not what makes inference hard. By the end of the series, you should be able to look at any production system and say why each one is there.",
+          "show": "On 'only one of these five', Kernels stays bright amber while the other four dim to grey outlines. A line appears below the panel: “1 of 5 does arithmetic”. On 'say why each one is there', the four dimmed cards relight one at a time, each with a small question mark that turns into a tick."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s03",
+      "name": "where the money goes",
+      "figs": [
+        18
+      ],
+      "visual": "Three stat tiles side by side across the upper two thirds, each with its own idiom because the three numbers have different units: left a donut chart, centre a money counter with stacking building icons, right a token counter with a per-second ticker underneath. The tiles then shrink into the top band and three thin lines converge from them onto a single card in the centre, “cost per token”, in white. A grey caveat stamp lands at the end. Amber marks compute in the donut. The idea: three enormous numbers, and one quantity that every engineering choice is finally judged by. As each new tile builds, the previous tile's sub-labels fade, leaving only its title and headline number.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why does this stack get so much engineering attention? Follow the money. By estimates for twenty twenty-six, about two thirds of all the compute spent on A I goes to inference, running models that are already trained, not training new ones.",
+          "show": "Left tile, title “Share of AI compute”. A donut draws clockwise: an amber arc to 240 degrees labelled “inference”, the remaining third grey and labelled “training”. Under it: “about two thirds, 2026”."
+        },
+        {
+          "id": "b2",
+          "say": "The biggest cloud companies, known as hyperscalers, are spending around seven hundred billion dollars on A I this year. That is capital expenditure, the money that goes on buildings, power and machines.",
+          "show": "Centre tile, title “Hyperscaler AI capex”. Small data-centre building icons stack up row by row while a counter runs from “$0” to “$700 billion” on 'seven hundred billion dollars'. Grey sub-label on 'capital expenditure': “capex: buildings, power, machines”."
+        },
+        {
+          "id": "b3",
+          "say": "And a single A P I, the interface that developers' software sends its requests to, handles over twenty trillion tokens a day. Spread over the day, that is about two hundred and thirty million tokens every second.",
+          "show": "Right tile, title “One API's daily volume”. A digit counter rolls up to “over 20,000,000,000,000” with “tokens per day” beneath. On 'every second', a second ticker below it spins continuously and settles on “≈ 231 million per second”."
+        },
+        {
+          "id": "b4",
+          "say": "At that scale, every architectural decision, from how the chip is laid out, to how its memory hierarchy is arranged, to how the scheduler orders the work, collapses into one number. Cost per token.",
+          "show": "The three tiles shrink into the top band, keeping only their headline numbers. Three thin grey lines draw downward, one per phrase, labelled “chip layout”, “memory hierarchy”, “scheduling policy”, and converge on 'one number' into a white-bordered card at centre: “cost per token”."
+        },
+        {
+          "id": "b5",
+          "say": "Inference, not training, is now where most of the money goes. That is a recent inversion. These are projections, and projections are uncertain. The direction is not. Serving models is where the compute and the money now go.",
+          "show": "A balance icon left of the card tips from a pan labelled “training” to a pan labelled “inference” on 'recent inversion'. On 'projections are uncertain', a grey stamp “estimates and projections” lands across the three top tiles. “cost per token” stays lit to the end."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s04",
+      "name": "everyone at once",
+      "figs": [
+        19
+      ],
+      "visual": "Top two thirds: a field where small blue squares, each one a conversation, pop in at random positions and random moments, then drift down along converging arrows into one box at bottom centre, “one set of machines”, drawn as three server icons inside a single outline. Heading “Production traffic: everyone at once” at top left. Midway, the bottom third turns into a left-to-right lane timeline showing a queue, which then morphs into a dot plot on a time axis. The idea: many unpredictable arrivals share one set of machines, which is both the economic win and the reason the worst case matters.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "And this is the traffic all that money serves. Not one user waiting politely. Thousands of separate conversations, arriving at unpredictable moments, all needing the same machines.",
+          "show": "Heading draws: “Production traffic: everyone at once”. On 'one user waiting politely', one lone square appears and waits. On 'thousands', squares burst in irregularly, 48 visible with more implied at the edges, each sliding down an arrow into “one set of machines” at uneven intervals."
+        },
+        {
+          "id": "b2",
+          "say": "That crowd turns out to be what makes the economics work. The machines can work on many conversations at once, and sharing the work is what brings the cost of each one down. Much of the rest of the series is about why.",
+          "show": "Squares near the machine box group into a tray of eight, the same “batch” tray from the stack, and enter together. A small meter beside the box labelled “cost per token” ticks downward as each fuller tray goes in."
+        },
+        {
+          "id": "b3",
+          "say": "The crowd has a price too. One slow request delays other people. Picture a queue. One long job, and everyone behind it waits.",
+          "show": "The field dims and its labels fade. The bottom third becomes a lane timeline running left to right, labelled “time”. Five request bars line up; the second is very long. On 'everyone behind it waits', each of the three bars behind it grows a grey hatched segment labelled “waiting” before it can start."
+        },
+        {
+          "id": "b4",
+          "say": "So an average can look perfectly fine while somebody is having a terrible time. That is why the measurements near the end of this film are about the worst case, not the average.",
+          "show": "The lane morphs into a dot plot on a horizontal axis labelled “time to answer”, schematic with no numbers. Thirty dots cluster at the left; two sit far to the right. A tick labelled “average” lands inside the cluster; on 'worst case', a second tick labelled “worst case” lands at the far-right dots and brightens."
+        },
+        {
+          "id": "b5",
+          "say": "That is what production means. Shared, concurrent, and paid for. It is a different problem from running a model once on your own machine.",
+          "show": "Three words stamp across the top band, one per spoken word: “shared”, “concurrent”, “paid for”. A small inset at bottom right shows a laptop with a single user and the label “once, on your own machine”, then greys out."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s05",
+      "name": "what one request carries",
+      "figs": [
+        20
+      ],
+      "visual": "Upper left: an open envelope-style panel titled “What arrives at the server”, holding three compartments. Upper right: a server icon with a small dashed box beside it labelled “kept from last request”. Lower half, from beat 4: a ladder of horizontal bars, one row per conversation turn, all starting from one left baseline and drawn to scale at 0.6 px per token (turn 1 = 12 px, turn 2 = 144 px, turn 3 = 276 px, turn 10 = 1,200 px). Earlier conversation in mid blue, each turn's new question as a bright blue segment at the right end. The idea: a request carries the whole history every time, so it grows turn after turn.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now zoom in on one request. What actually arrives at the server? Three things. The conversation so far, the new question, and a few settings.",
+          "show": "Camera zooms on one blue square from the crowd; it unfolds into the panel “What arrives at the server”. Compartments fill on each phrase: “the conversation so far” (blue, left), “the new question” (bright blue, right), and below them, full width, “settings: how long, how random, when to stop” (grey)."
+        },
+        {
+          "id": "b2",
+          "say": "The settings say how long the answer may get, how random the draw from the probability list should be, and when to stop. That draw is the one you saw earlier, where cat usually wins, but dog sometimes does.",
+          "show": "The settings strip expands into three icons, each appearing on its phrase: a ruler “how long”, a die “how random”, a stop sign “when to stop”. Beside the die, the probability bars from the opening chapter slide in, “cat 74.5%” and “dog 24.8%”; the die rolls once and lands on dog."
+        },
+        {
+          "id": "b3",
+          "say": "Here is the surprise. The whole conversation is sent every time, not just the new question. The model has no memory between requests, so anything it needs to know has to arrive with the request. Engineers call this stateless.",
+          "show": "The panel slides left and the server icon's dashed box “kept from last request” comes into focus. On 'no memory between requests', the box visibly empties and reads “nothing”. On 'stateless', the word “stateless” appears under the server in white."
+        },
+        {
+          "id": "b4",
+          "say": "Watch what that does to a conversation. Say every question is twenty tokens and every answer is two hundred. Turn one sends twenty tokens. Turn two sends the first question, the first answer and the new question. Two hundred and forty.",
+          "show": "The request panel and server shrink to a small textless thumbnail at top left, keeping only “stateless”. The ladder starts at lower left. Row “turn 1”: one bright blue segment “Q1”, 12 px, value “20”. Row “turn 2”: segments “Q1”, “A1”, “Q2” build left to right on each spoken item, 144 px in total, value “240”. Small grey tag in the corner: “illustrative”."
+        },
+        {
+          "id": "b5",
+          "say": "Turn three, four hundred and sixty. By turn ten, you are sending two thousand tokens to ask a twenty-token question.",
+          "show": "Row “turn 3” builds to 276 px, value “460”. A short vertical ellipsis, then row “turn 10” sweeps out to 1,200 px, value “2,000”. On 'a twenty-token question', only the tiny bright blue “Q10” segment at the right end of the turn-10 bar glows; the rest of the bar dims."
+        },
+        {
+          "id": "b6",
+          "say": "So a long conversation means a long input, every single turn. That fact comes back near the end of this film as the reason one particular cost keeps growing. Re-sending everything is what turns conversation length from bookkeeping into a hardware problem.",
+          "show": "Ghost rows for later turns extend past the right edge of the frame. On 'one particular cost keeps growing', a small upward arrow with a “?” appears beside the ladder, to be answered later. Bottom line: “conversation length → hardware problem”."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s06",
+      "name": "nothing lives in the model",
+      "figs": [
+        21
+      ],
+      "visual": "Centre: a large coral slab, “140 GB of weights”, drawn as a dense block of weight tiles. Upper left: a document card “system prompt” beside a building icon for the operator. A timeline along the bottom marks “training finished” well before “system prompt written”. Later a blue context strip forms in front of the slab and a single arrow carries it in. A cupboard icon at the far right gets crossed out. The idea: the weights are frozen and identical for everyone, so the only way to shape an answer is through the tokens in the context.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Every service puts some text at the start of every conversation, written by its operator, the company or developer running it. It says who the assistant is and how to behave. That text is called the system prompt.",
+          "show": "Upper left: a building icon labelled “operator”; beside it a document card titled “system prompt” with one grey line of example text, “You are a helpful assistant…”. The card's title brightens on 'system prompt'."
+        },
+        {
+          "id": "b2",
+          "say": "Now the fact that everything else hangs on. The weights, all hundred and forty gigabytes of them, are identical for every user, every request, forever. The weights do not know your system prompt.",
+          "show": "The coral slab “140 GB of weights” draws in centre. A white line stamps under it: “identical for every user, every request, forever”. On 'do not know', the system prompt card flies at the slab and bounces off. Heading at top: “The weights do not know your system prompt”."
+        },
+        {
+          "id": "b3",
+          "say": "They could not. Training finished long before that text existed, and the weights have not changed since. Nothing the operator writes is stored in the model.",
+          "show": "A timeline draws along the bottom: a dot “training finished” at the left, a long gap, a dot “system prompt written” at the right. On 'have not changed since', a padlock clicks onto the slab."
+        },
+        {
+          "id": "b4",
+          "say": "So anything that shapes the answer has to be in the context on that pass, that one run of the model. The context is every token placed in front of the model when it runs. The system prompt, the conversation, your question.",
+          "show": "The timeline, the operator card and the stamp line fade. A blue strip labelled “context” assembles in front of the slab, pills dropping in on each phrase: “system prompt”, “conversation”, “your question”. One arrow draws from the strip into the slab, labelled “that pass”."
+        },
+        {
+          "id": "b5",
+          "say": "There is no other channel. The model conditions on exactly one thing, the tokens in front of it at that moment. There is no cupboard on the server that it can reach into.",
+          "show": "Far right: a cupboard icon with a dotted line reaching toward the slab. On 'no cupboard', a grey cross covers it and the dotted line vanishes. The single arrow from the context strip stays, now labelled “the only input”."
+        },
+        {
+          "id": "b6",
+          "say": "Which settles half of a natural question. Where do the system prompt, the tool definitions and any loaded skill go? Into your context, every single turn, without exception. Tools and skills are coming up next.",
+          "show": "The label “the only input” and the crossed cupboard fade. Two more pills slot into the strip right after “system prompt”: “tool definitions” and “loaded skill”. A counter beside the strip ticks “turn 1, 2, 3…”, and the three pills reappear in the same slots on every tick. Label: “every turn, no exceptions”."
+        },
+        {
+          "id": "b7",
+          "say": "That is the architectural fact. The context window, the stretch of tokens the model can take in at once, is the only input it has.",
+          "show": "A frame draws around the strip, its right edge marked “maximum”, labelled “context window”. Bottom caption: “the context window is the only input”."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s07",
+      "name": "two questions that get confused",
+      "figs": [
+        22
+      ],
+      "visual": "Two tall cards side by side across the upper half: left “Does it reach the context?”, right “Does it cross the network from your device?”, both blue. From beat 4, two mini lanes draw below the right card, each running laptop or code window, then network line, then server, then a context strip. Both lanes end in identical context strips. The idea: where text is stored varies; where it ends up never does.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Two questions get treated as one, and they are not. The first. Does this text reach the context? For every one of these, the answer is yes, every turn.",
+          "show": "Left card draws: title “Does it reach the context?”, sub “Always yes, every turn”. Three small pills, “system prompt”, “tool definitions”, “loaded skill”, sit inside it, each getting a tick."
+        },
+        {
+          "id": "b2",
+          "say": "The second. Does it cross the network from your device? That varies.",
+          "show": "Right card draws: title “Does it cross the network from your device?”, sub “That varies”, with a small network-line icon that flickers between solid and dashed."
+        },
+        {
+          "id": "b3",
+          "say": "The first is forced by the architecture, which is what you just saw. The second is a product decision about where the text is stored.",
+          "show": "Tag under the left card: “forced by the architecture”. Tag under the right card: “product decision: where it is stored”."
+        },
+        {
+          "id": "b4",
+          "say": "Take two system prompts. One is held by the provider, the company that runs the model, and it never travels from your machine. The other is written by a developer using the A P I, and their software sends it with every call.",
+          "show": "The two tags fade. Below the right card two lanes draw. Top lane, “provider's system prompt”: laptop, line, server; the system prompt pill is already parked on the server and only a small message pill travels. Bottom lane, “developer's system prompt”: a code-window icon, line, server; the system prompt pill rides along with the message, three calls in a row on 'every call'."
+        },
+        {
+          "id": "b5",
+          "say": "Either way, it ends up in the same place. It takes up the same tokens, and it costs the same work to read in. So from here on, only the second question matters, because the first has no exceptions.",
+          "show": "At each lane's end an identical context strip; the system prompt pill lands in the same first slot, at the same length, in both. Label between them: “same tokens, same work”. On 'no exceptions', the left card gets a stamp “no exceptions” and dims; the right card stays lit."
+        },
+        {
+          "id": "b6",
+          "say": "Where something is stored and where it ends up are different things. Only the storage varies. The destination never does.",
+          "show": "Caption pair: on the left, arrows fanning out from three origins, labelled “storage: varies”; on the right, the same arrows converging into one context strip, labelled “destination: always the context”."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s08",
+      "name": "three places, one prompt",
+      "figs": [
+        23
+      ],
+      "visual": "Left third: three stacked shelves, each a card with an icon and a title: “On your device” (laptop), “On the server, for you” (server with a person badge), “On the server, for everyone” (server with a globe badge). Right two thirds: a horizontal strip, “one assembled prompt”, into which pills fly from the shelves. Later two, then three strips stack vertically to compare requests, with a teal highlight showing how far their beginnings match token for token. Pills blue, the reusable prefix teal. The idea: text from three places is glued in a fixed order, most shared first, so that requests share the longest possible beginning. When the comparison strips appear, the shelves shrink to their icons and the comparison strips use the same colour-coded pills without text, keyed to the labelled strip from beat 4.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So where can that text sit before a request is assembled? Three places. First, on your device. Your app holds it and sends it, like a developer's own system prompt.",
+          "show": "Heading: “Three places the text can sit”. Top shelf draws: laptop icon, title “On your device”. On 'your app holds it and sends it', a note appears beside it: “your app sends it”. On 'developer's own system prompt', a small pill “developer's system prompt” sits on the shelf."
+        },
+        {
+          "id": "b2",
+          "say": "Second, on the server, for you. It is stored against your account, like your custom instructions, or the files in a project.",
+          "show": "Middle shelf draws: server icon with a person badge, title “On the server, for you”; note “stored against your account”; pills “custom instructions” and “project files” sit on the shelf."
+        },
+        {
+          "id": "b3",
+          "say": "Third, on the server, for everyone. One copy, shared by every user, like the provider's own system prompt.",
+          "show": "Bottom shelf draws: server icon with a globe badge, title “On the server, for everyone”; note “one copy, shared by all”; pill “provider's system prompt” sits on it. Then the three side notes fade, leaving titles and pills."
+        },
+        {
+          "id": "b4",
+          "say": "All three end up in one assembled prompt. The serving system glues them together in a fixed order before the model sees anything. The most shared text first, then anything specific to you, then the conversation, then your newest message.",
+          "show": "On the right, a strip labelled “one assembled prompt”. Pills fly in, one per phrase, landing left to right: “provider's system prompt” from the bottom shelf, “your custom instructions” from the middle shelf, then “conversation so far”, then “newest message”. A grey arrow under the strip: “most shared → most specific”."
+        },
+        {
+          "id": "b5",
+          "say": "That order is not cosmetic. The server keeps a running record of everything it has already processed, and it can reuse that work, but only for a beginning that matches token for token from the very first one. That matching beginning is called a prefix.",
+          "show": "The strip lifts and is labelled “your request”; a second strip, “a stranger's request”, slides in beneath it with the same first pill and different later ones. On 'token for token', a teal highlight sweeps from the left across both strips and stops exactly where they first differ, at the end of the provider's system prompt. Label over the teal: “identical prefix: reusable”."
+        },
+        {
+          "id": "b6",
+          "say": "Most shared first makes that prefix as long as it can be. Your own next turn matches even further, right through the conversation so far. Put the newest message first instead, and two requests differ from the very first token. Nothing can be reused.",
+          "show": "A third strip, “your next turn”, appears; teal sweeps through provider prompt, custom instructions and conversation, stopping at the new message. On 'put the newest message first', all strips reshuffle so “newest message” jumps to the front; every teal highlight collapses to zero width and a grey label reads “nothing reusable”. Then the strips snap back to the correct order and the teal returns."
+        },
+        {
+          "id": "b7",
+          "say": "Three storage locations, one destination. The order is a deliberate consequence of how that prefix matching works, and the rule behind it gets its own chapter later.",
+          "show": "Shelves and strips settle: three thin arrows run from the shelves into one strip. Caption: “3 locations → 1 prompt”. The long teal prefix on “your next turn” stays lit."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s09",
+      "name": "a tool is two different things",
+      "figs": [
+        24
+      ],
+      "visual": "Upper half: two cards side by side, left “The description” (blue, a short text document), right “The implementation” (grey, a code-file icon). Bottom band: the blue context strip, with a model box at its right end that emits tokens. A gear icon labelled “serving system” sits between the model box and the implementation card. A vertical wall separates the implementation from the context strip. Teal marks the zero-token cost at the end. The idea: only the description is text the model reads; the code runs outside the model, so only documentation costs tokens. The heading fades after beat 1, and the description card's three lines leave with its pill.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now tools. A tool is something the model can ask to have done, like looking up today's weather. For any tool, two very different things exist. Its description, and its implementation.",
+          "show": "Heading: “For a tool, two very different things exist”. A wrench icon at centre splits into two cards on 'two very different things': left “The description”, right “The implementation”."
+        },
+        {
+          "id": "b2",
+          "say": "The description is its name, its arguments, and what it returns. That is text, and it goes into the context. The implementation is the code that actually runs. It never enters the context.",
+          "show": "Left card shows three short lines: “name: get_weather”, “arguments: city”, “returns: temperature”; on 'goes into the context', it shrinks to a pill and drops into the blue context strip. Right card shows a code-file icon and “the code that actually runs”; on 'never enters', a vertical wall draws between it and the strip, labelled “never enters the context”."
+        },
+        {
+          "id": "b3",
+          "say": "That is because the model cannot execute anything. All it can do is emit text. So it emits text in a shape the serving system recognises as a call. Get weather, city, Seoul.",
+          "show": "The model box at the right of the strip emits tokens that assemble into a blue pill “get_weather(city: 'Seoul')”. On 'recognises as a call', the gear icon “serving system” draws a bracket around the pill."
+        },
+        {
+          "id": "b4",
+          "say": "Ordinary software outside the model runs the code and hands back a result. The result goes into the context as more text, and the model carries on from there.",
+          "show": "The gear passes the call over the wall to the code-file card, whose lines scroll as it runs. A result pill “18°C, clear” comes back over the wall and appends to the context strip; the model box resumes emitting tokens."
+        },
+        {
+          "id": "b5",
+          "say": "So a tool's code lives wherever it lives, on a server or on your own machine, and the model never sees a line of it. Nor does it see the code inside a plugin, a packaged set of tools.",
+          "show": "The code-file card slides onto a server icon, and a copy onto a laptop icon. On 'never sees a line', an eye icon with a cross appears over both. On 'a plugin', a box labelled “plugin” wraps three small wrench icons, and its code stays behind the same wall."
+        },
+        {
+          "id": "b6",
+          "say": "All the model needs is enough description to know the tool exists and how to phrase a call. That is why a tool with a long description costs you tokens on every turn, while a tool with a thousand lines of code costs you none.",
+          "show": "The description pill in the strip gets a soft highlight: “enough to call it”. Then two meters side by side. Left, “long description”: a token counter that steps up on each tick of “turn 1, 2, 3”. Right, “1,000 lines of code”: counter fixed at “0 tokens”, in teal, on 'costs you none'."
+        },
+        {
+          "id": "b7",
+          "say": "The expensive part of a tool, by token count, is its documentation, not its behaviour.",
+          "show": "The two meters hold. Caption below them: “cost: documentation, not behaviour”. The description pill glows; the code card stays dim behind its wall."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s10",
+      "name": "skills, loaded only when needed",
+      "figs": [
+        25
+      ],
+      "visual": "Top band: a row of eight pills, each a puzzle-piece icon with a numeral 1 to 8 for skills 1 to 8, under the heading “Always present: just enough to know what exists”. Middle band: the same row with skill 2 unfolded into a tall document block entering the context strip. Then the camera pulls out to a grid of forty pills and a long outlined context-window bar drawn to scale, 200,000 tokens = 1,600 px, so 80,000 = 640 px, 3,200 = 25.6 px. Pills and token blocks blue; the on-demand saving teal. The idea: a cheap catalogue is always present, the expensive contents only when needed, and the arithmetic forces it.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Skills work the same way, with a twist. A skill is a packet of instructions for one kind of job, say, building a slide deck or filling in a form. What is always present is just enough to know that each one exists.",
+          "show": "Heading: “Always present: just enough to know what exists”. Eight blue pills draw in a row, each a puzzle-piece icon with a numeral, 1 to 8. On 'building a slide deck', a slide icon appears briefly over pill 2; on 'filling in a form', a form icon over pill 5."
+        },
+        {
+          "id": "b2",
+          "say": "Each one is just a name and a single sentence, about thirty tokens apiece. That one-line list is the catalogue.",
+          "show": "One tag under the row: “≈30 tokens each”. Sub-label: “a name and one sentence each”. On 'the catalogue', a bracket spans the row, labelled “catalogue”."
+        },
+        {
+          "id": "b3",
+          "say": "When what you ask matches one of those descriptions, that skill's full instructions are loaded into the context, about two thousand tokens. The rest stay as one-line descriptions.",
+          "show": "Second heading: “Loaded only when one is actually needed”. A user-message pill appears and a thin line links it to pill 2, which unfolds into a tall document block labelled “full instructions ≈ 2,000 tokens” and drops into the blue context strip. Pill 1 stays small; pills 3 to 8 sit inside a dashed outline labelled “the other six stay one-liners”."
+        },
+        {
+          "id": "b4",
+          "say": "Why bother? Suppose there are forty skills. Forty times thirty tokens is twelve hundred tokens. That is affordable.",
+          "show": "Camera pulls out: the row becomes a 5 by 8 grid of forty pills. An equation builds term by term on the spoken words: “40” × “30” = “1,200 tokens”. Tag: “affordable”."
+        },
+        {
+          "id": "b5",
+          "say": "Now load all forty in full. Forty times two thousand is eighty thousand tokens. In a large window of two hundred thousand tokens, that is forty percent gone before you have typed a word.",
+          "show": "A long outlined bar draws across the lower half, 1,600 px: “context window: 200,000 tokens”. All forty pills unfold at once; a blue block fills the bar from the left to 640 px as “40 × 2,000 = 80,000” builds above it. Marker at the block's right edge: “40%”."
+        },
+        {
+          "id": "b6",
+          "say": "Load only the one you need, and you pay twelve hundred for the catalogue plus two thousand for that skill. Three thousand two hundred tokens instead of eighty thousand. Twenty-five times smaller.",
+          "show": "Directly under the 80,000 block, a thin teal bar draws to the same scale, 25.6 px: “1,200 + 2,000 = 3,200”. On 'twenty-five times smaller', a bracket compares the two bars, labelled “25× smaller”."
+        },
+        {
+          "id": "b7",
+          "say": "A plugin is a bundle of skills and tools, and it behaves the same way. The catalogue is cheap, and the contents are fetched on demand.",
+          "show": "The plugin box from the tools scene returns, now wrapping a few puzzle-piece pills and one wrench pill. Two labels: “catalogue: cheap”, “contents: on demand”."
+        },
+        {
+          "id": "b8",
+          "say": "That is called progressive disclosure, and the arithmetic forces it. Keeping every skill's full text resident would cost more of the window than the conversation.",
+          "show": "Caption: “progressive disclosure”. On 'more of the window than the conversation', the 640 px block of 80,000 flashes beside a much smaller blue block labelled “a long conversation”."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s11",
+      "name": "what you pay for before you type",
+      "figs": [
+        27
+      ],
+      "visual": "A horizontal bar chart drawn to scale, 2,000 tokens = 600 px: four rows, labels in a left column, bars from a common baseline. Below a rule line, a stacked total bar 1,425 px long. Later a 6 px sliver for the user's 20-token question sits just right of the total. Bars blue; the provider row carries a small globe badge and the custom-instructions row a person badge, echoing the shelves from earlier. A grey stamp “illustrative”. The idea: the preamble in front of your first word dwarfs what you type, and you pay for all of it every turn.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now add it all up. Everything that sits in front of your first word is called the preamble. Here is what might be in it, and who put it there. The provider's system prompt, two thousand tokens.",
+          "show": "Heading: “What sits in front of your first word”, with a small tag “the preamble” on 'called the preamble'. Row 1: label “provider's system prompt” with a globe badge; on 'two thousand tokens' its bar grows to 600 px, value “2,000”."
+        },
+        {
+          "id": "b2",
+          "say": "Your custom instructions, three hundred. The tool definitions, four hundred and fifty. And one loaded skill, two thousand.",
+          "show": "Row 2 “your custom instructions”, 90 px, “300”. Row 3 “tool definitions”, 135 px, “450”. Row 4 “one loaded skill”, 600 px, “2,000”. Each bar grows on its spoken number."
+        },
+        {
+          "id": "b3",
+          "say": "Altogether, four thousand seven hundred and fifty tokens. This setup lists no skill catalogue. With forty skills, their one-line descriptions would add another twelve hundred.",
+          "show": "A rule line draws. The row labels fade and the four bars slide end to end, keeping their numbers, into one stacked bar, 1,425 px, labelled “total 4,750 tokens”. On 'another twelve hundred', a dashed ghost extension 360 px long appears at its end, labelled “+1,200 catalogue”, then fades."
+        },
+        {
+          "id": "b4",
+          "say": "Now your question. Say it is twenty tokens. The preamble in front of it is nearly two hundred and forty times longer. These figures are illustrative. The shape is not. The preamble is usually far larger than anything the user types.",
+          "show": "A 6 px bright blue sliver, “your question ≈ 20”, appears just right of the total bar. A bracket over both: “≈ 237×”. On 'illustrative', a grey stamp lands across the chart: “illustrative”."
+        },
+        {
+          "id": "b5",
+          "say": "None of it is anything you typed in this message. Even your custom instructions were written once, long ago. Yet all of it counts against your window and your bill, on every single turn.",
+          "show": "A counter “turn 1, 2, 3…” ticks at top right. On each tick the whole stacked bar flashes, a small coin icon drops beside it, and a copy of it fills the left end of a context-window outline below."
+        },
+        {
+          "id": "b6",
+          "say": "Where it was stored changes who transmits it. It does not change that you pay to have all of it read in, and then looked back over for every token of the answer. That looking back is called attention, and it comes later.",
+          "show": "On 'read in', a sweep runs left to right across the stacked bar. Then answer tokens appear one by one to the right of the question sliver; for each, a faint arc reaches back over the whole preamble on 'looked back over'. Small label: “attention, later”."
+        },
+        {
+          "id": "b7",
+          "say": "Storage location is invisible to you. Token count is not. And the preamble is almost always the largest thing in the request.",
+          "show": "Two captions stack: “storage: invisible to you”, “token count: not”. The preamble bar stays dominant, the tiny question sliver at its end."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "the weights of a seventy-billion-parameter model in 16-bit are 140 GB",
+      "python": "70e9*2/1e9",
+      "result": "140.0"
+    },
+    {
+      "claim": "donut arc for 'about two thirds' of AI compute = 240 degrees",
+      "python": "360*2/3",
+      "result": "240.0"
+    },
+    {
+      "claim": "over 20 trillion tokens a day is about 231 million tokens per second (said 'about two hundred and thirty million')",
+      "python": "20e12/86400/1e6",
+      "result": "231.4814814814815"
+    },
+    {
+      "claim": "illustrative conversation, 20-token questions and 200-token answers: turn n sends 20n + 200(n-1) tokens = 20, 240, 460, 2,000 for turns 1, 2, 3, 10",
+      "python": "[20*n+200*(n-1) for n in (1,2,3,10)]",
+      "result": "[20, 240, 460, 2000]"
+    },
+    {
+      "claim": "turn 10 = ten questions plus nine answers = 200 + 1,800 = 2,000 tokens",
+      "python": "(10*20, 9*200, 10*20+9*200)",
+      "result": "(200, 1800, 2000)"
+    },
+    {
+      "claim": "ladder bar widths at 0.6 px per token: 12, 144, 276, 1,200 px",
+      "python": "[round((20*n+200*(n-1))*0.6,1) for n in (1,2,3,10)]",
+      "result": "[12.0, 144.0, 276.0, 1200.0]"
+    },
+    {
+      "claim": "forty skills at thirty tokens each = 1,200 tokens",
+      "python": "40*30",
+      "result": "1200"
+    },
+    {
+      "claim": "forty skills fully loaded at 2,000 tokens each = 80,000 tokens",
+      "python": "40*2000",
+      "result": "80000"
+    },
+    {
+      "claim": "80,000 tokens is 40% of a 200,000-token window; the atlas's '40% of a large window' implies a 200,000-token window, now stated explicitly",
+      "python": "(80000/200000, 80000/0.4)",
+      "result": "(0.4, 200000.0)"
+    },
+    {
+      "claim": "loading one skill: 1,200 catalogue + 2,000 contents = 3,200 tokens",
+      "python": "1200+2000",
+      "result": "3200"
+    },
+    {
+      "claim": "80,000 / 3,200 = 25 times smaller",
+      "python": "80000/3200",
+      "result": "25.0"
+    },
+    {
+      "claim": "fig 25 drawing: 8 skills shown, skill 1 stays a one-liner, skill 2 loads, 'the other six' are skills 3 to 8",
+      "python": "8-1-1",
+      "result": "6"
+    },
+    {
+      "claim": "context-window bar at 1,600 px for 200,000 tokens: 80,000 = 640 px, 3,200 = 25.6 px, 1,200 = 9.6 px",
+      "python": "[1600*x/200000 for x in (200000,80000,3200,1200)]",
+      "result": "[1600.0, 640.0, 25.6, 9.6]"
+    },
+    {
+      "claim": "illustrative preamble: 2,000 + 300 + 450 + 2,000 = 4,750 tokens",
+      "python": "2000+300+450+2000",
+      "result": "4750"
+    },
+    {
+      "claim": "preamble bars at 600 px per 2,000 tokens: 600, 90, 135, 600, total 1,425 px; a 20-token question = 6 px",
+      "python": "[w*600/2000 for w in (2000,300,450,2000,4750,20)]",
+      "result": "[600.0, 90.0, 135.0, 600.0, 1425.0, 6.0]"
+    },
+    {
+      "claim": "reconciliation with the skills scene: fig 27 lists no skill catalogue; a forty-skill catalogue would add 1,200 (ghost extension 360 px), giving 5,950",
+      "python": "(4750+1200, 1200*600/2000)",
+      "result": "(5950, 360.0)"
+    },
+    {
+      "claim": "preamble against a 20-token question: 4,750 / 20 = 237.5, said 'nearly two hundred and forty times'",
+      "python": "4750/20",
+      "result": "237.5"
+    }
+  ]
+}

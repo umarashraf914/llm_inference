@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+video/node_modules/
+video/engine/vendor/
+video/*/build/

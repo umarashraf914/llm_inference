@@ -1,0 +1,718 @@
+{
+  "chapter": "ch08",
+  "title": "Layers, attention, and the parameter count",
+  "kicker": "08 · Layers, attention, and the parameter count",
+  "figs": [
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104
+  ],
+  "scenes": [
+    {
+      "id": "ch08_s01",
+      "name": "a layer does two things",
+      "figs": [
+        91
+      ],
+      "visual": "Dark stage. Bottom band: five blue token pills in a row, 'the', 'cat', 'sat', 'down', 'it', each with a tall thin blue vector bar standing on it (the 8,192-number vectors from the previous chapter, drawn as a column of faint cells). Centre: a large rounded blue panel titled 'One transformer layer' that the five columns rise into. Inside it, two sub-panels side by side. Left sub-panel 'Attention', subtitle 'moves information between tokens', drawn so that thin blue threads cross sideways between the five columns. Right sub-panel 'Feed-forward network', subtitle 'transforms each token alone', drawn so each column passes straight up through its own small box with no sideways threads. Later the single panel duplicates into a tall stack on the right third. The idea the motion makes visible: sideways movement exists only in attention; the feed-forward step is strictly vertical, one column at a time.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "You have seen how text becomes vectors: every token, a list of eight thousand one hundred and ninety-two numbers. Now those vectors enter the model proper. And the model proper is a stack of layers.",
+          "show": "Five token pills fade up at the bottom with their vector bars, a small grey tag beside the first bar: '8,192 numbers'. On 'stack of layers', the empty 'One transformer layer' panel draws on above them and the five bars slide up into its lower edge."
+        },
+        {
+          "id": "b2",
+          "say": "One layer does exactly two things. First, attention. Attention moves information between tokens. It is the only place where one token's vector can be changed by another's.",
+          "show": "Left sub-panel 'Attention' draws on with subtitle 'moves information between tokens'. On 'moves information', blue threads draw sideways between the five columns, a bright pulse travelling from 'cat' to 'it'. On 'the only place', a small tag appears under the sub-panel: 'the only cross-token step'."
+        },
+        {
+          "id": "b3",
+          "say": "Second, the feed-forward network. It takes each token's vector on its own and transforms it, the same way at every position, without looking at any neighbour.",
+          "show": "Right sub-panel 'Feed-forward network' draws on with subtitle 'transforms each token alone'. Five separate small boxes light in turn, each column passing straight up through its own box; no threads cross. Tag under it: 'every position independently'."
+        },
+        {
+          "id": "b4",
+          "say": "A modern large model stacks sixty to over a hundred of these layers. Ours has eighty. What comes out of one layer is what goes into the next, and every layer has its own separate set of weights.",
+          "show": "Camera pulls back; the panel shrinks to a slab and copies itself upward into a tall stack on the right third. A range label beside the stack: '60 to 100+ layers', then a counter on the stack runs from 1 to 80 on 'Ours has eighty'. An arrow runs from the top of slab 1 into slab 2 on 'goes into the next'. On 'its own separate set of weights', each slab briefly shows a different tiny weight-grid texture."
+        },
+        {
+          "id": "b5",
+          "say": "Hold on to that division of labour. One step mixes across positions, the other does not. Nearly every optimisation you will meet later treats the two separately.",
+          "show": "Zoom back to the single layer. The two sub-panels separate slightly with a gap between them. Two short labels: under attention 'mixes across positions', under feed-forward 'one position at a time'. Hold."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s02",
+      "name": "what a weighted average is",
+      "figs": [
+        93
+      ],
+      "visual": "Clean board, two rows. Top row: three blue value tiles '10', '20', '30' on the left, an amber equation box on the right. Bottom row: the same three tiles, each with an amber weight chip beneath ('× 0.5', '× 0.3', '× 0.2'), and an amber equation box on the right. A horizontal number line from 10 to 30 runs along the bottom with a marker that shows where each average lands. The values never move; only weights and the marker change, which is the point of the scene.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Before attention, one small idea: the weighted average. Start with a plain one. Ten, twenty and thirty. Add them up, sixty. Divide by three, twenty. Each value counts equally.",
+          "show": "Header top-left: 'A plain average counts everything equally'. Tiles '10', '20', '30' pop in on 'Ten, twenty and thirty'. Amber box builds term by term: '(10 + 20 + 30)', then '= 60', then '/ 3 = 20'. Number line below, marker drops to 20."
+        },
+        {
+          "id": "b2",
+          "say": "Now let some count more than others. Give ten a weight of one half, twenty a weight of point three, and thirty a weight of point two.",
+          "show": "Second header: 'A weighted average lets some count more'. Copies of the three tiles slide down into the second row. On each spoken weight, an amber chip clicks in under its tile: '× 0.5', '× 0.3', '× 0.2'. Each tile's height scales with its weight, so '10' becomes the tallest."
+        },
+        {
+          "id": "b3",
+          "say": "Multiply each value by its weight. Ten times a half is five. Twenty times point three is six. Thirty times point two is six. Five plus six plus six is seventeen.",
+          "show": "Each product appears under its chip as it is spoken: '5', '6', '6', in amber. They fly into the second equation box, which builds '5 + 6 + 6 = 17'. The number-line marker slides from 20 to 17."
+        },
+        {
+          "id": "b4",
+          "say": "Notice the weights add up to exactly one. That keeps the answer inside the range of the values, somewhere between ten and thirty. And because ten counts for half, the answer is pulled down towards it.",
+          "show": "Small amber sum under the chips: '0.5 + 0.3 + 0.2 = 1'. The number line's span 10 to 30 brightens as a bracket labelled 'stays in range'. A short arrow on the line points from 20 towards 10, ending at 17."
+        },
+        {
+          "id": "b5",
+          "say": "Now change only the weights. Flip them to point two, point three and point five. Same three values, and the answer moves to twenty-three. The values never changed. Only how much each one counts.",
+          "show": "The chips animate to '× 0.2', '× 0.3', '× 0.5'; tiles resize, '30' now tallest. Equation box rebuilds '2 + 6 + 15 = 23'; marker slides from 17 to 23. The three value tiles pulse to show they are untouched."
+        },
+        {
+          "id": "b6",
+          "say": "That separation, between what the values are and how much each one counts, is exactly what attention does. Hold this one idea. Attention is nothing more than this, applied to a sequence of tokens.",
+          "show": "Two labels appear side by side: over the tiles 'what the values are', over the chips 'how much each counts'. A thin divider draws between them. Hold, then everything dims except the divider."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s03",
+      "name": "query, key and value",
+      "figs": [
+        92
+      ],
+      "visual": "Left third: one token pill 'cat' with its tall blue vector bar. Three grey-blue weight-matrix tiles labelled 'W Q', 'W K', 'W V' sit to its right. Three output vectors emerge on the right: 'Query', 'Key', 'Value', each a blue bar with a short role caption. Later the board re-composes into a small 5 by 5 score grid in the centre: rows are queries, columns are keys, both labelled by the five tokens 'the cat sat down it'. Upper-right triangle of the grid is dimmed. Colour: vectors blue, the score arithmetic amber.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Inside attention, each token's vector is multiplied by three different weight matrices. Out come three new vectors, each with its own job. Making them is called projecting, and the three results have names.",
+          "show": "The 'cat' vector bar sits left. On 'three different weight matrices', tiles 'W Q', 'W K', 'W V' slide in. The bar is copied three times and each copy passes through one tile, emerging on the right as three shorter bars. A small grey caption below: 'one vector, three projections'."
+        },
+        {
+          "id": "b2",
+          "say": "The query: what this token is looking for. The key: what it can offer to other tokens. The value: what it actually contributes when it is matched.",
+          "show": "Each output bar gets its label as spoken: 'Query' with caption 'what this token is looking for'; 'Key' with 'what it can offer'; 'Value' with 'what it contributes when matched'. Icons beside each: a magnifying glass for query, a key for key, a small parcel for value."
+        },
+        {
+          "id": "b3",
+          "say": "To compare one token's query with another token's key, multiply them pair by pair and add it all up. The same multiply and add from the very beginning. One number comes out, a score for how well they match.",
+          "show": "Zoom on a tiny worked example, centre: query '[1, 2, 0, -1]' above key '[0.5, 1, 3, 0]'. Pairs light in amber one by one: '0.5', '2', '0', '0', then sum '= 2.5'. A grey footnote: 'real ones are far longer'. The result '2.5' drops into a single amber cell labelled 'score'."
+        },
+        {
+          "id": "b4",
+          "say": "Do that for every query against every key, and you get a grid of similarity scores. One row for each token asking, one column for each token being asked.",
+          "show": "The score cell becomes the corner of a 5 by 5 grid in the centre. Row labels down the left: 'the', 'cat', 'sat', 'down', 'it' with a query icon; column labels across the top, same tokens, with a key icon. Cells fill in amber in a fast sweep, row by row."
+        },
+        {
+          "id": "b5",
+          "say": "One detail. A token only looks back, at itself and the tokens before it, never ahead. That rule gets its own name later.",
+          "show": "The upper-right triangle of the grid, above the diagonal, dims to grey. A small arrow under the bottom row points left, labelled 'looks back only'."
+        },
+        {
+          "id": "b6",
+          "say": "Those scores decide how the values are blended into an updated vector for each position. That is how context from one token reaches another.",
+          "show": "Below the grid, five blue value bars appear in a row. From the bottom row of the grid, thin amber lines run to the value bars and the bars pour into a single new blue bar labelled 'updated vector'. A tag: 'context reaches across'."
+        },
+        {
+          "id": "b7",
+          "say": "With five tokens, the grid is tiny. With thousands, it is enormous, and in the third episode of this series it becomes the central object. Three roles, all made from one vector.",
+          "show": "The 5 by 5 grid recedes as a vast faint grid expands behind it, thousands of cells across, edge fading off screen. Small label: 'thousands × thousands'. Then cut back to the three bars Query, Key, Value with the caption 'three roles from one vector'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s04",
+      "name": "attention in one sentence",
+      "figs": [
+        94
+      ],
+      "visual": "Headline across the top band: 'Attention is a weighted average of the other tokens'. Top-left: a blue token pill 'it' with a magnifying-glass query icon and the label 'this token asks'. Left column below: four token pills stacked vertically 'the', 'cat', 'sat', 'down', each with a key icon. To their right, horizontal amber bars drawn to scale, length proportional to weight, with numbers at the bar ends. Bottom centre: a blue box 'the blended result'. Same structure as the weighted-average scene, now with tokens.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now put the pieces together. Here is a short sentence, the cat sat down, and a new token arrives, the word it. Its query asks a question of the four tokens that came before.",
+          "show": "The four pills 'the', 'cat', 'sat', 'down' stack in the left column. On 'the word it', the 'it' pill drops in at top-left with the label 'this token asks'. A faint dashed line fans from 'it' to each of the four pills."
+        },
+        {
+          "id": "b2",
+          "say": "Its query is scored against each of their keys. Say the scores come out zero for the, two point five for cat, one point seven for sat, and zero for down.",
+          "show": "Beside each pill an amber score number appears in turn: 'the 0', 'cat 2.5', 'sat 1.7', 'down 0'. A grey corner tag: 'illustrative'. Tiny grey footnote under the column: 'its own score left out, for clarity'."
+        },
+        {
+          "id": "b3",
+          "say": "Softmax, the step from the very start that turns scores into shares, turns these into weights. Point oh five, point six two, point two eight, point oh five. Together, exactly one.",
+          "show": "A small 'softmax' label sweeps down the column. The scores morph into weights while amber bars grow to scale: '0.05' short, '0.62' long, '0.28' medium, '0.05' short. Under the bars: 'how much each earlier token counts'; a sum ticks up to 'adds to 1.00'."
+        },
+        {
+          "id": "b4",
+          "say": "Then the values of those four tokens are blended using those weights. Cat's value makes up sixty-two percent of the result. The word the, just five percent. Out comes a new vector for the word it, carrying mostly cat.",
+          "show": "A blue value bar appears beside each pill, its opacity set by its weight. They slide down and merge into the box 'the blended result' at bottom centre; the merged bar is tinted mostly with cat's colour stripe. Labels flash briefly on the bars: '62%' on cat, '5%' on the."
+        },
+        {
+          "id": "b5",
+          "say": "So query, key and value are three roles in one weighted average. The query asks. The keys decide the weights. The values are what gets averaged.",
+          "show": "Three role tags pin onto the picture as spoken: 'query asks' on the 'it' pill, 'keys decide the weights' on the bars, 'values get averaged' on the blended result box."
+        },
+        {
+          "id": "b6",
+          "say": "These particular weights are illustrative. What is not illustrative is that they always add to one. And the three names stop being mysterious: who is asking, how much each counts, and what is being averaged.",
+          "show": "'illustrative' tag brightens briefly; '1.00' sum glows white and holds. Bottom band: three words fade up in a row, 'who asks', 'how much', 'what is averaged'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s05",
+      "name": "what context means",
+      "figs": [
+        95
+      ],
+      "visual": "Top half: two rows of token pills, 'the river bank' and 'my savings bank', with the two 'bank' pills vertically aligned on the right. Bottom half, later: a long horizontal strip of many small token pills, the conversation so far, ending in a highlighted newest token on the right; a bracket over the strip marks the context window. The bracket slides right as new tokens arrive and the leftmost pills drop out and grey.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A token's meaning depends on what came before it. The word bank means one thing after river, and quite another after savings.",
+          "show": "Row one 'the river bank' fades in; a small water-wave icon above 'bank'. Row two 'my savings bank' fades in; a coin icon above its 'bank'. The two 'bank' pills are identical blue."
+        },
+        {
+          "id": "b2",
+          "say": "Attention is how that dependence is computed. Bank's query finds river's key, and river's value is blended into bank's vector. Same token, different neighbours, different result.",
+          "show": "In each row a curved thread draws from 'bank' back to 'river' and to 'savings'. The two 'bank' pills each gain a coloured stripe from their neighbour, so they now look different. Label between rows: 'same token, different result'."
+        },
+        {
+          "id": "b3",
+          "say": "Everything the model can see right now is called its context: the conversation so far, plus the newest token.",
+          "show": "Rows fade up and away. Bottom half: a long strip of small pills builds left to right. A wide blue bracket spans it labelled 'the conversation so far'; the rightmost pill glows and gets its own label 'the newest token'. Header: 'Context is everything the model can see right now'."
+        },
+        {
+          "id": "b4",
+          "say": "Context length is how many tokens the model can attend over. Beyond that limit, the earliest tokens fall out, and they can no longer influence anything at all.",
+          "show": "The bracket gets a fixed width and the label 'context length'. New pills arrive at the right; the bracket slides right with them, and the leftmost pills fall below the strip and turn grey, with a tag 'out of reach'."
+        },
+        {
+          "id": "b5",
+          "say": "Here is the part that matters later. Every token in the context has to be looked at for every new token produced. So a long conversation is not just a longer input. It is more work, for every single token.",
+          "show": "As each new pill arrives, thin amber threads fan from it back to every pill inside the bracket, all at once. A counter beside the newest pill reads 'looks at: 12', then on the next token '13', then '14'. The fan visibly grows with the strip."
+        },
+        {
+          "id": "b6",
+          "say": "Context length is not a storage limit. It is a recurring cost.",
+          "show": "Two lines centre: 'not a storage limit' greys and slides aside; 'a recurring cost' holds in white. The amber fan keeps pulsing faintly behind."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s06",
+      "name": "what a layer produces",
+      "figs": [
+        96
+      ],
+      "visual": "One wide blue panel 'One layer' across the middle with three stations left to right: 'vectors in', 'mix, then transform', 'vectors out'. Five vector bars of identical height enter on the left and five identical-height bars leave on the right, now with a brighter, richer texture. Then the panel turns 90 degrees into a vertical slab and copies into a short stack, the out-bars of one slab plugging into the next.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Step back and look at a whole layer from outside. In go vectors, one per token. Inside, attention mixes them, then the feed-forward step transforms each one. Out come vectors.",
+          "show": "Panel 'One layer' draws on. Five bars slide into station 'vectors in'. Station 'mix, then transform' lights: first blue threads cross between bars, then each bar passes through its own small box. Five bars exit at 'vectors out'."
+        },
+        {
+          "id": "b2",
+          "say": "Same count, same width. Five tokens in, five out, eight thousand one hundred and ninety-two numbers each. A layer never shortens or lengthens anything. It replaces each token's vector with a better one.",
+          "show": "Brackets measure both sides: '5 × 8,192' on the left, '5 × 8,192' on the right, ending with an '=' between them. The out-bars carry a richer texture than the in-bars. Label: 'same count, same width'."
+        },
+        {
+          "id": "b3",
+          "say": "Better means carrying more of what the surrounding text implies. The first layers pick up local patterns. Later ones work with what the earlier layers produced.",
+          "show": "A faint sentence of pills above the panel; on 'local patterns' a small bracket covers two neighbouring pills; on 'later ones' a larger bracket covers the whole sentence. Grey caption: 'more of what the text implies'."
+        },
+        {
+          "id": "b4",
+          "say": "And because what comes out has exactly the same shape as what goes in, layers can simply be stacked, the output of one plugged straight into the next.",
+          "show": "The panel rotates into a vertical slab; the out-bars on top line up with the in-slot of a second slab that slides on above it, then a third and a fourth. A small plug icon clicks at each join."
+        },
+        {
+          "id": "b5",
+          "say": "That shape-preserving property is what makes depth possible at all. Eighty layers is eighty rounds of the same kind of refinement.",
+          "show": "The stack fast-forwards to 80 slabs; a counter beside it runs 4 to 80. Label: 'shape in = shape out'. The bars travelling up the stack get gradually richer in texture."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s07",
+      "name": "the tempting picture, and what actually happens",
+      "figs": [
+        97,
+        98
+      ],
+      "visual": "Left half first: the tempting picture, drawn with dashed grey outlines. A horizontal chain 'embedding' to 'W_Q, W_K, W_V' to 'Q, K, V', then a vertical column of four small slabs 'layer 2', 'layer 3', 'layer 4', 'layer 5' with the Q, K, V pills carried upward through them unchanged. Then it is struck through in grey and slides aside. Right side: the actual picture, header 'Each layer owns its own three matrices': four wide blue layer rows stacked, each containing three tiles 'W_Q layer 1', 'W_K layer 1', 'W_V layer 1', and so on, each row's tiles a visibly different grid texture.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here is a picture that seems natural. The embedding gives each token a vector, once. Multiply it by W Q, W K and W V, once. Get a query, a key and a value, and carry those three up through every layer.",
+          "show": "Header: 'One natural picture: computed once, carried upward'. Dashed chain builds left to right: 'embedding', arrow, 'W_Q, W_K, W_V', arrow, 'Q, K, V'. On 'carry those three up', the Q, K, V pills float up through four stacked dashed slabs 'layer 2' to 'layer 5' without changing."
+        },
+        {
+          "id": "b2",
+          "say": "It is a reasonable reading. The weights are fixed after training, and the embedding is computed once. So why would you ever do the same multiplication twice?",
+          "show": "Two small ticks appear beside the chain: 'weights fixed after training', 'embedding computed once'. A question mark settles over the column of slabs."
+        },
+        {
+          "id": "b3",
+          "say": "That picture is worth stating plainly, because what you have seen so far could easily leave you with it. But it is not what happens. And the reason matters, because later it explains the shape of the cache formula.",
+          "show": "On 'not what happens', a grey line strikes through the whole dashed picture and it slides to the left edge, shrunk. A small grey tag stays with it: 'tempting, but wrong'."
+        },
+        {
+          "id": "b4",
+          "say": "Here is what actually happens. Each layer owns its own three matrices, and computes query, key and value afresh. Layer one has its own W Q, W K and W V. Layer two has a different set. So does layer three, and layer four.",
+          "show": "Header: 'Each layer owns its own three matrices'. Row 'layer 1' draws on with tiles 'W_Q layer 1', 'W_K layer 1', 'W_V layer 1'. Rows 'layer 2', 'layer 3', 'layer 4' stack on above it, each tile with a visibly different grid texture, appearing on each spoken layer."
+        },
+        {
+          "id": "b5",
+          "say": "Eighty layers means eighty separate query matrices, eighty key matrices and eighty value matrices. Two hundred and forty in all. Each learned independently in training, and all different from one another.",
+          "show": "The four rows compress and the stack extends to 80 rows; a counter on the right runs to '80 × 3 = 240'. Each tile shimmers with its own distinct texture to show no two match."
+        },
+        {
+          "id": "b6",
+          "say": "So the multiplication happens eighty times per token, not once. Each time against a different matrix, and a different input. Nothing is shared and nothing is reused. Layer forty's W K has nothing to do with layer thirty-nine's.",
+          "show": "A single token's vector climbs the stack; at each row a small amber flash marks a fresh multiply, an amber counter beside the stack running 1 to 80. Then the camera zooms to two adjacent rows labelled 'layer 39' and 'layer 40'; their W_K tiles sit side by side with a grey '≠' between them."
+        },
+        {
+          "id": "b7",
+          "say": "So keys and values are made inside every layer, from that layer's own input, never once at the bottom. Keep that in mind. Later it decides what can be saved and reused.",
+          "show": "Each of the 80 rows emits a tiny Q, K, V pill trio to its right at once, a column of 80 trios. Caption at the bottom: 'made in every layer, not once at the bottom'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s08",
+      "name": "the residual stream",
+      "figs": [
+        99
+      ],
+      "visual": "A broad vertical blue band, the residual stream, runs from the bottom of the frame to the top, centre. Label at its base: 'the residual stream: one vector per token, 8,192 numbers wide'. Three layer stations sit along it, 'layer 1', 'layer 2', 'layer 3'. At each station a side-loop branches right: three small pills Q, K, V are made, used, and then fade out; K and V pills alone drop into a small teal shelf at the far right labelled per layer. A plus sign marks where each layer's result rejoins the band. Header: 'One thing flows upward; three things are made fresh at every stop'.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So what does travel from layer to layer? One thing: a vector per token, eight thousand one hundred and ninety-two numbers wide. It is called the residual stream.",
+          "show": "The blue band draws upward from the bottom. Base label: 'the residual stream: one vector per token, 8,192 numbers wide'. Header fades in at top."
+        },
+        {
+          "id": "b2",
+          "say": "At each layer, the stream is read, and fresh query, key and value vectors are made from it. They are used inside that layer, and then discarded. They are not carried up.",
+          "show": "At station 'layer 1' a side-loop branches right; pills Q, K, V pop out, a quick amber flash between them, then Q fades to nothing. Label: 'layer 1 makes Q, K, V'. Same at 'layer 2' and 'layer 3' in quicker succession, each labelled 'layer N makes Q, K, V'."
+        },
+        {
+          "id": "b3",
+          "say": "What the layer works out is added back onto the stream. That adding back is where the name residual comes from. So the stream leaves every layer updated, and still exactly the same width.",
+          "show": "The side-loop's output arrow returns into the band at a '+' symbol. The band above each station brightens slightly. A width bracket on the band reads '8,192' below layer 1 and '8,192' above layer 3. Label near the top: 'the residual stream, updated'."
+        },
+        {
+          "id": "b4",
+          "say": "That constant width is why layers can simply be stacked, all the way up.",
+          "show": "The band extends upward off the top of frame; more stations ghost in above, suggesting 80. Width brackets repeat, all '8,192'."
+        },
+        {
+          "id": "b5",
+          "say": "Keys and values are the one partial exception. They are kept, but only for the cache, that running record the server keeps of everything it has already processed. And each layer keeps its own.",
+          "show": "Replay at the three stations: this time the K and V pills do not fade; they drop into a teal shelf at the far right, one shelf compartment per layer, labelled 'kept: layer 1', 'kept: layer 2', 'kept: layer 3'. Small tag on the shelf: 'the cache, explained later'."
+        },
+        {
+          "id": "b6",
+          "say": "The residual stream is the only thing that flows. Everything else is manufactured and consumed within a single layer.",
+          "show": "Everything except the blue band dims. The band pulses upward once from bottom to top. Caption: 'only the stream flows'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s09",
+      "name": "where the parameters live, and how many matrices",
+      "figs": [
+        104,
+        100
+      ],
+      "visual": "Centre: one layer panel exploded into its weight-matrix tiles, header 'Every layer is parameterised by weight matrices'. Top row, attention: 'query', 'key', 'value', 'combine'. Bottom row, feed-forward: 'feed-forward, first' and 'feed-forward, second', then a third tile 'feed-forward, gate' slides in. Tiles start neutral blue-grey. Second half: the panel becomes a ledger, header 'Counting the matrices in one model', with rows 'W_Q', 'W_K', 'W_V', 'W_O', each followed by a bar '80 of them, one per layer', a total row, then a feed-forward row. Tiles turn coral when the narration turns to reading them every token.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Let's open one layer and list every weight matrix inside it. Attention has four. Query, key, value, and one more, called combine, written W O.",
+          "show": "Header draws on. The layer panel splits open; four tiles fly out into the top row as named: 'query', 'key', 'value', 'combine'. Under 'combine', a small grey label 'W_O'."
+        },
+        {
+          "id": "b2",
+          "say": "Combine takes the blended result that comes out of attention and turns it into the update that is added back onto the residual stream.",
+          "show": "A small blended-result bar flows into 'combine' and out the other side, then along a short arrow into a slice of the blue residual band at the panel's edge, with a '+' at the join."
+        },
+        {
+          "id": "b3",
+          "say": "The feed-forward network, in its classic form, has two. One widens each token's vector, and one narrows it back. That makes six matrices per layer.",
+          "show": "Bottom row: 'feed-forward, first' appears with a bar that widens as it passes through; 'feed-forward, second' with a bar that narrows back. Counter at right: '6 per layer', with grey tag 'classic design'."
+        },
+        {
+          "id": "b4",
+          "say": "Our model's feed-forward has one extra, a gate. It is a second widening matrix that decides how much of each widened number gets through. So here it is seven per layer. Four for attention, three for feed-forward.",
+          "show": "A third tile 'feed-forward, gate' slides in beside 'first'; a small valve icon on it. Counter changes '6' to '7 per layer', and two group brackets appear: '4 attention', '3 feed-forward'."
+        },
+        {
+          "id": "b5",
+          "say": "Now count across the whole model. Eighty W Q, one per layer. Eighty W K. Eighty W V. Eighty W O. Three hundred and twenty attention weight matrices.",
+          "show": "Ledger: header 'Counting the matrices in one model'. Rows 'W_Q', 'W_K', 'W_V', 'W_O' appear in turn, each with a bar '80 of them, one per layer' that fills with 80 tiny tiles. Total row: '320 attention weight matrices'."
+        },
+        {
+          "id": "b6",
+          "say": "Plus three feed-forward matrices in every layer, another two hundred and forty. Five hundred and sixty in all, and not one of them is shared between layers.",
+          "show": "Row 'feed-forward' appears: '3 × 80 = 240'. Grand total below, counter running to '560'. Grey tag: 'none shared'."
+        },
+        {
+          "id": "b7",
+          "say": "That is why a model's parameter count grows in direct proportion to its depth. And it is why reading the weights once per token means reading all five hundred and sixty of these, every token.",
+          "show": "All 560 tiny tiles turn coral and stream in a single file down a pipe at the bottom of frame, a counter beside the pipe labelled 'per token'. Grey label: 'parameters grow with depth'."
+        },
+        {
+          "id": "b8",
+          "say": "Eighty layers is not eighty repetitions of the same work. It is eighty different sets of weights to fetch.",
+          "show": "The 80 layer groups lay out as 80 distinct coral blocks, each a slightly different texture. Caption: '80 different sets of weights to fetch'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s10",
+      "name": "sizing one layer",
+      "figs": [
+        101
+      ],
+      "visual": "Left two thirds: the seven matrices of one layer drawn as rectangles to scale, width by height in their real shapes: two 8,192 by 8,192 squares (W_Q, W_O), two thin 8,192 by 1,024 strips (W_K, W_V), and three long 8,192 by 28,672 rectangles (gate, first, second). Right third: a running ledger card with amber numbers, header 'Add it up'. A small key in the corner: 'shapes from a published 70B model (Llama 3 70B)'. Numbers are amber arithmetic; tiles blue-grey.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now the strongest evidence that every layer really has its own matrices. Add up their sizes, using the shapes of a published seventy-billion-parameter model, and check the total against the advertised size.",
+          "show": "Header 'Add it up and check against the advertised size'. Corner key fades in: 'shapes from a published 70B model (Llama 3 70B)'. Empty ledger card on the right."
+        },
+        {
+          "id": "b2",
+          "say": "A matrix holds rows times columns of weights. W Q takes the stream's eight thousand one hundred and ninety-two numbers and gives back a query just as wide. Eight thousand one hundred and ninety-two squared is sixty-seven point one million weights.",
+          "show": "A square tile 'W_Q' draws on with edge labels '8,192' and '8,192'. An amber equation builds: '8,192 × 8,192 = 67.1 M'. Ledger line: 'W_Q 67.1 M'."
+        },
+        {
+          "id": "b3",
+          "say": "The key and value matrices are smaller. Here is why. Attention runs as sixty-four small attentions side by side, called heads, each a hundred and twenty-eight numbers wide. Sixty-four times a hundred and twenty-eight is eight thousand one hundred and ninety-two.",
+          "show": "The W_Q square slices into 64 thin vertical strips, each labelled faintly; a bracket on one strip reads '128'. Amber equation: '64 heads × 128 = 8,192'."
+        },
+        {
+          "id": "b4",
+          "say": "Every head gets its own query. But this model shares keys and values: only eight key heads and eight value heads, each serving a group of eight query heads. So a key is eight times a hundred and twenty-eight, one thousand and twenty-four numbers.",
+          "show": "Beside the 64 query strips, only 8 teal key strips appear; brackets group the query strips into 8 groups of 8, each group pointing to one key strip. Label: 'shared keys and values'. Amber: '8 × 128 = 1,024'."
+        },
+        {
+          "id": "b5",
+          "say": "So W K is eight thousand one hundred and ninety-two by one thousand and twenty-four, about eight point four million weights. W V is the same. Why that sharing pays off comes back with the cache.",
+          "show": "Two thin strips 'W_K' and 'W_V' draw on, each '8,192 × 1,024 = 8.4 M', visibly an eighth the width of W_Q. Ledger lines: 'W_K 8.4 M', 'W_V 8.4 M'. Teal tag on the pair: 'saving, explained later'."
+        },
+        {
+          "id": "b6",
+          "say": "Combine, W O, takes the sixty-four heads' results laid side by side, eight thousand one hundred and ninety-two numbers again, and maps them back into the stream. Square again, sixty-seven point one million. Attention, per layer: a hundred and fifty-one million.",
+          "show": "Square tile 'W_O' draws on, '8,192 × 8,192 = 67.1 M'. Ledger sums: '67.1 + 8.4 + 8.4 + 67.1', resolving to ledger row 'attention, per layer 151.0 M'."
+        },
+        {
+          "id": "b7",
+          "say": "The feed-forward widens each vector to twenty-eight thousand six hundred and seventy-two numbers. So each of its three matrices is eight thousand one hundred and ninety-two by that: two hundred and thirty-four point nine million weights.",
+          "show": "Three long rectangles 'gate', 'first', 'second' unroll one after another, each edge-labelled '8,192' and '28,672'. Amber equation on the first: '8,192 × 28,672 = 234.9 M'; the other two copy the label."
+        },
+        {
+          "id": "b8",
+          "say": "Three of them make seven hundred and four point six million, far more than attention's hundred and fifty-one.",
+          "show": "The three rectangles group under a bracket, '3 × 234.9 M = 704.6 M'. Beside them the attention tiles look small; the ledger gains row 'feed-forward, per layer 704.6 M'."
+        },
+        {
+          "id": "b9",
+          "say": "One layer: eight hundred and fifty-five point six million parameters. Notice that about eighty-two percent of it sits in the feed-forward. Times eighty layers, sixty-eight point five billion.",
+          "show": "Ledger row 'one layer 855.6 M'. A thin proportional bar under it splits '17.6% attention' and '82.4% feed-forward'. Then 'x 80 layers' and the counter runs to '68.5 B'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s11",
+      "name": "the parameter count settles it",
+      "figs": [
+        101
+      ],
+      "visual": "The ledger card from the previous scene, now centred and large, header 'The parameter count settles it'. Rows: 'attention, per layer 151.0 M', 'feed-forward, per layer 704.6 M', 'one layer 855.6 M', 'x 80 layers 68.5 B', then new rows 'plus embedding and output head 2.1 B', a rule, 'total 70.6 B' and beside it a grey stamp 'advertised: 70 B'. Then a second, ghosted ledger slides in to the right for the what-if: Q, K, V counted once.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Then the two vocabulary tables. The embedding table you met earlier, about a hundred and twenty-eight thousand rows of eight thousand one hundred and ninety-two numbers, holds one point oh five billion weights.",
+          "show": "A tall thin blue table slides in at the ledger's left, labelled 'embedding 128,256 × 8,192', with the amber result '1.05 B'."
+        },
+        {
+          "id": "b2",
+          "say": "The output head at the far end, which turns the final vector back into scores, is the same size again. Together, two point one billion.",
+          "show": "A second identical table 'output head 128,256 × 8,192', '1.05 B', slides in beside the first. The two merge into ledger row 'plus embedding and output head 2.1 B'."
+        },
+        {
+          "id": "b3",
+          "say": "Total: seventy point six billion. Advertised: seventy billion. It lands, to within rounding.",
+          "show": "Rule draws under the rows; 'total' counter runs to '70.6 B'. Grey stamp 'advertised: 70 B' presses in beside it. A small tick mark appears between them."
+        },
+        {
+          "id": "b4",
+          "say": "Now redo the sum, assuming W Q, W K and W V exist only once for the whole model, instead of once per layer.",
+          "show": "A second ledger, dashed grey, slides in to the right titled 'if Q, K, V existed only once'. Its attention line shows W_Q, W_K, W_V struck to '× 1' while W_O and feed-forward stay '× 80'."
+        },
+        {
+          "id": "b5",
+          "say": "You get sixty-three point nine billion. The model would be more than six billion parameters short of what it is.",
+          "show": "Dashed ledger total runs to '63.9 B'. A grey gap bar between '63.9 B' and '70 B' labelled 'more than 6 B missing'."
+        },
+        {
+          "id": "b6",
+          "say": "So the per-layer answer is not a design opinion. It is the only version that adds up. The arithmetic is the evidence: the count only works if every layer has its own three matrices.",
+          "show": "Dashed ledger fades out. The real ledger's '70.6 B' and 'advertised: 70 B' hold. Caption: 'only per-layer matrices add up'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s12",
+      "name": "why stack so many layers",
+      "figs": [
+        102
+      ],
+      "visual": "Right half: a tall ladder of 80 thin blue slabs, bottom to top, with four markers at slabs 1, 10, 40 and 80. Left half: a short passage of faint token pills (three short lines of text pills) with one highlighted token in the middle; a blue reach-bracket around that token widens at each marker. Each marker's text label sits in grey italic and carries a small grey tag 'intuition'. Header: 'Depth, one layer at a time'. At the end, a coral byte counter at the foot of the ladder.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So depth is expensive. Why stack so many layers? Here is a rough picture of what depth buys, one layer at a time.",
+          "show": "Header draws on. The 80-slab ladder builds upward quickly. The passage of pills fades in on the left with one highlighted token near the middle."
+        },
+        {
+          "id": "b2",
+          "say": "After one layer, a token knows its neighbours. After ten, it knows the phrase it sits in. After forty, the sentence. After eighty, it can carry the whole passage.",
+          "show": "Markers light in turn with labels: 'after 1 layer: a token knows its neighbours', 'after 10: the phrase it sits in', 'after 40: the sentence', 'after 80: the whole passage'. On each, the reach-bracket around the highlighted token widens: two neighbours, a phrase, the sentence, all three lines."
+        },
+        {
+          "id": "b3",
+          "say": "That is intuition, not measurement. Nobody can point at layer forty and read off what it knows. What is certain is that each layer can only build on what the layer below it produced.",
+          "show": "The four labels turn grey italic and a tag 'intuition, not measurement' appears beside them. A pointer hovers over slab 40 with a grey question mark. Then small upward arrows draw between consecutive slabs: 'builds on the one below'."
+        },
+        {
+          "id": "b4",
+          "say": "And the cost is exact. It is linear in depth. Eighty layers means eighty times the weights, and eighty times the reading, for every single token.",
+          "show": "Labels dim. Each slab turns coral from bottom to top as a counter runs '× 1' to '× 80'. Label at the side, white: 'cost is linear in depth'."
+        },
+        {
+          "id": "b5",
+          "say": "Eighty layers of eight hundred and fifty-five point six million weights is sixty-eight point five billion. At two bytes each, that is about a hundred and thirty-seven gigabytes.",
+          "show": "Amber equation beside the ladder: '80 × 855.6 M = 68.5 B'. Then in coral: '× 2 bytes = 136.9 GB'."
+        },
+        {
+          "id": "b6",
+          "say": "That is nearly all of the roughly hundred and forty gigabytes read for every token. And that part is exact: every byte count from here on depends on it.",
+          "show": "A coral bar fills to 136.9 against a faint outline marked '≈ 140 GB per token'. Caption: 'exact, and the byte count depends on it'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s13",
+      "name": "back to words: one forward pass",
+      "figs": [
+        103,
+        104
+      ],
+      "visual": "Left to right across the frame: 'final vector' (a tall blue bar at the top of the layer stack, last position only), then a large coral output-head matrix, then a long amber strip of scores 'score every token', then a softmax share chart, then one token pill 'pick one'. Under the three stations, small grey sizes: '8,192 numbers', 'about 128,000 numbers', '1 token'. A loop arrow then runs from the picked token back to the input row at the bottom left and up through the stack, closing the circle. Header: 'The last step: from a vector to a word'. Ends on the per-layer roster of seven matrix tiles beside the 80-slab stack.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "One last step. What comes out of the top layer is still not words. It is one vector per token, each eight thousand one hundred and ninety-two numbers. To choose the next token, only one is needed: the vector at the last position.",
+          "show": "The 80-slab stack sits on the left with five token columns rising out of the top. On 'only one is needed', four columns dim and the last one, above 'it', brightens and slides right to become 'final vector', small label '8,192 numbers'."
+        },
+        {
+          "id": "b2",
+          "say": "That vector is multiplied by one more matrix, the vocabulary projection, also called the output head. It has one row for every token in the vocabulary, so out comes a score for every one of them, about a hundred and twenty-eight thousand numbers.",
+          "show": "A tall coral matrix 'output head' draws on, rows labelled down its side '0, 1, 2, … 128,255'. The final vector sweeps across every row and a long amber strip 'score every token' fills, label 'about 128,000 numbers'."
+        },
+        {
+          "id": "b3",
+          "say": "It is the output projection you met earlier, the one that has to read every row, for every token. Then softmax turns the scores into shares, and one token is drawn.",
+          "show": "A coral tag on the matrix: 'every row, every token'. The amber strip collapses into a few share bars, one tall, the rest tiny, and a single token pill drops out: 'pick one', label '1 token'."
+        },
+        {
+          "id": "b4",
+          "say": "That token is appended to the input, and the entire eighty-layer journey begins again for the next one. Embedding lookup, eighty layers, output head, pick one. That whole journey is one forward pass.",
+          "show": "The picked pill flies along a loop arrow back to the end of the input row at bottom left. As each stage is named, it lights in sequence around the loop: 'embedding lookup', the stack '80 layers', 'output head', 'pick one'. The whole loop is labelled 'one forward pass'."
+        },
+        {
+          "id": "b5",
+          "say": "That closes the loop from the very start. Everything between the first embedding lookup and this pick is arithmetic on arrays of numbers.",
+          "show": "The loop runs once more, faster. A bracket spans from 'embedding lookup' to 'pick one' labelled 'arithmetic on arrays of numbers'."
+        },
+        {
+          "id": "b6",
+          "say": "Every layer is parameterised by weight matrices. Seven per layer here, six in the classic design, times sixty to a hundred layers in today's large models. These weights are what the model learned in training. They are the model.",
+          "show": "The loop fades; the stack moves to centre. Beside it, the seven tiles of one layer reappear: 'query', 'key', 'value', 'combine', 'feed-forward, first', 'feed-forward, gate', 'feed-forward, second', with a grey '6 classic, 7 here'. Label: 'times 60 to 100 layers'. Then a white caption: 'the weights are the model'."
+        },
+        {
+          "id": "b7",
+          "say": "How many of these matrices there are, and how big each one is, is the number everything else divides by, or multiplies against.",
+          "show": "The seven tiles and the stack collapse into a single amber-outlined number '70.6 B parameters'. It turns coral and settles as the numerator of a fraction bar with a blank denominator, a '×' slot waiting beside it. Hold."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "plain average (10 + 20 + 30) / 3 = 20",
+      "python": "(10+20+30)/3",
+      "result": "20.0"
+    },
+    {
+      "claim": "weighted average 10×0.5 + 20×0.3 + 30×0.2 = 5 + 6 + 6 = 17",
+      "python": "10*0.5+20*0.3+30*0.2",
+      "result": "17.0"
+    },
+    {
+      "claim": "the weights 0.5 + 0.3 + 0.2 add to 1",
+      "python": "0.5+0.3+0.2",
+      "result": "1.0"
+    },
+    {
+      "claim": "added example: flipped weights 0.2, 0.3, 0.5 on the same values give 2 + 6 + 15 = 23",
+      "python": "10*0.2+20*0.3+30*0.5",
+      "result": "23.0"
+    },
+    {
+      "claim": "added example: dot product [1,2,0,-1]·[0.5,1,3,0] = 0.5 + 2 + 0 + 0 = 2.5",
+      "python": "sum(a*b for a,b in zip([1,2,0,-1],[0.5,1,3,0]))",
+      "result": "2.5"
+    },
+    {
+      "claim": "added example (illustrative scores chosen to reproduce the atlas's illustrative weights): softmax of scores 0, 2.5, 1.7, 0 gives 0.05, 0.62, 0.28, 0.05",
+      "python": "import math; s=[0,2.5,1.7,0]; e=[math.exp(x) for x in s]; t=sum(e); print([round(x/t,3) for x in e])",
+      "result": "[0.051, 0.62, 0.278, 0.051]"
+    },
+    {
+      "claim": "fig 94 attention weights 0.05 + 0.62 + 0.28 + 0.05 = 1.00",
+      "python": "round(0.05+0.62+0.28+0.05,2)",
+      "result": "1.0"
+    },
+    {
+      "claim": "cat's weight 0.62 = 62 percent, the's weight 0.05 = 5 percent",
+      "python": "print(0.62*100, 0.05*100)",
+      "result": "62.0 5.0"
+    },
+    {
+      "claim": "80 layers × 3 (W_Q, W_K, W_V) = 240 matrices",
+      "python": "80*3",
+      "result": "240"
+    },
+    {
+      "claim": "4 attention matrices × 80 layers = 320; 3 feed-forward × 80 = 240; total 560",
+      "python": "print(4*80, 3*80, 4*80+3*80)",
+      "result": "320 240 560"
+    },
+    {
+      "claim": "64 query heads × 128 = 8,192 (the residual width)",
+      "python": "64*128",
+      "result": "8192"
+    },
+    {
+      "claim": "8 KV heads × 128 = 1,024; each KV head serves 64 / 8 = 8 query heads",
+      "python": "print(8*128, 64//8)",
+      "result": "1024 8"
+    },
+    {
+      "claim": "W_Q (and W_O) 8,192 × 8,192 = 67,108,864 = 67.1 M",
+      "python": "8192*8192",
+      "result": "67108864"
+    },
+    {
+      "claim": "W_K (and W_V) 8,192 × 1,024 = 8,388,608 = 8.4 M",
+      "python": "8192*1024",
+      "result": "8388608"
+    },
+    {
+      "claim": "attention per layer 67.1 + 8.4 + 8.4 + 67.1 = 151.0 M (exact 150,994,944)",
+      "python": "2*8192*8192+2*8192*1024",
+      "result": "150994944"
+    },
+    {
+      "claim": "one feed-forward matrix 8,192 × 28,672 = 234.9 M",
+      "python": "8192*28672",
+      "result": "234881024"
+    },
+    {
+      "claim": "feed-forward per layer, three matrices (gate, up, down) = 704.6 M",
+      "python": "3*8192*28672",
+      "result": "704643072"
+    },
+    {
+      "claim": "one layer 151.0 M + 704.6 M = 855.6 M",
+      "python": "2*8192*8192+2*8192*1024+3*8192*28672",
+      "result": "855638016"
+    },
+    {
+      "claim": "added: share of one layer that is feed-forward 82.4%, attention 17.6%",
+      "python": "print(704643072/855638016*100, 150994944/855638016*100)",
+      "result": "82.35294117647058 17.647058823529413"
+    },
+    {
+      "claim": "80 layers × 855.6 M = 68.5 B",
+      "python": "80*855638016",
+      "result": "68451041280"
+    },
+    {
+      "claim": "embedding table 128,256 × 8,192 = 1.05 B parameters; embedding + untied output head = 2.1 B (matches the chapter-notes correction: table is 2.10 GB in 16-bit)",
+      "python": "print(128256*8192, 2*128256*8192, 128256*8192*2/1e9)",
+      "result": "1050673152 2101346304 2.101346304"
+    },
+    {
+      "claim": "total 68.45 B + 2.10 B = 70.6 B against an advertised 70 B",
+      "python": "(80*855638016+2*128256*8192)/1e9",
+      "result": "70.552387584"
+    },
+    {
+      "claim": "what-if: W_Q, W_K, W_V once for the whole model gives 63.9 B; short by 6.6 B against our total and 6.1 B against the advertised 70 B, so 'more than six billion short'",
+      "python": "q=8192*8192;k=8192*1024;o=8192*8192;f=3*8192*28672;e=2*128256*8192;tot=80*(q+2*k+o+f)+e;alt=80*(o+f)+(q+2*k)+e;print(alt/1e9,(tot-alt)/1e9,70-alt/1e9)",
+      "result": "63.925387264 6.62700032 6.074612735999999"
+    },
+    {
+      "claim": "added: the 80 layers' weights in 16-bit, 68.45 B × 2 bytes = 136.9 GB, of the roughly 140 GB per token",
+      "python": "80*855638016*2/1e9",
+      "result": "136.90208256"
+    },
+    {
+      "claim": "context: the film's 140 GB is 70 B × 2 bytes; the full 70.55 B count × 2 is 141.1 GB, so '137 of roughly 140' is honest",
+      "python": "print(70e9*2/1e9, 70552387584*2/1e9)",
+      "result": "140.0 141.104775168"
+    },
+    {
+      "claim": "CORRECTION fig 103: atlas labels the final vector '4,096 numbers' (an 8B model's width); the film uses the 70B residual width 8,192 throughout, consistent with fig 99 and the chapter notes. Scores: 128,256 rows, said as 'about 128,000'",
+      "python": "print(64*128, 128256)",
+      "result": "8192 128256"
+    },
+    {
+      "claim": "RECONCILED fig 104 vs fig 100: fig 104 draws six matrices per layer (classic two-matrix feed-forward) while fig 100 counts 4 + 3 = 7 per layer (Llama's gated feed-forward: gate, up, down). The film says 'seven here, six in the classic design'; 7 × 80 = 560 matches fig 100",
+      "python": "print(6*80, 7*80)",
+      "result": "480 560"
+    },
+    {
+      "claim": "residual width check: 5 tokens × 8,192 in = 5 × 8,192 out",
+      "python": "5*8192",
+      "result": "40960"
+    }
+  ]
+}

@@ -1,0 +1,605 @@
+{
+  "chapter": "ch11",
+  "title": "Arithmetic intensity and the roofline",
+  "kicker": "11 · Arithmetic intensity and the roofline",
+  "figs": [
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127
+  ],
+  "scenes": [
+    {
+      "id": "ch11_s01",
+      "name": "the slowest step sets the pace",
+      "figs": [
+        119
+      ],
+      "visual": "Dark canvas in two bands. Top band (y 110 to 470): a laundry line on a conveyor, three blue station cards 320 x 190 at x centres 480, 960 and 1440: a washing-machine icon 'wash · 30 min', a tumble-dryer icon 'dry · 60 min', a folded-shirt icon 'fold · 10 min'. Blue laundry-basket pills ride the conveyor at y 430. Top right: a counter 'finished loads' with a small clock tag under it. Bottom band (y 560 to 1000), from b5: the chip as a two-station line, a coral station 'memory' with an HBM-stack icon at x 520, a pipe carrying coral byte particles to the right, and an amber station 'arithmetic' with a chip icon at x 1400. The idea the motion makes visible: when stations work at the same time on different items, only the slowest one sets the pace, and a chip making a token is a line with just two stations. The laundry line never clears: from b5 it shrinks to a 40% thumbnail strip along the top, and it returns in ch11_s10.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Start somewhere ordinary, a laundry. Three stations in a row. Washing takes thirty minutes a load, drying takes an hour, and folding takes ten minutes. With several loads on the go, every station is busy at once, each with a different load.",
+          "show": "Top band builds on the spoken words: on 'washing' the wash card pops in with '30 min', on 'drying' the dry card with '60 min', on 'folding' the fold card with '10 min'. On 'several loads on the go', four blue basket pills enter from the left so that every station holds one at the same moment; each icon animates at once (drum spins, heat shimmer, shirt folds)."
+        },
+        {
+          "id": "b2",
+          "say": "How often does a finished load come out? Once an hour. Every load has to spend its hour in the dryer, however quick the rest is. The slowest step sets the pace, and that step has a name. The bottleneck.",
+          "show": "The conveyor runs in compressed time. Baskets queue in front of the dryer; the wash and fold cards show small grey hourglasses between loads. On 'once an hour', the counter ticks to 1 and the clock tag reads 'one every 60 min'. On 'the bottleneck', the dryer card's outline turns coral and a white tag drops onto it: 'slow step: bottleneck'."
+        },
+        {
+          "id": "b3",
+          "say": "Now buy a washer that's twice as fast. Still one load an hour. Learn to fold twice as fast. Still one an hour. Speeding up either fast step changes nothing at all.",
+          "show": "On 'twice as fast', the wash tag flips '30 min' to '15 min' with a teal flash; the washer now idles longer, but the counter still ticks once per dryer cycle and the clock tag stays 'one every 60 min'. On 'fold twice as fast', the fold tag flips '10 min' to '5 min', teal flash, same result. On 'nothing at all', a grey tag under each fast card: 'fast step: no change'."
+        },
+        {
+          "id": "b4",
+          "say": "Speed up the dryer instead, from sixty minutes to forty, and a load comes out every forty minutes. Only the slow step sets the pace, and improving it is the only change that helps.",
+          "show": "Wash and fold tags revert to '30 min' and '10 min'; the 'fast step: no change' tags fade. On 'from sixty minutes to forty', the dryer tag flips '60 min' to '40 min' with a teal flash, its queue shortens, the counter visibly speeds up and the clock tag turns teal: 'one every 40 min'. The 'slow step: bottleneck' tag stays on the dryer, which is still the slowest."
+        },
+        {
+          "id": "b5",
+          "say": "A chip making a token is the same kind of line, with two stations working at the same time. The memory delivers bytes, and the arithmetic units do operations on them, while the next bytes are already on their way. So everything on this chip has two possible bottlenecks. The arithmetic, or the memory.",
+          "show": "The laundry band shrinks to a thumbnail strip along the top at 40% opacity. On 'the memory delivers bytes', the coral 'memory' station with its HBM-stack icon appears at bottom left; on 'the arithmetic units do operations', the amber 'arithmetic' station with a chip icon appears at bottom right; a pipe draws between them. Coral particles stream along the pipe while amber sparks fire at the arithmetic station, both moving at once on successive chunks. On 'two possible bottlenecks', a white label above the pipe: 'two possible bottlenecks'."
+        },
+        {
+          "id": "b6",
+          "say": "A workload is described as bound by whichever it runs out of first. Memory bound means the arithmetic units sit idle, waiting for data. Compute bound is the reverse. The arithmetic is flat out, and the memory has capacity to spare.",
+          "show": "On 'memory bound', the particle stream thins to a trickle, the amber station greys out with an hourglass icon, and a coral label appears under the pipe: 'memory bound: arithmetic idle'. On 'compute bound', the stream turns steady with visible unused width in the pipe drawn as a dotted outline, the amber station glows with a small gauge at '100%', and the label swaps to an amber 'compute bound: memory has spare capacity'."
+        },
+        {
+          "id": "b7",
+          "say": "You've already met a memory-bound case. One token on an H one hundred: about forty-two milliseconds of memory traffic, and about zero point one four milliseconds of arithmetic. Make the arithmetic twice as fast, and the token still takes forty-two milliseconds. The arithmetic was never the slow step.",
+          "show": "The pipe dims to 30%. Two lanes draw under it on one time axis from 0 to 45 ms, grey tag 'one token, H100': a coral lane '41.8 ms memory' spanning almost the full width, and an amber sliver '0.14 ms arithmetic' at the far left. A teal 'token done' marker stands at 41.8 ms. On 'twice as fast', the amber sliver halves and its label changes to '0.07 ms'; the 'token done' marker does not move. Coral tag on the lane: 'memory bound'."
+        },
+        {
+          "id": "b8",
+          "say": "Both kinds of bound are wasteful. They just waste different things. A memory-bound workload wastes arithmetic. In that token, the arithmetic units were busy about a third of one percent of the time. A compute-bound workload wastes bandwidth.",
+          "show": "On 'a third of one percent', a small amber readout beside the sliver: 'busy 0.34%'. Then two tags side by side below the lanes: on 'wastes arithmetic', a greyed amber chip icon with 'memory bound wastes arithmetic'; on 'wastes bandwidth', a half-empty coral pipe icon with 'compute bound wastes bandwidth'."
+        },
+        {
+          "id": "b9",
+          "say": "These two words get used constantly and are rarely defined. Now they are. And whichever limit is lower is the one that binds, so a workload is bound by one or the other, not both. That is what gives the picture you're about to build two regions, with a single corner where the two limits tie.",
+          "show": "Lanes and tags fade. The words 'memory bound' in coral and 'compute bound' in amber slide to the centre, side by side, separated by one white vertical divider. On 'a single corner where the two limits tie', a small white dot lights at the top of the divider and holds, a preview of the ridge."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s02",
+      "name": "operations per byte",
+      "figs": [
+        120
+      ],
+      "visual": "Centre top: a formula card that builds term by term, 'arithmetic intensity = operations performed ÷ bytes moved', with 'operations performed' in amber and 'bytes moved' in coral. Below it, two horizontal lanes, each a short pipe from a coral HBM-stack icon at left to an amber workbench at right: the top lane 'high intensity', the bottom lane 'low intensity'. A byte is a coral cube; an operation is an amber spark with a tally. From b5 the lanes dim and a worked example for decode builds in the centre from three blue cards. Idea: the same byte can pay for a lot of arithmetic or almost none, and the ratio is known from the shapes before anything runs.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "So which bottleneck will a workload hit? You could run it and measure. But there is a way to know in advance, with one ratio. Take the operations a workload performs, and divide them by the bytes it moves.",
+          "show": "On 'run it and measure', a stopwatch icon appears at the right edge; on 'know in advance', a grey stroke crosses it out. On 'the operations a workload performs', the amber term 'operations performed' types in at centre top; on 'divide them by the bytes', a fraction bar draws and the coral term 'bytes moved' drops beneath it."
+        },
+        {
+          "id": "b2",
+          "say": "That ratio is called arithmetic intensity. In plain words, it's how much work the chip gets out of each byte it drags in from off-chip memory. Check the units. Operations over bytes. Operations per byte.",
+          "show": "On 'arithmetic intensity', the label 'arithmetic intensity =' slides in to the left of the fraction, completing the formula card. On 'drags in', one coral cube travels from a small HBM icon to a small chip icon under the card. On 'check the units', a grey line builds beneath the card: 'operations ÷ bytes = operations per byte'."
+        },
+        {
+          "id": "b3",
+          "say": "High intensity means each byte, once it arrives, is reused many times. One trip across the bus pays for a lot of arithmetic.",
+          "show": "Top lane 'high intensity' lights up: one coral cube arrives at the amber workbench and stays while amber sparks fire again and again; a tally beside it counts 1 to 8 before the next cube arrives. Grey tag: 'reuses each byte many times'."
+        },
+        {
+          "id": "b4",
+          "say": "Low intensity means the chip loads a byte, does almost nothing with it, and needs another. The arithmetic units spend their time waiting at the door.",
+          "show": "Bottom lane 'low intensity' lights up: coral cubes arrive one after another; each one makes a single amber spark and is dropped, and between cubes the workbench shows an hourglass. Grey tag: 'loads a byte, does almost nothing'. On 'waiting at the door', the hourglass pulses."
+        },
+        {
+          "id": "b5",
+          "say": "You already know one workload's intensity. One step of decode on our model, making one token. A hundred and forty billion operations, divided by a hundred and forty gigabytes, which is a hundred and forty billion bytes. One operation per byte. Very low indeed.",
+          "show": "Both lanes dim to 30%. In the centre a worked fraction builds on the spoken numbers: amber '140 billion operations' on top, coral '140 billion bytes' beneath with a small grey note '= 140 GB', then '= 1 operation per byte'. A blue tag at its left: 'decode, one token'. On 'very low indeed', the bottom 'low intensity' lane brightens for a moment: decode belongs there."
+        },
+        {
+          "id": "b6",
+          "say": "And notice what that took. A parameter count, two operations per weight, and two bytes per weight. Nothing was run, and nothing was timed. The intensity came from the shapes of the problem alone.",
+          "show": "Three blue cards slide out above the fraction on the spoken words: '70 billion parameters', '× 2 operations each', '× 2 bytes each'. A thin amber line links '× 2 operations each' to the numerator and a coral line links '× 2 bytes each' to the denominator. On 'nothing was run', the crossed-out stopwatch reappears beside them. On 'shapes of the problem alone', a white tag: 'from the shapes alone'."
+        },
+        {
+          "id": "b7",
+          "say": "That's the point of the metric. Compare it with one number from the chip, and it tells you which resource a workload will exhaust, before you run anything. You'll derive that number in a few minutes. One ratio, and the single most useful number in this whole story.",
+          "show": "The worked example fades; the formula card moves to the centre and enlarges. On 'one number from the chip', a dashed empty box appears to its right holding a white question mark, labelled 'the chip's number'. On 'single most useful number', a teal underline sweeps beneath the formula card and it takes a soft teal glow."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s03",
+      "name": "a scale where small things survive",
+      "figs": [
+        121
+      ],
+      "visual": "Two horizontal lanes across the width, each from x 210 to x 1710, so 1,500 px long. Top lane, at y 330: an ordinary linear axis, title 'ordinary scale'. Bottom lane, at y 760: a logarithmic axis, title 'log scale', with ticks 1, 10, 100, 1,000 and 10,000 every 375 px. Four blue quantities, 1, 3, 30 and 300, appear as bars in the top lane and as markers in the bottom lane. Top lane scale, first with 300 filling the lane: 5 px per unit, so bars of 5, 15, 150 and 1,500 px. Then with the lane stretched to 10,000: 0.15, 0.45, 4.5 and 45 px. Bottom lane positions measured from its left end: 0, 179, 554 and 929 px. Idea: on a log axis every equal step is the same multiplication, so a one and a three hundred share one picture.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To compare intensities you'll want a chart, and that raises a problem of scale. Try drawing four quantities as bars on an ordinary scale. One, three, thirty, and three hundred.",
+          "show": "Top lane draws with its title 'ordinary scale'. On each spoken number a blue tag drops in above the lane: '1', '3', '30', '300'. The bottom lane is not yet drawn."
+        },
+        {
+          "id": "b2",
+          "say": "Give the three hundred the whole width. The thirty is a short stub, a tenth as long. The three and the one are slivers, a few pixels wide.",
+          "show": "On 'the whole width', the 300 bar grows to the full 1,500 px. On 'a tenth as long', the 30 bar grows to 150 px. On 'slivers', the 3 bar at 15 px and the 1 bar at 5 px appear, and a magnifier icon hovers over them."
+        },
+        {
+          "id": "b3",
+          "say": "Now stretch the scale to ten thousand, which the chart ahead will need. The three hundred shrinks to a stub, and the other three vanish entirely. On an ordinary scale, small things vanish.",
+          "show": "On 'ten thousand', the lane's end label changes to '10,000' and every bar shrinks in proportion: 300 to 45 px, 30 to 4.5 px, 3 and 1 to under half a pixel. On 'vanish entirely', the 1, 3 and 30 bars disappear and their tags turn grey. On 'small things vanish', a grey caption under the lane: 'small things vanish'."
+        },
+        {
+          "id": "b4",
+          "say": "You met the fix earlier, with the powers of ten. A logarithmic scale. Mark one, ten, a hundred, a thousand and ten thousand, with equal gaps between them.",
+          "show": "Top lane dims to 40%. Bottom lane draws with its title 'log scale'. On each spoken number a tick and label drop in, 375 px apart: '1', '10', '100', '1,000', '10,000'. On 'equal gaps', small white brackets mark each gap and flash together to show they match."
+        },
+        {
+          "id": "b5",
+          "say": "Same distance along the axis, but now each step means ten times, rather than plus ten. Getting from one to ten takes exactly as much room as getting from a thousand to ten thousand.",
+          "show": "Each gap gains a teal tag '× 10'. A grey ghost tag '+ 10' appears over the first gap and is struck out. On 'one to ten' the first gap flashes; on 'a thousand to ten thousand' the last gap flashes the same width."
+        },
+        {
+          "id": "b6",
+          "say": "Now place the four again. Three lands just under halfway from one to ten. Thirty lands the same distance past ten, and three hundred the same distance past a hundred. Each is ten times the last, so they sit evenly spaced, and all four are plainly visible.",
+          "show": "Blue markers drop into the bottom lane on the spoken numbers: '1' at the left end, '3' at 179 px, just under halfway to the 10 tick, '30' at 554 px, '300' at 929 px. On 'evenly spaced', two brackets show the 3-to-30 and 30-to-300 spans as the same 375 px, each tagged '× 10'."
+        },
+        {
+          "id": "b7",
+          "say": "Both axes of the chart ahead are drawn this way. It's the only way to put a one and a three hundred on the same picture and still see both. And those two will matter. Decode gets one operation per byte, and an H one hundred, as you'll see, needs nearly three hundred.",
+          "show": "On 'still see both', the '1' and '300' markers glow. On 'decode gets one operation per byte', a coral tag hangs under the '1': 'decode'. On 'needs nearly three hundred', an amber tag under the '300': 'what the chip needs'."
+        },
+        {
+          "id": "b8",
+          "say": "One more reading habit. On axes like these, a straight line means multiplying, not adding. You'll see one in a moment.",
+          "show": "Bottom right, a small inset pair of log axes draws. A straight blue line runs through three dots at (1, 3), (10, 30) and (100, 300), with step arrows tagged '× 10 across, × 10 up'. Label under the inset: 'straight line = multiplying'. Hold."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s04",
+      "name": "a point is a pair",
+      "figs": [
+        122
+      ],
+      "visual": "A clean pair of axes in the centre: horizontal axis from x 420 to x 1500 along y 860, vertical axis from y 860 up to y 200 along x 420, with plain ticks 0 to 6 on both. One blue point with dashed guide lines to the axes. In b3 the axis titles and ticks change into the roofline's own, so this scene ends on the empty, labelled log axes that the next scene builds on. Idea: a point is a pair of numbers; its left-right place belongs to the workload, its ceiling to the chip.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Next, a chart with two axes. One runs left to right along the bottom, and it's called x. The other runs up the side, and it's called y.",
+          "show": "On 'left to right', the horizontal axis draws on from left to right, its end labelled 'x'. On 'up the side', the vertical axis draws upward, labelled 'y'. Ticks 0 to 6 appear along both."
+        },
+        {
+          "id": "b2",
+          "say": "A point on the chart is a pair of numbers. Read straight down to the bottom axis for one of them, and straight across to the side axis for the other. This point is x equals four, y equals three. One point, one x, one y.",
+          "show": "A blue point drops in at (4, 3). On 'straight down', a dashed line falls from it to the horizontal axis, where the '4' tick lights. On 'straight across', a dashed line runs left to the vertical axis, where the '3' lights. On 'one point, one x, one y', a label beside the point: 'one point: one x, one y'."
+        },
+        {
+          "id": "b3",
+          "say": "On the chart that follows, the bottom axis is arithmetic intensity, how much arithmetic a workload does per byte. The side axis is how fast it therefore runs, in operations per second.",
+          "show": "On 'arithmetic intensity', the x label is replaced by the title 'operations per byte', with 'operations' amber and 'byte' coral, and the 0 to 6 ticks morph into log ticks '1', '10', '100', '1,000', '10,000'. On 'how fast', the y label becomes the amber title 'operations per second' and its ticks morph to '1', '10', '100', '1,000', with the unit 'trillion'. The blue point stays."
+        },
+        {
+          "id": "b4",
+          "say": "Each workload is one point. Where it sits left to right is a property of the workload, fixed by its shapes. How high it can rise is a property of the chip.",
+          "show": "On 'where it sits left to right', the point slides right and back while a blue tag rides with it: 'position: the workload'. On 'how high it can rise', a dashed vertical rises from the point and stops under a short grey bar near the top, labelled 'ceiling: the chip'."
+        },
+        {
+          "id": "b5",
+          "say": "Two sentences of orientation. With them, the shape that comes next is something you can read, rather than something to take on trust.",
+          "show": "The point, its guides and its tags fade, leaving the clean, labelled log axes, which carry straight into the next scene."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s05",
+      "name": "two ceilings",
+      "figs": [
+        123
+      ],
+      "visual": "A log-log chart for the H100 fills the left two thirds, starting from the labelled axes of ch11_s04. Plot coordinates shared by ch11_s05, s06 and s07: horizontal axis 'operations per byte (log)' with ticks 1, 10, 100, 1,000, 10,000 at x = 320, 570, 820, 1070, 1320 (250 px per factor of ten); vertical axis 'trillion operations per second (log)' with ticks 1, 10, 100, 1,000 at y = 900, 650, 400, 150 (also 250 px per factor of ten, so any line of fixed bandwidth runs at exactly 45 degrees). Plot area clipped at y = 110. Amber flat ceiling at y = 151 (989 trillion). Coral slanted ceiling through (320, 769), (570, 519), (820, 269), meeting the flat ceiling at the ridge, (938, 151). Sidebar for formulas at x 1400 to 1880. Corner tag at top left: 'H100'. The flat ceiling is amber because arithmetic sets it; the slanted ceiling is coral because bytes set it. Idea: each ceiling is drawn from one specification-sheet number, and the slanted one is a multiplication, so on log axes it is a straight line.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now build the chart for an H one hundred. Both axes are logarithmic. Along the bottom, intensity, from one to ten thousand operations per byte. Up the side, speed, from one trillion to a thousand trillion operations a second, which is ten to the fifteen.",
+          "show": "The axes from the last scene rescale into the chart's position. On 'one to ten thousand', the five horizontal tick labels light left to right; on 'one trillion to a thousand trillion', the four vertical tick labels light bottom to top. On 'ten to the fifteen', a small grey tag beside the top tick: '= 10¹⁵'. Grey tag under the plot: 'both axes logarithmic'. Corner tag 'H100' fades in."
+        },
+        {
+          "id": "b2",
+          "say": "First limit, the arithmetic. However much work a workload gets from each byte, this chip can't do more than nine hundred and eighty-nine trillion operations a second. That's a flat ceiling, the same height everywhere. Peak arithmetic.",
+          "show": "On 'nine hundred and eighty-nine trillion', an amber horizontal line draws left to right across the whole plot at y = 151, value tag '989 trillion/s'. A row of small amber arrows rises from below and stops dead at the line. On 'peak arithmetic', its label lands above the left end: 'flat ceiling: peak arithmetic'."
+        },
+        {
+          "id": "b3",
+          "say": "Second limit, the memory. It delivers three point three five trillion bytes a second. At one operation per byte, those bytes can feed three point three five trillion operations a second, and no more.",
+          "show": "On 'three point three five trillion bytes', a coral pipe icon appears in the sidebar labelled '3.35 trillion bytes/s'. On 'one operation per byte', a coral dot lands on the chart at (320, 769), tagged '3.35 trillion'."
+        },
+        {
+          "id": "b4",
+          "say": "At ten operations per byte, the same bytes feed ten times the work, thirty-three and a half trillion. At a hundred, three hundred and thirty-five trillion. Each step right is a step up, and on these axes that multiplication draws a straight, slanted line. The slanted ceiling.",
+          "show": "On 'ten operations per byte', a coral dot lands at (570, 519) tagged '33.5 trillion'; on 'a hundred', another at (820, 269) tagged '335 trillion'. Step arrows between the dots: '× 10 across, × 10 up'. On 'straight, slanted line', a coral line draws through the three dots and stops where it meets the amber line; label along it: 'slanted ceiling: bandwidth'."
+        },
+        {
+          "id": "b5",
+          "say": "Its height is bandwidth times intensity, and the units check out. Bytes per second, times operations per byte. The bytes cancel, leaving operations per second. Each extra operation per byte buys exactly three point three five trillion more a second, so the line climbs at a rate set by the memory bandwidth. Faster memory would lift the whole line.",
+          "show": "Sidebar: an equation builds term by term, coral 'bytes / second' × 'operations / byte' = amber 'operations / second'. On 'the bytes cancel', both 'bytes' strike through in grey. On 'three point three five trillion more', a sidebar tag: '+1 op per byte → +3.35 trillion/s'. On 'lift the whole line', a ghost coral line slides up parallel to the slanted ceiling and settles back."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s06",
+      "name": "the lower ceiling wins",
+      "figs": [
+        123
+      ],
+      "visual": "The same chart and coordinates as ch11_s05, both ceilings drawn. Plot coordinates shared by ch11_s05, s06 and s07: horizontal axis 'operations per byte (log)' with ticks 1, 10, 100, 1,000, 10,000 at x = 320, 570, 820, 1070, 1320 (250 px per factor of ten); vertical axis 'trillion operations per second (log)' with ticks 1, 10, 100, 1,000 at y = 900, 650, 400, 150 (also 250 px per factor of ten, so any line of fixed bandwidth runs at exactly 45 degrees). Plot area clipped at y = 110. Amber flat ceiling at y = 151 (989 trillion). Coral slanted ceiling through (320, 769), (570, 519), (820, 269), meeting the flat ceiling at the ridge, (938, 151). Sidebar for formulas at x 1400 to 1880. The sidebar holds the rule 'attainable = min( peak, bandwidth × intensity )'. Two test workloads are shown as vertical dashed probes at intensity 10 (x = 570) and 1,000 (x = 1070). Then the ridge gets a white marker and the two regions are tinted: coral at 10% under the slanted part, amber at 10% under the flat part. Idea: a workload can never pass either ceiling, so its speed is set by the lower one.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A workload can't break through either ceiling. So the fastest it can possibly run, its attainable speed, is whichever ceiling is lower. Attainable equals the minimum of the peak, and bandwidth times intensity.",
+          "show": "Sidebar: the rule builds term by term on the spoken words, white 'attainable =', white 'min(', amber 'peak', coral 'bandwidth × intensity', white ')'. On 'whichever ceiling is lower', a grey tag beneath: 'min = the smaller of the two'."
+        },
+        {
+          "id": "b2",
+          "say": "Try an intensity of ten. Bandwidth times intensity is thirty-three and a half trillion. The peak is nine hundred and eighty-nine. The smaller wins, so here the memory sets the limit.",
+          "show": "A vertical dashed probe drops at x = 570. It meets the coral line at y = 519, tag '33.5', and carries on up to the amber line, tag '989'. On 'the smaller wins', the '33.5' tag glows coral and the '989' tag dims; a white dot settles at (570, 519). Sidebar line: 'min(989, 33.5) = 33.5'."
+        },
+        {
+          "id": "b3",
+          "say": "Now try a thousand. Bandwidth times intensity is three thousand three hundred and fifty trillion, far above the peak of nine hundred and eighty-nine. Now the arithmetic sets the limit.",
+          "show": "The first probe fades. A second probe drops at x = 1070 and runs up past the amber line to the clipped top of the plot, where an arrowhead carries a coral tag '3,350': the slanted line, extended, would be that high here, far off the chart. The amber line is tagged '989'. On 'the arithmetic sets the limit', the '989' tag glows and a white dot settles at (1070, 151). Sidebar line: 'min(989, 3,350) = 989'."
+        },
+        {
+          "id": "b4",
+          "say": "Where the slanted line meets the flat one, there's a corner, called the ridge. Left of it, workloads are memory bound. Right of it, compute bound. A workload always hits whichever ceiling is lower.",
+          "show": "Probes and dots fade. On 'called the ridge', a white marker pops at (938, 151) labelled 'the ridge', and a thin white vertical drops from it to the horizontal axis. On 'memory bound', the area under the slanted part tints coral at 10% with the label 'memory bound'; on 'compute bound', the area under the flat part tints amber at 10% with 'compute bound'."
+        },
+        {
+          "id": "b5",
+          "say": "The shape looks like a roof, and that's its name, the roofline. It was introduced in two thousand nine by three computer architects, Samuel Williams, Andrew Waterman and David Patterson. Two ceilings, and one rule for choosing between them.",
+          "show": "The roof outline, coral slant then amber flat, thickens and glows; a small house-roof icon traces the same shape above the sidebar. On 'the roofline', the title 'the roofline' lands at top centre. On 'two thousand nine', a grey credit line under it: 'Williams, Waterman & Patterson, 2009'. On 'one rule', the sidebar rule pulses once."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s07",
+      "name": "why the roof bends",
+      "figs": [
+        124
+      ],
+      "visual": "The same chart. Plot coordinates shared by ch11_s05, s06 and s07: horizontal axis 'operations per byte (log)' with ticks 1, 10, 100, 1,000, 10,000 at x = 320, 570, 820, 1070, 1320 (250 px per factor of ten); vertical axis 'trillion operations per second (log)' with ticks 1, 10, 100, 1,000 at y = 900, 650, 400, 150 (also 250 px per factor of ten, so any line of fixed bandwidth runs at exactly 45 degrees). Plot area clipped at y = 110. Amber flat ceiling at y = 151 (989 trillion). Coral slanted ceiling through (320, 769), (570, 519), (820, 269), meeting the flat ceiling at the ridge, (938, 151). Sidebar for formulas at x 1400 to 1880. Both limits are now drawn in full as independent lines: the amber flat line dashed across the whole width, and the coral slanted line continuing straight through the corner, dashed, until it leaves the clipped top of the plot (y = 110) at about x = 979. Whichever line is higher at a given intensity is dimmed to 25%. A white workload dot rides the roof with a live readout of its height in trillions of operations a second. Idea: the corner is not drawn on purpose; it appears wherever two independent limits cross and the lower one always wins.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why does the picture have a corner at all? Draw both limits in full. The flat line runs the whole width. The slanted line keeps climbing, straight through it and off the top.",
+          "show": "Region tints and ridge marker fade to 20%. On 'the flat line runs the whole width', the amber line extends as a dashed line to both plot edges. On 'keeps climbing', the coral line extends past the corner as a dashed line and exits the clipped top of the plot with an arrowhead at about x = 979."
+        },
+        {
+          "id": "b2",
+          "say": "At every intensity, only the lower of the two can be reached. Trace the lower line, and the roof appears by itself. The shape isn't a convention to memorise. It's what happens when two independent limits share the same axes, and the lower one always wins.",
+          "show": "A white tracer runs left to right along whichever line is lower at each x: up the coral slant to the corner, then along the amber flat. The traced path brightens; the amber line left of the corner and the coral line right of it dim to 25%. On 'the lower one always wins', a grey tag at top left: 'two limits, the lower wins'."
+        },
+        {
+          "id": "b3",
+          "say": "Now send a workload along the roof, starting on the left. Here the memory is the bottleneck. Anything that gets more work out of each byte moves the point right, and the line carries it up. More arithmetic per byte means more speed.",
+          "show": "A white workload dot appears at (320, 769), readout '3.35'. On 'moves the point right', it slides up the coral slant and the readout counts through '33.5' at intensity 10 and '335' at 100. On 'more speed', a label over the left half: 'more arithmetic per byte → more speed'."
+        },
+        {
+          "id": "b4",
+          "say": "Cross the corner, and the climbing stops. Here the arithmetic is the bottleneck, and its units are already full. More work per byte buys no speed at all.",
+          "show": "On 'cross the corner', the dot passes the ridge at (938, 151); the readout stops at '989' and stays there while the dot slides on to intensity 10,000 at x = 1320. A small amber gauge rides beside it at '100%'. Label over the right half: 'arithmetic units already full'."
+        },
+        {
+          "id": "b5",
+          "say": "The corner is where the two limits are exactly equal. Left of it, improve the bytes. Move fewer of them, or get more work out of each. Right of it, improving the bytes buys nothing. That's the entire diagram.",
+          "show": "On 'exactly equal', the ridge marker returns to full strength and pulses, tag 'both limits equal'. On 'left of it, improve the bytes', a teal arrow pushes a dot on the slant right and it climbs, tag 'improve the bytes'. On 'buys nothing', the same teal arrow pushes a dot on the flat part; it slides right but not up, grey tag 'buys nothing'."
+        },
+        {
+          "id": "b6",
+          "say": "All that's left is to give the corner a number. First, though, one question. What decides where it sits?",
+          "show": "Everything dims to 30% except the ridge marker, which gains a white box beside it: '? ops per byte'. Hold."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s08",
+      "name": "the ratio, not the size",
+      "figs": [
+        125
+      ],
+      "visual": "Left 45%: two chip cards stacked, 'small chip' on top and 'big chip' below (renamed from the atlas's Chip A and Chip B so they read aloud cleanly). Each card has an amber bar for operations per second and a coral bar under it for bytes per second; amber and coral each use their own scale, and the big chip's bars are exactly twice the small chip's (amber 300 and 600 px, coral 150 and 300 px). A white ratio badge ends each card. Right 55%: a log-log chart, intensity 1, 10, 100 at x = 1060, 1360, 1660 and operations per second 10, 100, 1,000 at y = 950, 650, 350, 300 px per factor of ten on both. Small chip's roofline: coral slant through (1060, 740) to the corner (1360, 440), amber flat at y = 440. Big chip's: the same shape exactly 90 px higher, through (1060, 650), corner (1360, 350), flat at y = 350. Grey tag 'toy numbers'. Idea: scale both numbers and the corner stays put; only the ratio decides which side a workload falls on.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Take two made-up chips, with tiny numbers to keep the arithmetic easy. The small chip does five hundred operations a second, and its memory delivers fifty bytes a second. The big chip does a thousand operations a second, and its memory delivers a hundred bytes.",
+          "show": "Grey tag 'toy numbers' at top left. On 'the small chip', the top card builds: amber bar '500 ops/s', then coral bar '50 bytes/s'. On 'the big chip', the lower card builds: amber '1,000 ops/s', coral '100 bytes/s'."
+        },
+        {
+          "id": "b2",
+          "say": "The big chip is twice the small one in both directions. Now divide each chip's operations by its bytes. Five hundred over fifty is ten. A thousand over a hundred is ten. The ratio is identical.",
+          "show": "On 'twice the small one', '× 2' tags link each of the big chip's bars to the matching small-chip bar. On 'five hundred over fifty', the small chip's badge builds '500 ÷ 50 = 10'; on 'a thousand over a hundred', the big chip's builds '1,000 ÷ 100 = 10'. On 'identical', both badges flash white together."
+        },
+        {
+          "id": "b3",
+          "say": "Now draw both rooflines. The big chip's sits twice as high everywhere. But look at the corners. They line up, one above the other, at ten operations per byte. The same ten as the ratio.",
+          "show": "Chart draws: the small chip's roofline as a thin line, the big chip's as a thick line above it. On 'twice as high', short brackets at three intensities show the same 90 px gap, each tagged '× 2'. On 'they line up', a white dashed vertical drops through both corners at x = 1360, tagged '10 ops per byte'; the ratio badges glow."
+        },
+        {
+          "id": "b4",
+          "say": "Test a workload that does five operations per byte. On the small chip, fifty bytes a second feed two hundred and fifty operations, under its five hundred. Memory bound. On the big chip, a hundred bytes feed five hundred, under its thousand. Memory bound again, just twice as fast.",
+          "show": "A blue probe line at intensity 5, x = 1270. On 'two hundred and fifty', a dot lands on the small chip's slant at y = 531, tag '250', coral tag 'memory bound'. On 'five hundred, under its thousand', a dot lands on the big chip's slant at y = 440, tag '500', 'memory bound'. On 'twice as fast', a '× 2' bracket joins the two dots."
+        },
+        {
+          "id": "b5",
+          "say": "Now one that does twenty. The small chip's memory could feed a thousand operations a second, but its arithmetic stops at five hundred. Compute bound. The big chip's could feed two thousand, and it stops at a thousand. Compute bound again. A workload sits on the same side of the corner on both.",
+          "show": "The probe moves to intensity 20, x = 1450. Small chip: a dashed coral extension reaches '1,000' at y = 350, but the dot sits on its amber flat line at y = 440, tag '500', amber tag 'compute bound'. Big chip: the extension reaches '2,000' at y = 260, the dot sits at y = 350, tag '1,000', 'compute bound'. On 'same side of the corner', the corner line glows with both probes to its right."
+        },
+        {
+          "id": "b6",
+          "say": "So the ratio says what kind of work a chip suits. The absolute numbers say how fast it gets through it. Two different questions.",
+          "show": "Chart dims to 40%. Under the cards, two white lines appear in turn: 'ratio: what kind of work it suits', then 'absolute numbers: how fast'."
+        },
+        {
+          "id": "b7",
+          "say": "And the memory wall is a statement about the ratio. Over the decade you saw earlier, compute grew about eighty times and bandwidth about seventeen. The top number grew faster than the bottom one, so the ratio grew about four point seven times, and the corner slid that far to the right.",
+          "show": "Small inset at bottom left, recalled from the earlier decade chart: amber 'compute × 80', coral 'bandwidth × 17', badge '80 ÷ 17 ≈ 4.7'. On the main chart a grey ghost roofline labelled '2012' keeps its corner at x = 1360; on 'slid that far to the right', a second roofline labelled '2022' slides its corner right to x ≈ 1562, a teal arrow between the corners tagged '× 4.7'. Grey tag: 'schematic'."
+        },
+        {
+          "id": "b8",
+          "say": "Double both numbers, or multiply both by ten, and a ratio doesn't budge. It's scale-free. That's exactly why it's the right way to describe a trend that has held across many generations of hardware.",
+          "show": "Inset and ghost fade. Both cards' bars grow in lockstep, first × 2 and then × 10; the badges stay '10' throughout. On 'scale-free', a white tag between the cards: 'scale-free'."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s09",
+      "name": "deriving the ridge",
+      "figs": [
+        126
+      ],
+      "visual": "Left half: a derivation that builds top to bottom, a blue card 'bandwidth × intensity = peak', an arrow, an amber card 'intensity = peak ÷ bandwidth', then the H100 numbers and a teal result card '= 295 ops per byte'. Right half: the H100 roofline chart from ch11_s05 to s07 scaled to 60%, the ridge marker still carrying its '? ops per byte' box. In b7 an H200 slanted line is added above the H100's, and its ridge sits about 39 px left of the H100's at full scale, about 23 px at this 60% scale. Idea: the corner is one division of two specification-sheet numbers, a property of the chip alone.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now give the corner its number. The ridge is where the two ceilings meet, the intensity at which bandwidth times intensity reaches the peak.",
+          "show": "Chart at right; on 'where the two ceilings meet', the ridge marker pulses. At left the blue card builds term by term: coral 'bandwidth', '× intensity', '=', amber 'peak'."
+        },
+        {
+          "id": "b2",
+          "say": "Solve for the intensity. Divide both sides by the bandwidth, and intensity equals peak divided by bandwidth. That's the very ratio from the two made-up chips, which is why their corners sat at ten.",
+          "show": "On 'divide both sides', a grey '÷ bandwidth' appears under each side, and the bandwidth on the left strikes through. An arrow draws down to the amber card 'intensity = peak ÷ bandwidth'. On 'the two made-up chips', a small ghost of the badge '500 ÷ 50 = 10' flies in beside the card and fades."
+        },
+        {
+          "id": "b3",
+          "say": "Look at what's in it. The peak and the bandwidth, both straight off the chip's specification sheet. No workload appears anywhere. The ridge is a property of the chip alone.",
+          "show": "A small spec-sheet icon slides in; its lines 'Peak compute 989 TFLOP/s' and 'Memory bandwidth 3.35 TB/s' highlight and fly into 'peak' and 'bandwidth'. On 'no workload appears anywhere', a grey 'workload' tag drifts toward the formula and bounces off. White tag: 'a property of the chip alone'."
+        },
+        {
+          "id": "b4",
+          "say": "For an H one hundred, the peak is nine hundred and eighty-nine trillion operations a second, and the bandwidth is three point three five trillion bytes a second. Units first. Operations per second, over bytes per second. The seconds cancel, leaving operations per byte. Exactly the unit of intensity.",
+          "show": "Below the formula: amber 'peak: 989 trillion ops/s', coral 'bandwidth: 3.35 trillion bytes/s'. On 'units first', a grey unit line builds: 'ops / s ÷ bytes / s'. On 'the seconds cancel', both '/ s' strike through, leaving 'ops per byte'."
+        },
+        {
+          "id": "b5",
+          "say": "Now divide. Nine hundred and eighty-nine, over three point three five. Two hundred and ninety-five operations per byte. If that number sounds familiar, this is where it comes from.",
+          "show": "On 'divide', '989 ÷ 3.35' builds and a counter runs from 0 to 295; the teal result card lands: '= 295 ops per byte'. On the chart, the ridge's '? ops per byte' box flips to '295', and the white vertical from the ridge meets the horizontal axis between the 100 and 1,000 ticks, with an axis tag '295'."
+        },
+        {
+          "id": "b6",
+          "say": "Below two hundred and ninety-five operations per byte, a workload is memory bound on this chip. Above it, compute bound. One division, and the chip is characterised.",
+          "show": "On 'below', the chart region left of 295 tints coral, label 'memory bound'; on 'above', the region right of it tints amber, label 'compute bound'. On 'one division', the teal result card gains an underline."
+        },
+        {
+          "id": "b7",
+          "say": "Try it on another chip. The H two hundred, from earlier, has the same arithmetic as the H one hundred, but faster memory, four point eight terabytes per second. Nine hundred and eighty-nine over four point eight is about two hundred and six. Faster memory slides the corner left.",
+          "show": "Corner tag 'H200: same 989 trillion ops/s, 4.8 TB/s'. A brighter coral slant draws parallel above the H100's, since it starts at 4.8 rather than 3.35 trillion at intensity 1. Formula line at left: '989 ÷ 4.8 ≈ 206'. Its ridge marker appears just left of the H100's, tagged '206'. On 'slides the corner left', a teal arrow runs from '295' to '206'."
+        },
+        {
+          "id": "b8",
+          "say": "It's worth doing once yourself, for whatever hardware you use. The ridge is the number every workload gets compared against.",
+          "show": "The H200 line and its tags fade. The teal '295' card enlarges in the centre with a small pencil icon and the tag 'do it for your chip'. Hold."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s10",
+      "name": "what the roofline ignores",
+      "figs": [
+        127
+      ],
+      "visual": "Three blue assumption cards across the top half at x centres 400, 960 and 1520: 'One memory level' over 'no cache hierarchy', 'No launch latency' over 'work starts instantly', 'Perfect pipelining' over 'no bubbles'. As each is discussed, a small illustration builds beneath it in the lower half. Then the H100 roofline returns small along the bottom with grey dots for real workloads sitting on or under the roof, never above. The scene closes on a three-item recap strip. Idea: the model is honest about being simple, and its simplifications only ever make the real thing slower than the roof.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Like any model, the roofline buys its simplicity with assumptions. Three of them are worth knowing.",
+          "show": "Three empty card outlines appear across the top, under a grey heading 'what the roofline assumes'."
+        },
+        {
+          "id": "b2",
+          "say": "One memory level. It pretends there's a single memory, with a single bandwidth. Real chips also keep small, faster stores of recently used data close to the arithmetic, layered like a desk, a shelf and a warehouse. That layering is called a cache hierarchy, and the roofline ignores it.",
+          "show": "Card one fills: 'One memory level' / 'no cache hierarchy'. Beneath it, the roofline's picture: one coral HBM block piped to an amber chip. On 'a desk, a shelf and a warehouse', three icons build outward from the chip, small to large: a desk, a bookshelf, a warehouse, tagged 'small, fast' at the near end and 'big, slow' at the far end."
+        },
+        {
+          "id": "b3",
+          "say": "A hardware cache, by the way, is a different thing from the running record the server keeps between requests. Same word, different job.",
+          "show": "A grey tag under the three icons: 'hardware cache ≠ the server's record'. A faint server icon appears beside it and is set apart by a thin divider."
+        },
+        {
+          "id": "b4",
+          "say": "No launch latency. It assumes work starts the instant it's asked for. On a real chip, every piece of work handed over takes a small, fixed time just to get going, before a single byte moves or a single operation runs.",
+          "show": "Card two fills: 'No launch latency' / 'work starts instantly'. Beneath it, two short lanes: 'ideal', where a job block starts at the left edge, and 'real', where a small grey gap labelled 'start-up' comes before the same block."
+        },
+        {
+          "id": "b5",
+          "say": "Perfect pipelining. It assumes the fetching and the arithmetic overlap perfectly, like the laundry line with every station always loaded. Real chips have bubbles, moments when a station sits empty, waiting for the next piece of work.",
+          "show": "Card three fills: 'Perfect pipelining' / 'no bubbles'. Beneath it, the laundry thumbnail from ch11_s01 returns with every station loaded; then the folding station empties for a moment and a grey bubble icon floats over it, labelled 'bubble'."
+        },
+        {
+          "id": "b6",
+          "say": "Start-up delays and bubbles can only make the real thing slower. That's why the roof is a ceiling. Real workloads land on it, or somewhere below it.",
+          "show": "The small H100 roofline draws along the bottom. Grey dots for real workloads land on or under the roof, none above. On 'a ceiling', the roof outline brightens; tag 'real workloads: on or below'."
+        },
+        {
+          "id": "b7",
+          "say": "So it's a simplification on every count. But as a first-order check, a quick rough diagnosis of whether a workload will starve the arithmetic units or starve the memory bus, it has held up since two thousand nine.",
+          "show": "Each card gains a small grey tag 'simplified'. On 'starve the arithmetic units', an amber tag appears right of the ridge on the small chart; on 'starve the memory bus', a coral tag left of it. On 'since two thousand nine', a grey tag: '2009 to today'."
+        },
+        {
+          "id": "b8",
+          "say": "Knowing a model's assumptions is what lets you trust it where it applies, and distrust it where it doesn't.",
+          "show": "Cards and chart hold. A white line lands across the lower centre: 'trust it where it applies'."
+        },
+        {
+          "id": "b9",
+          "say": "So you now hold the whole instrument. An intensity, from a workload's shapes. A roof, from two numbers on a spec sheet. And a ridge, at two hundred and ninety-five. Next, the two phases of inference go onto it.",
+          "show": "Cards fade. A recap strip of three items builds left to right on the spoken words: the formula card 'intensity: from the shapes', a roof outline 'roof: two spec numbers', the teal badge 'ridge: 295'. On 'the two phases', two empty point markers tagged 'prefill' and 'decode' hover just off the edge of the small chart, waiting."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Laundry analogy: with all stations busy at once, a load leaves every max(30, 60, 10) = 60 min",
+      "python": "max(30,60,10)",
+      "result": "60"
+    },
+    {
+      "claim": "Laundry: washer twice as fast (15 min) still gives 60; folding twice as fast (5 min) still gives 60",
+      "python": "max(15,60,10), max(30,60,5)",
+      "result": "60 60"
+    },
+    {
+      "claim": "Laundry: dryer sped up to 40 min gives a load every 40 min (dryer still slowest)",
+      "python": "max(30,40,10)",
+      "result": "40"
+    },
+    {
+      "claim": "One token on an H100, arithmetic: 140 billion ops / 989 trillion ops/s = 0.14 ms (as in ch06)",
+      "python": "140e9/989e12*1e3",
+      "result": "0.14155712841253792"
+    },
+    {
+      "claim": "One token on an H100, memory: 140 GB / 3.35 TB/s = 41.8 ms, 'about forty-two' (as in ch06)",
+      "python": "140e9/3.35e12*1e3",
+      "result": "41.791044776119406"
+    },
+    {
+      "claim": "Arithmetic twice as fast: 0.07 ms, and the token still takes max(41.8, 0.07) = 41.8 ms",
+      "python": "140e9/(2*989e12)*1e3, max(140e9/3.35e12, 140e9/(2*989e12))*1e3",
+      "result": "0.07077856420626896 41.791044776119406"
+    },
+    {
+      "claim": "Arithmetic units busy 0.14 / 41.8 = 0.34% of that token, 'about a third of one percent'",
+      "python": "(140e9/989e12)/(140e9/3.35e12)*100",
+      "result": "0.33872598584428715"
+    },
+    {
+      "claim": "Decode intensity: (2 x 70e9 operations) / (70e9 x 2 bytes) = 1 operation per byte",
+      "python": "(2*70e9)/(70e9*2)",
+      "result": "1.0"
+    },
+    {
+      "claim": "Linear lane, 300 filling 1,500 px: bars for 1, 3, 30, 300 are 5, 15, 150, 1,500 px; 30 is a tenth of 300",
+      "python": "[1500/300*v for v in (1,3,30,300)], 30/300",
+      "result": "[5.0, 15.0, 150.0, 1500.0] 0.1"
+    },
+    {
+      "claim": "Linear lane stretched to 10,000 over 1,500 px: 1, 3, 30, 300 become 0.15, 0.45, 4.5, 45 px (first three vanish)",
+      "python": "[1500/10000*v for v in (1,3,30,300)]",
+      "result": "[0.15, 0.44999999999999996, 4.5, 45.0]"
+    },
+    {
+      "claim": "Log lane at 375 px per factor of ten: 1, 3, 30, 300 sit at 0, 179, 554, 929 px; 3-30 and 30-300 gaps both 375 px",
+      "python": "import math; [round(375*math.log10(v),1) for v in (1,3,30,300)]",
+      "result": "[0.0, 178.9, 553.9, 928.9]"
+    },
+    {
+      "claim": "3 sits 'just under halfway' from 1 to 10 on a log axis: log10(3) = 0.477",
+      "python": "import math; math.log10(3)",
+      "result": "0.47712125471966244"
+    },
+    {
+      "claim": "Slanted ceiling on an H100: 3.35 trillion bytes/s x 1, 10, 100, 1,000 ops/byte = 3.35, 33.5, 335, 3,350 trillion ops/s",
+      "python": "[3.35e12*i/1e12 for i in (1,10,100,1000)]",
+      "result": "[3.35, 33.5, 335.0, 3350.0]"
+    },
+    {
+      "claim": "Attainable at intensity 10: min(989, 33.5) = 33.5 trillion (memory bound); at 1,000: min(989, 3,350) = 989 (compute bound)",
+      "python": "min(989,3.35*10), min(989,3.35*1000)",
+      "result": "33.5 989"
+    },
+    {
+      "claim": "Ridge on an H100: 989 trillion ops/s / 3.35 trillion bytes/s = 295 ops per byte; back-check 3.35 x 295.22 = 989",
+      "python": "989e12/3.35e12, 3.35*(989/3.35)",
+      "result": "295.2238805970149 988.9999999999999"
+    },
+    {
+      "claim": "Ridge on an H200 (added): same 989 trillion ops/s dense 16-bit as the H100, 4.8 TB/s, so 989 / 4.8 = 206 ops per byte",
+      "python": "989e12/4.8e12",
+      "result": "206.04166666666666"
+    },
+    {
+      "claim": "Toy chips (fig 125): small 500 / 50 = 10, big 1,000 / 100 = 10",
+      "python": "500/50, 1000/100",
+      "result": "10.0 10.0"
+    },
+    {
+      "claim": "Toy chips at intensity 5: small min(500, 50x5) = 250, big min(1000, 100x5) = 500, both memory bound",
+      "python": "min(500,50*5), min(1000,100*5)",
+      "result": "250 500"
+    },
+    {
+      "claim": "Toy chips at intensity 20: memory could feed 1,000 and 2,000; attainable min = 500 and 1,000, both compute bound",
+      "python": "50*20, 100*20, min(500,50*20), min(1000,100*20)",
+      "result": "1000 2000 500 1000"
+    },
+    {
+      "claim": "Big chip's roofline is 2x the small one's everywhere: log10(2) x 300 px = 90 px higher on the toy chart",
+      "python": "import math; 300*math.log10(2)",
+      "result": "90.30899869919436"
+    },
+    {
+      "claim": "Decade from ch06: compute x80 / bandwidth x17 = 4.7x, so the ridge (peak / bandwidth) moved 4.7x right; on the toy chart x = 1360 + 300 log10(4.7) = 1562",
+      "python": "import math; 80/17, 1360+300*math.log10(80/17)",
+      "result": "4.705882352941177 1561.792319684101"
+    },
+    {
+      "claim": "H100 chart coordinates (250 px per factor of ten): flat ceiling y = 900 - 250 log10(989) = 151; slanted line at intensity 1, 10, 100 at y = 769, 519, 269; ridge x = 320 + 250 log10(295.2) = 938",
+      "python": "import math; Y=lambda p: 900-250*math.log10(p); X=lambda i: 320+250*math.log10(i); round(Y(989),1), [round(Y(3.35*i),1) for i in (1,10,100)], round(X(989/3.35),1)",
+      "result": "151.2 [768.7, 518.7, 268.7] 937.5"
+    },
+    {
+      "claim": "H200 ridge sits 39 px left of the H100 ridge at full chart scale (23 px at 60%)",
+      "python": "import math; X=lambda i: 320+250*math.log10(i); round(X(989/3.35)-X(989/4.8),1), round(0.6*(X(989/3.35)-X(989/4.8)),1)",
+      "result": "39.0 23.4"
+    },
+    {
+      "claim": "Storyboard: the extended H100 slanted line leaves the plot's clip edge (y = 110, which is 1,445 trillion) at intensity 431, x = 979",
+      "python": "import math; p=10**((900-110)/250); i=p/3.35; p, i, round(320+250*math.log10(i),1)",
+      "result": "1445.439770745928 431.47455843162027 978.7"
+    },
+    {
+      "claim": "Toy chart coordinates (300 px per factor of ten): intensity 5 and 20 at x = 1270 and 1450; heights 250, 500, 1,000, 2,000 at y = 531, 440, 350, 260",
+      "python": "import math; X=lambda i: 1060+300*math.log10(i); Y=lambda p: 950-300*math.log10(p/10); [round(X(i),1) for i in (5,20)], [round(Y(p),1) for p in (250,500,1000,2000)]",
+      "result": "[1269.7, 1450.3] [530.6, 440.3, 350.0, 259.7]"
+    },
+    {
+      "claim": "CORRECTION fig 123: the atlas illustrates the slanted ceiling with a round 3 TB/s (3 and 30 trillion ops/s); the film uses the H100's 3.35 TB/s (3.35 and 33.5 trillion) so the drawn line and the 295 ridge come from the same two numbers",
+      "python": "3e12*1/1e12, 3e12*10/1e12, 3.35e12*1/1e12, 3.35e12*10/1e12",
+      "result": "3.0 30.0 3.35 33.5"
+    },
+    {
+      "claim": "CORRECTION fig 121: atlas says 1, 3 and 30 are all invisible on a linear axis; with 300 at full width, 30 is a tenth of it (the atlas's own drawing: 28 px of 560). The film shows that honestly, then stretches the axis to 10,000, where 1, 3 and 30 really do vanish (0.15, 0.45, 4.5 px of 1,500)",
+      "python": "560*30/600, 1500*30/10000",
+      "result": "28.0 4.5"
+    }
+  ]
+}
