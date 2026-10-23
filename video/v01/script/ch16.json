@@ -40,8 +40,8 @@
         },
         {
           "id": "b4",
-          "say": "Your keys and values stopped existing. Only the small text survives, in a database, and rebuilding them from text is exactly what prefill does.",
-          "show": "On 'stopped existing', the dashed outlines vanish. On 'small text', the database cylinder draws at the left with a small blue document inside, tag 'text: small, kept'. On 'rebuilding', an arrow draws from the database through the amber 'prefill' gear into free slots in the H B M; the gear spins and coral K V tiles are rebuilt there one by one, each gaining a teal outline. Tag under the gear: 'text in, keys and values out'."
+          "say": "Only the small text survives, in a database. Your keys and values, the model's processed form of it, stopped existing. Rebuilding them from text is exactly what prefill does.",
+          "show": "On 'small text', the database cylinder draws at the left with a small blue document inside, tag 'text: small, kept'. On 'stopped existing', the dashed outlines in the H B M vanish. On 'Rebuilding', an arrow draws from the database through the amber 'prefill' gear into free slots in the H B M; the gear spins and coral K V tiles are rebuilt there one by one, each gaining a teal outline. Tag under the gear: 'text in, keys and values out'."
         },
         {
           "id": "b5",
@@ -135,8 +135,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Case C, the pair from earlier: Tell me the capital of France, please. Four words shared, the whole phrase, the capital of France, but the very first token differs.",
-          "show": "Label top-left: 'case C: a minute later, same words reordered'. On 'the pair from earlier', a small grey tag 'seen earlier' flickers beside the label and fades. The arriving pills slide in as spoken. On 'Four words shared', grey arcs draw between 'the', 'capital', 'of' and 'France' in the two rows, counter 'shared words: 4'; on 'the whole phrase', the four arcs glow together. On 'very first token', the cursor passes the '770' segments, turning them teal, and stops dead at the first pills; 'Tell' and 'What' flash, marker 'diverges at the very first token'; the arcs snap and fade."
+          "say": "Case C, the pair from earlier: Tell me the capital of France, please. It shares the whole phrase, the capital of France, but the very first token differs.",
+          "show": "Label top-left: 'case C: a minute later, same words reordered'. On 'the pair from earlier', a small grey tag 'seen earlier' flickers beside the label and fades. The arriving pills slide in as spoken. On 'the whole phrase', grey arcs draw between 'the', 'capital', 'of' and 'France' in the two rows, counter 'shared words: 4', and the four arcs glow together. On 'very first token', the cursor passes the '770' segments, turning them teal, and stops dead at the first pills; 'Tell' and 'What' flash, marker 'diverges at the very first token'; the arcs snap and fade."
         },
         {
           "id": "b2",
@@ -165,8 +165,8 @@
         },
         {
           "id": "b2",
-          "say": "Count only your seven-token question. In case A, all seven matched, plus the whole history. Only four new words were fresh. B, five of seven. C, none.",
-          "show": "Column header 'your 7 tokens' appears. On 'In case A', A's cell: seven teal mini-pills and '7 / 7 · 100%'; on 'plus the whole history', a small teal tag 'plus the whole history'; on 'four new words', a small tag with four amber mini-pills, '+4 new, prefilled'. On 'five of seven', B's cell: five teal and two amber, '5 / 7 · 71%'. On 'none', C's cell: seven amber, '0 / 7 · 0%'."
+          "say": "Count only your seven tokens. In case A, all seven matched, plus the whole history. Only four new words were fresh. B, five of seven. C, none.",
+          "show": "Column header 'your 7 tokens' appears. On 'In case A', A's cell: seven teal mini-pills and '7 / 7 · 100%'; on 'plus the whole history', a small teal tag inside the cell, 'plus the whole history'; on 'four new words', a second small tag inside the cell with four amber mini-pills, '+4 new, prefilled'. On 'five of seven', B's cell: five teal and two amber, '5 / 7 · 71%'. On 'none', C's cell: seven amber, '0 / 7 · 0%'."
         },
         {
           "id": "b3",
@@ -251,12 +251,12 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Warmth also makes a large fixed preamble cheap. A cached read, an input token that hits the cache, skips prefill, so it is cheap to serve. Providers price it at roughly a tenth of a fresh one.",
+          "say": "Warmth also makes a large fixed preamble cheap. A cached read, an input token already held, skips prefill, so it is cheap to serve. Providers price it at roughly a tenth of a fresh one.",
           "show": "Right half: a price-tag icon. On 'a cached read', a teal token pill with the tag 'cached read: an input hit'. On 'skips prefill', a small amber gear icon beside the pill gets a grey cross. On 'cheap to serve', a tag on the shared block at the left: 'cheap to serve'. On 'a tenth', two bars to scale: 'fresh input token', amber, 400 px; 'cached input token', teal, 40 px, label 'about 1/10'."
         },
         {
           "id": "b2",
-          "say": "Illustratively, case C's seven hundred and seventy-seven input tokens would then bill like about eighty-four fresh ones.",
+          "say": "Illustratively, case C's seven hundred and seventy-seven input tokens would bill like about eighty-four fresh ones.",
           "show": "Below the price bars, a small bill builds line by line: '770 cached × 0.1 = 77', then '+ 7 fresh = 84'. Beside it, two bars to scale, 777 units = 1,000 px: 108 px in teal, 'billed like 84', against 1,000 px in amber, 'all fresh: 777'. Grey footnote: 'illustrative; real discounts vary'."
         },
         {
@@ -339,7 +339,7 @@
       "result": "7"
     },
     {
-      "claim": "CORRECTION: fig 51 caption says cases B and C 'share the same number of words with the original'. They do not: B shares 6 tokens (What, is, the, capital, of, ?) and C shares 4 words (the, capital, of, France). Both are 7 tokens long, like the original; the film says that instead ('both seven tokens, like the original, and share many of its words'), and quotes the prefix matches as 'B matches five, C none' rather than the caption's 'near-total hit', which describes the whole prompt (775 of 777). Prefix matches: B 5, C 0.",
+      "claim": "CORRECTION: fig 51 caption says cases B and C 'share the same number of words with the original'. They do not: B shares 6 tokens (What, is, the, capital, of, ?) and C shares 4 words (the, capital, of, France). Both are 7 tokens long, like the original; the film says that instead ('both seven tokens, like the original, sharing many of its words'), and quotes the prefix matches as 'B matches five, C none' rather than the caption's 'near-total hit', which describes the whole prompt (775 of 777). Prefix matches: B 5, C 0.",
       "python": "o='What is the capital of France ?'.split(); b='What is the capital of Japan ?'.split(); c='Tell me the capital of France please'.split(); print(len(o),len(b),len(c),[w for w in b if w in o],[w for w in c if w in o])",
       "result": "7 7 7 ['What', 'is', 'the', 'capital', 'of', '?'] ['the', 'capital', 'of', 'France']"
     },

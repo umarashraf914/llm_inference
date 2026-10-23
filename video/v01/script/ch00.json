@@ -45,7 +45,7 @@
         },
         {
           "id": "b3",
-          "say": "Put together, the arithmetic fills just this sliver. Under one percent of the time. The other ninety-nine percent is something else.",
+          "say": "Back at true scale, the arithmetic is just this sliver, under one percent of the thirty milliseconds. More than ninety-nine percent is something else.",
           "show": "On 'Put together', the inset collapses back down its guide lines into the bar's first millisecond, and the lines retract. The 5 px sliver is left at true scale. On 'this sliver', a short amber pointer drops onto the sliver's top from a tag left-anchored at (240, 580): 'all the arithmetic'. On 'Under one percent', the tag swaps to 'arithmetic: under 1%'. On 'ninety-nine percent', the remaining 1,495 px fill with flat grey in one soft fade, not a left-to-right sweep, so the bar does not read as a clock. The white label 'something else: over 99%' lands inside the grey at (960, 680). A large soft grey '?' (96 px) fades up above the grey at (1,240, 560)."
         },
         {
@@ -68,7 +68,7 @@
         },
         {
           "id": "b2",
-          "say": "How fast it calculates, and how fast its memory delivers. For any model, on any chip.",
+          "say": "How fast it calculates, and how fast its memory delivers the model. For any model, on any chip.",
           "show": "On 'calculates', the line at y 350 resolves into amber text 'operations per second: ?', and it glows once together with the amber sliver on the bar below. On 'memory', the line at y 450 resolves into coral text 'bytes per second: ?'. A thin coral thread draws from that line's left end (1,030, 450) to the right side of the '30 ms' readout (570, 330). On 'delivers', a short blue thread draws straight up from the model-file icon to the stopwatch (x 260, y 492 to 388), and '30 ms' flashes coral once. The amber line gets no thread to the stopwatch. The values stay '?' on purpose. On 'any model, on any chip', a fan of three faint chip icons and three model-file icons of different sizes riffles behind the card and settles."
         },
         {

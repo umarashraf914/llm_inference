@@ -83,7 +83,7 @@
         133,
         134
       ],
-      "visual": "Header top band: 'The observation that saves everything'. Left half, upper: a row of six blue token pills 't1' to 't6', each with a small blue key tile 'K' and value tile 'V' stacked above it; an amber pill 't7' arrives from the right. A teal-bordered banner over them, two lines: 'Earlier keys and values' / 'do not depend on the new token'. Left half, lower, from b2: a blue box 'generating token 1,000' and an amber box 'recompute 999 positions'; then a staircase of amber blocks in columns of 0, 1, 2 and 3 inside a dashed 4 by 3 rectangle, and an equation that builds term by term. Right half, from b4: one chart titled 'Two ways to grow', a single shared y axis 'total work' and x axis 'tokens', a teal straight line 'Linear' and an amber upward curve 'Quadratic', with a strip of per-token bars under each, and a grey 'schematic' tag. The idea the motion makes visible: earlier keys and values are frozen, so recomputing them is pure repetition, and that repetition piles up as a triangle whose total outruns anything linear.",
+      "visual": "Header top band: 'The observation that saves everything'. Left half, upper: a row of six blue token pills 't1' to 't6', each with a small blue key tile 'K' and value tile 'V' stacked above it; an amber pill 't7' arrives from the right. A teal-bordered banner over them, two lines: 'Earlier keys and values' / 'do not depend on the new token'. Left half, lower, from b2: a blue box 'generating token 1,000' and an amber box 'recompute 999 positions'; then a staircase of amber blocks in columns of 0, 1, 2 and 3 inside a dashed 4 by 3 rectangle, and an equation that builds term by term. From b4 the left half keeps only its amber block columns, with no text, and the chart title replaces the header. Right half, from b4: one chart titled 'Two ways to grow', a single shared y axis 'total work' and x axis 'tokens', a teal straight line 'Linear' and an amber upward curve 'Quadratic', with a strip of per-token bars under each, and a grey 'schematic' tag. The idea the motion makes visible: earlier keys and values are frozen, so recomputing them is pure repetition, and that repetition piles up as a triangle whose total outruns anything linear.",
       "beats": [
         {
           "id": "b1",
@@ -324,7 +324,7 @@
         },
         {
           "id": "b4",
-          "say": "So the model and the conversation's state compete, which shapes every technique ahead: shrinking the cache, sharing it between requests that start alike, splitting it across machines, or never storing parts at all.",
+          "say": "So the model and each conversation's state compete, which shapes every technique ahead: shrinking the cache, sharing it between requests that start alike, splitting it across machines, or never storing parts at all.",
           "show": "The bracket, its label and the 'read once, shared' tag fade, leaving the block labels 'weights' and 'cache'. On 'compete', the weights block and the five cache blocks pulse in turn, both particle streams crowding the one bus. Four teal cards slide up along the bottom, one per phrase: a shrink-arrows icon 'shrink it'; a two-users icon 'share a common prefix'; a two-servers icon 'split across machines'; a crossed-out-block icon 'don't store parts'. As the cards land, the block labels fade, so the card labels are the only text."
         },
         {
@@ -397,9 +397,9 @@
       "result": "320.0 4.0 327.68 32.768"
     },
     {
-      "claim": "fig 139: with 64 KV heads (no grouped-query attention) the cache would be 2,621,440 bytes per token = 2.62 MB in the film's decimal units (2.5 only in binary MiB), eight times larger. Corrected: narration now says 'about two point six megabytes', matching the on-screen '2.6 MB'",
-      "python": "print(2*80*64*128*2, 2*80*64*128*2/1e6, 2*80*64*128*2/2**20, 2*80*64*128*2/327680)",
-      "result": "2621440 2.62144 2.5 8.0"
+      "claim": "fig 139: with 64 KV heads (no grouped-query attention) the cache would be 2,621,440 bytes per token, eight times larger: 8 x 320 KB = 2,560 KB, and 2.62 million bytes, so 'about two point six megabytes' and the on-screen '2.6 MB' hold whether a megabyte is read as 1,000 KB or 1,000,000 bytes; it is 2.5 only if a megabyte is 1,024 x 1,024 bytes, a convention the film does not use",
+      "python": "print(2*80*64*128*2, 8*320, 2*80*64*128*2/1e6, 2*80*64*128*2/2**20, 2*80*64*128*2/327680)",
+      "result": "2621440 2560 2.62144 2.5 8.0"
     },
     {
       "claim": "fig 140: 1,000 / 10,000 / 100,000 tokens of cache = 0.33 / 3.3 / 33 GB (all three now spoken); bars drawn to scale against 140 GB are 0.23%, 2.3% and 23.4% of the weights bar (hairline, sliver, about a quarter)",
