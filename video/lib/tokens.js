@@ -96,12 +96,14 @@ const __TOK = (() => {
     if (st.sw) g.edge = S.rect({ ...R, stroke: st.stroke, strokeOpacity: st.so, sw: st.sw, dash: st.dash, filter: st.glow ? `url(#glow-${st.glow})` : undefined }, g);
     return g;
   }
-  /** Indices from a range spec: i, [a, b] (inclusive; negatives count from the end), an array of indices, or 'all'. */
+  /** Indices from a range spec: i, [a, b] (inclusive; negatives count from the end), {list: [i, j, ...]}, or 'all'.
+   *  (An array of three or more numbers is also read as a list.) */
   function idx(range, n) {
     const fix = i => (i < 0 ? n + i : i);
     if (range === undefined || range === 'all') return [...Array(n).keys()];
+    if (range && typeof range === 'object' && Array.isArray(range.list)) return range.list.map(fix).filter(i => i >= 0 && i < n);
     if (Array.isArray(range)) {
-      if (range.length > 2 || range.__list) return range.map(fix).filter(i => i >= 0 && i < n);
+      if (range.length > 2) return range.map(fix).filter(i => i >= 0 && i < n);
       const a = fix(range[0]), b = fix(range[1] ?? range[0]);
       const out = [];
       for (let i = Math.max(0, a); i <= Math.min(n - 1, b); i++) out.push(i);
@@ -234,22 +236,25 @@ function libTokenize(text, o = {}) {
  *    id (number | string | true = an illustrative stable ID), idPos 'below' | 'above' | 'inline', idPrefix
  *    'ID ' (inline), idSize max(24, size*0.8), idColor 'muted', idHidden false (inline: the chip starts
  *    narrow, showing only the text, and .showId() widens it), icon (icon id, drawn before the text),
- *    iconColor (state's text colour), frame false (true: a thin rectangular packet frame round the chip),
- *    hidden false, decorative false (size < 24: marks it data-audit="ignore").
+ *    iconColor (the state's tone), frame false (true: a thin rectangular packet frame round the chip, as a
+ *    token travels the wire), frameTone 'struct', hidden false, decorative false (size < 24: marks it
+ *    data-audit="ignore").
  * Returns <g> with .body (scaled by pop/pulse), .skin (current skin), .label, .iconEl, .idEl, .idG (inline),
  *    .frameEl, and geometry as drawn: .x .y (top) .w .h .l .r .t .b .cx .cy .rad .wNarrow, .text, .state.
  *    .__dx/.__dy is the planned offset (where helpers have moved it).
  * Helpers (each returns a tween/timeline for S.add; call in time order):
  *    .pop({d: 0.5, from: 0.6}) pop in · .in({from: 'up', d: 0.6, dist: 30}) slide in · .out({d: 0.35})
  *    .flyIn([x, y], {d: 0.8}) fly in from a point (parent coords) · .moveTo([x, y], {d: 0.7}) centre to a point
- *    .moveBy(dx, dy, {d}) · .travel(pathD | <path>, {d: 1, ease, appear}) the centre follows a path (start it at
- *        the chip's current centre; appear: fades in as it sets off)
+ *    .moveBy(dx, dy, {d}) · .travel(pathD | <path>, {d: 1, ease: 'power1.inOut', appear}) the centre follows a
+ *        path in the parent's coordinates (start it at the chip's centre; appear: fades in as it sets off). Draw
+ *        a visible route in S.layers.back so the chip rides over it.
  *    .setState(state, {d: 0.4}) crossfade to another colour state · .swap(text, {state, d: 0.35}) relabel
  *    .pulse({scale: 1.12, d: 0.5}) · .glow({tone: 'white', hold: 0.6, d: 0.3}) a ring flashes (hold: Infinity
  *        keeps it; .unglow() removes it) · .glowId({hold}) ring round the ID only
  *    .showId({d: 0.5}) the ID appears (inline + idHidden: the chip widens to reveal it)
  *    .stripe(tones, {d: 0.5}) a band in the neighbours' colours appears along the chip's bottom (what attention
- *        mixed in) · .badge(text, {tone: 'helps', d: 0.4}) a small numbered disc clips onto the top-right corner
+ *        mixed in) · .badge(text, {tone: 'helps', d: 0.4}) a solid disc ('2') or pill ('5 of 7') clips onto the
+ *        top-right corner (a position, a count)
  *    .textOff({d: 0.4}) / .textOn() the letters fade (the model's view: plain pills)
  *   const tok = libToken(S, { text: 'fox', x: 760, y: 500, id: 4271, idPos: 'inline', idHidden: true });
  *   S.add(tok.flyIn([200, 500]), 'b2~fox');
@@ -434,13 +439,16 @@ function libToken(S, o = {}, parent) {
     return gsap.fromTo(sg, { autoAlpha: 0, scaleX: 0.2, transformOrigin: '50% 50%' }, { autoAlpha: 1, scaleX: 1, duration: so.d ?? 0.5, ease: 'power3.out', transformOrigin: '50% 50%' });
   };
   g.badge = (txt, bo = {}) => {
-    const br = Math.max(17, Math.round(size * 0.52));
-    const bx = x + g.__w - Math.round(br * 0.1), by = y - Math.round(br * 0.2);
+    // a disc for a digit or two ('2'), a pill for more ('5 of 7'); its right end hangs just past the chip
+    const br = Math.max(17, Math.round(size * 0.52)), bs = Math.max(24, Math.round(br * 1.25));
+    const tw2 = S.measure(String(txt), { size: bs, weight: 750 });
+    const bw = Math.max(2 * br, tw2 + 18);
+    const bx = x + g.__w - Math.round(br * 0.1) + (bw / 2 - br), by = y - Math.round(br * 0.2);
     const bg = S.g(null, g);
-    const tone = bo.tone || 'helps';
-    S.circle({ x: bx, y: by, r: br, fill: T.BASE }, bg);
-    S.circle({ x: bx, y: by, r: br, fill: `url(#solid-${T.GRAD.includes(tone) ? tone : 'helps'})` }, bg);
-    const bt = S.text(String(txt), { x: bx, y: by + 1, size: Math.max(24, Math.round(br * 1.25)), weight: 750, anchor: 'middle', color: T.DARK }, bg);
+    const tone = T.GRAD.includes(bo.tone) ? bo.tone : 'helps';
+    S.rect({ x: bx - bw / 2, y: by - br, w: bw, h: 2 * br, r: br, fill: T.BASE }, bg);
+    S.rect({ x: bx - bw / 2, y: by - br, w: bw, h: 2 * br, r: br, fill: `url(#solid-${tone})` }, bg);
+    const bt = S.text(String(txt), { x: bx, y: by + 1, size: bs, weight: 750, anchor: 'middle', color: T.DARK }, bg);
     bt.setAttribute('data-audit', 'ignore');   // the digit sits inside its own disc, which overlaps the chip edge by design
     g.badgeEl = bg;
     return gsap.fromTo(bg, { autoAlpha: 0, scale: 0.3, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: bo.d ?? 0.4, ease: 'back.out(2.6)', transformOrigin: '50% 50%' });
@@ -462,23 +470,30 @@ function libToken(S, o = {}, parent) {
  *    {t, id}), idPos 'below' | 'above', idSize, slots 0 (empty dashed slots after the tokens; append fills
  *    them), slotW (default w or h*1.6), joined false (start as one sentence bar; .cut() breaks it into chips;
  *    one line only), hidden false (start with every chip hidden: .reveal() them), window (a context-window
- *    outline: {n (chip slots) | w (px), label, tone 'struct', dashed true}), decorative false.
+ *    outline: {n (chip slots of width w or slotW) | w (px), label (above its right end), size 26, tone 'struct',
+ *    dashed true, pad 10}), decorative false.
  * Returns <g> (root) with .content (inner group: scrolled by .shift/.push), .tokens[] (libToken chips in
  *    order, each with .i, .line), .slots[], .items[] (chips and slots in layout order), .bar (joined bar),
  *    .windowEl, .windowLabel, .lineH, .h, .size and .l .r .t .b .w of the initial layout.
- * Helpers (each returns a tween/timeline; call them in time order; a range is i | [a, b] | 'all' | [i, j, k, ...]):
+ * Helpers (each returns a tween/timeline; call them in time order; a range is i | [a, b] (inclusive; negatives
+ * count from the end) | 'all' | {list: [i, j, ...]}):
  *    .append(t | {t, id, state}, {from: [x, y] | via: pathD, d, state})  a chip joins the end (or fills the first
- *        slot): pops in, flies in from a point, or rides a path (e.g. a return arrow) and lands. tl.token = chip
+ *        slot): pops in, flies in from a point, or rides a path (e.g. a return arrow, in the strip's coordinates;
+ *        end it at .next(t)) and lands. The row makes room just before it arrives. tl.token = the new chip
  *    .stream(list, {every: 0.25, ...append})   append several, one every `every` s
- *    .push(t, {keep, d: 0.5, drop: true})      sliding window: append, scroll left so the last `keep` chips show,
- *        and the ones that fall out drop below the line and turn grey ('out of reach')
+ *    .push(t, {keep (window.n), d: 0.5, drop: true, fallen: 3, dy, state: 'dim'})  sliding window: append, scroll
+ *        left so the last `keep` chips show; each chip that falls out drops straight down under the window's left
+ *        end and turns grey ('out of reach'), older fallen chips move along, and beyond `fallen` they fade.
+ *        .fallenRow() -> {x1, cy} of that row, for a tag
  *    .reveal(range | 'slots', {every: 0.08, d}) pop in chips that already exist (hidden until then)
  *    .setState(range, state, {d: 0.4, stagger: 0})   recolour (stagger > 0 sweeps left to right)
- *    .highlight(n, {tone: 'helps', label, d: 0.8, pad: 8})  a band behind the first n chips ('prefix'); call
- *        again to grow or shrink it (0 collapses it); any earlier label fades. tl.labelEl = the label
+ *    .highlight(n, {tone: 'helps', label, d: 0.8, pad: 8, size: 28})  a band behind the first n chips ('prefix');
+ *        call again to grow or shrink it (0 collapses it); any earlier label fades. tl.labelEl = the label. The
+ *        band is placed where the chips are planned to be: after a split/reflow, call it again to follow them
  *    .cut({d: 0.9})                 joined sentence bar -> separate chips (cut marks, then they part)
  *    .split(i, pieces, {d: 0.9})    chip i cracks into pieces in place; the rest make room. tl.pieces = chips
- *    .reorder(order, {d: 0.9})      new order (array of current token indices); chips that jump forward arc over
+ *    .reorder(order, {d: 0.9, arc: true})  new order (array of current token indices); a chip that jumps to the
+ *        front or back hops over the others
  *    .relayout({maxW, vertical, align, x, y, gap, lineGap}, {d: 0.9, stagger: 0.02})  reflow: a grid, a column...
  *    .swap(i, text, {state})        relabel chip i ('t2' -> 'XX') · .textOff(range) / .textOn(range) letters fade
  *    .showIds({stagger: 0.05}) · .badges(range, labels, {tone, stagger}) · .stripe(i, tones)
@@ -486,8 +501,8 @@ function libToken(S, o = {}, parent) {
  *    .lift(range, {dy: -14})        raise chips a little (brighten them yourself with setState)
  *    .shift(n, {d: 0.6})            scroll the content so chip n sits at the strip's left edge
  *    .showWindow({d: 0.6}) / .solidWindow({d: 0.5}) the context-window outline appears / turns solid
- *    .bracket(a, b, {label, up, tone, size}) -> a bracket <g> under (or over) chips a..b, hidden until its
- *        .drawOn({d: 0.6}) (fade it with fx.out)
+ *    .bracket(a, b, {label, up, tone, size, parent}) -> a bracket <g> under (or over, clear of IDs) chips a..b,
+ *        hidden until its .drawOn({d: 0.6}); fade it with fx.out
  * Geometry (planned, in the strip's coordinates, after the helpers called so far):
  *    .at(i) -> {x1, x2, cx, cy, t, b} · .span(a, b) · .next(t) -> {x, y} centre where the next append lands
  *   const s = libTokenStrip(S, { x: 960, y: 260, align: 'middle', tokens: ['the', ' quick', ' brown', ' fox', ' jumps'], joined: true });
@@ -555,12 +570,21 @@ function libTokenStrip(S, o = {}, parent) {
   const relayoutInto = (tl, at, ro = {}) => {
     const P = T.layout(root.items.map(c => c.__w), L);
     const d = ro.d ?? 0.6, ease = ro.ease || 'power3.inOut';
+    // which chips hop over the others (reorder): those that travel further than any one chip is wide (the one
+    // that jumps to the front or the back); if none do but chips cross (a swap), the ones moving left hop
+    const arcs = new Set();
+    if (ro.arc) {
+      const mv = root.items.map((c, k) => ({ c, dx: c.__fell ? 0 : P[k].x - c.x0 - c.__dx })).filter(m => Math.abs(m.dx) > 0.5);
+      const maxW = Math.max(0, ...mv.map(m => m.c.__w)) + gap;
+      mv.filter(m => Math.abs(m.dx) > maxW + 0.5).forEach(m => arcs.add(m.c));
+      if (!arcs.size && mv.some(m => m.dx > 0) && mv.some(m => m.dx < 0)) mv.filter(m => m.dx < 0).forEach(m => arcs.add(m.c));
+    }
     root.items.forEach((c, k) => {
       c.line = P[k].line;
       if (c.__fell) return;   // out of the window: placed by push
       const tx = P[k].x - c.x0, ty = P[k].y - c.cy0 + c.__drop + c.__lift;
       if (Math.abs(tx - c.__dx) < 0.01 && Math.abs(ty - c.__dy) < 0.01) return;
-      const arc = ro.arc && tx < c.__dx - c.__w ? -(h * 1.15) : 0;
+      const arc = arcs.has(c) ? -(h * 1.15) : 0;
       if (arc) {
         tl.fromTo(c, { x: c.__dx }, { x: tx, duration: d, ease, immediateRender: false }, at + k * (ro.stagger || 0));
         tl.fromTo(c, { y: c.__dy }, { y: c.__dy + arc, duration: d / 2, ease: 'power2.out', immediateRender: false }, at + k * (ro.stagger || 0));
@@ -927,7 +951,8 @@ function libTokenStrip(S, o = {}, parent) {
  *    .composer .sendBtn, .tokens[] (each {g, text, raw, flash, stand, i, line, x, w, y}), .lines, .maxLines,
  *    .ax .ay .aw .lineH, and frame geometry .x .y .w .h .l .r .t .b .cx .cy.
  * Helpers (return tweens/timelines; call in time order):
- *    .drawOn({d: 0.8})             the window and its chrome appear, with the question (unless it is typed)
+ *    .drawOn({d: 0.8})             the window and its chrome appear, with the question bubble (if .typeQuestion is
+ *                                  also used, the bubble stays empty until the typing starts)
  *    .typeQuestion({d})            the question types into the bubble as it grows (empty until then)
  *    .send({d: 0.5})               the send button pulses
  *    .stream({from, to | count, every: 0.1, times, relax})   tokens land one by one (from defaults to the next
@@ -943,7 +968,7 @@ function libTokenStrip(S, o = {}, parent) {
  *    .showCaret() / .hideCaret()
  * Geometry: .span(a, b) -> {x1, x2, cx, y, t, b} (ignores scrolling) · .find(text, nth = 1) -> token index
  *   const chat = libChatWindow(S, { question: 'Why is the sky blue?', answer: ANSWER, splits: { wavelengths: ['wave', 'lengths'] } });
- *   S.add(chat.drawOn({ question: false }), 'b1');
+ *   S.add(chat.drawOn(), 'b1');
  *   S.add(chat.typeQuestion(), 'b1+0.4');
  *   S.add(chat.stream({ to: chat.find(' blues') + 1, every: 0.03 }), 'b2-2.22');
  *   S.add(chat.pillify(chat.find(' blues') - 5, chat.find(' blues')), 'b2');
@@ -1005,7 +1030,7 @@ function libChatWindow(S, o = {}, parent) {
   const maxLines = o.maxLines ?? Math.max(1, Math.floor((bottom - (ay - lineH / 2)) / lineH));
   const answerG = S.g(null, root);
   const scroller = S.g(null, answerG);
-  const sparkleFade = S.g(null, scroller);   // scroll fade (attribute opacity); the icon itself takes drawOn / fx (style)
+  const sparkleFade = S.g({ opacity: 1 }, scroller);   // scroll fade (attribute opacity); the icon itself takes drawOn / fx (style)
   root.sparkle = S.icon('ph:sparkle-fill', { x: iconX, y: ay, size: icon, color: tone }, sparkleFade);
   // ---- tokens, laid out word by word (a word = a token with a leading space plus the pieces glued to it)
   const toks = Array.isArray(o.answer) ? o.answer.slice() : libTokenize(o.answer || '', { splits: o.splits });
@@ -1169,8 +1194,10 @@ function libChatWindow(S, o = {}, parent) {
       const arr = byLine[ln], onLine = root.tokens.filter(t => t.line === ln);
       const lastOn = onLine[onLine.length - 1], first = arr[0], lastP = arr[arr.length - 1];
       const prev = root.tokens[first.i - 1], after = onLine.filter(t => t.i > lastP.i);
-      const base = prev && prev.line === ln && !/^\s/.test(first.raw) ? pPad + 3 : 0;            // clear a glued neighbour before
-      const extra = after.length && !/^\s/.test(after[0].raw) ? pPad + 3 : 0;                    // and after
+      // keep ~6 px of air between a pill and the words either side (a word space alone leaves ~2 px)
+      const air = Math.max(0, pPad + 6 - spW);
+      const base = prev && prev.line === ln ? (/^\s/.test(first.raw) ? air : pPad + 3) : 0;
+      const extra = after.length ? (/^\s/.test(after[0].raw) ? air : pPad + 3) : 0;
       const room = ax + aw + pad * 0.3 - (lastOn.x + lastOn.w + (lastOn === lastP ? pPad : 0)) - base - extra;
       const sp = arr.length > 1 ? Math.max(2 * pPad + 2, Math.min(want, room / (arr.length - 1))) : 0;
       if (arr.length > 1 && room < (arr.length - 1) * sp - 1) S.warn(`libChatWindow.pillify: line ${ln + 1} overflows by ${Math.round((arr.length - 1) * sp - room)} px; pillify fewer tokens or widen the window`);
@@ -1375,9 +1402,11 @@ function libBubble(S, o = {}, parent) {
  *    .land(i, [x, y], {d: 0.8})             a segment flies in from a point and lands in place
  *    .append(seg, {d: 0.7})                 add a segment at the end (it grows in)
  *    .paint(range, state, {d: 0.4, stagger}) recolour segments (e.g. 'cached' teal for a hit, 'prefill' amber)
- *    .highlight(tokens, {tone: 'helps', label, d: 0.9})  a band sweeps over the first `tokens` tokens
- *    .notch(tokens, {label, d: 0.4})        a white notch drops across the bar at a token offset ('differs here')
- *    .showLabels(range, {d: 0.4})           labels of segments appear on cue (hidden until then)
+ *    .highlight(tokens, {tone: 'helps', label, d: 0.9, size: 28, labelX, labelY})  a band sweeps over the first
+ *        `tokens` tokens (call again to move it; 0 collapses it); its label sits above, clear of outside labels
+ *    .notch(tokens, {label, d: 0.4, size: 26}) a white notch drops across the bar at a token offset ('differs
+ *        here'); its label sits beneath the value rows. tl.notchEl
+ *    .showLabels(range, {d: 0.4, stagger: 0.1})  stack layout: segment labels appear on cue (hidden until then)
  *    .showFrame({d: 0.8})                   the context-window outline draws on
  *   const ps = libPromptStack(S, { x: 140, y: 700, scale: 0.25, rows: { x: 620, y: 230 }, total: true,
  *     segments: [{ label: "provider's system prompt", tokens: 2000, icon: 'ph:globe-duotone' }, { label: 'tool definitions', tokens: 450 }] });

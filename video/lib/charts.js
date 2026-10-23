@@ -314,13 +314,14 @@ function libRoofline(S, o = {}, parent) {
   if (!show.roof) { C.hide(g.slopeL); C.hide(g.flatR); }
 
   // ---- region tints (a soft vertical gradient under each part of the roof) and their labels
+  const tintStops = {};
   const tintGrad = (tone) => {
     const id = C.uid('tint');
     const lg = S.el('linearGradient', { id, x1: 0, y1: ry, x2: 0, y2: xb, gradientUnits: 'userSpaceOnUse' }, defs);
-    S.el('stop', { offset: 0, 'stop-color': S.tone(tone), 'stop-opacity': 0.17 }, lg);
-    S.el('stop', { offset: 1, 'stop-color': S.tone(tone), 'stop-opacity': 0.05 }, lg);
+    tintStops[tone] = [S.el('stop', { offset: 0, 'stop-color': S.tone(tone), 'stop-opacity': 0.17 }, lg), S.el('stop', { offset: 1, 'stop-color': S.tone(tone), 'stop-opacity': 0.05 }, lg)];
     return `url(#${id})`;
   };
+  const tintK = { memory: 1, compute: 1 };
   const memD = `M${P(pS0[0], xb)} L${P(...pS0)} L${P(rx, ry)} L${P(rx, xb)} Z`;
   const cmpD = `M${P(rx, xb)} L${P(rx, ry)} L${P(xr, ry)} L${P(xr, xb)} Z`;
   g.tints = { memory: S.path({ d: memD, fill: tintGrad('bytes') }, tintG), compute: S.path({ d: cmpD, fill: tintGrad('compute') }, tintG) };
@@ -466,6 +467,18 @@ function libRoofline(S, o = {}, parent) {
       t.fromTo([ridge.tagBg, ridge.tag], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, d * 0.8);
       if (tagHits.length) t.to(tagHits, { autoAlpha: 0, duration: 0.3 }, d * 0.8);
     } else t.set([ridge.tagBg, ridge.tag], { autoAlpha: 0 }, 0);
+    return t;
+  };
+  g.tint = (which, k, a = {}) => {          // region tint strength: 1 = default (≈ 10%), 2.5 ≈ 25%
+    const stops = tintStops[which === 'compute' ? 'compute' : 'bytes'], k0 = tintK[which];
+    tintK[which] = k;
+    return C.drive(k0, k, v => { stops[0].setAttribute('stop-opacity', C.r2(0.17 * v * 100) / 100); stops[1].setAttribute('stop-opacity', C.r2(0.05 * v * 100) / 100); }, { d: a.d ?? 0.6, ease: 'power2.inOut' });
+  };
+  g.ridgeTagTo = (text, a = {}) => {         // the axis tag changes ('?' → '295'); its pill resizes with it
+    const d = a.d ?? 0.45, t = gsap.timeline();
+    const w1 = S.measure(String(text), { size: tsz, family: 'mono', weight: 600 }) + 22, w0 = +ridge.tagBg.getAttribute('width');
+    t.add(S.fx.swap(ridge.tag, String(text), { d }), 0);
+    t.fromTo(ridge.tagBg, { attr: { width: w0, x: rx - w0 / 2 } }, { attr: { width: w1, x: rx - w1 / 2 }, duration: d, ease: 'power2.inOut', immediateRender: false }, 0);
     return t;
   };
   g.tagPeak = (a = {}) => gsap.fromTo(g.peakTagEl, { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: a.d ?? 0.6, ease: 'power3.out' });
@@ -632,17 +645,42 @@ function libRoofline(S, o = {}, parent) {
   g.bracket = (I1, I2, a = {}) => {
     const bg = S.g(null, a.parent || g.marks);
     const xa = X(Math.min(I1, I2)), xz = X(Math.max(I1, I2)), y = a.y ?? (xb - 30), tk = a.tick ?? 12;
-    const tone = a.tone || 'ink';
-    bg.line = S.path({ d: `M${C.r2(xa)},${y + tk} L${C.r2(xa)},${y} L${C.r2(xz)},${y} L${C.r2(xz)},${y + tk}`, stroke: tone, sw: 2.5, join: 'miter' }, bg);
+    const tone = a.tone || 'ink', arrow = a.style === 'arrow';
+    if (arrow) {          // an arrow from I1 to I2 with end ticks at I1 ("the corner moves × 4.7 right")
+      const xs = X(I1), xe = X(I2), dir = Math.sign(xe - xs) || 1;
+      bg.line = S.path({ d: `M${C.r2(xs)},${y} L${C.r2(xe - dir * 3)},${y}`, stroke: tone, sw: 2.5 }, bg);
+      bg.head = S.path({ d: C.headD(xe, y, dir, 0, 13), stroke: tone, sw: 2.5 }, bg);
+      bg.ticks = S.path({ d: `M${C.r2(xs)},${y - tk} L${C.r2(xs)},${y + tk}`, stroke: tone, sw: 2.5 }, bg);
+    } else bg.line = S.path({ d: `M${C.r2(xa)},${y + tk} L${C.r2(xa)},${y} L${C.r2(xz)},${y} L${C.r2(xz)},${y + tk}`, stroke: tone, sw: 2.5, join: 'miter' }, bg);
     if (a.label) bg.label = S.text(a.label, { x: (xa + xz) / 2, y: y - 24, size: a.size ?? 28, anchor: 'middle', color: tone, weight: 650, family: a.mono ? 'mono' : 'sans' }, bg);
     bg.in = (b = {}) => {
-      const t = gsap.timeline();
-      t.add(C.draw(bg.line, { d: b.d ?? 0.6, from: '50% 50%', to: '0% 100%', ease: 'power2.out' }), 0);
-      if (bg.label) t.fromTo(bg.label, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out' }, (b.d ?? 0.6) * 0.5);
+      const t = gsap.timeline(), d = b.d ?? 0.6;
+      if (arrow) {
+        t.add(C.draw(bg.ticks, { d: 0.2 }), 0);
+        t.add(C.draw(bg.line, { d, ease: 'power2.inOut' }), 0.1);
+        t.fromTo(bg.head, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15 }, 0.1 + d * 0.9);
+      } else t.add(C.draw(bg.line, { d, from: '50% 50%', to: '0% 100%', ease: 'power2.out' }), 0);
+      if (bg.label) t.fromTo(bg.label, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out' }, d * 0.5);
       return t;
     };
     bg.out = (b = {}) => C.fadeOut(bg, { d: b.d ?? 0.35 });
     return bg;
+  };
+  g.span = (I, P1, P2, a = {}) => {            // a vertical double arrow at intensity I between two speeds
+    const sg = S.g(null, a.parent || g.marks), tone = a.tone || 'ink';
+    const x = X(I) + (a.dx ?? 0), ya = Math.min(Y(P1), Y(P2)), yz = Math.max(Y(P1), Y(P2)), p = a.pad ?? 7;
+    sg.line = S.path({ d: `M${C.r2(x)},${C.r2(ya + p + 2)} L${C.r2(x)},${C.r2(yz - p - 2)}`, stroke: tone, sw: 2.5 }, sg);
+    sg.heads = [S.path({ d: C.headD(x, ya + p, 0, -1, 11), stroke: tone, sw: 2.5 }, sg), S.path({ d: C.headD(x, yz - p, 0, 1, 11), stroke: tone, sw: 2.5 }, sg)];
+    const right = (a.side || 'right') === 'right';
+    if (a.label) sg.label = S.text(a.label, { x: x + (right ? 16 : -16), y: (ya + yz) / 2, size: a.size ?? 28, anchor: right ? 'start' : 'end', weight: 650, color: tone }, sg);
+    sg.in = (b = {}) => {
+      const t = gsap.timeline();
+      t.fromTo([sg.line, ...sg.heads], { autoAlpha: 0, scaleY: 0.2, transformOrigin: '50% 50%' }, { autoAlpha: 1, scaleY: 1, duration: b.d ?? 0.45, ease: 'power3.out' }, 0);
+      if (sg.label) t.fromTo(sg.label, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0.15);
+      return t;
+    };
+    sg.out = (b = {}) => C.fadeOut(sg, { d: b.d ?? 0.35 });
+    return sg;
   };
   g.addRoof = (a = {}) => {
     const rg = S.g({ opacity: a.opacity }, plot);
@@ -804,11 +842,14 @@ function libScaleCompare(S, o = {}, parent) {
   const styles = items.map(it => it.style);
 
   const barsG = S.g(null, g);
+  const growF = items.map(() => 1);                 // how much of each bar is drawn (its entrance sweep)
+  const fromCenter = items.map(() => false);
   g.rows = items.map((it, i) => {
     const y = inline ? y0 : y0 + i * (bh + gap);
     const rg = S.g(null, barsG);
     const tone = it.tone, s = STY[it.style] || STY.solid;
     const row = { g: rg, item: it, x: x0, y, h: bh, cy: y + bh / 2, tone };
+    if (it.track) row.trackEl = S.rect({ x: x0, y, w: W, h: bh, r: 8, fill: '#ffffff', fillOpacity: 0.035, stroke: '#ffffff', strokeOpacity: 0.22, sw: 1.5 }, rg);
     row.base = S.rect({ x: x0, y, w: 1, h: bh, r: 8, fill: C.BASE }, rg);
     row.grey = S.rect({ x: x0, y, w: 1, h: bh, r: 8, fill: '#a7b1cc', fillOpacity: 0.26 }, rg);
     row.solid = S.rect({ x: x0, y, w: 1, h: bh, r: 8, fill: `url(#solid-${C.GRAD.includes(tone) ? tone : 'struct'})` }, rg);
@@ -835,21 +876,30 @@ function libScaleCompare(S, o = {}, parent) {
     const L = lenAt(v);
     return v > 0 ? Math.max(L, hair) : 0;
   };
+  const tiny = i => live[i] > 0 && lenAt(live[i]) < 6;
+  const textEnd = i => {                     // where a bar's value text (if any) ends, for tags placed after it
+    const row = g.rows[i];
+    if (!row.textEl || row.textEl.style.display === 'none') return null;
+    return +row.textEl.getAttribute('x') + S.measure(row.textEl.textContent, { size: tsz, family: 'mono', weight: 600 });
+  };
+  const annots = [];                         // annotations re-placed on every render (they follow the bars)
   function render() {
     g.rows.forEach((row, i) => {
-      const L = drawnLen(i, live[i]), x = startOf(i);
-      const vis = Math.min(L, edge - x);
+      const Lf = drawnLen(i, live[i]), x = startOf(i);
+      const L = Lf * growF[i], xs = fromCenter[i] ? x + (Lf - L) / 2 : x;
+      const vis = Math.max(0, Math.min(L, edge - xs));
       const r = Math.min(8, vis / 2, bh / 2);
       for (const k of ['base', 'grey', 'solid', 'outline']) {
-        row[k].setAttribute('x', C.r2(x)); row[k].setAttribute('width', C.r2(Math.max(vis, 0.001)));
+        row[k].setAttribute('x', C.r2(xs)); row[k].setAttribute('width', C.r2(Math.max(vis, 0.001)));
         row[k].setAttribute('rx', C.r2(r)); row[k].setAttribute('ry', C.r2(r));
       }
-      Object.assign(row, { x, len: L, r: x + vis, hair: live[i] > 0 && lenAt(live[i]) < hair, value: live[i] });
+      Object.assign(row, { x, len: Lf, r: x + Math.min(Lf, edge - x), hair: live[i] > 0 && lenAt(live[i]) < hair, value: live[i] });
       if (row.textEl) {
-        row.textEl.setAttribute('x', C.r2(x + Math.min(L, edge) + (lenAt(live[i]) < 6 && live[i] > 0 ? bh / 2 + 26 : 18)));
-        row.textEl.style.display = x + L > 1800 ? 'none' : '';
+        row.textEl.setAttribute('x', C.r2(x + Math.min(Lf, edge) + (tiny(i) ? bh / 2 + 26 : 18)));
+        row.textEl.style.display = x + Lf > 1800 ? 'none' : '';
       }
     });
+    annots.forEach(a => a.place());
   }
   render();
   g.X = v => x0 + lenAt(v);
@@ -860,13 +910,13 @@ function libScaleCompare(S, o = {}, parent) {
   g.in = (a = {}) => {
     const d = a.d ?? 1.0, stg = a.stagger ?? 0.3, t = gsap.timeline();
     g.rows.forEach((row, i) => {
-      const fin = vals[i];
-      const set = v => { live[i] = v; render(); };
-      t.fromTo(row.g, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, i * stg);
-      // the sweep: from zero to the planned value (tiny ones simply appear)
-      t.add(C.drive(0, fin, set, { d: lenAt(fin) < 6 ? 0.25 : d, ease: 'power3.out' }), i * stg);
+      fromCenter[i] = a.from === 'center' && (!inline || i === 0);
+      const at = i * stg;
+      t.fromTo(row.g, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, at);
+      // the sweep (tiny bars simply appear)
+      t.add(C.drive(0, 1, f => { growF[i] = f; render(); }, { d: lenAt(vals[i]) < 6 ? 0.25 : d, ease: a.ease || 'power3.out' }), at);
       const txt = [row.labelEl, row.textEl, row.offEl].filter(Boolean);
-      if (txt.length) t.fromTo(txt, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: 'power2.out' }, i * stg + Math.min(d, 0.5));
+      if (txt.length) t.fromTo(txt, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: 'power2.out' }, at + Math.min(d, 0.5));
     });
     return t;
   };
@@ -902,69 +952,94 @@ function libScaleCompare(S, o = {}, parent) {
     return C.drive(0, 1, f => { st.m = C.lerp(m0, 0, f); render(); }, { d: a.d ?? 1.4, ease: 'power2.inOut' });
   };
 
+  // ---- annotations: they follow their bar (grow, log morph) and draw on with .in()
   const annot = (gg, inFn) => {
     gg.in = inFn || ((b = {}) => gsap.fromTo(gg, { autoAlpha: 0 }, { autoAlpha: 1, duration: b.d ?? 0.45, ease: 'power2.out' }));
     gg.out = (b = {}) => C.fadeOut(gg, { d: b.d ?? 0.35 });
+    annots.push(gg);
+    gg.place();
     return gg;
   };
-  const planEnd = i => startOf(i) + drawnLen(i, vals[i]);
+  const drawIn = (gg, frac, b, extra) => {   // group shows, the drawn fraction runs 0 → 1, labels fade
+    const t = gsap.timeline(), d = b.d ?? 0.6;
+    t.fromTo(gg, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0);
+    t.add(C.drive(0, 1, f => { frac.v = f; gg.place(); }, { d, ease: b.ease || 'power2.out' }), 0);
+    if (extra) extra(t, d);
+    return t;
+  };
   g.tag = (i, text, a = {}) => {
-    const row = g.rows[i], tg = S.g(null, g);
-    const side = a.side || 'end', sz = a.size ?? 26, tone = a.tone || 'muted';
-    const xe = Math.min(planEnd(i), 1800);
-    let x, y, anchor = 'start';
-    if (side === 'end') { x = xe + 18; y = row.cy + 1; }
-    else if (side === 'above') { x = startOf(i); y = row.y - 30; }
-    else if (side === 'below') { x = startOf(i); y = row.y + bh + 30; }
-    else { x = startOf(i) + 22; y = row.cy + 1; }
-    tg.label = S.text(text, { x: x + (a.dx || 0), y: y + (a.dy || 0), size: sz, weight: 600, color: side === 'inside' ? (a.tone || 'ink') : tone, anchor, family: a.mono ? 'mono' : 'sans' }, tg);
+    const tg = S.g(null, g);
+    const side = a.side || 'end', tone = a.tone || (side === 'inside' || side === 'center' ? 'ink' : 'muted');
+    tg.label = S.text(text, { x: 0, y: 0, size: a.size ?? 26, weight: 600, color: tone, anchor: side === 'center' ? 'middle' : 'start', family: a.mono ? 'mono' : 'sans' }, tg);
+    tg.place = () => {
+      const row = g.rows[i], xs = startOf(i), L = drawnLen(i, live[i]);
+      let x, y = row.cy + 1;
+      if (side === 'end') { const te = textEnd(i); x = te != null ? te + 22 : Math.min(xs + L, 1800) + (tiny(i) ? bh / 2 + 26 : 18); }
+      else if (side === 'above') { x = xs; y = row.y - 30; }
+      else if (side === 'below') { x = xs; y = row.y + bh + 30; }
+      else if (side === 'center') x = xs + Math.min(L, edge - xs) / 2;
+      else x = xs + 22;
+      tg.label.setAttribute('x', C.r2(x + (a.dx || 0))); tg.label.setAttribute('y', C.r2(y + (a.dy || 0)));
+    };
     return annot(tg, (b = {}) => gsap.fromTo(tg, { autoAlpha: 0, x: side === 'end' ? -10 : 0, y: side === 'end' ? 0 : 8 }, { autoAlpha: 1, x: 0, y: 0, duration: b.d ?? 0.5, ease: 'power3.out' }));
   };
   g.pointer = (i, text, a = {}) => {
-    const row = g.rows[i], pg = S.g(null, g);
+    const pg = S.g(null, g), fr = { v: 1 };
     const tone = a.tone || 'ink', len = a.len ?? 64, up = (a.side || 'above') === 'above';
-    const px = a.at != null ? startOf(i) + lenAt(a.at) : startOf(i) + Math.max(drawnLen(i, vals[i]), 0) / 2;
-    const ya = up ? row.y - 6 : row.y + bh + 6, yb = up ? ya - len : ya + len;
-    pg.line = S.line({ x1: px, y1: yb, x2: px, y2: ya, stroke: tone, sw: 2.5 }, pg);
-    pg.head = S.path({ d: C.headD(px, ya, 0, up ? 1 : -1, 10), stroke: tone, sw: 2.5 }, pg);
-    pg.label = S.text(text, { x: px - 8 + (a.dx || 0), y: yb + (up ? -22 : 24), size: a.size ?? 26, weight: 600, color: tone }, pg);
-    return annot(pg, (b = {}) => {
-      const t = gsap.timeline();
+    pg.line = S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: tone, sw: 2.5 }, pg);
+    pg.head = S.path({ d: '', stroke: tone, sw: 2.5 }, pg);
+    pg.label = S.text(text, { x: 0, y: 0, size: a.size ?? 26, weight: 600, color: tone }, pg);
+    pg.place = () => {
+      const row = g.rows[i];
+      const px = a.at != null ? startOf(i) + lenAt(a.at) : startOf(i) + drawnLen(i, live[i]) / 2;
+      const ya = up ? row.y - 6 : row.y + bh + 6, yb = up ? ya - len : ya + len;
+      pg.line.setAttribute('x1', C.r2(px)); pg.line.setAttribute('x2', C.r2(px));
+      pg.line.setAttribute('y1', C.r2(yb)); pg.line.setAttribute('y2', C.r2(yb + (ya - yb) * fr.v));
+      pg.head.setAttribute('d', C.headD(px, ya, 0, up ? 1 : -1, 10));
+      pg.head.setAttribute('opacity', fr.v > 0.9 ? 1 : 0);
+      pg.label.setAttribute('x', C.r2(px - 8 + (a.dx || 0))); pg.label.setAttribute('y', C.r2(yb + (up ? -22 : 24)));
+    };
+    return annot(pg, (b = {}) => drawIn(pg, fr, { d: b.d ?? 0.4, ease: 'power2.in' }, t => {
       t.fromTo(pg.label, { autoAlpha: 0, y: up ? -8 : 8 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out' }, 0);
-      t.add(C.draw(pg.line, { d: b.d ?? 0.35, ease: 'power2.in' }), 0.1);
-      t.fromTo(pg.head, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12 }, 0.1 + (b.d ?? 0.35) * 0.85);
-      return t;
-    });
+    }));
   };
   g.dimension = (i, label, a = {}) => {
-    const row = g.rows[i], dg = S.g(null, g);
-    const xa = startOf(i), xz = Math.min(planEnd(i), 1830), y = row.y + bh + (a.gap ?? 34), tone = a.tone || 'muted';
-    const sz = a.size ?? 28, lw = S.measure(label, { size: sz, weight: 600 }) + 36, cx = (xa + xz) / 2;
-    dg.ticks = [S.line({ x1: xa, y1: y - 12, x2: xa, y2: y + 12, stroke: tone, sw: 2 }, dg), S.line({ x1: xz, y1: y - 12, x2: xz, y2: y + 12, stroke: tone, sw: 2 }, dg)];
-    dg.left = S.line({ x1: cx - lw / 2, y1: y, x2: xa, y2: y, stroke: tone, sw: 2 }, dg);
-    dg.right = S.line({ x1: cx + lw / 2, y1: y, x2: xz, y2: y, stroke: tone, sw: 2 }, dg);
-    dg.label = S.text(label, { x: cx, y: y + 1, size: sz, anchor: 'middle', weight: 600, color: a.labelTone || 'ink' }, dg);
-    return annot(dg, (b = {}) => {
-      const t = gsap.timeline(), d = b.d ?? 0.7;
-      t.add(C.draw([dg.left, dg.right], { d, ease: 'power2.out' }), 0);
-      t.fromTo(dg.ticks, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, d * 0.85);
+    const dg = S.g(null, g), fr = { v: 1 };
+    const tone = a.tone || 'muted', sz = a.size ?? 28, lw = S.measure(label, { size: sz, weight: 600 }) + 36;
+    dg.ticks = [S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: tone, sw: 2 }, dg), S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: tone, sw: 2 }, dg)];
+    dg.left = S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: tone, sw: 2 }, dg);
+    dg.right = S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: tone, sw: 2 }, dg);
+    dg.label = S.text(label, { x: 0, y: 0, size: sz, anchor: 'middle', weight: 600, color: a.labelTone || 'ink' }, dg);
+    dg.place = () => {
+      const row = g.rows[i], xa = startOf(i), xz = Math.min(xa + drawnLen(i, live[i]), 1830), y = row.y + bh + (a.gap ?? 34);
+      const cx = (xa + xz) / 2, h = Math.min(lw / 2, (xz - xa) / 2);
+      const L1 = cx - h - (cx - h - xa) * fr.v, R1 = cx + h + (xz - cx - h) * fr.v;
+      const set = (e, p) => { for (const k in p) e.setAttribute(k, C.r2(p[k])); };
+      set(dg.left, { x1: cx - h, y1: y, x2: L1, y2: y }); set(dg.right, { x1: cx + h, y1: y, x2: R1, y2: y });
+      set(dg.ticks[0], { x1: xa, y1: y - 12, x2: xa, y2: y + 12, opacity: C.smooth((fr.v - 0.85) / 0.15) });
+      set(dg.ticks[1], { x1: xz, y1: y - 12, x2: xz, y2: y + 12, opacity: C.smooth((fr.v - 0.85) / 0.15) });
+      set(dg.label, { x: cx, y: y + 1 });
+    };
+    return annot(dg, (b = {}) => drawIn(dg, fr, { d: b.d ?? 0.7 }, t => {
       t.fromTo(dg.label, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0);
-      return t;
-    });
+    }));
   };
   g.bracket = (v1, v2, a = {}) => {
-    const row = g.rows[a.row ?? 0], bg = S.g(null, g);
+    const bg = S.g(null, g), fr = { v: 1 }, ri = a.row ?? 0;
     const up = (a.side || 'above') === 'above', tone = a.tone || 'ink', tk = 12;
-    const xa = startOf(a.row ?? 0) + lenAt(Math.min(v1, v2)), xz = Math.min(startOf(a.row ?? 0) + lenAt(Math.max(v1, v2)), 1830);
-    const y = up ? row.y - (a.gap ?? 20) : row.y + bh + (a.gap ?? 20), dir = up ? 1 : -1;
-    bg.line = S.path({ d: `M${C.r2(xa)},${y + dir * tk} L${C.r2(xa)},${y} L${C.r2(xz)},${y} L${C.r2(xz)},${y + dir * tk}`, stroke: tone, sw: 2.5, join: 'miter' }, bg);
-    if (a.label) bg.label = S.text(a.label, { x: (xa + xz) / 2, y: y - dir * 26, size: a.size ?? 28, anchor: 'middle', weight: 650, color: tone }, bg);
-    return annot(bg, (b = {}) => {
-      const t = gsap.timeline();
-      t.add(C.draw(bg.line, { d: b.d ?? 0.6, from: '50% 50%', to: '0% 100%', ease: 'power2.out' }), 0);
+    bg.line = S.path({ d: '', stroke: tone, sw: 2.5, join: 'miter' }, bg);
+    if (a.label) bg.label = S.text(a.label, { x: 0, y: 0, size: a.size ?? 28, anchor: 'middle', weight: 650, color: tone }, bg);
+    bg.place = () => {
+      const row = g.rows[ri], xs = startOf(ri);
+      const xa = xs + lenAt(Math.min(v1, v2)), xz = Math.min(xs + lenAt(Math.max(v1, v2)), 1830);
+      const y = up ? row.y - (a.gap ?? 20) : row.y + bh + (a.gap ?? 20), dir = up ? 1 : -1, mid = (xa + xz) / 2;
+      const ha = mid - (mid - xa) * fr.v, hz = mid + (xz - mid) * fr.v, k = C.smooth((fr.v - 0.8) / 0.2) * tk;
+      bg.line.setAttribute('d', `M${C.r2(ha)},${C.r2(y + dir * k)} L${C.r2(ha)},${y} L${C.r2(hz)},${y} L${C.r2(hz)},${C.r2(y + dir * k)}`);
+      if (bg.label) { bg.label.setAttribute('x', C.r2(mid)); bg.label.setAttribute('y', y - dir * 26); }
+    };
+    return annot(bg, (b = {}) => drawIn(bg, fr, { d: b.d ?? 0.6 }, t => {
       if (bg.label) t.fromTo(bg.label, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0.2);
-      return t;
-    });
+    }));
   };
 
   // ---- the magnifier: a round lens on a leader, or a rectangular inset on two guide lines
@@ -1034,9 +1109,10 @@ function libScaleCompare(S, o = {}, parent) {
       const sy0 = row.y - 10, sy1 = row.y + bh + 10;
       const pw = mo.w ?? 1000, ph = mo.h ?? 170;
       const px = mo.x ?? C.clamp((sx0 + sx1) / 2 - pw / 2, 110, 1810 - pw), py = mo.y ?? Math.max(120, sy0 - 90 - ph);
-      const zoom = pw / Math.max(sx1 - sx0, 0.01);
+      const pad = mo.pad ?? 28;
+      const zoom = (pw - 2 * pad) / Math.max(sx1 - sx0, 0.01);
       const barH = mo.barH ?? 60;
-      const M = { zoom, px, py, pw, ph, barH, barY: py + (mo.barTop ?? (ph - barH) * 0.4), X: X_ => px + (X_ - sx0) * zoom, Y: Y_ => Y_ };
+      const M = { zoom, px, py, pw, ph, pad, barH, barY: py + (mo.barTop ?? (mo.ruler ? 26 : (ph - barH) / 2)), X: X_ => px + pad + (X_ - sx0) * zoom, Y: Y_ => Y_ };
       mg.window = S.rect({ x: sx0 - 3, y: sy0, w: Math.max(sx1 - sx0 + 6, 6), h: sy1 - sy0, r: 6, stroke: 'ink', sw: 2, strokeOpacity: 0.8 }, mg);
       mg.guides = [
         S.line({ x1: sx0 - 3, y1: sy0, x2: px, y2: py + ph, stroke: 'muted', sw: 1.5, strokeOpacity: 0.7 }, mg),
@@ -1049,9 +1125,17 @@ function libScaleCompare(S, o = {}, parent) {
       S.rect({ x: px + 1, y: py + 1, w: pw - 2, h: ph - 2, r: 13 }, cp).setAttribute('fill', '#fff');
       const cg = S.g({ 'clip-path': `url(#${clipId})`, 'data-audit': 'ignore' }, panel);   // a clipped picture
       (mo.content || contentDefault)(cg, M);
+      if (mo.ruler) {                     // a dimension line spanning the window, e.g. '1 ms'
+        const ry_ = py + ph - 34, xa = px + pad, xz = px + pw - pad, lw = S.measure(mo.ruler, { size: 26, weight: 600 }) + 32, cx = px + pw / 2;
+        S.line({ x1: xa, y1: ry_, x2: cx - lw / 2, y2: ry_, stroke: 'muted', sw: 2 }, cg);
+        S.line({ x1: cx + lw / 2, y1: ry_, x2: xz, y2: ry_, stroke: 'muted', sw: 2 }, cg);
+        S.line({ x1: xa, y1: ry_ - 11, x2: xa, y2: ry_ + 11, stroke: 'muted', sw: 2 }, cg);
+        S.line({ x1: xz, y1: ry_ - 11, x2: xz, y2: ry_ + 11, stroke: 'muted', sw: 2 }, cg);
+        mg.rulerEl = S.text(mo.ruler, { x: cx, y: ry_ + 1, size: 26, anchor: 'middle', weight: 600, color: 'ink' }, cg);
+      }
       S.rect({ x: px, y: py, w: pw, h: ph, r: 14, stroke: 'ink', sw: 2, strokeOpacity: 0.75 }, panel);
       const tag = mo.tag === false ? null : (mo.tag ?? `× ${C.sig(zoom, 2)}`);
-      if (tag) mg.tagEl = S.text(tag, { x: px + pw - 18, y: py + 28, size: 24, anchor: 'end', weight: 600, color: 'muted', family: 'mono' }, mg);
+      if (tag) mg.tagEl = S.text(tag, { x: px + pw - 20, y: py + 30, size: 26, anchor: 'end', weight: 600, color: 'muted', family: 'mono' }, mg);
       Object.assign(mg, { panel, content: cg, M });
       const s0 = Math.max((sx1 - sx0 + 6) / pw, 0.02);
       const closed = { x: (sx0 + sx1) / 2 - (px + pw / 2), y: (sy0 + sy1) / 2 - (py + ph / 2), s: s0, ox: px + pw / 2, oy: py + ph / 2 };

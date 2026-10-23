@@ -27,8 +27,10 @@
  *   entrances, or the component's own .drawOn() / .reveal().
  * - Helpers RETURN tweens or timelines: place them with S.add(tween, at). Nothing here adds to S.tl, reads
  *   the clock or uses Math.random (seeded with S.rand), so any frame is the same however it is reached.
- * - Helpers that change a state (setState, focus, power, open, close, glow…) plan it like fx.xform does:
- *   call one component's state helpers in time order.
+ * - Helpers that change a state (setState, focus, power, open, close, glow, sleep…) plan it like fx.xform
+ *   does: call one component's state helpers in time order. They may overlap in time: a later one takes over
+ *   as soon as it starts, the same whether the frame is reached playing forwards or seeking backwards.
+ *   Effects (compute, activity, blink, flash, ping, pulse) are independent layers and overlap freely.
  * - The root's transform is yours: fx.in/fx.pop it, or S.xset/fx.xform it (not both on the same element;
  *   wrap in a S.g() holder if you need both). Helpers only ever animate inner parts.
  * - Coordinates are in the parent's space. Objects (chip, server, rack, data centre, device) are placed by
@@ -86,6 +88,13 @@ var _libHW = (function () {
     lin('hw-glass-on', [[0, '#1b3466'], [1, '#0e1c3d']]);
     lin('hw-shell', [[0, '#26324f'], [1, '#18223a']]);           // laptop lid back / phone back
     lin('hw-hall', [[0, '#101a34'], [1, '#080e1c']]);            // data-centre interior
+  }
+
+  /** a libChip's drawn extent {w, h} (pins / slab included, label excluded) for a body size and stack count */
+  function chipExtent(s, hbm) {
+    if (hbm) return { w: s * 2.04, h: s * 1.24 };
+    const n = Math.round(clamp(s / 16, 2, 10)), pl = clamp(s * 0.07, 3, 15), pt = clamp(s * 0.76 / n * 0.32, 1.3, 5.5);
+    return { w: s + 2 * pl + pt, h: s + 2 * pl + pt, pl, pt, n };
   }
 
   /** rounded-rectangle subpath (for batched paths) */
@@ -293,7 +302,7 @@ var _libHW = (function () {
     return out;
   }
 
-  return { NS, GRAD, BASE, DARK, GREY, clamp, lerp, f2, smooth, nextId, hexRGB, mix, soft, defs, rr, circ, xf, drive, channel, swapText, splitUnit, setValueText, valueWidth, ranks, sel, ignore, label, badge, spinnerPath, fan, unitShapes };
+  return { NS, GRAD, BASE, DARK, GREY, chipExtent, clamp, lerp, f2, smooth, nextId, hexRGB, mix, soft, defs, rr, circ, xf, drive, channel, swapText, splitUnit, setValueText, valueWidth, ranks, sel, ignore, label, badge, spinnerPath, fan, unitShapes };
 })();
 
 
@@ -326,7 +335,7 @@ var _libHW = (function () {
  *   .compute({d = 2, rate = 2.2, seed})  sparks: random cores flash bright amber for d seconds (work being
  *                                     done), then settle back to the planned state
  *   .flash({d = 0.5, to = 0.6})       the die flashes amber once (bytes arrived and were used)
- *   .pulse({d = 0.6, scale = 1.07, tone = 'compute'})   a glowing halo and a small swell: "this chip"
+ *   .pulse({d = 0.6, scale = 1.07, tone = 'compute'})   a soft bloom, a glowing outline and a small swell
  *   .rename(text, {d = 0.45})         swap the name label (e.g. 'GPU' → 'H100'; needs a label at build)
  *   .port(side, gap = 0) → {x, y}     a point on the edge ('left'|'right'|'top'|'bottom') for pipes and flows
  *   .bus(i) → path d                  (hbm) from stack i's inner edge to the die, for S.flow({d: chip.bus(0)})
@@ -353,8 +362,7 @@ function libChip(S, o = {}, parent) {
 
   if (!hbm) {
     // ---- plain chip: pins on four sides, package, die
-    const n = Math.round(H.clamp(s / 16, 2, 10)), span = s * 0.76, step = span / n;
-    const pl = H.clamp(s * 0.07, 3, 15), pt = H.clamp(step * 0.32, 1.3, 5.5);
+    const E = H.chipExtent(s, 0), n = E.n, span = s * 0.76, step = span / n, pl = E.pl, pt = E.pt;
     let d = '';
     for (let j = 0; j < n; j++) {
       const t = -span / 2 + (j + 0.5) * step;
@@ -610,10 +618,7 @@ function libChipGrid(S, o = {}, parent) {
   const rows = o.rows ?? 2, cols = o.cols ?? 8, size = o.size ?? 40;
   const cx = o.x ?? 960, cy = o.y ?? 540;
   const root = S.g(null, parent);
-  // measure one chip's extent (pins / slab included) to space them
-  const probe = libChip(S, { ...(o.chip || {}), size, x: 0, y: 0, label: null }, root);
-  const pw = probe.w, ph = probe.h;
-  probe.remove();
+  const { w: pw, h: ph } = H.chipExtent(size, (o.chip || {}).hbm || 0);
   const gap = o.gap ?? size * 0.5;
   const W = cols * pw + (cols - 1) * gap, Hh = rows * ph + (rows - 1) * gap;
   root.chips = [];
@@ -668,16 +673,20 @@ function libChipGrid(S, o = {}, parent) {
  *     icon = 'chip'           header icon: 'chip' (a libChip) | 'doc' (a printed sheet) | any icon id | null,
  *     fold = false            draw the card as a printed page with a folded corner,
  *     rows = []               each {label, value, unit, tone = 'struct', tag, tagTone = 'neutral'} or null
- *                             (a placeholder line that never resolves),
+ *                             (a placeholder line that never resolves). A value's number is set in mono and
+ *                             its unit in sans, split automatically ('3.35 TB/s' → 3.35 + TB/s); or give the
+ *                             number as value and the unit as unit. The 'row' layout shows values, not labels,
  *     start = 'shown'         'shown' | 'placeholder' (grey lines until .reveal) | 'empty' (nothing until .reveal),
+ *     phLen = 'varied'        placeholder line length: 'varied' (seeded 48–88 % of the row) or a fraction (1 = full),
  *     rowStyle = 'split'      'split' (name left, value right) | 'inline' ('operations per second: ?', in tone),
- *     valueStyle = 'text'     'text' (mono, in tone) | 'pill' (a soft pill in the row's tone),
- *     size = 28 (row names), valueSize = 30, titleSize = 40, rowH = auto (2.3 × size), pad = 36,
+ *     valueStyle = 'text'     'text' (in the row's tone) | 'pill' (white in a soft pill of the row's tone),
+ *     size = 28 (row names), valueSize = 30, titleSize = 40 ('row': 36), rowH = auto (2.3 × size), pad = 36,
  *     tone = 'neutral'        the card's outline tone, note = null (a muted line under the rows; 'row': under
  *                             the name, string or array of lines), seed = 5}
  * Returns <g> (root) with .face (the card; .flip scales it), .bg, .titleEl, .kickerEl, .iconEl, .noteEl
- *   (array for 'row' notes), .rows[] each {g (holder: yours to xform), body, content, ph, band, accent,
- *   labelEl, valueEl, unitEl, tagEl, valueG, tagG, x, y, w, h, cy, valueX}, anchors .x .y .w .h .l .r .t .b .cx .cy
+ *   (array for 'row' notes), .rows[] each {g (holder: yours to S.xset / fx.xform, e.g. to lift a row out of
+ *   the sheet), body, content, ph, band, accent, labelEl, valueEl (number + unit tspans), valueG (value and
+ *   its pill), tagEl, tagG, x, y, w, h, cy, valueX}, anchors .x .y .w .h .l .r .t .b .cx .cy
  * Helpers (return tweens/timelines; state helpers plan, call in time order):
  *   .reveal(i | [i…] | 'all', {d = 0.55, stagger = 0.12})   rows land (placeholder line resolves into text)
  *   .brighten(i | [i…], {d = 0.4})     placeholder lines brighten (tinted to the row's tone): "these two"
@@ -685,7 +694,8 @@ function libChipGrid(S, o = {}, parent) {
  *   .dimRows(i | [i…] | 'all', to = 0.3, {d})   dim rows without a highlight (to = 1 restores)
  *   .glow(i | [i…] | 'all', {part = 'row' | 'value' | 'tag', d = 0.8, tone})   a brief glow on each
  *   .setValue(i, text, {d = 0.45})     swap a row's value text ('?' → '3.35')
- *   .count(i, from, to, {d = 1.2, fmt})   count a row's value (fmt defaults to the engine's int/fixed)
+ *   .count(i, from, to, {d = 1.2, fmt})   count a row's value; fmt returns the whole value, e.g.
+ *                                     v => v.toFixed(2) + ' TB/s' (default: integer, or 2 decimals)
  *   .flip({title, values: {i: text}, notes}, {d = 0.9})   the card flips over and comes back as another chip
  * Example:
  *   const sheet = libSpecSheet(S, { x: 1000, y: 180, title: 'chip spec sheet', start: 'placeholder', rowStyle: 'inline',
@@ -819,7 +829,7 @@ function libSpecSheet(S, o = {}, parent) {
       const body = S.g(null, g);
       if (i > 0) H.ignore(S.line({ x1: labelX, y1: ry, x2: right, y2: ry, stroke: '#ffffff', strokeOpacity: 0.06, sw: 1 }, body));
       const phH = Math.max(10, Math.round(size * 0.42));
-      const ph = S.rect({ x: labelX, y: cy - phH / 2, w: (valueRight - labelX) * (0.48 + 0.4 * pr()), h: phH, r: phH / 2, fill: '#ffffff', fillOpacity: 0.1 }, body);
+      const ph = S.rect({ x: labelX, y: cy - phH / 2, w: (valueRight - labelX) * (typeof o.phLen === 'number' ? o.phLen : 0.48 + 0.4 * pr()), h: phH, r: phH / 2, fill: '#ffffff', fillOpacity: 0.1 }, body);
       const content = S.g(null, body);
       const row = { g, body, content, band, flash, ph, tone, x, y: ry, w: W, h: rowH, cy, placeholder: !!ri.placeholder, plan: ri.value ?? '', label: ri.label, unit: ri.unit, vsize, usize: Math.round(vsize * 0.8) };
       if (!ri.placeholder) {
@@ -971,6 +981,7 @@ function libSpecSheet(S, o = {}, parent) {
  * below the chassis to show the GPUs inside (libChip packages) drawing in one by one.
  *
  * o: {x = 960, y = 540 (centre of the chassis), w = 420, h = w × 0.235,
+ *     detail = auto             'full' (w ≥ 240: screws, bay lights, handles) | 'lite' (≥ 90) | 'min',
  *     tone = 'neutral'          chassis outline tint ('compute' / 'bytes' / 'helps' to colour a machine by role),
  *     on = true                 power light lit at build (false: dark until .power(true)),
  *     badge = null              {icon, tone = 'struct'} (a disc at the top-right corner) or {text, icon, tone}
@@ -983,7 +994,8 @@ function libSpecSheet(S, o = {}, parent) {
  * Returns <g> (root) with .chassis, .gpus[] (libChips, in the drawer), .tray {x,y,w,h} (drawer, open size),
  *   .badgeEl, .labelEl, .subEl, .leds[] (bay lights, full detail), .powerLed, and anchors .cx .cy .w .h .l .r .t .b
  * Helpers (return tweens/timelines; state helpers plan, call in time order):
- *   .open({d = 0.7, stagger = 0.22, draw = true})   the drawer slides out; GPUs draw on one by one
+ *   .open({d = 0.7, stagger = 0.22, draw = true})   the drawer slides out; GPUs draw on one by one (the
+ *                                     first time; the GPUs are hidden until then unless draw: false)
  *   .close({d = 0.5})                 the drawer slides shut
  *   .power(on, {d = 0.4})             the power light (and bay lights) on / off
  *   .activity({d = 2, rate = 3})      bay and activity lights blink amber at random (seeded) for d seconds
@@ -1475,7 +1487,6 @@ function libDataCentre(S, o = {}, parent) {
   S.path({ d: vents, fill: '#060a14' }, rg);
   S.path({ d: leds, fill: 'helps', fillOpacity: 0.85 }, rg);
   // activity lights: a seeded subset are real circles that can blink; the rest are a static path
-  const rnd = S.rand(o.seed ?? 2);
   const nb = Math.min(blinkers.length, o.blinkers ?? 40);
   const pick = H.ranks(S, blinkers.length, (o.seed ?? 2) + 5);
   let staticAct = '';
@@ -1485,7 +1496,6 @@ function libDataCentre(S, o = {}, parent) {
     else staticAct += H.circ(L.x, L.y, L.r);
   });
   if (staticAct) S.path({ d: staticAct, fill: '#4a3a1c' }, rg);
-  void rnd;
   root.hiEl = H.ignore(S.rect({ x: 0, y: 0, w: rw + 12, h: G.h + 12, r: G.r + 4, stroke: 'helps', sw: Math.max(2.5, rw / 60), opacity: 0, filter: 'url(#glow-helps)' }, root));
   if (hero) {
     const ub = unitBox(hero.row, hero.rack, hero.unit);
@@ -1547,7 +1557,8 @@ function libDataCentre(S, o = {}, parent) {
  * by default; .screen is a clipped group for your own content. style: 'icon' uses the full-colour Fluent
  * emoji (fluent:laptop / fluent:mobile-phone) for very small uses.
  *
- * o: {kind = 'laptop' | 'phone', x = 960, y = 540 (centre of the device), w = 320 (laptop) / 150 (phone),
+ * o: {kind = 'laptop' | 'phone', x = 960, y = 540 (centre of the device),
+ *     w = 320 (laptop) / 150 (phone); style 'icon': 140 / 90,
  *     style = 'drawn'           'drawn' (default: in the film's palette, with every helper) | 'icon' (the
  *                               full-colour Fluent emoji; off-palette, so only for tiny uses; helpers limited
  *                               to ping / sleep / wake / port),
@@ -1575,7 +1586,6 @@ function libDevice(S, o = {}, parent) {
   const kind = o.kind || 'laptop';
   const cx = o.x ?? 960, cy = o.y ?? 540;
   const root = S.g(null, parent);
-  const tonePing = S.tone('struct');
   if (o.style === 'icon') {
     const w = o.w ?? (kind === 'phone' ? 90 : 140);
     root.iconEl = S.icon(kind === 'phone' ? 'fluent:mobile-phone' : 'fluent:laptop', { x: cx, y: cy, size: w }, root);
@@ -1662,8 +1672,7 @@ function libDevice(S, o = {}, parent) {
   }
 
   // ---- screen (shared): glass, light, clipped content, ping overlay
-  const gEl = S.rect({ x: glass.x, y: glass.y, w: glass.w, h: glass.h, r: glass.r, fill: 'url(#hw-glass)' }, lidFront);
-  void gEl;
+  S.rect({ x: glass.x, y: glass.y, w: glass.w, h: glass.h, r: glass.r, fill: 'url(#hw-glass)' }, lidFront);
   const lightEl = S.rect({ x: glass.x, y: glass.y, w: glass.w, h: glass.h, r: glass.r, fill: 'url(#hw-glass-on)', opacity: screenOn ? 1 : 0 }, lidFront);
   const cid = H.nextId('hw-screen');
   const cp = document.createElementNS(H.NS, 'clipPath');
@@ -1714,7 +1723,6 @@ function libDevice(S, o = {}, parent) {
     const tn = S.tone(po.tone || 'struct');
     return pingCh(0, 1, p => { pingEl.setAttribute('fill', tn); pingEl.setAttribute('opacity', (0.32 * Math.sin(Math.PI * p)).toFixed(3)); }, { d: po.d ?? 0.6, ease: 'none' });
   };
-  void tonePing;
   let lidPlan = 0;   // 0 open, 1 closed
   const applyLid = v => {
     if (kind !== 'laptop') return;

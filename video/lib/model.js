@@ -183,6 +183,7 @@ var _libModel = (function () {
     const d = o.d ?? 0.4, tl = gsap.timeline();
     if (old) tl.fromTo(old, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.5, ease: 'power1.in', immediateRender: false }, 0);
     tl.fromTo(t, { autoAlpha: 0, y: o.dy ?? 10 }, { autoAlpha: 1, y: 0, duration: d * 0.75, ease: 'power2.out', immediateRender: false }, old ? d * 0.25 : 0);
+    if (old) tl.add(inFlight([old, t], d), 0);
     return tl;
   }
   /** a proxy tween: apply(p) for p 0..1 over d, seek-safe in both directions */
@@ -193,6 +194,16 @@ var _libModel = (function () {
       v: 1, duration: Math.max(0.001, d), ease: o.ease || 'none', immediateRender: false,
       onStart: go, onUpdate: go, onReverseComplete: () => apply(0),
     });
+  }
+  /** while this tween runs (d s), els carry data-audit="ignore": copies in flight overlap on purpose (seek-safe) */
+  function inFlight(els, d) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
+    return drive(d, p => list.forEach(e => (p > 0 && p < 1 ? e.setAttribute('data-audit', 'ignore') : e.removeAttribute('data-audit'))));
+  }
+  /** from this instant on, els carry data-audit="ignore" (seek-safe) */
+  function ignoreFrom(els) {
+    const list = (Array.isArray(els) ? els : [els]).filter(Boolean);
+    return drive(0.001, p => list.forEach(e => (p > 0 ? e.setAttribute('data-audit', 'ignore') : e.removeAttribute('data-audit'))));
   }
   /** set a text element's content at one instant (seek-safe): before -> after */
   function tick(el, before, after) {
@@ -239,7 +250,7 @@ var _libModel = (function () {
     hide(g);
     return g;
   }
-  return { BASE, GRAD, MINUS, clamp, f2, isEll, num, parse, hide, mix, idx, textTone, skin, cell, cellText, overlay, flash, paint, relabel, drive, tick, plan, fadeTo, rr, hatch, chip };
+  return { BASE, GRAD, MINUS, clamp, f2, isEll, num, parse, hide, mix, idx, textTone, skin, cell, cellText, overlay, flash, paint, relabel, drive, inFlight, ignoreFrom, tick, plan, fadeTo, rr, hatch, chip };
 })();
 
 /* ------------------------------------------------------------------ libNum */
@@ -429,6 +440,7 @@ function libVector(S, o = {}, parent) {
     const st = po.stagger ?? 0.06;
     tl.fromTo(items, { autoAlpha: 0, scale: po.scale ?? 0.5, transformOrigin: '50% 50%' },
       { autoAlpha: 1, scale: 1, duration: po.d ?? 0.45, ease: po.ease || 'back.out(2)', stagger: st, transformOrigin: '50% 50%' }, 0);
+    tl.add(M.inFlight(items, (po.d ?? 0.45) + st * (items.length - 1)), 0);
     if (decor.childNodes.length) tl.fromTo(decor, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: 'power1.out' }, Math.min(0.3, st * items.length * 0.5));
     return tl;
   };
@@ -636,6 +648,7 @@ function libMatVec(S, o = {}, parent) {
     M.hide(t);
     if (prev) tl.fromTo(prev, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.5, immediateRender: false }, at);
     tl.fromTo(t, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: d, ease: 'power2.out', immediateRender: false }, at + (prev ? d * 0.25 : 0));
+    if (prev) tl.add(M.inFlight([prev, t], d * 1.3), at);
     P.accText = t;
   };
 
@@ -645,6 +658,7 @@ function libMatVec(S, o = {}, parent) {
     const st = io.stagger ?? 0.03;
     tl.add(g.input.pop({ stagger: 0.06 }), 0);
     tl.fromTo(g.cells, { autoAlpha: 0, scale: 0.6, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: io.d ?? 0.55, ease: 'back.out(1.8)', stagger: { each: st, grid: [rows, cols], from: 'start' }, transformOrigin: '50% 50%' }, 0.15);
+    tl.add(M.inFlight(g.cells, (io.d ?? 0.55) + st * (rows + cols)), 0.15);
     tl.add(g.output.pop({ stagger: 0.05 }), 0.35);
     const extra = [g.WLabel, ...g.counterEls.map(c => c.g)].filter(Boolean);
     if (extra.length) tl.fromTo(extra, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, stagger: 0.08 }, 0.5);
@@ -663,6 +677,7 @@ function libMatVec(S, o = {}, parent) {
       tl.fromTo(c, { y: dy }, { y: 0, duration: d, ease: 'power3.inOut', immediateRender: false }, t);
     });
     tl.add(M.flash(S, g.input.cells, { tone: 'white', d: 0.5, stagger: 0.06, peak: 0.8 }), 0);
+    tl.add(M.inFlight(g.ghost.cells, d + cols * (lo.stagger ?? 0.06)), 0);
     P.laid = true;
     return tl;
   };
@@ -710,6 +725,7 @@ function libMatVec(S, o = {}, parent) {
       const dy = wc.cy - laneY;
       tl.fromTo(cp, { autoAlpha: 0, scale: 0.4, x: 0, y: dy, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, x: 0, y: dy, duration: 0.3 / sp, ease: 'back.out(2.4)', immediateRender: false }, t + 0.26 / sp);
       tl.fromTo(cp, { y: dy }, { y: 0, duration: 0.45 / sp, ease: 'power2.inOut', immediateRender: false }, t + 0.5 / sp);
+      tl.add(M.inFlight(cp, 0.72 / sp), t + 0.25 / sp);
       bump(tl, t + 0.26 / sp, { mul: 1, mac: 1, ops: 1 });
       if (j > 0) {
         const px = (colX(j) - gap / 2);
@@ -742,6 +758,7 @@ function libMatVec(S, o = {}, parent) {
       tl.fromTo(cp, { x: 0 }, { x: dx, duration: d * 0.6, ease: 'power2.inOut', immediateRender: false }, t + d * 0.18);
       tl.fromTo(cp, { y: -lift }, { y: 0, duration: d * 0.25, ease: 'power2.in', immediateRender: false }, t + d * 0.75);
       tl.fromTo(cp, { autoAlpha: 1, scale: 1 }, { autoAlpha: 0, scale: 0.7, duration: d * 0.12, immediateRender: false }, t + d * 0.92);
+      tl.add(M.inFlight(cp, d * 1.05), t);
       if (k < C.plus.length && C.plus[k]) tl.fromTo(C.plus[k], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 / sp, immediateRender: false }, t);
       sum = Math.round((sum + (M.parse(cp.v) || 0)) * 1e6) / 1e6;
       accLabel(M.num(sum, nf), tl, t + d * 0.95, 0.22 / sp);
@@ -762,6 +779,7 @@ function libMatVec(S, o = {}, parent) {
     tl.fromTo(cp, { autoAlpha: 0, scale: 0.8, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.18 / sp, immediateRender: false }, 0);
     tl.fromTo(cp, { y: 0 }, { y: dy, duration: d, ease: 'power3.inOut', immediateRender: false }, 0.05 / sp);
     tl.fromTo(cp, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.15 / sp, immediateRender: false }, 0.05 / sp + d);
+    tl.add(M.inFlight(cp, 0.25 / sp + d), 0);
     tl.add(g.output.set(i, shown ? val : null, { d: 0.3 / sp, tone: 'struct' }), 0.05 / sp + d * 0.85);
     if (P.accText) { tl.fromTo(P.accText, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 / sp, immediateRender: false }, 0); P.accText = null; }
     if (P.accOn && eo.keepAcc !== true) { tl.fromTo(g.acc, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3 / sp, immediateRender: false }, 0.2 / sp + d); P.accOn = false; }
@@ -1082,8 +1100,9 @@ function libLayerStack(S, o = {}, parent) {
       const xs = g.slabX(a + 1) - (co.enter ?? 70), xe = g.slabX(b + 1) + (co.exit ?? 70), yy = co.y ?? Y;
       S.xset(holder, { x: xs, y: yy, s: 1 });
       M.hide(holder);
-      tl.fromTo(holder, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25, immediateRender: false }, 0);
+      tl.fromTo(holder, { autoAlpha: 0 }, { autoAlpha: 1, duration: Math.min(0.25, d * 0.12), immediateRender: false }, 0);
       tl.add(S.fx.xform(holder, { x: xe }, { d, ease: 'none' }), 0);
+      tl.add(M.inFlight(holder, d), 0);
       if (co.flash !== false) for (let i = a; i <= b; i++) flashSlab(tl, i, (g.slabX(i + 1) - xs) / (xe - xs) * d - fd * 0.15, tone, fd);
       if (co.counter) {
         const sx = g.slabs.map((s, i) => g.slabX(i + 1));
@@ -1094,8 +1113,9 @@ function libLayerStack(S, o = {}, parent) {
       const ys = Y + (co.enter ?? 60), ye = g.top() - (co.exit ?? 50);
       S.xset(holder, { x: xx, y: ys, s: 1 });
       M.hide(holder);
-      tl.fromTo(holder, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25, immediateRender: false }, 0);
+      tl.fromTo(holder, { autoAlpha: 0 }, { autoAlpha: 1, duration: Math.min(0.25, d * 0.12), immediateRender: false }, 0);
       tl.add(S.fx.xform(holder, { y: ye }, { d, ease: 'none' }), 0);
+      tl.add(M.inFlight(holder, d), 0);
       if (co.flash !== false) for (let i = a; i <= b; i++) flashSlab(tl, i, Math.max(0, (ys - g.slabY(i + 1)) / (ys - ye) * d - fd * 0.15), tone, fd);
       if (co.counter) {
         const sy = g.slabs.map((s, i) => g.slabY(i + 1));
@@ -1205,10 +1225,10 @@ function libLayerStack(S, o = {}, parent) {
     const wedge = S.path({ d: `M${f2(a1[0])},${f2(a1[1])}L${f2(D.x)},${f2(D.y + 12)}L${f2(D.x)},${f2(D.y + D.h - 12)}L${f2(a2[0])},${f2(a2[1])}Z`, fill: '#ffffff', fillOpacity: 0.04 }, lg);
     const l1 = S.line({ x1: a1[0], y1: a1[1], x2: D.x, y2: D.y + 12, stroke: 'muted', sw: 1.5, strokeOpacity: 0.6 }, lg);
     const l2 = S.line({ x1: a2[0], y1: a2[1], x2: D.x, y2: D.y + D.h - 12, stroke: 'muted', sw: 1.5, strokeOpacity: 0.6 }, lg);
-    M.hide(wedge);
+    M.hide(wedge); M.hide(l1); M.hide(l2);
     if (DT.leaders) tl.fromTo(DT.leaders, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, 0);
     DT.leaders = lg;
-    tl.fromTo([l1, l2], { drawSVG: '0%', autoAlpha: 1 }, { drawSVG: '100%', duration: d * 0.45, ease: 'power2.inOut', immediateRender: true }, d * 0.5);
+    tl.fromTo([l1, l2], { drawSVG: '0%', autoAlpha: 1 }, { drawSVG: '100%', autoAlpha: 1, duration: d * 0.45, ease: 'power2.inOut', immediateRender: false }, d * 0.5);
     tl.fromTo(wedge, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.45, immediateRender: false }, d * 0.6);
     const title = S.text(oo.title ?? (o.detailTitle ? o.detailTitle(L) : `layer ${L}`), { x: D.x + 24, y: D.y + 34, size: 28, weight: 650, color: 'ink' }, D);
     M.hide(title);
@@ -1418,6 +1438,7 @@ function libAttention(S, o = {}, parent) {
   g.in = (io = {}) => {
     const tl = gsap.timeline();
     tl.fromTo(g.tokens, { autoAlpha: 0, scale: 0.5, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: io.d ?? 0.5, ease: 'back.out(2.2)', stagger: io.stagger ?? 0.08, transformOrigin: '50% 50%' }, 0);
+    tl.add(M.inFlight(g.tokens, (io.d ?? 0.5) + (io.stagger ?? 0.08) * n), 0);
     const extra = [...(g.badges || []), g.queryLabelEl].filter(Boolean);
     if (extra.length) tl.fromTo(extra, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, stagger: 0.03 }, (io.stagger ?? 0.08) * n);
     return tl;
@@ -1454,7 +1475,7 @@ function libAttention(S, o = {}, parent) {
         fresh.push(t);
         g.labels[a.j] = t;
       });
-      if (old.length) tl.fromTo(old, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.4, immediateRender: false }, 0);
+      if (old.length) { tl.fromTo(old, { autoAlpha: 1 }, { autoAlpha: 0, duration: d * 0.4, immediateRender: false }, 0); tl.add(M.inFlight(old.concat(fresh), d * 0.9), 0); }
       tl.fromTo(fresh, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: d * 0.6, stagger: 0.05, ease: 'power2.out', immediateRender: false }, d * 0.3);
       P.labels = fresh;
     }
@@ -1476,7 +1497,7 @@ function libAttention(S, o = {}, parent) {
     allArcs().forEach((a, k) => {
       const wv = W[a.j] || 0;
       if (wv <= 0) return;
-      const dot = S.g(null, front);
+      const dot = S.g({ 'data-audit': 'ignore' }, front);
       const rad = 5 + 13 * Math.sqrt(wv);
       S.circle({ x: 0, y: 0, r: rad * 2.4, fill: `url(#pglow-${M.GRAD.includes(vt) ? vt : 'struct'})` }, dot);
       S.circle({ x: 0, y: 0, r: rad, fill: vt }, dot);
@@ -1668,6 +1689,7 @@ function libAttentionGrid(S, o = {}, parent) {
     const d = io.d ?? 0.6;
     tl.fromTo(labG, { autoAlpha: 0 }, { autoAlpha: 1, duration: d }, 0);
     tl.fromTo(g.cells.flat(), { autoAlpha: 0, scale: 0.7, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: d * 0.7, ease: 'back.out(1.8)', stagger: { each: 0.02, grid: [n, n], from: 'start' }, transformOrigin: '50% 50%' }, 0.1);
+    tl.add(M.inFlight(g.cells.flat(), d * 0.7 + 0.02 * n * n), 0.1);
     return tl;
   };
   g.fill = (fo = {}) => {
@@ -1698,6 +1720,10 @@ function libAttentionGrid(S, o = {}, parent) {
     const st = d * 0.6 / Math.max(1, n - 1);
     g.maskBands.forEach((bg, k) => tl.fromTo(bg, { autoAlpha: 0 }, { autoAlpha: 1, duration: d * 0.4, ease: 'power1.out', immediateRender: false }, k * st));
     if (g.maskLabel) tl.fromTo(g.maskLabel, { autoAlpha: 0, scale: 0.9, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(2)', immediateRender: false }, d * 0.7);
+    // the masked cells sit under the hatching (and the label's plate) from here on: not layout any more
+    const under = [];
+    for (let r = 0; r < n; r++) for (let c = r + 1; c < n; c++) under.push(g.cells[r][c]);
+    tl.add(M.ignoreFrom(under), d * 0.7);
     P.masked = true;
     return tl;
   };
