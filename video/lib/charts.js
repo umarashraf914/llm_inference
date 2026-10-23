@@ -1000,7 +1000,7 @@ function libScaleCompare(S, o = {}, parent) {
       const clipId = C.uid('lens');
       const cp = S.el('clipPath', { id: clipId }, disc);
       S.circle({ x: cx, y: cy, r: R - 1 }, cp).setAttribute('fill', '#fff');
-      const cg = S.g({ 'clip-path': `url(#${clipId})` }, disc);
+      const cg = S.g({ 'clip-path': `url(#${clipId})`, 'data-audit': 'ignore' }, disc);   // a clipped picture
       S.circle({ x: cx, y: cy, r: R, fill: '#ffffff', fillOpacity: 0.03 }, cg);
       (mo.content || contentDefault)(cg, M);
       S.circle({ x: cx, y: cy, r: R, stroke: 'ink', sw: 3, strokeOpacity: 0.9 }, disc);
@@ -1047,7 +1047,7 @@ function libScaleCompare(S, o = {}, parent) {
       const clipId = C.uid('inset');
       const cp = S.el('clipPath', { id: clipId }, panel);
       S.rect({ x: px + 1, y: py + 1, w: pw - 2, h: ph - 2, r: 13 }, cp).setAttribute('fill', '#fff');
-      const cg = S.g({ 'clip-path': `url(#${clipId})` }, panel);
+      const cg = S.g({ 'clip-path': `url(#${clipId})`, 'data-audit': 'ignore' }, panel);   // a clipped picture
       (mo.content || contentDefault)(cg, M);
       S.rect({ x: px, y: py, w: pw, h: ph, r: 14, stroke: 'ink', sw: 2, strokeOpacity: 0.75 }, panel);
       const tag = mo.tag === false ? null : (mo.tag ?? `× ${C.sig(zoom, 2)}`);
@@ -1459,13 +1459,17 @@ function libGrowthCurve(S, o = {}, parent) {
     const ids = a.ids || series.map(s => s.id), tone = a.tone || 'ink';
     mg.guide = a.guide === false ? null : S.line({ x1: 0, y1: 0, x2: 0, y2: 0, stroke: tone, sw: 2, dash: '6 7', strokeOpacity: 0.6, cap: 'butt' }, mg);
     mg.dots = ids.map(id => S.circle({ x: 0, y: 0, r: 9, fill: sOf(id).tone, stroke: C.DARK, sw: 2.5 }, mg));
-    mg.label = a.label ? S.text(a.label, { x: 0, y: 0, size: a.size ?? 26, anchor: 'middle', weight: 600, color: tone }, mg) : null;
+    const side = a.side || 'left';
+    mg.label = a.label ? S.text(a.label, { x: 0, y: 0, size: a.size ?? 26, anchor: side === 'left' ? 'end' : side === 'right' ? 'start' : 'middle', weight: 600, color: tone }, mg) : null;
     mg.place = () => {
       const x = X(xv), ys = ids.map(id => Y(sOf(id).f(xv)));
       const top = Math.min(...ys), vis = x >= x0 - 1 && x <= x0 + w + 1;
       mg.dots.forEach((d, i) => { d.setAttribute('cx', C.r2(x)); d.setAttribute('cy', C.r2(ys[i])); d.setAttribute('opacity', vis && ys[i] >= y0 - 1 ? 1 : 0); });
       if (mg.guide) { mg.guide.setAttribute('x1', C.r2(x)); mg.guide.setAttribute('x2', C.r2(x)); mg.guide.setAttribute('y1', y0 + h); mg.guide.setAttribute('y2', C.r2(Math.max(top + 14, y0))); mg.guide.setAttribute('opacity', vis ? 1 : 0); }
-      if (mg.label) { mg.label.setAttribute('x', C.r2(x)); mg.label.setAttribute('y', C.r2(Math.max(top - 34, y0 - 20))); mg.label.setAttribute('opacity', vis ? 1 : 0); }
+      if (mg.label) {
+        const lx = side === 'left' ? x - 16 : side === 'right' ? x + 16 : x;
+        mg.label.setAttribute('x', C.r2(lx)); mg.label.setAttribute('y', C.r2(Math.max(top - (side === 'above' ? 34 : 26), y0 - 20))); mg.label.setAttribute('opacity', vis ? 1 : 0);
+      }
     };
     marks.push(mg); mg.place();
     return annot(mg, (b = {}) => {

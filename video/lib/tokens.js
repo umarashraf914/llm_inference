@@ -1149,7 +1149,8 @@ function libChatWindow(S, o = {}, parent) {
   // ---- pills that stand apart, glow, dim, ghosts
   const rng = (a, b) => T.idx([a, b ?? a], root.tokens.length).map(i => root.tokens[i]);
   const caretSpread = (tl, d) => {
-    // re-place the caret on every frame of the spread (it reads the token's live position)
+    // re-place the caret on every frame of the spread (it reads the token's live position). Called before AND
+    // after the spread tweens: forward renders run children first to last, backward renders last to first.
     const p = { v: 0 };
     tl.fromTo(p, { v: 0 }, { v: 1, duration: d, ease: 'none', immediateRender: false, onUpdate: placeCaret, onReverseComplete: placeCaret }, 0);
   };
@@ -1160,6 +1161,7 @@ function libChatWindow(S, o = {}, parent) {
   root.pillify = (a, b, po = {}) => {
     const want = po.spread ?? Math.round(2 * pPad + 10), d = po.d ?? 0.4, tl = gsap.timeline();
     const ts = rng(a, b);
+    caretSpread(tl, d);
     // spread line by line: pills on one line stand apart by `want` px, less if the line has no room left
     const byLine = {};
     ts.forEach(tk => (byLine[tk.line] = byLine[tk.line] || []).push(tk));
@@ -1182,6 +1184,7 @@ function libChatWindow(S, o = {}, parent) {
   root.unpillify = (a, b, po = {}) => {
     const d = po.d ?? 0.4, tl = gsap.timeline();
     const ts = rng(a, b), lines = new Set(ts.map(t => t.line));
+    caretSpread(tl, d);
     root.tokens.filter(t => lines.has(t.line) && t.i >= ts[0].i).forEach(tk => setSx(tl, tk, 0, d));
     ts.forEach(tk => { tk.__pill = false; tl.fromTo(tk.stand, { opacity: 1 }, { opacity: 0, duration: d, ease: 'power1.in', immediateRender: false }, 0); });
     caretSpread(tl, d);
