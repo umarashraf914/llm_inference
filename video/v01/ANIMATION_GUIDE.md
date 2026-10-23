@@ -97,7 +97,8 @@ the beat start: check the warnings printed by `stills`.
 `pop(els)`, `draw(paths)`, `drawArrow(a)`, `count(counter,from,to)`, `grow(bar)`, `type(text)`,
 `pulse(els)`, `dim(els,{to})`, `undim(els)`, `move(els,{x,y,scale,d})` (offset from where it was drawn),
 `recolor(els,{fill,stroke})`, `swap(text,newText)`, `strike(text)`, `orbit(cycle)`,
-`cam({x,y,scale,d})` (centre the view on a point at a zoom; return with `cam({})`).
+`cam({x,y,scale,d})` (centre the view on a point at a zoom; return with `cam({})`; it is built on
+`xform`, so add camera moves in time order within the scene).
 
 Raw GSAP is fine for anything else (`gsap.fromTo(...)`, `gsap.timeline()`), added with `S.add`.
 
@@ -177,6 +178,9 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
   bigger or the words shorter.
 - Many particles cost render time: keep `S.flow` to ≤ 8 simultaneous paths and `every ≥ 0.06`.
 - Filters (`url(#shadow)`, `url(#glow-<tone>)`) are fine on a few elements, not on hundreds.
+- Do not fill large areas with an SVG `<pattern>` under a zoomed camera: Chromium drops pattern fills
+  at deep zoom-out. Draw repeated tiles as one `<path>` (ch01_s01's field: 20,000 tiles, one path).
+- Do not animate `S.camera` or any scaled group with raw GSAP `x/y/scale`: use `fx.cam` / `fx.xform`.
 - The scene's duration is fixed by the narration. Plan the visual rhythm to the beats; the final
   ~0.5 s is the automatic fade out.
 
