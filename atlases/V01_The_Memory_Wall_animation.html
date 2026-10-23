@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One conversation, end to end</title>
+<style>
+:root{--paper:#FBFAF8;--ink:#17191C;--muted:#6B6F76;--rule:#DFDDD8;--panel:#fff;
+--m:#9A6410;--m-fill:#FBEEDA;--m-text:#6B4408;--s:#1B7A6B;--s-fill:#DEF0EC;--s-text:#0F4A41;
+--h:#B4472C;--h-fill:#F7E7E1;--h-text:#7A2E1B;--u:#9B9FA6;--u-fill:#F0EFEC;--u-text:#3A3D42;
+--v:#6C5CE0;--v-fill:#EAE7FB;--v-text:#41369B;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--paper:#131416;--ink:#E8E6E1;--muted:#9AA0A7;--rule:#2C2E32;
+--panel:#191B1E;--m:#E0A83C;--m-fill:#392B11;--m-text:#F2DAAA;--s:#4FBFA8;--s-fill:#12332E;--s-text:#A3E0D3;
+--h:#E07A5F;--h-fill:#3A211A;--h-text:#F2C6B6;--u:#6E727A;--u-fill:#1E2023;--u-text:#C8CBD0;
+--v:#9B8CF5;--v-fill:#221D46;--v-text:#CFC7FA}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;
+-webkit-font-smoothing:antialiased;font-size:14px}
+.wrap{max-width:1180px;margin:0 auto;padding:34px 22px 120px}
+h1{font-size:27px;font-weight:500;margin:0 0 8px;letter-spacing:-.01em}
+.kick{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--muted);margin-bottom:12px}
+.lede{color:var(--muted);max-width:76ch;margin:0 0 22px}
+.actbar{display:flex;align-items:baseline;gap:12px;border-top:2px solid var(--ink);
+padding-top:14px;margin-bottom:6px}
+.actno{font-family:var(--mono);font-size:11.5px;color:var(--h);letter-spacing:.1em;white-space:nowrap}
+.acttitle{font-size:19px;font-weight:500}
+.narr{color:var(--muted);min-height:44px;margin:0 0 18px;max-width:88ch}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid var(--rule);border-radius:12px;background:var(--panel);padding:14px 16px 16px}
+.card h2{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+color:var(--muted);margin:0 0 12px}
+.chat{min-height:250px;display:flex;flex-direction:column;gap:9px}
+.bub{max-width:88%;padding:9px 12px;border-radius:11px;border:1px solid;font-size:13px;
+animation:pop .28s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bub.user{align-self:flex-end;background:var(--s-fill);border-color:var(--s);color:var(--s-text)}
+.bub.asst{align-self:flex-start;background:var(--u-fill);border-color:var(--u);color:var(--u-text)}
+.bub.tool{align-self:flex-start;background:var(--v-fill);border-color:var(--v);color:var(--v-text);
+font-family:var(--mono);font-size:11.5px}
+.bub.live{border-style:dashed}
+.bub .cr{display:inline-block;width:6px;height:13px;background:currentColor;vertical-align:-2px;
+margin-left:2px;animation:blink .8s steps(2) infinite;opacity:.75}
+.bub .who{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;opacity:.62;margin-bottom:3px}
+.blocks{min-height:250px;display:flex;flex-direction:column;gap:6px}
+.blk{border:1px solid;border-radius:8px;padding:7px 11px;font-size:12.5px;display:flex;
+justify-content:space-between;gap:12px;align-items:baseline;animation:pop .28s ease}
+.blk .tk{font-family:var(--mono);font-size:11px;opacity:.72;white-space:nowrap}
+.blk .bt{font-size:11px;opacity:.72;margin-top:2px}
+.blk.sys{background:var(--h-fill);border-color:var(--h);color:var(--h-text)}
+.blk.tools{background:var(--v-fill);border-color:var(--v);color:var(--v-text)}
+.blk.user{background:var(--s-fill);border-color:var(--s);color:var(--s-text)}
+.blk.asst{background:var(--m-fill);border-color:var(--m);color:var(--m-text)}
+.blk.tool{background:var(--v-fill);border-color:var(--v);color:var(--v-text)}
+.blk.live{box-shadow:0 0 0 2px var(--m)}
+.blk.ghosted{opacity:.34;filter:grayscale(.6)}
+.full{margin-top:16px}
+.wintrack{position:relative;height:34px;border:1px solid var(--rule);border-radius:7px;
+overflow:hidden;display:flex;background:var(--paper)}
+.winseg{height:100%;transition:width .3s ease}
+.winseg.sys{background:var(--h-fill);border-right:1px solid var(--h)}
+.winseg.tools{background:var(--v-fill);border-right:1px solid var(--v)}
+.winseg.user{background:var(--s-fill);border-right:1px solid var(--s)}
+.winseg.asst{background:var(--m-fill);border-right:1px solid var(--m)}
+.winseg.tool{background:var(--v-fill);border-right:1px solid var(--v)}
+.winmeta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:6px}
+.gen{font-family:var(--mono);font-size:13px;line-height:1.9;min-height:62px;
+padding:9px 11px;border:1px dashed var(--rule);border-radius:8px;background:var(--paper)}
+.tok{display:inline-block;padding:1px 4px;margin:0 1px;border-radius:4px;
+background:var(--m-fill);color:var(--m-text);border:1px solid var(--m);animation:pop .18s ease}
+.caret{display:inline-block;width:7px;height:15px;background:var(--m);vertical-align:-2px;
+animation:blink .8s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.cache{display:flex;flex-wrap:wrap;gap:2px;min-height:64px;align-content:flex-start}
+.cb{width:9px;height:9px;border-radius:2px;border:1px solid}
+.cb.sys{background:var(--h-fill);border-color:var(--h)}
+.cb.tools{background:var(--v-fill);border-color:var(--v)}
+.cb.user{background:var(--s-fill);border-color:var(--s)}
+.cb.asst{background:var(--m-fill);border-color:var(--m)}
+.cb.tool{background:var(--v-fill);border-color:var(--v)}
+.cb.gone{background:transparent;border-color:var(--rule);border-style:dashed}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{border:1px solid var(--rule);border-radius:9px;padding:9px 11px;background:var(--paper)}
+.stat .k{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:var(--mono);font-size:16px;margin-top:3px}
+.phase{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;
+border:1px solid;font-family:var(--mono);letter-spacing:.04em}
+.ph-idle{background:var(--u-fill);border-color:var(--u);color:var(--u-text)}
+.ph-prefill{background:var(--s-fill);border-color:var(--s);color:var(--s-text)}
+.ph-decode{background:var(--m-fill);border-color:var(--m);color:var(--m-text)}
+.ph-tool{background:var(--v-fill);border-color:var(--v);color:var(--v-text)}
+.ph-evict{background:var(--h-fill);border-color:var(--h);color:var(--h-text)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);
+border-top:1px solid var(--rule);padding:11px 22px;display:flex;gap:9px;align-items:center;
+flex-wrap:wrap;z-index:20}
+button{font:inherit;font-size:13px;padding:7px 13px;border-radius:8px;border:1px solid var(--rule);
+background:var(--paper);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);min-width:92px}
+button:disabled{opacity:.4;cursor:default}
+.acts{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.acts button{padding:5px 9px;font-size:11.5px;font-family:var(--mono)}
+.acts button.on{background:var(--h-fill);border-color:var(--h);color:var(--h-text)}
+input[type=range]{width:110px}
+.prog{position:fixed;left:0;bottom:0;height:3px;background:var(--h);z-index:21;transition:width .2s}
+.note{margin-top:26px;font-size:13px;color:var(--muted);max-width:82ch}
+.note b{color:var(--ink);font-weight:500}
+
+.net{display:flex;align-items:center;gap:12px;margin-top:16px;border:1px solid var(--rule);
+border-radius:12px;background:var(--panel);padding:12px 16px}
+.netside{font-size:12px;color:var(--muted);white-space:nowrap;min-width:96px}
+.netpipe{flex:1;height:34px;border:1px dashed var(--rule);border-radius:8px;position:relative;
+overflow:hidden;display:flex;align-items:center}
+.pk{position:absolute;height:16px;border-radius:4px;border:1px solid;font-size:9.5px;
+display:flex;align-items:center;justify-content:center;font-family:var(--mono)}
+.pk.up{background:var(--s-fill);border-color:var(--s);color:var(--s-text);animation:goup 1.1s ease-out}
+.pk.dn{background:var(--m-fill);border-color:var(--m);color:var(--m-text);animation:godn 1s linear}
+@keyframes goup{from{left:2%;opacity:0}20%{opacity:1}to{left:88%;opacity:1}}
+@keyframes godn{from{right:2%;opacity:0}20%{opacity:1}to{right:88%;opacity:1}}
+.netnote{font-size:12px;color:var(--muted);margin-top:8px}
+</style></head><body>
+<div class="prog" id="prog" style="width:0"></div>
+<div class="wrap">
+<div class="kick">V1 &middot; companion animation</div>
+<h1>One conversation, end to end</h1>
+<p class="lede">What actually reaches the server when you type a message, where the system prompt and
+the tool definitions sit, what the context window is measuring, and what changes when you come back
+a day later. Every number is computed from the token counts shown, for a 70-billion-parameter model
+in 16-bit precision.</p>
+
+<div class="actbar"><span class="actno" id="actno">ACT 1 / 19</span>
+<span class="acttitle" id="acttitle">…</span></div>
+<p class="narr" id="narr">…</p>
+
+<div class="grid">
+  <div class="card"><h2>What you see &mdash; the same tokens, one trip later</h2><div class="chat" id="chat"></div></div>
+  <div class="card"><h2>What the server is holding &mdash; sent in full once per turn, never per token</h2>
+    <div class="blocks" id="blocks"></div></div>
+</div>
+
+<div class="net">
+  <div class="netside">your device</div>
+  <div class="netpipe" id="pipe"></div>
+  <div class="netside" style="text-align:right">the server</div>
+</div>
+<div class="netnote" id="netnote"></div>
+<div class="card full"><h2>The context window</h2>
+  <div class="wintrack" id="wintrack"></div>
+  <div class="winmeta"><span id="winused">0 tokens used</span><span id="wincap">of 8,192</span></div>
+</div>
+
+<div class="card full"><h2>Being generated on the server, this instant</h2>
+  <div class="gen" id="gen"></div></div>
+
+<div class="card full"><h2>On the server</h2>
+  <div style="margin-bottom:10px"><span class="phase ph-idle" id="phase">idle</span></div>
+  <div class="cache" id="cache"></div>
+  <div class="stats">
+    <div class="stat"><div class="k">Tokens in cache</div><div class="v" id="s1">0</div></div>
+    <div class="stat"><div class="k">Cache size</div><div class="v" id="s2">0 MB</div></div>
+    <div class="stat"><div class="k">Weights read this turn</div><div class="v" id="s3">0 TB</div></div>
+    <div class="stat"><div class="k">Tokens generated</div><div class="v" id="s4">0</div></div>
+  </div></div>
+
+<p class="note"><b>How to read the cache row.</b> Each small square is one block of 16 tokens, coloured
+by which part of the conversation it holds. Squares turn dashed when the block has been evicted and
+its contents no longer exist on the server.</p>
+
+<div class="bar">
+  <button class="primary" id="play">Play</button>
+  <button id="prev">Back</button>
+  <button id="next">Step</button>
+  <button id="reset">Restart</button>
+  <label style="font-size:12px;color:var(--muted)">speed
+    <input type="range" id="speed" min="1" max="10" value="6"></label>
+  <span style="font-family:var(--mono);font-size:12px;color:var(--muted)" id="counter">1 / 1</span>
+  <div class="acts" id="acts"></div>
+</div>
+</div>
+
+<script>
+const CAP = 8192, BYTES_PER_TOKEN = 320*1024, WEIGHTS_GB = 140, BLOCK = 16;
+
+const SYS  = "You are a travel assistant. Answer briefly. Call a tool whenever you need live data; never guess a forecast.";
+const TOOLS= 'get_weather(city, date) -> {temp_c, rain_prob, summary}\nget_forecast(city, days) -> [...]';
+
+const T = {
+  call1: ["get","_weather","(","city","=","\"","Seoul","\"",","," date","=","\"","2026","-","09","-","04","\"",")"],
+  ans1 : ["Seoul"," tomorrow",":"," around"," 24"," °C",","," with"," a"," 75","%"," chance"," of",
+          " showers"," in"," the"," afternoon","."," Take"," the"," umbrella","."],
+  call2: ["get","_weather","(","city","=","\"","Seoul","\"",","," date","=","\"","2026","-","09","-","05","\"",")"],
+  ans2 : ["Friday"," looks"," clear"," at"," 26"," °C","."," No"," umbrella"," needed","."],
+  ans3 : ["This"," weekend"," in"," Seoul",":"," dry"," on"," Saturday",","," light"," rain"," Sunday"," evening","."]
+};
+const B = {
+  sys  : {id:'sys',   role:'sys',   label:'System prompt',      n:320, sub:'set by the operator, not by you'},
+  tools: {id:'tools', role:'tools', label:'Tool definitions',   n:450, sub:'names, arguments and return shapes'},
+  u1   : {id:'u1',    role:'user',  label:'Your first message', n:16,  sub:'"weather in Seoul, umbrella tomorrow?"'},
+  c1   : {id:'c1',    role:'asst',  label:'Tool call',          n:T.call1.length, sub:'generated by the model'},
+  r1   : {id:'r1',    role:'tool',  label:'Tool result',        n:58,  sub:'came back from outside the model'},
+  a1   : {id:'a1',    role:'asst',  label:'Answer 1',           n:T.ans1.length,  sub:'generated by the model'},
+  u2   : {id:'u2',    role:'user',  label:'Your second message',n:5,   sub:'"and the day after?"'},
+  c2   : {id:'c2',    role:'asst',  label:'Tool call 2',        n:T.call2.length, sub:'generated by the model'},
+  r2   : {id:'r2',    role:'tool',  label:'Tool result 2',      n:54,  sub:'came back from outside the model'},
+  a2   : {id:'a2',    role:'asst',  label:'Answer 2',           n:T.ans2.length,  sub:'generated by the model'},
+  u3   : {id:'u3',    role:'user',  label:'Message, a day later',n:8,  sub:'"what about this weekend?"'},
+  c3   : {id:'c3',    role:'asst',  label:'Answer 3',           n:T.ans3.length,  sub:'generated by the model'}
+};
+
+// ---- build the step list -------------------------------------------------
+const S = [];
+let act = 0;
+function A(title){ act++; return title; }
+function push(o){ S.push(Object.assign({act, blocks:[], chat:[], phase:'idle', gen:null,
+  genN:0, cached:0, evicted:false, live:null, tb:0, gt:0}, o)); }
+
+const bl = (...ids)=>ids.map(i=>B[i]);
+const ch = (...c)=>c;
+
+let a = A('Nothing has happened yet');
+push({title:a, narr:'The model is loaded into the memory beside the chip: 140 gigabytes of weights that never change. No conversation exists. The cache is empty.'});
+
+a = A('The system prompt goes in first');
+push({title:a, blocks:bl('sys'), live:'sys',
+ narr:'Before you type anything, the operator puts a system prompt at the front. You never see it, you did not write it, and you pay for it on every single turn. 320 tokens here.'});
+
+a = A('Then the tool definitions');
+push({title:a, blocks:bl('sys','tools'), live:'tools',
+ narr:'Every tool the model may call has to be described in the prompt: its name, its arguments, what it returns. The model cannot call something it has not been told about. 450 tokens, also on every turn.'});
+push({title:a, blocks:bl('sys','tools'),
+ narr:'770 tokens are already committed and the conversation has not started. This fixed preamble is the reason short questions are rarely cheap.'});
+
+a = A('You type a question');
+push({title:a, blocks:bl('sys','tools'), chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"]),
+ narr:'In your window this is the first thing that exists. On the server it is the third block.'});
+push({title:a, blocks:bl('sys','tools','u1'), live:'u1',
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"]),
+ narr:'Your message is cut into 16 tokens and appended. The whole assembled thing, 786 tokens, is what actually crosses the network.'});
+
+a = A('Prefill: the whole prompt at once');
+push({title:a, phase:'prefill', blocks:bl('sys','tools','u1'), cached:786, tb:0.14,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"]),
+ narr:'All 786 tokens go through the model together, because they all already exist. One pass over the 140 GB of weights serves every one of them. Each token leaves its keys and values behind in the cache.'});
+
+a = A('Decode: one token at a time');
+const pre1 = ['sys','tools','u1'];
+for (let i=1;i<=T.call1.length;i++){
+  push({title:a, phase:'decode', blocks:bl(...pre1), cached:786+i, gen:T.call1, genN:i,
+    gt:i, tb:0.14+i*WEIGHTS_GB/1000,
+    chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+            ['tool', T.call1.slice(0,i).join(''), true]),
+    narr:i===1
+      ? 'Now it changes completely. Each new token needs its own full pass over all 140 GB of weights, because the token before it did not exist until a moment ago.'
+      : `Token ${i}. Another 140 gigabytes read, to produce one token. The cache grows by one entry each time.`});
+}
+a = A('The model asks for a tool');
+push({title:a, phase:'decode', blocks:bl(...pre1,'c1'), cached:786+B.c1.n, gen:T.call1,
+ genN:T.call1.length, gt:B.c1.n, tb:0.14+B.c1.n*WEIGHTS_GB/1000,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")']),
+ narr:'The generated tokens spell out a tool call. Nothing magic happened: the model emitted text in a shape the serving system recognises, and stopped.'});
+
+a = A('The tool runs outside the model');
+push({title:a, phase:'tool', blocks:bl(...pre1,'c1'), cached:786+B.c1.n,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")']),
+ narr:'The model is not running now. Ordinary software calls a weather service over the network. This takes as long as it takes, and no GPU is involved.'});
+push({title:a, phase:'prefill', blocks:bl(...pre1,'c1','r1'), live:'r1',
+ cached:786+B.c1.n+B.r1.n, tb:0.14+B.c1.n*WEIGHTS_GB/1000+0.14,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}']),
+ narr:'The result is appended to the context as a new block and prefilled, exactly like a user message. From the model\u2019s point of view a tool result is just more text that appeared in front of it.'});
+
+a = A('Now the answer');
+const pre2 = ['sys','tools','u1','c1','r1'];
+const base2 = 786+B.c1.n+B.r1.n;
+for (let i=1;i<=T.ans1.length;i++){
+  push({title:a, phase:'decode', blocks:bl(...pre2), cached:base2+i, gen:T.ans1, genN:i,
+    gt:B.c1.n+i, tb:0.28+(B.c1.n+i)*WEIGHTS_GB/1000,
+    chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+            ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+            ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+            ['asst', T.ans1.slice(0,i).join(''), true]),
+    narr:i===1 ? 'Back to one token per full pass over the weights. This is the part of the turn you watch streaming into the window.'
+               : `Token ${i} of the answer.`});
+}
+a = A('The two panels are the same tokens');
+push({title:a, phase:'decode', blocks:bl(...pre2), cached:base2+8, gen:T.ans1, genN:8,
+ gt:B.c1.n+8, tb:0.28+(B.c1.n+8)*WEIGHTS_GB/1000,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst', T.ans1.slice(0,8).join(''), true]),
+ narr:'Look at the top-left and the middle panel together. They hold the same eight tokens, because a token is sent the moment it is made. It is not generated in full and shown afterwards.'});
+push({title:a, phase:'decode', blocks:bl(...pre2), cached:base2+9, gen:T.ans1, genN:9,
+ gt:B.c1.n+9, tb:0.28+(B.c1.n+9)*WEIGHTS_GB/1000,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst', T.ans1.slice(0,9).join(''), true]),
+ narr:'There is a lag, and it is one one-way trip: roughly 65 milliseconds from Seoul to a distant data centre. But it is the same lag for every token, so the rate you read at is exactly the rate of generation. Only the start is delayed.'});
+push({title:a, phase:'decode', blocks:bl(...pre2), cached:base2+10, gen:T.ans1, genN:10,
+ gt:B.c1.n+10, tb:0.28+(B.c1.n+10)*WEIGHTS_GB/1000,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst', T.ans1.slice(0,10).join(''), true]),
+ narr:'If the server did wait and send the finished answer, a five-hundred-token reply would show you nothing for fifteen seconds and then appear all at once. That is what a non-streaming call does, and it is why chat windows do not use one.'});
+
+a = A('Turn one is finished');
+push({title:a, blocks:bl(...pre2,'a1'), cached:base2+B.a1.n,
+ gt:B.c1.n+B.a1.n, tb:0.28+(B.c1.n+B.a1.n)*WEIGHTS_GB/1000,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.']),
+ narr:'One question, one answer, and the server read the entire model 41 times: once for prefill and once for every generated token. That is 5.7 terabytes moved for a two-line reply.'});
+
+a = A('You ask a follow-up straight away');
+const c1 = ['sys','tools','u1','c1','r1','a1'];
+const t1 = base2+B.a1.n;
+push({title:a, blocks:bl(...c1,'u2'), live:'u2', cached:t1+B.u2.n,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.'],
+         ['user','And the day after?']),
+ narr:'Five words. But look at the right-hand panel: the entire conversation is re-sent, because the model kept nothing between requests. Your five words arrive at the end of 906 tokens of history.'});
+push({title:a, phase:'prefill', blocks:bl(...c1,'u2'), cached:t1+B.u2.n, tb:0.14,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.'],
+         ['user','And the day after?']),
+ narr:'The cache is still warm. Those 906 tokens are already sitting on the server with their keys and values computed, so only the 5 new tokens have to be prefilled. Cheap.'});
+
+a = A('Second turn, same shape');
+push({title:a, blocks:bl(...c1,'u2','c2','r2','a2'), cached:1024,
+ gt:B.c2.n+B.a2.n, tb:0.14+(B.c2.n+B.a2.n)*WEIGHTS_GB/1000,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.'],
+         ['user','And the day after?'],
+         ['tool','get_weather(city="Seoul", date="2026-09-05")'],
+         ['tool','{"temp_c":26,"rain_prob":0.10,"summary":"clear"}'],
+         ['asst','Friday looks clear at 26 °C. No umbrella needed.']),
+ narr:'Another tool call, another result, another answer. The conversation now stands at exactly 1,024 tokens and its cache occupies 320 megabytes of the server\u2019s memory.'});
+
+a = A('What the context window is measuring');
+push({title:a, blocks:bl(...c1,'u2','c2','r2','a2'), cached:1024,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.'],
+         ['user','And the day after?'],
+         ['tool','get_weather(city="Seoul", date="2026-09-05")'],
+         ['tool','{"temp_c":26,"rain_prob":0.10,"summary":"clear"}'],
+         ['asst','Friday looks clear at 26 °C. No umbrella needed.']),
+ narr:'The window is not storage and not memory. It is the maximum number of tokens the model may attend over in one pass. Everything in the bar counts against it: system prompt, tools, every question, every answer and every tool result.'});
+push({title:a, blocks:bl(...c1,'u2','c2','r2','a2'), cached:1024,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.'],
+         ['user','And the day after?'],
+         ['tool','get_weather(city="Seoul", date="2026-09-05")'],
+         ['tool','{"temp_c":26,"rain_prob":0.10,"summary":"clear"}'],
+         ['asst','Friday looks clear at 26 °C. No umbrella needed.']),
+ narr:'Note who is using it. Your two messages are 21 tokens between them. The preamble you never see is 770, and the tool results are 112. You are the smallest tenant in your own conversation.'});
+
+a = A('You close the tab. A day passes.');
+push({title:a, phase:'evict', blocks:bl(...c1,'u2','c2','r2','a2'), cached:1024, evicted:true,
+ chat:ch(['user',"What's the weather in Seoul, and should I take an umbrella tomorrow?"],
+         ['tool','get_weather(city="Seoul", date="2026-09-04")'],
+         ['tool','{"temp_c":24,"rain_prob":0.75,"summary":"showers in the afternoon"}'],
+         ['asst','Seoul tomorrow: around 24 °C, with a 75% chance of showers in the afternoon. Take the umbrella.'],
+         ['user','And the day after?'],
+         ['tool','get_weather(city="Seoul", date="2026-09-05")'],
+         ['tool','{"temp_c":26,"rain_prob":0.10,"summary":"clear"}'],
+         ['asst','Friday looks clear at 26 °C. No umbrella needed.']),
+ narr:'That 320 megabytes was needed by other people. The cache is evicted and the keys and values stop existing. The text of your conversation survives, in a database, as text.'});
+
+a = A('You come back and ask one more thing');
+const c2b = [...c1,'u2','c2','r2','a2'];
+push({title:a, blocks:bl(...c2b,'u3'), live:'u3', cached:0, evicted:true,
+ chat:ch(['user','Thanks — what about this weekend?']),
+ narr:'Your window shows a fresh-looking message. The server receives all 1,032 tokens again, because that is the only way the model can know what you are referring to.'});
+push({title:a, phase:'prefill', blocks:bl(...c2b,'u3'), cached:1032, tb:0.14,
+ chat:ch(['user','Thanks — what about this weekend?']),
+ narr:'And this time nothing is warm. All 1,032 tokens have to be prefilled from scratch: 86 times as much prefill work as the follow-up you asked a minute after the first answer, for a question of the same size.'});
+
+a = A('Then the same loop again');
+const base3 = 1032;
+for (let i=1;i<=T.ans3.length;i++){
+  push({title:a, phase:'decode', blocks:bl(...c2b,'u3'), cached:base3+i, gen:T.ans3, genN:i,
+    gt:i, tb:0.14+i*WEIGHTS_GB/1000,
+    chat:ch(['user','Thanks — what about this weekend?'],
+            ['asst', T.ans3.slice(0,i).join(''), true]),
+    narr:i===1 ? 'Decode is identical to before. It does not care how the context was assembled, only how long it is.'
+               : `Token ${i}. The cache is refilling as it goes.`});
+}
+push({title:a, blocks:bl(...c2b,'u3','c3'), cached:base3+B.c3.n, gt:B.c3.n,
+ tb:0.14+B.c3.n*WEIGHTS_GB/1000,
+ chat:ch(['user','Thanks — what about this weekend?'],
+         ['asst','This weekend in Seoul: dry on Saturday, light rain Sunday evening.']),
+ narr:'Answered. The conversation is now 1,046 tokens, its cache is warm again, and the clock on the next eviction has started.'});
+
+a = A('When the window finally fills');
+push({title:a, blocks:bl(...c2b,'u3','c3'), cached:base3+B.c3.n, windowFull:true,
+ chat:ch(['user','Thanks — what about this weekend?'],
+         ['asst','This weekend in Seoul: dry on Saturday, light rain Sunday evening.']),
+ narr:'Keep going and the bar reaches the end. The model cannot attend over more tokens than its window, so something has to leave — usually the oldest turns. The system prompt and the tools are pinned at the front and never dropped, which is why they are the one cost that never goes away.'});
+
+a = A('So does the text go up word by word?');
+push({title:a, blocks:bl(...c2b,'u3','c3'), cached:base3+B.c3.n,
+ chat:ch(['user','Thanks — what about this weekend?'],
+         ['asst','This weekend in Seoul: dry on Saturday, light rain Sunday evening.']),
+ narr:'No, and it does not wait for the whole answer either. One request goes up carrying the entire conversation. Then the connection stays open and each token comes down as it is made. During generation your device sends nothing at all.'});
+push({title:a, blocks:bl(...c2b,'u3','c3'), cached:base3+B.c3.n,
+ chat:ch(['user','Thanks — what about this weekend?'],
+         ['asst','This weekend in Seoul: dry on Saturday, light rain Sunday evening.']),
+ narr:'Inside the server the sequence does grow by one token each step, but the model only ever processes that one new token. Everything before it is already in the cache as keys and values, which is precisely what the cache exists to avoid recomputing.'});
+push({title:a, blocks:bl(...c2b,'u3','c3'), cached:base3+B.c3.n,
+ chat:ch(['user','Thanks — what about this weekend?'],
+         ['asst','This weekend in Seoul: dry on Saturday, light rain Sunday evening.']),
+ narr:'Two different things get called re-sending. Within one answer, nothing repeats and the server holds the state. Between two turns, everything repeats, because a new request is the only thing the server is given. The first costs nothing; the second costs everything.'});
+
+a = A('What to take from this');
+push({title:a, blocks:bl(...c2b,'u3','c3'), cached:base3+B.c3.n,
+ chat:ch(['user','Thanks — what about this weekend?'],
+         ['asst','This weekend in Seoul: dry on Saturday, light rain Sunday evening.']),
+ narr:'Three things. The model has no memory, so every turn re-sends everything. The window counts all of it, most of which you did not write. And a warm cache is the difference between prefilling five tokens and prefilling a thousand — which is why a reply feels quick when you keep typing and slow when you come back tomorrow.'});
+
+// ---- render --------------------------------------------------------------
+const $ = id => document.getElementById(id);
+let i = 0, timer = null;
+const ACTS = [...new Set(S.map(s=>s.act))];
+
+function fmtTB(x){ return x < 1 ? (x*1000).toFixed(0)+' GB' : x.toFixed(1)+' TB'; }
+
+function draw(){
+  const s = S[i];
+  $('actno').textContent = `ACT ${s.act} / ${ACTS.length}`;
+  $('acttitle').textContent = s.title;
+  $('narr').textContent = s.narr;
+  $('counter').textContent = `${i+1} / ${S.length}`;
+  $('prog').style.width = (100*(i+1)/S.length)+'%';
+
+  $('chat').innerHTML = s.chat.map(([w,t,live])=>
+    `<div class="bub ${w}${live?' live':''}"><div class="who">${
+      w==='user'?'you':w==='tool'?'tool':'assistant'}${live?' · arriving':''}</div>${
+      t.replace(/&/g,'&amp;').replace(/</g,'&lt;')}${live?'<span class="cr"></span>':''}</div>`).join('');
+
+  $('blocks').innerHTML = s.blocks.map(b=>{
+    const cls = [ 'blk', b.role,
+                  s.live===b.id ? 'live':'',
+                  (s.evicted && s.cached===0) ? 'ghosted':'' ].filter(Boolean).join(' ');
+    return `<div class="${cls}"><div><div>${b.label}</div><div class="bt">${b.sub}</div></div>
+            <div class="tk">${b.n} tok</div></div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:13px">nothing yet</div>';
+
+  const total = s.blocks.reduce((a,b)=>a+b.n,0);
+  $('wintrack').innerHTML = s.blocks.map(b=>
+    `<div class="winseg ${b.role}" style="width:${100*b.n/CAP}%" title="${b.label}: ${b.n}"></div>`).join('')
+    + (s.windowFull ? `<div class="winseg asst" style="width:${100*(CAP-total)/CAP}%;opacity:.35"></div>`:'');
+  $('winused').textContent = `${total.toLocaleString()} tokens used` +
+     (total ? `  ·  ${(100*total/CAP).toFixed(1)}%` : '');
+  $('wincap').textContent = `of ${CAP.toLocaleString()}`;
+
+  if (s.gen){
+    $('gen').innerHTML = s.gen.slice(0,s.genN).map(t=>
+      `<span class="tok">${t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/ /g,'&nbsp;')}</span>`).join('')
+      + '<span class="caret"></span>';
+  } else $('gen').innerHTML = '<span style="color:var(--muted)">nothing being generated right now</span>';
+
+  const ph = s.phase;
+  $('phase').className = 'phase ph-'+ph;
+  $('phase').textContent = {idle:'idle', prefill:'prefill — all tokens at once',
+    decode:'decode — one token per full weight read', tool:'waiting on an external tool',
+    evict:'cache evicted'}[ph];
+
+
+  const pipe = $('pipe'), nn = $('netnote');
+  if (ph === 'prefill' && !s.gen){
+    pipe.innerHTML = `<div class="pk up" style="width:150px;top:9px">${total.toLocaleString()} tokens, one request</div>`;
+    nn.textContent = 'Up the wire, once: the whole prompt in a single request. Nothing else goes up until you type again.';
+  } else if (ph === 'decode'){
+    pipe.innerHTML = `<div class="pk dn" style="width:74px;top:9px">1 token</div>`;
+    nn.textContent = 'Down the wire only. Your device is sending nothing — it is listening on the connection it already opened.';
+  } else if (ph === 'tool'){
+    pipe.innerHTML = '';
+    nn.textContent = 'Neither. The serving system is calling a weather service; your connection is simply held open.';
+  } else if (ph === 'evict'){
+    pipe.innerHTML = '';
+    nn.textContent = 'Nothing on the wire. You are not connected at all; the server is reclaiming memory.';
+  } else {
+    pipe.innerHTML = '';
+    nn.textContent = 'Nothing travelling.';
+  }
+
+  const nb = Math.ceil(s.cached/BLOCK);
+  let out='', acc=0;
+  for (const b of s.blocks){
+    const cnt = Math.min(Math.ceil(b.n/BLOCK), Math.max(0, nb-acc));
+    for (let k=0;k<cnt;k++) out += `<div class="cb ${b.role}"></div>`;
+    acc += cnt; if (acc>=nb) break;
+  }
+  if (s.evicted && s.cached===0)
+    out = Array.from({length:Math.ceil(1024/BLOCK)},()=>'<div class="cb gone"></div>').join('');
+  $('cache').innerHTML = out || '<span style="color:var(--muted);font-size:12.5px">empty</span>';
+
+  $('s1').textContent = s.cached.toLocaleString();
+  $('s2').textContent = (s.cached*BYTES_PER_TOKEN/1e6).toFixed(1)+' MB';
+  $('s3').textContent = fmtTB(s.tb||0);
+  $('s4').textContent = (s.gt||0).toString();
+
+  document.querySelectorAll('#acts button').forEach(btn=>
+    btn.classList.toggle('on', +btn.dataset.act===s.act));
+  $('prev').disabled = i===0; $('next').disabled = i===S.length-1;
+}
+
+$('acts').innerHTML = ACTS.map(n=>`<button data-act="${n}">${n}</button>`).join('');
+$('acts').onclick = e => { if(e.target.dataset.act){
+  i = S.findIndex(s=>s.act===+e.target.dataset.act); stop(); draw(); }};
+
+function step(){ if(i<S.length-1){ i++; draw(); } else stop(); }
+function stop(){ clearInterval(timer); timer=null; $('play').textContent='Play'; }
+function play(){
+  if(timer){ stop(); return; }
+  if(i>=S.length-1) i=0;
+  $('play').textContent='Pause';
+  const ms = 1400 - (+$('speed').value)*120;
+  timer = setInterval(step, ms);
+}
+$('play').onclick = play;
+$('next').onclick = ()=>{ stop(); step(); };
+$('prev').onclick = ()=>{ stop(); if(i>0){ i--; draw(); } };
+$('reset').onclick = ()=>{ stop(); i=0; draw(); };
+$('speed').oninput = ()=>{ if(timer){ stop(); play(); } };
+document.addEventListener('keydown', e=>{
+  if(e.key===' '){ e.preventDefault(); play(); }
+  if(e.key==='ArrowRight'){ stop(); step(); }
+  if(e.key==='ArrowLeft'){ stop(); if(i>0){ i--; draw(); } }
+});
+draw();
+</script></body></html>

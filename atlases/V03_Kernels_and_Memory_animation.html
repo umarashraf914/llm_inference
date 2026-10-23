@@ -1,0 +1,216 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vanilla attention vs FlashAttention, step by step</title>
+<style>
+:root{--paper:#FBFAF8;--ink:#17191C;--muted:#6B6F76;--rule:#DFDDD8;--panel:#FFFFFF;
+--m:#9A6410;--m-fill:#FBEEDA;--m-text:#6B4408;
+--s:#1B7A6B;--s-fill:#DEF0EC;--s-text:#0F4A41;
+--h:#B4472C;--h-fill:#F7E7E1;--h-text:#7A2E1B;
+--u:#9B9FA6;--u-fill:#F0EFEC;--u-text:#3A3D42;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media(prefers-color-scheme:dark){:root{--paper:#131416;--ink:#E8E6E1;--muted:#9AA0A7;--rule:#2C2E32;
+--panel:#191B1E;--m:#E0A83C;--m-fill:#392B11;--m-text:#F2DAAA;--s:#4FBFA8;--s-fill:#12332E;--s-text:#A3E0D3;
+--h:#E07A5F;--h-fill:#3A211A;--h-text:#F2C6B6;--u:#6E727A;--u-fill:#1E2023;--u-text:#C8CBD0;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 20px 80px}
+.kick{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+color:var(--muted);margin-bottom:12px}
+h1{font-size:27px;font-weight:500;margin:0 0 10px;letter-spacing:-.01em}
+.lede{color:var(--muted);font-size:14.5px;max-width:74ch;margin:0 0 22px}
+.setup{display:flex;gap:26px;flex-wrap:wrap;font-size:13px;color:var(--muted);
+border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:14px 0;margin-bottom:22px}
+.setup b{color:var(--ink);font-weight:500}
+.ctl{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule);
+padding:12px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+button{font-family:var(--sans);font-size:13.5px;padding:7px 13px;border-radius:7px;
+border:1px solid var(--rule);background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.pri{background:var(--ink);color:var(--paper);border-color:var(--ink);min-width:78px}
+button.key{border-color:var(--m);color:var(--m-text);background:var(--m-fill)}
+.count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-left:6px}
+input[type=range]{width:110px;accent-color:var(--h)}
+.scrub{flex:1;min-width:160px;accent-color:var(--ink)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:820px){.panels{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;
+display:flex;flex-direction:column;min-height:560px}
+.ptitle{font-size:16px;font-weight:500;margin:0 0 3px}
+.psub{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 9px;border-radius:6px;
+background:var(--u-fill);color:var(--u-text);display:inline-block;margin-bottom:12px}
+.chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+padding:3px 8px;border-radius:5px;margin-left:8px;border:1px solid}
+.c-read,.c-write,.c-cleared{background:var(--h-fill);color:var(--h-text);border-color:var(--h)}
+.c-compute{background:var(--m-fill);color:var(--m-text);border-color:var(--m)}
+.c-discard,.c-idle{background:var(--u-fill);color:var(--u-text);border-color:var(--u)}
+.c-done{background:var(--s-fill);color:var(--s-text);border-color:var(--s)}
+.sram{border:1px dashed var(--rule);border-radius:10px;padding:13px;min-height:236px;
+display:flex;gap:11px;flex-wrap:wrap;align-content:flex-start;margin-bottom:14px}
+.sramlab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);margin-bottom:7px}
+.empty{color:var(--muted);font-size:13px;font-style:italic;margin:auto}
+.tensor{border-radius:8px;padding:7px 9px;border:1px solid}
+.tensor.hi{box-shadow:0 0 0 3px color-mix(in srgb,currentColor 22%,transparent)}
+.tlabel{font-family:var(--mono);font-size:10.5px;display:block;margin-bottom:5px;opacity:.85}
+.grid{display:grid;gap:3px}
+.grid i{font-family:var(--mono);font-size:11px;font-style:normal;padding:3px 5px;border-radius:3px;
+background:color-mix(in srgb,currentColor 10%,transparent);text-align:right;min-width:40px}
+.t-q,.t-k,.t-v,.t-o{background:var(--s-fill);border-color:var(--s);color:var(--s-text)}
+.t-s{background:var(--m-fill);border-color:var(--m);color:var(--m-text)}
+.t-stat{background:var(--u-fill);border-color:var(--u);color:var(--u-text)}
+.note{font-size:13.5px;color:var(--muted);min-height:76px;border-top:1px solid var(--rule);
+padding-top:12px;margin-bottom:12px}
+.note.keyed{color:var(--m-text);font-weight:500}
+.meter{margin-top:auto}
+.mlab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:5px}
+.mlab b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.bar{height:9px;background:var(--u-fill);border-radius:5px;overflow:hidden}
+.fill{height:100%;background:var(--h);width:0;transition:width .28s ease}
+.fill.low{background:var(--s)}
+.fin{font-size:12.5px;color:var(--h-text);background:var(--h-fill);border:1px solid var(--h);
+border-radius:7px;padding:8px 11px;margin-bottom:12px;display:none}
+.fin.on{display:block}
+.tally{margin-top:26px;border:1px solid var(--rule);border-radius:12px;padding:20px;background:var(--panel)}
+.tally h2{font-size:17px;font-weight:500;margin:0 0 14px}
+.trow{display:flex;align-items:center;gap:14px;margin-bottom:10px;font-size:13.5px}
+.trow span:first-child{width:190px;color:var(--muted)}
+.tbar{height:20px;border-radius:5px}
+.foot{margin-top:26px;font-size:13.5px;color:var(--muted);max-width:76ch}
+.foot b{color:var(--ink);font-weight:500}
+</style></head><body><div class="wrap">
+
+<div class="kick">V3 &middot; animation</div>
+<h1>Vanilla attention against FlashAttention, every single step</h1>
+<p class="lede">A real attention head, shrunk until every number fits on screen. Nothing is skipped and
+nothing is approximated &mdash; the FlashAttention side below produces exactly the same output as the
+vanilla side, checked to sixteen decimal places. Watch the traffic counter at the bottom of each panel.</p>
+
+<div class="setup">
+<span><b>4</b> tokens</span><span>head dimension <b>2</b></span><span>block size <b>2</b></span>
+<span>score matrix <b>4&times;4</b></span><span>counter unit: <b>numbers crossing the bus</b></span>
+</div>
+
+<div class="ctl">
+<button id="rst">Reset</button>
+<button id="bak">&#9664;</button>
+<button class="pri" id="ply">Play</button>
+<button id="fwd">&#9654;</button>
+<button class="key" id="jmp">Jump to the rescale</button>
+<span class="count" id="cnt"></span>
+<input type="range" class="scrub" id="scr" min="0" value="0">
+<span class="count">speed</span><input type="range" id="spd" min="250" max="2400" value="1150">
+</div>
+
+<div class="panels">
+<div class="panel">
+<p class="ptitle">Vanilla attention</p><p class="psub">Three separate kernel launches</p>
+<div><span class="badge" id="vk"></span><span class="chip" id="vc"></span></div>
+<div class="fin" id="vf"></div>
+<div class="sramlab">SRAM</div>
+<div class="sram" id="vs"></div>
+<div class="note" id="vn"></div>
+<div class="meter"><div class="mlab"><span>HBM traffic</span><b id="vt">0</b></div>
+<div class="bar"><div class="fill" id="vb"></div></div></div>
+</div>
+
+<div class="panel">
+<p class="ptitle">FlashAttention</p><p class="psub">One fused kernel, tiled</p>
+<div><span class="badge" id="fk"></span><span class="chip" id="fc"></span></div>
+<div class="fin" id="ff"></div>
+<div class="sramlab">SRAM</div>
+<div class="sram" id="fs"></div>
+<div class="note" id="fn"></div>
+<div class="meter"><div class="mlab"><span>HBM traffic</span><b id="ft">0</b></div>
+<div class="bar"><div class="fill low" id="fb"></div></div></div>
+</div>
+</div>
+
+<div class="tally"><h2>Where the traffic went</h2>
+<div class="trow"><span>Vanilla, score matrix</span>
+<div class="tbar" style="width:340px;background:var(--m)"></div><span>64 numbers</span></div>
+<div class="trow"><span>Vanilla, Q K V and output</span>
+<div class="tbar" style="width:170px;background:var(--s)"></div><span>32 numbers</span></div>
+<div class="trow"><span>FlashAttention, score matrix</span>
+<div class="tbar" style="width:2px;background:var(--m)"></div><span>0 numbers</span></div>
+<div class="trow"><span>FlashAttention, Q K V and output</span>
+<div class="tbar" style="width:255px;background:var(--s)"></div><span>48 numbers</span></div>
+<p class="foot" style="margin-top:16px">Notice the fourth bar is <b>longer</b> than the second.
+FlashAttention moves <b>more</b> Q, K and V traffic than vanilla does, because tiling forces it to
+re-read K and V once for every block of Q. It wins anyway, because it deleted the first bar entirely.</p>
+</div>
+
+<p class="foot"><b>Why the win looks small here.</b> At four tokens the score matrix has 16 entries
+while Q, K and V have 8 each &mdash; comparable. Real attention runs at thousands of tokens, where the
+score matrix is tens of millions of entries and Q, K and V are still only thousands. The first bar
+grows quadratically; the others do not. That is the entire argument, and this toy badly understates it.</p>
+
+<p class="foot"><b>On the loop order.</b> This animation runs the outer loop over blocks of Q and the
+inner loop over blocks of K and V, which is FlashAttention 2's arrangement and what runs today. The
+video describes version 1 at 10:52, which had it the other way round &mdash; and in that version the
+output accumulator has to be written back to HBM and read again on every outer sweep. Swapping the
+loops so the accumulator never leaves SRAM was one of version 2's changes.</p>
+
+<script>
+const D={"vanilla":[{"kernel":"Before anything runs","sram":[],"op":"idle","note":"HBM holds Q, K and V. Nothing is on the chip. The traffic counter is at zero.","traffic":0,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 1 of 3 &mdash; compute the scores","sram":[{"label":"Q","data":[[1,0],[0,1],[1,1],[0.5,0.5]],"cls":"q","hi":null}],"op":"read","note":"Load Q from HBM into SRAM. Four rows, two columns, so eight numbers cross the bus.","traffic":8,"moved":8,"hi":null,"cleared":false},{"kernel":"Kernel 1 of 3 &mdash; compute the scores","sram":[{"label":"Q","data":[[1,0],[0,1],[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K","data":[[1,0],[0,1],[1,1],[1,-1]],"cls":"k","hi":null}],"op":"read","note":"Load K as well. Eight more numbers.","traffic":16,"moved":8,"hi":null,"cleared":false},{"kernel":"Kernel 1 of 3 &mdash; compute the scores","sram":[{"label":"Q","data":[[1,0],[0,1],[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K","data":[[1,0],[0,1],[1,1],[1,-1]],"cls":"k","hi":null},{"label":"S","data":[[1,0,1,1],[0,1,1,-1],[1,1,2,0],[0.5,0.5,1.0,0.0]],"cls":"s","hi":null}],"op":"compute","note":"Multiply Q by K transposed. S is 4x4 &mdash; sixteen numbers, and it is now the biggest thing here.","traffic":16,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 1 of 3 &mdash; compute the scores","sram":[{"label":"Q","data":[[1,0],[0,1],[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K","data":[[1,0],[0,1],[1,1],[1,-1]],"cls":"k","hi":null},{"label":"S","data":[[1,0,1,1],[0,1,1,-1],[1,1,2,0],[0.5,0.5,1.0,0.0]],"cls":"s","hi":"all"}],"op":"write","note":"Write all sixteen entries of S out to HBM. This is the write that FlashAttention will delete entirely.","traffic":32,"moved":16,"hi":null,"cleared":false},{"kernel":"Kernel 1 has ended","sram":[],"op":"cleared","note":"The kernel finishes and SRAM is gone. Everything it computed is lost unless it was written out. That is the only reason S had to go to HBM.","traffic":32,"moved":0,"hi":null,"cleared":true},{"kernel":"Kernel 2 of 3 &mdash; softmax","sram":[{"label":"S","data":[[1,0,1,1],[0,1,1,-1],[1,1,2,0],[0.5,0.5,1.0,0.0]],"cls":"s","hi":null}],"op":"read","note":"A brand-new kernel launches. It can only read HBM, so it reads all sixteen entries of S back in.","traffic":48,"moved":16,"hi":null,"cleared":false},{"kernel":"Kernel 2 of 3 &mdash; softmax","sram":[{"label":"S","data":[[1,0,1,1],[0,1,1,-1],[1,1,2,0],[0.5,0.5,1.0,0.0]],"cls":"s","hi":null},{"label":"row max","data":[[1],[1],[2],[1.0]],"cls":"stat","hi":"all"}],"op":"compute","note":"Find the largest score in each row. Subtracting it before exponentiating is what stops the exponential overflowing.","traffic":48,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 2 of 3 &mdash; softmax","sram":[{"label":"S","data":[[1,0,1,1],[0,1,1,-1],[1,1,2,0],[0.5,0.5,1.0,0.0]],"cls":"s","hi":null},{"label":"row max","data":[[1],[1],[2],[1.0]],"cls":"stat","hi":null},{"label":"exp(S - max)","data":[[1.0,0.368,1.0,1.0],[0.368,1.0,1.0,0.135],[0.368,0.368,1.0,0.135],[0.607,0.607,1.0,0.368]],"cls":"s","hi":"all"}],"op":"compute","note":"Subtract each row's maximum and exponentiate. These are the unnormalised weights.","traffic":48,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 2 of 3 &mdash; softmax","sram":[{"label":"exp(S - max)","data":[[1.0,0.368,1.0,1.0],[0.368,1.0,1.0,0.135],[0.368,0.368,1.0,0.135],[0.607,0.607,1.0,0.368]],"cls":"s","hi":null},{"label":"row sum","data":[[3.368],[2.503],[1.871],[2.581]],"cls":"stat","hi":"all"}],"op":"compute","note":"Sum each row. That sum is the softmax denominator.","traffic":48,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 2 of 3 &mdash; softmax","sram":[{"label":"P","data":[[0.297,0.109,0.297,0.297],[0.147,0.399,0.399,0.054],[0.197,0.197,0.534,0.072],[0.235,0.235,0.387,0.143]],"cls":"s","hi":"all"},{"label":"row sum","data":[[3.368],[2.503],[1.871],[2.581]],"cls":"stat","hi":null}],"op":"compute","note":"Divide by the denominator. P is the finished attention weight matrix &mdash; still 4x4.","traffic":48,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 2 of 3 &mdash; softmax","sram":[{"label":"P","data":[[0.297,0.109,0.297,0.297],[0.147,0.399,0.399,0.054],[0.197,0.197,0.534,0.072],[0.235,0.235,0.387,0.143]],"cls":"s","hi":"all"}],"op":"write","note":"Write all sixteen entries of P out to HBM, for the same reason as before.","traffic":64,"moved":16,"hi":null,"cleared":false},{"kernel":"Kernel 2 has ended","sram":[],"op":"cleared","note":"SRAM is cleared again. Two full n-by-n matrices have now been written to HBM and one has been read back.","traffic":64,"moved":0,"hi":null,"cleared":true},{"kernel":"Kernel 3 of 3 &mdash; weight the values","sram":[{"label":"P","data":[[0.297,0.109,0.297,0.297],[0.147,0.399,0.399,0.054],[0.197,0.197,0.534,0.072],[0.235,0.235,0.387,0.143]],"cls":"s","hi":null}],"op":"read","note":"Third kernel. Read all sixteen entries of P back from HBM.","traffic":80,"moved":16,"hi":null,"cleared":false},{"kernel":"Kernel 3 of 3 &mdash; weight the values","sram":[{"label":"P","data":[[0.297,0.109,0.297,0.297],[0.147,0.399,0.399,0.054],[0.197,0.197,0.534,0.072],[0.235,0.235,0.387,0.143]],"cls":"s","hi":null},{"label":"V","data":[[1,0],[0,1],[1,1],[2,0]],"cls":"v","hi":null}],"op":"read","note":"Load V. Eight numbers.","traffic":88,"moved":8,"hi":null,"cleared":false},{"kernel":"Kernel 3 of 3 &mdash; weight the values","sram":[{"label":"P","data":[[0.297,0.109,0.297,0.297],[0.147,0.399,0.399,0.054],[0.197,0.197,0.534,0.072],[0.235,0.235,0.387,0.143]],"cls":"s","hi":null},{"label":"V","data":[[1,0],[0,1],[1,1],[2,0]],"cls":"v","hi":null},{"label":"O","data":[[1.188,0.406],[0.655,0.799],[0.876,0.731],[0.908,0.622]],"cls":"o","hi":"all"}],"op":"compute","note":"Multiply. O is 4x2 &mdash; the same shape as Q, and the actual answer.","traffic":88,"moved":0,"hi":null,"cleared":false},{"kernel":"Kernel 3 of 3 &mdash; weight the values","sram":[{"label":"P","data":[[0.297,0.109,0.297,0.297],[0.147,0.399,0.399,0.054],[0.197,0.197,0.534,0.072],[0.235,0.235,0.387,0.143]],"cls":"s","hi":null},{"label":"V","data":[[1,0],[0,1],[1,1],[2,0]],"cls":"v","hi":null},{"label":"O","data":[[1.188,0.406],[0.655,0.799],[0.876,0.731],[0.908,0.622]],"cls":"o","hi":"all"}],"op":"write","note":"Write the output. Eight numbers.","traffic":96,"moved":8,"hi":null,"cleared":false},{"kernel":"Done","sram":[],"op":"done","note":"Ninety-six numbers crossed the bus. Sixty-four of them &mdash; two thirds &mdash; were the score matrix being written out and read back, twice over.","traffic":96,"moved":0,"hi":null,"cleared":true}],"flash":[{"kernel":"Before anything runs","sram":[],"op":"idle","note":"Same HBM, same Q, K and V. One kernel this time, not three.","traffic":0,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2)","sram":[{"label":"Q_i","data":[[1,0],[0,1]],"cls":"q","hi":"all"}],"op":"read","note":"Load only rows 1 to 2 of Q. Four numbers, not eight.","traffic":4,"moved":4,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2)","sram":[{"label":"Q_i","data":[[1,0],[0,1]],"cls":"q","hi":null},{"label":"O_i","data":[[0.0,0.0],[0.0,0.0]],"cls":"o","hi":"all"},{"label":"m_i","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"l_i","data":[[0],[0]],"cls":"stat","hi":null}],"op":"compute","note":"Set up three running values in SRAM: the output accumulator O, the running maximum m (starting at minus infinity), and the running denominator l. These stay resident for the whole inner loop.","traffic":4,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"Q_i","data":[[1,0],[0,1]],"cls":"q","hi":null},{"label":"K_j","data":[[1,0],[0,1]],"cls":"k","hi":"all"},{"label":"V_j","data":[[1,0],[0,1]],"cls":"v","hi":"all"},{"label":"O_i","data":[[0.0,0.0],[0.0,0.0]],"cls":"o","hi":null},{"label":"m_i","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"l_i","data":[[0.0],[0.0]],"cls":"stat","hi":null}],"op":"read","note":"Load the first block of K and V. Eight numbers.","traffic":12,"moved":8,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"Q_i","data":[[1,0],[0,1]],"cls":"q","hi":null},{"label":"K_j","data":[[1,0],[0,1]],"cls":"k","hi":null},{"label":"V_j","data":[[1,0],[0,1]],"cls":"v","hi":null},{"label":"S_ij","data":[[1,0],[0,1]],"cls":"s","hi":"all"},{"label":"O_i","data":[[0.0,0.0],[0.0,0.0]],"cls":"o","hi":null},{"label":"m_i","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"l_i","data":[[0.0],[0.0]],"cls":"stat","hi":null}],"op":"compute","note":"Compute this tile of the score matrix. It is 2x2 &mdash; four numbers &mdash; and it exists only in SRAM.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"S_ij","data":[[1,0],[0,1]],"cls":"s","hi":null},{"label":"row max of tile","data":[[1],[1]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[1],[1]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[-999],[-999]],"cls":"stat","hi":null}],"op":"compute","note":"Compare the tile's row maxima against the running maximum and take the larger.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"correction","data":[[0.0],[0.0]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[1],[1]],"cls":"stat","hi":null}],"op":"compute","note":"The maximum did not move, so the correction factor is 1 and nothing needs repairing.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"S_ij","data":[[1,0],[0,1]],"cls":"s","hi":null},{"label":"m_i","data":[[1],[1]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,0.368],[0.368,1.0]],"cls":"s","hi":"all"}],"op":"compute","note":"Subtract the new running maximum from the tile and exponentiate.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"correction","data":[[0.0],[0.0]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,0.368],[0.368,1.0]],"cls":"s","hi":null},{"label":"l_i","data":[[1.368],[1.368]],"cls":"stat","hi":"all"}],"op":"compute","note":"Rescale the running denominator by the correction, then add this tile's row sums.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"P_ij","data":[[1.0,0.368],[0.368,1.0]],"cls":"s","hi":null},{"label":"V_j","data":[[1,0],[0,1]],"cls":"v","hi":null},{"label":"O_i","data":[[1.0,0.368],[0.368,1.0]],"cls":"o","hi":"all"},{"label":"l_i","data":[[1.368],[1.368]],"cls":"stat","hi":null}],"op":"compute","note":"Rescale the output accumulator by the same correction, then add this tile's contribution. This is the fold. O never leaves SRAM.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 1","sram":[{"label":"O_i","data":[[1.0,0.368],[0.368,1.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[1]],"cls":"stat","hi":null},{"label":"l_i","data":[[1.368],[1.368]],"cls":"stat","hi":null}],"op":"discard","note":"The tile of S has served its purpose and is discarded. It never touched HBM, and the next tile will be written over the top of it.","traffic":12,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"Q_i","data":[[1,0],[0,1]],"cls":"q","hi":null},{"label":"K_j","data":[[1,1],[1,-1]],"cls":"k","hi":"all"},{"label":"V_j","data":[[1,1],[2,0]],"cls":"v","hi":"all"},{"label":"O_i","data":[[1.0,0.368],[0.368,1.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[1]],"cls":"stat","hi":null},{"label":"l_i","data":[[1.368],[1.368]],"cls":"stat","hi":null}],"op":"read","note":"Load the next block of K and V, overwriting the previous one. The old block is simply gone.","traffic":20,"moved":8,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"Q_i","data":[[1,0],[0,1]],"cls":"q","hi":null},{"label":"K_j","data":[[1,1],[1,-1]],"cls":"k","hi":null},{"label":"V_j","data":[[1,1],[2,0]],"cls":"v","hi":null},{"label":"S_ij","data":[[1,1],[1,-1]],"cls":"s","hi":"all"},{"label":"O_i","data":[[1.0,0.368],[0.368,1.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[1]],"cls":"stat","hi":null},{"label":"l_i","data":[[1.368],[1.368]],"cls":"stat","hi":null}],"op":"compute","note":"Compute this tile of the score matrix. It is 2x2 &mdash; four numbers &mdash; and it exists only in SRAM.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"S_ij","data":[[1,1],[1,-1]],"cls":"s","hi":null},{"label":"row max of tile","data":[[1],[1]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[1],[1]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[1],[1]],"cls":"stat","hi":null}],"op":"compute","note":"Compare the tile's row maxima against the running maximum and take the larger.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"correction","data":[[1.0],[1.0]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[1],[1]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[1],[1]],"cls":"stat","hi":null}],"op":"compute","note":"The maximum did not move, so the correction factor is 1 and nothing needs repairing.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"S_ij","data":[[1,1],[1,-1]],"cls":"s","hi":null},{"label":"m_i","data":[[1],[1]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,1.0],[1.0,0.135]],"cls":"s","hi":"all"}],"op":"compute","note":"Subtract the new running maximum from the tile and exponentiate.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"correction","data":[[1.0],[1.0]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,1.0],[1.0,0.135]],"cls":"s","hi":null},{"label":"l_i","data":[[3.368],[2.503]],"cls":"stat","hi":"all"}],"op":"compute","note":"Rescale the running denominator by the correction, then add this tile's row sums.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"P_ij","data":[[1.0,1.0],[1.0,0.135]],"cls":"s","hi":null},{"label":"V_j","data":[[1,1],[2,0]],"cls":"v","hi":null},{"label":"O_i","data":[[4.0,1.368],[1.639,2.0]],"cls":"o","hi":"all"},{"label":"l_i","data":[[3.368],[2.503]],"cls":"stat","hi":null}],"op":"compute","note":"Rescale the output accumulator by the same correction, then add this tile's contribution. This is the fold. O never leaves SRAM.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2) &middot; K,V block 2","sram":[{"label":"O_i","data":[[4.0,1.368],[1.639,2.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[1]],"cls":"stat","hi":null},{"label":"l_i","data":[[3.368],[2.503]],"cls":"stat","hi":null}],"op":"discard","note":"The tile of S has served its purpose and is discarded. It never touched HBM, and the next tile will be written over the top of it.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2)","sram":[{"label":"O_i","data":[[4.0,1.368],[1.639,2.0]],"cls":"o","hi":null},{"label":"l_i","data":[[3.368],[2.503]],"cls":"stat","hi":null},{"label":"O_i final","data":[[1.188,0.406],[0.655,0.799]],"cls":"o","hi":"all"}],"op":"compute","note":"The inner loop is finished, so divide by the final denominator. This is the only division in the whole algorithm.","traffic":20,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 1 (rows 1&ndash;2)","sram":[{"label":"O_i final","data":[[1.188,0.406],[0.655,0.799]],"cls":"o","hi":"all"}],"op":"write","note":"Write these output rows to HBM. Four numbers, once.","traffic":24,"moved":4,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4)","sram":[{"label":"Q_i","data":[[1,1],[0.5,0.5]],"cls":"q","hi":"all"}],"op":"read","note":"Load only rows 3 to 4 of Q. Four numbers, not eight.","traffic":28,"moved":4,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4)","sram":[{"label":"Q_i","data":[[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"O_i","data":[[0.0,0.0],[0.0,0.0]],"cls":"o","hi":"all"},{"label":"m_i","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"l_i","data":[[0],[0]],"cls":"stat","hi":null}],"op":"compute","note":"Set up three running values in SRAM: the output accumulator O, the running maximum m (starting at minus infinity), and the running denominator l. These stay resident for the whole inner loop.","traffic":28,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"Q_i","data":[[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K_j","data":[[1,0],[0,1]],"cls":"k","hi":"all"},{"label":"V_j","data":[[1,0],[0,1]],"cls":"v","hi":"all"},{"label":"O_i","data":[[0.0,0.0],[0.0,0.0]],"cls":"o","hi":null},{"label":"m_i","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"l_i","data":[[0.0],[0.0]],"cls":"stat","hi":null}],"op":"read","note":"Load the first block of K and V. Eight numbers.","traffic":36,"moved":8,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"Q_i","data":[[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K_j","data":[[1,0],[0,1]],"cls":"k","hi":null},{"label":"V_j","data":[[1,0],[0,1]],"cls":"v","hi":null},{"label":"S_ij","data":[[1,1],[0.5,0.5]],"cls":"s","hi":"all"},{"label":"O_i","data":[[0.0,0.0],[0.0,0.0]],"cls":"o","hi":null},{"label":"m_i","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"l_i","data":[[0.0],[0.0]],"cls":"stat","hi":null}],"op":"compute","note":"Compute this tile of the score matrix. It is 2x2 &mdash; four numbers &mdash; and it exists only in SRAM.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"S_ij","data":[[1,1],[0.5,0.5]],"cls":"s","hi":null},{"label":"row max of tile","data":[[1],[0.5]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[1],[0.5]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[-999],[-999]],"cls":"stat","hi":null}],"op":"compute","note":"Compare the tile's row maxima against the running maximum and take the larger.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"correction","data":[[0.0],[0.0]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[-999],[-999]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[1],[0.5]],"cls":"stat","hi":null}],"op":"compute","note":"The maximum did not move, so the correction factor is 1 and nothing needs repairing.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"S_ij","data":[[1,1],[0.5,0.5]],"cls":"s","hi":null},{"label":"m_i","data":[[1],[0.5]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,1.0],[1.0,1.0]],"cls":"s","hi":"all"}],"op":"compute","note":"Subtract the new running maximum from the tile and exponentiate.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"correction","data":[[0.0],[0.0]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,1.0],[1.0,1.0]],"cls":"s","hi":null},{"label":"l_i","data":[[2.0],[2.0]],"cls":"stat","hi":"all"}],"op":"compute","note":"Rescale the running denominator by the correction, then add this tile's row sums.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"P_ij","data":[[1.0,1.0],[1.0,1.0]],"cls":"s","hi":null},{"label":"V_j","data":[[1,0],[0,1]],"cls":"v","hi":null},{"label":"O_i","data":[[1.0,1.0],[1.0,1.0]],"cls":"o","hi":"all"},{"label":"l_i","data":[[2.0],[2.0]],"cls":"stat","hi":null}],"op":"compute","note":"Rescale the output accumulator by the same correction, then add this tile's contribution. This is the fold. O never leaves SRAM.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 1","sram":[{"label":"O_i","data":[[1.0,1.0],[1.0,1.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[0.5]],"cls":"stat","hi":null},{"label":"l_i","data":[[2.0],[2.0]],"cls":"stat","hi":null}],"op":"discard","note":"The tile of S has served its purpose and is discarded. It never touched HBM, and the next tile will be written over the top of it.","traffic":36,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"Q_i","data":[[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K_j","data":[[1,1],[1,-1]],"cls":"k","hi":"all"},{"label":"V_j","data":[[1,1],[2,0]],"cls":"v","hi":"all"},{"label":"O_i","data":[[1.0,1.0],[1.0,1.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[0.5]],"cls":"stat","hi":null},{"label":"l_i","data":[[2.0],[2.0]],"cls":"stat","hi":null}],"op":"read","note":"Load the next block of K and V, overwriting the previous one. The old block is simply gone.","traffic":44,"moved":8,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"Q_i","data":[[1,1],[0.5,0.5]],"cls":"q","hi":null},{"label":"K_j","data":[[1,1],[1,-1]],"cls":"k","hi":null},{"label":"V_j","data":[[1,1],[2,0]],"cls":"v","hi":null},{"label":"S_ij","data":[[2,0],[1.0,0.0]],"cls":"s","hi":"all"},{"label":"O_i","data":[[1.0,1.0],[1.0,1.0]],"cls":"o","hi":null},{"label":"m_i","data":[[1],[0.5]],"cls":"stat","hi":null},{"label":"l_i","data":[[2.0],[2.0]],"cls":"stat","hi":null}],"op":"compute","note":"Compute this tile of the score matrix. It is 2x2 &mdash; four numbers &mdash; and it exists only in SRAM.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"S_ij","data":[[2,0],[1.0,0.0]],"cls":"s","hi":null},{"label":"row max of tile","data":[[2],[1.0]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[2],[1.0]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[1],[0.5]],"cls":"stat","hi":null}],"op":"compute","note":"The running maximum has moved. Everything already folded into O and l was scaled by the old maximum, so all of it is now wrong by a known factor.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":true},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"correction","data":[[0.368],[0.607]],"cls":"stat","hi":"all"},{"label":"m_i (old)","data":[[1],[0.5]],"cls":"stat","hi":null},{"label":"m_i (new)","data":[[2],[1.0]],"cls":"stat","hi":null}],"op":"compute","note":"The correction factor is exp(old max minus new max). This single number per row repairs every term folded in so far.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":true},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"S_ij","data":[[2,0],[1.0,0.0]],"cls":"s","hi":null},{"label":"m_i","data":[[2],[1.0]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,0.135],[1.0,0.368]],"cls":"s","hi":"all"}],"op":"compute","note":"Subtract the new running maximum from the tile and exponentiate.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"correction","data":[[0.368],[0.607]],"cls":"stat","hi":null},{"label":"P_ij","data":[[1.0,0.135],[1.0,0.368]],"cls":"s","hi":null},{"label":"l_i","data":[[1.871],[2.581]],"cls":"stat","hi":"all"}],"op":"compute","note":"Rescale the running denominator by the correction, then add this tile's row sums.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"P_ij","data":[[1.0,0.135],[1.0,0.368]],"cls":"s","hi":null},{"label":"V_j","data":[[1,1],[2,0]],"cls":"v","hi":null},{"label":"O_i","data":[[1.639,1.368],[2.342,1.607]],"cls":"o","hi":"all"},{"label":"l_i","data":[[1.871],[2.581]],"cls":"stat","hi":null}],"op":"compute","note":"Rescale the output accumulator by the same correction, then add this tile's contribution. This is the fold. O never leaves SRAM.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4) &middot; K,V block 2","sram":[{"label":"O_i","data":[[1.639,1.368],[2.342,1.607]],"cls":"o","hi":null},{"label":"m_i","data":[[2],[1.0]],"cls":"stat","hi":null},{"label":"l_i","data":[[1.871],[2.581]],"cls":"stat","hi":null}],"op":"discard","note":"The tile of S has served its purpose and is discarded. It never touched HBM, and the next tile will be written over the top of it.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4)","sram":[{"label":"O_i","data":[[1.639,1.368],[2.342,1.607]],"cls":"o","hi":null},{"label":"l_i","data":[[1.871],[2.581]],"cls":"stat","hi":null},{"label":"O_i final","data":[[0.876,0.731],[0.908,0.622]],"cls":"o","hi":"all"}],"op":"compute","note":"The inner loop is finished, so divide by the final denominator. This is the only division in the whole algorithm.","traffic":44,"moved":0,"hi":null,"cleared":false,"key":false},{"kernel":"Q block 2 (rows 3&ndash;4)","sram":[{"label":"O_i final","data":[[0.876,0.731],[0.908,0.622]],"cls":"o","hi":"all"}],"op":"write","note":"Write these output rows to HBM. Four numbers, once.","traffic":48,"moved":4,"hi":null,"cleared":false,"key":false},{"kernel":"Done","sram":[],"op":"done","note":"Forty-eight numbers crossed the bus, and not one of them belonged to a score matrix. Same arithmetic, same answer, half the traffic on a problem this small.","traffic":48,"moved":0,"hi":null,"cleared":false,"key":true}],"Q":[[1,0],[0,1],[1,1],[0.5,0.5]],"K":[[1,0],[0,1],[1,1],[1,-1]],"V":[[1,0],[0,1],[1,1],[2,0]],"vanTotal":96,"flashTotal":48,"Oref":[[1.188,0.406],[0.655,0.799],[0.876,0.731],[0.908,0.622]]};
+const maxLen=Math.max(D.vanilla.length,D.flash.length);
+const maxT=Math.max(D.vanTotal,D.flashTotal);
+let step=0,timer=null;
+const $=i=>document.getElementById(i);
+$('scr').max=maxLen-1;
+
+const fmt=v=>{
+  if(v<=-999)return '\u2212\u221e';
+  if(Object.is(v,0)||v===0)return '0';
+  let s=(Math.round(v*1000)/1000).toString();
+  return s.replace('-','\u2212');
+};
+const matHTML=t=>{
+  const cols=t.data[0].length;
+  const cells=t.data.map(r=>r.map(v=>`<i>${fmt(v)}</i>`).join('')).join('');
+  return `<div class="tensor t-${t.cls}${t.hi?' hi':''}"><span class="tlabel">${t.label}</span>`+
+         `<div class="grid" style="grid-template-columns:repeat(${cols},auto)">${cells}</div></div>`;
+};
+
+function side(pre,list,idx,fin){
+  const s=list[Math.min(idx,list.length-1)];
+  $(pre+'k').innerHTML=s.kernel;
+  const c=$(pre+'c');c.textContent=s.op;c.className='chip c-'+s.op;
+  $(pre+'s').innerHTML=s.sram.length?s.sram.map(matHTML).join(''):
+    '<div class="empty">'+(s.cleared?'cleared &mdash; everything not written to HBM is gone':'nothing loaded yet')+'</div>';
+  const n=$(pre+'n');n.innerHTML=s.note;n.className='note'+(s.key?' keyed':'');
+  $(pre+'t').textContent=s.traffic;
+  $(pre+'b').style.width=(100*s.traffic/maxT)+'%';
+  const f=$(pre+'f');
+  if(idx>=list.length-1&&fin){f.className='fin on';f.innerHTML=fin;}else{f.className='fin';}
+}
+function render(){
+  side('v',D.vanilla,step, step>=D.vanilla.length?
+    'Finished in 18 steps &mdash; ahead of the other side. It still moved twice the bytes.':null);
+  side('f',D.flash,step,null);
+  $('cnt').textContent='step '+(step+1)+' / '+maxLen;
+  $('scr').value=step;
+}
+function go(n){step=Math.max(0,Math.min(maxLen-1,n));render();}
+function play(){
+  if(timer){clearInterval(timer);timer=null;$('ply').textContent='Play';return;}
+  if(step>=maxLen-1)step=0;
+  $('ply').textContent='Pause';
+  timer=setInterval(()=>{if(step>=maxLen-1){play();return;}go(step+1);},+$('spd').value);
+}
+$('ply').onclick=play;
+$('fwd').onclick=()=>{if(timer)play();go(step+1);};
+$('bak').onclick=()=>{if(timer)play();go(step-1);};
+$('rst').onclick=()=>{if(timer)play();go(0);};
+$('scr').oninput=e=>{if(timer)play();go(+e.target.value);};
+$('spd').oninput=()=>{if(timer){clearInterval(timer);timer=null;play();}};
+$('jmp').onclick=()=>{if(timer)play();const k=D.flash.findIndex(s=>s.key);if(k>=0)go(k);};
+document.onkeydown=e=>{
+  if(e.key===' '){e.preventDefault();play();}
+  if(e.key==='ArrowRight'){e.preventDefault();if(timer)play();go(step+1);}
+  if(e.key==='ArrowLeft'){e.preventDefault();if(timer)play();go(step-1);}
+};
+render();
+</script></div></body></html>

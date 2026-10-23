@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Inference Engineering</title><style>
+:root{--paper:#FBFAF8;--ink:#17191C;--muted:#6B6F76;--rule:#DFDDD8;--panel:#fff;
+--h:#B4472C;--s:#1B7A6B;
+--sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media(prefers-color-scheme:dark){:root{--paper:#131416;--ink:#E8E6E1;--muted:#9AA0A7;
+--rule:#2C2E32;--panel:#191B1E;--h:#E07A5F;--s:#4FBFA8;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:64px 28px 96px}
+.kick{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--muted);margin-bottom:14px}
+h1{font-size:32px;font-weight:500;margin:0 0 10px;letter-spacing:-.012em}
+.lede{color:var(--muted);font-size:15px;max-width:64ch;margin:0 0 8px}
+.stats{display:flex;gap:26px;flex-wrap:wrap;font-size:13px;color:var(--muted);
+border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:14px 0;margin:26px 0 34px}
+.stats b{color:var(--ink);font-weight:500}
+a.row{display:flex;align-items:baseline;gap:14px;text-decoration:none;color:inherit;
+padding:15px 18px;border:1px solid var(--rule);border-radius:10px;background:var(--panel);
+margin-bottom:8px}
+a.row:hover{border-color:var(--muted)}
+a.sub{margin-left:34px;padding:11px 16px;background:transparent}
+.v{font-family:var(--mono);font-size:12.5px;color:var(--h);min-width:24px}
+.t{font-size:15.5px;font-weight:500;flex:1}
+a.sub .t{font-weight:400;font-size:14.5px;color:var(--muted)}
+.n{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.note{margin-top:38px;padding:20px 22px;border:1px solid var(--rule);border-radius:10px;
+background:var(--panel);font-size:14px;color:var(--muted);max-width:68ch}
+.note b{color:var(--ink);font-weight:500}
+</style></head><body><div class='wrap'>
+<div class='kick'>Figure atlases</div>
+<h1>The Engineering Behind LLM Inference</h1>
+<p class='lede'>Nine videos, built from the ground up. Each opens by defining what it assumes, so no prior background is needed. Each atlas follows its video's order and is
+self-contained: you should not need the video open to follow it.</p>
+<div class='stats'><span><b>9</b> atlases</span><span><b>551</b> figures</span>
+<span><b>3h 50m</b> of video</span><span><b>5,706</b> caption cues</span></div>
+<a class='row' href='V01_The_Memory_Wall.html'><span class='v'>V1</span><span class='t'>The Memory Wall</span><span class='n'>147 figures &middot; 31:08</span></a><a class='row sub' href='V01_The_Memory_Wall_animation.html'><span class='v'>&#8627;</span><span class='t'>One conversation, end to end &mdash; interactive</span><span class='n'>20 acts</span></a><a class='row' href='V02_Inside_the_GPU.html'><span class='v'>V2</span><span class='t'>Inside the GPU</span><span class='n'>100 figures &middot; 20:26</span></a><a class='row' href='V03_Kernels_and_Memory.html'><span class='v'>V3</span><span class='t'>Kernels and Memory</span><span class='n'>100 figures &middot; 49:21</span></a><a class='row' href='V04_Quantization.html'><span class='v'>V4</span><span class='t'>Quantization</span><span class='n'>83 figures &middot; 20:47</span></a><a class='row' href='V05_Parallelism.html'><span class='v'>V5</span><span class='t'>Parallelism</span><span class='n'>25 figures &middot; 16:45</span></a><a class='row' href='V06_Mixture_of_Experts.html'><span class='v'>V6</span><span class='t'>Mixture of Experts</span><span class='n'>23 figures &middot; 22:38</span></a><a class='row' href='V07_Serving_in_Production.html'><span class='v'>V7</span><span class='t'>Serving in Production</span><span class='n'>26 figures &middot; 29:59</span></a><a class='row' href='V08_Speculative_Decoding_and_Long_Context.html'><span class='v'>V8</span><span class='t'>Speculative Decoding and Long Context</span><span class='n'>32 figures &middot; 29:58</span></a><a class='row' href='V09_The_Whole_Stack.html'><span class='v'>V9</span><span class='t'>The Whole Stack</span><span class='n'>15 figures &middot; 9:02</span></a><a class='row sub' href='V03_Kernels_and_Memory_animation.html'><span class='v'>&#8627;</span><span class='t'>Vanilla vs FlashAttention, 42 steps, interactive</span><span class='n'>interactive</span></a>
+<div class='note'><b>How this folder works.</b> One file per video, named for the video. Each is the
+single latest version of that video's figures. When a topic needs more depth, the new figures go
+into the existing file at the point in the video where they belong, and that file replaces the
+previous one. No addenda, no version suffixes, nothing kept alongside.</div>
+</div></body></html>
