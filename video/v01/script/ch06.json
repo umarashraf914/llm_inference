@@ -25,7 +25,7 @@
       "figs": [
         70
       ],
-      "visual": "Opens on the previous chapter's 30 ms bar, redrawn on its own on an empty canvas (no title, no teal arrows): 1,500 px wide, with its 5 px amber sliver 'arithmetic, under 1%' and the coral remainder carrying a coral tag with a blank name box and a '?'. The bar shrinks to a small parked copy at the top-right corner (about 300 px wide, coral remainder and '?' tag still visible) and stays there, dimmed, for the whole scene. The rest of the canvas splits into two horizontal bands with a faint grey divider. Top band, the CPU: four large blue rounded cards in a row, each with a worker icon (Phosphor 'user-gear'), label 'CPU' at the left. Bottom band, the GPU: a dense grid of small amber squares, 48 columns by 12 rows (576 drawn, standing for thousands), label 'GPU' at the left. Both bands persist. Amber '×' task tiles are later poured into both, so the grid visibly swallows a whole batch in one go while the four cards queue. The grid then briefly becomes a pixel screen, and a chain of blue token pills shows the one shape of work this chip is bad at. Colour: blue for the CPU cards and token pills (structure), amber for the GPU grid and the multiplications (arithmetic).",
+      "visual": "Opens on the previous chapter's 30 ms bar, redrawn on its own on an empty canvas (no title, no teal arrows): 1,500 px wide, with its 5 px amber sliver 'arithmetic, under 1%' and the coral remainder carrying a coral tag with a blank name box and a '?'. The bar shrinks to a small parked copy at the top-right corner (about 300 px wide, coral remainder and '?' tag still visible) and stays there, dimmed, for the whole scene. The rest of the canvas splits into two horizontal bands with a faint grey divider. Top band, the CPU: four large blue rounded cards in a row, each with a worker icon (Phosphor 'user-gear'), label 'CPU' at the left. Bottom band, the GPU: a dense grid of small amber squares, 48 columns by 12 rows (576 drawn, standing for thousands), label 'GPU' at the left. Both bands persist. Amber '×' task tiles are later poured into both, so the grid visibly swallows a whole group in one go while the four cards queue. The grid then briefly becomes a pixel screen, and a chain of blue token pills shows the one shape of work this chip is bad at. Colour: blue for the CPU cards and token pills (structure), amber for the GPU grid and the multiplications (arithmetic).",
       "beats": [
         {
           "id": "b1",
@@ -44,8 +44,8 @@
         },
         {
           "id": "b4",
-          "say": "A token is about seventy billion multiplications, in huge batches where none waits on another, so a G P U clears thousands at a time.",
-          "show": "Centre overlay, both bands dimmed: a pile of identical amber '×' tiles, and a counter beside it running to '≈ 70,000,000,000 multiplications per token' on 'seventy billion'. On 'huge batches', the pile separates into a column of stacked trays of tiles, one tray standing for one batch; grey tag 'within a batch, no tile waits' and, smaller beneath it, 'named next chapter: vector × matrix'. As the two tags fade, on 'clears thousands', the top tray splits in two streams: top, tiles queue in front of the four cards, which take four at a time while a long queue grows; bottom, tiles rain onto the grid, one per square, and the whole grid flashes and clears them together, again and again. Right-edge counters: top 'cleared: 4, 8, 12', bottom 'cleared: 576, 1,152, 1,728'. Grey corner tag 'schematic'."
+          "say": "A token is about seventy billion multiplications, in huge groups where none waits on another, so a G P U clears thousands at a time.",
+          "show": "Centre overlay, both bands dimmed: a pile of identical amber '×' tiles, and a counter beside it running to '≈ 70,000,000,000 multiplications per token' on 'seventy billion'. On 'huge groups', the pile separates into a column of stacked trays of tiles, one tray standing for one group; grey tag 'within a group, no tile waits' and, smaller beneath it, 'named next chapter: vector × matrix'. As the two tags fade, on 'clears thousands', the top tray splits in two streams: top, tiles queue in front of the four cards, which take four at a time while a long queue grows; bottom, tiles rain onto the grid, one per square, and the whole grid flashes and clears them together, again and again. Right-edge counters: top 'cleared: 4, 8, 12', bottom 'cleared: 576, 1,152, 1,728'. Grey corner tag 'schematic'."
         },
         {
           "id": "b5",
@@ -69,8 +69,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "From now on, the chip means the G P U's compute die, the part that calculates. It holds only about a thousandth of the model.",
-          "show": "The amber grid from the last scene shrinks into the amber die as the package draws on around it, with its grey 'generic GPU' tag. On 'compute die', label 'The chip' appears above the die with a small grey '= compute die' beside it. On 'the part that calculates', the first line beneath lands in amber: 'does the arithmetic'. On 'a thousandth', the second line lands in grey, 'holds almost nothing', and a magnifier over the die shows a small tray, tag '≈ 0.1 GB in all · ≈ 1/1,000 of the model', the same figure as earlier."
+          "say": "The chip itself is the G P U's compute die, one piece of silicon that calculates. It holds only about a thousandth of the model.",
+          "show": "The amber grid from the last scene shrinks into the amber die as the package draws on around it, with its grey 'generic GPU' tag. On 'The chip itself', label 'The chip' appears above the die; on 'compute die', a small grey '= compute die' lands beside it. On 'one piece of silicon', the die's outline flashes once. On 'that calculates', the first line beneath lands in amber: 'does the arithmetic'. On 'a thousandth', the second line lands in grey, 'holds almost nothing', and a magnifier over the die shows a small tray, tag '≈ 0.1 GB in all · ≈ 1/1,000 of the model', the same figure as earlier."
         },
         {
           "id": "b2",
@@ -79,7 +79,7 @@
         },
         {
           "id": "b3",
-          "say": "So every weight crosses that bus, every token. That is the coral ninety-nine percent: moving the weights, and waiting for them.",
+          "say": "So every weight crosses that bus, every token. That's the coral ninety-nine percent: moving the weights, and waiting for them.",
           "show": "Coral weight tiles stream from the memory across the bus into the die, each flashing amber and vanishing as it is used; the memory never empties. Counter: 'token 1'; the full stream crosses; 'token 2'; it crosses again in full; 'token 3'. Tag under the bus: '140 GB, every token'. On 'the coral ninety-nine percent', the parked bar at the top-right brightens and slides a little toward centre and its '?' dissolves. On 'moving the weights', the blank name box fills with 'moving the weights'. On 'waiting for them', a thin coral leader line joins the tag to the flow on the bus."
         },
         {
@@ -110,12 +110,12 @@
         },
         {
           "id": "b3",
-          "say": "Eight bits make a byte, and a weight takes two bytes, enough for useful accuracy. So seventy billion weights become a hundred and forty gigabytes.",
-          "show": "The readout lifts off the trace and becomes blue cells. On 'Eight bits', one cell first, label '1 bit = one yes-or-no', then on 'a byte' the row grows to eight cells reading 0 1 0 1 0 1 0 1, a bracket draws under it 'one byte', and a small grey counter doubles beside it to '256 patterns'. On 'two bytes', two coral blocks slide together: '1 weight = 2 bytes = 16 bits', small grey '65,536 patterns'. Each label dims as the next lands. On 'seventy billion', the bit and byte labels fade and the bottom band builds '70 billion weights × 2 bytes = 140 GB' term by term, with a small grey note '1 GB = 1 billion bytes'. A coral file icon '140 GB' drops toward a tiny amber chip outline, bounces off, and settles into a large coral memory block: tag 'only fits in the memory'."
+          "say": "Eight bits make a byte, and a weight takes two, enough for useful accuracy. That's why seventy billion weights make the hundred and forty gigabytes.",
+          "show": "The readout lifts off the trace and becomes blue cells. On 'Eight bits', one cell first, label '1 bit = one yes-or-no', then on 'a byte' the row grows to eight cells reading 0 1 0 1 0 1 0 1, a bracket draws under it 'one byte', and a small grey counter doubles beside it to '256 patterns'. On 'takes two', two coral blocks slide together: '1 weight = 2 bytes = 16 bits', small grey '65,536 patterns'. Each label dims as the next lands. On 'That's why', the bit and byte labels fade and the bottom band brings back the equation from earlier whole, '70 billion weights × 2 bytes = 140 GB', with a small grey note '1 GB = 1 billion bytes'; on 'seventy billion', the '× 2 bytes' term is outlined in white, the answer to the earlier 'why two'. A coral file icon '140 GB' drops toward a tiny amber chip outline, bounces off, and settles into a large coral memory block: tag 'only fits in the memory'."
         },
         {
           "id": "b4",
-          "say": "Sixteen bits is the usual choice, and shrinking it comes later in the series. Parameters times bytes gives bytes. You'll use that constantly.",
+          "say": "Sixteen bits is the usual choice. Shrinking it comes later in the series. Parameters times bytes gives bytes. You'll use that constantly.",
           "show": "Grey side tag in two lines: '16 bits: the common default' and 'fewer bits: later in the series'. On 'Parameters times bytes', everything else dims and the centre reads, in white with 'bytes' in coral: 'parameters × bytes each = bytes'."
         }
       ]
@@ -130,8 +130,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Bits cross at a rate called bandwidth. It's not speed in the everyday sense, but width times frequency: how many wires, times how often each sends a bit.",
-          "show": "Top band: 'bandwidth' appears in coral. On 'width', a bracket labelled 'width' appears to its left; on 'frequency', a ticking clock icon labelled 'frequency' to its right. On 'how many wires', the equation builds in two lines: 'bandwidth =' then 'wires × bits per second per wire', each term lighting as it is spoken. Then '÷ 8 → bytes per second' lands at the end in coral."
+          "say": "Bits cross at a rate, the bandwidth from earlier. It's not speed in the everyday sense, but width times frequency: how many wires, times how often each sends a bit.",
+          "show": "On 'the bandwidth from earlier', 'bandwidth' appears in coral in the top band. On 'width', a bracket labelled 'width' appears to its left; on 'frequency', a ticking clock icon labelled 'frequency' to its right. On 'how many wires', the equation builds in two lines: 'bandwidth =' then 'wires × bits per second per wire', each term lighting as it is spoken. Then '÷ 8 → bytes per second' lands at the end in coral."
         },
         {
           "id": "b2",
@@ -145,8 +145,8 @@
         },
         {
           "id": "b4",
-          "say": "Memory gets faster mostly by getting wider, and that many wires can't be long, so it sits against the chip. Why it's hard to make faster comes later.",
-          "show": "On 'getting wider', the equation brightens again and the word 'wires' in it is underlined in teal. On 'can't be long', the pipes shrink into the bottom-left corner; the GPU package returns at centre with its 'generic GPU' tag, its bus redrawn as thousands of hair-thin lines, and the coral memory blocks slide inward until they nearly touch the amber die. Label 'wide needs short'. On 'hard to make faster', a small grey tag on the equation: 'why it's hard: later this chapter'."
+          "say": "Memory gets faster mostly by getting wider, and that many wires can't be long, so it sits against the chip.",
+          "show": "On 'getting wider', the equation brightens again and the word 'wires' in it is underlined in teal. On 'can't be long', the pipes shrink into the bottom-left corner; the GPU package returns at centre with its 'generic GPU' tag, its bus redrawn as thousands of hair-thin lines, and the coral memory blocks slide inward until they nearly touch the amber die. Label 'wide needs short'. As the beat ends, a small grey tag lands on the equation: 'why it's hard: later this chapter'."
         }
       ]
     },
@@ -160,8 +160,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Why not put the memory on the chip? Each chip is optimised for one job. Logic and storage need different manufacturing processes, and nobody has made both work well on one piece of silicon.",
-          "show": "A ghost arrow tries to drag a coral memory stack onto the amber die; it springs back. Heading appears. The package dims to the background. On 'Logic', the amber card slides in at the left; on 'storage', the coral card at the middle, each with a small recipe-card icon labelled 'process', visibly different. On 'nobody has made both', the blue card lands at the right; the amber and coral cards slide together into one slab, a crack runs across it, and they separate again."
+          "say": "Why not put the memory on the chip? Each chip is optimised for one job. Logic and dense storage need different manufacturing processes, and nobody has made both work well on one piece of silicon.",
+          "show": "A ghost arrow tries to drag a coral memory stack onto the amber die; it springs back. Heading appears. The package dims to the background. On 'Logic', the amber card slides in at the left; on 'dense storage', the coral card at the middle, each with a small recipe-card icon labelled 'process', visibly different. On 'nobody has made both', the blue card lands at the right; the amber and coral cards slide together into one slab, a crack runs across it, and they separate again."
         },
         {
           "id": "b2",
@@ -186,7 +186,7 @@
       "figs": [
         76
       ],
-      "visual": "Two horizontal lanes, left to right. Top lane, heading 'Latency: how long one request takes': a blue 'ask' pill at the left, a long dashed 'wait' segment with a stopwatch above it, and a blue 'arrive' pill at the right. Bottom lane, heading 'Bandwidth: how much travels at once': parallel tracks carrying coral packets. Midway, the lanes slide down and two icons take the stage, a container ship (Fluent Emoji Flat 'ship') and a motorbike courier (Fluent Emoji Flat 'motor scooter'). At the end the bottom tracks are shown first running dry, then filled solid. Teal is used only for the fix, 'many in flight'.",
+      "visual": "Two horizontal lanes, left to right. Top lane, heading 'Latency: how long one request takes': a blue 'ask' pill at the left, a long dashed 'wait' segment with a stopwatch above it, and a blue 'arrive' pill at the right. Bottom lane, heading 'Bandwidth: how much travels at once': parallel tracks carrying coral packets. Midway, the lanes slide down and two icons take the stage, a container ship (Fluent Emoji Flat 'ship'), briefly joined by a second identical ship, and a motorbike courier (Fluent Emoji Flat 'motor scooter'). At the end the bottom tracks are shown first running dry, then filled solid. Teal is used only for the fix, 'many in flight'.",
       "beats": [
         {
           "id": "b1",
@@ -195,17 +195,17 @@
         },
         {
           "id": "b2",
-          "say": "They're independent. A container ship takes weeks but carries a town's goods: high bandwidth, high latency. A motorbike courier is the reverse.",
-          "show": "The lanes slide down and dim. Left: the container ship stacked with crates, tags 'latency: weeks' in grey and 'bandwidth: huge' in coral. Right, on 'motorbike courier': the motorbike with one parcel, tags 'latency: minutes' and 'bandwidth: tiny'. Caption: 'independent · wide and slow, narrow and quick'."
+          "say": "They're independent. A container ship takes weeks, carrying a town's goods. Add a second, and the goods double, not the weeks. A motorbike courier is the reverse.",
+          "show": "The lanes slide down and dim. Left: the container ship stacked with crates, tags 'latency: weeks' in grey and 'bandwidth: huge' in coral. On 'Add a second', an identical ship slides in behind the first; on 'the goods double', 'bandwidth: huge' becomes 'bandwidth: ×2', and on 'not the weeks', 'latency: weeks' pulses once, unchanged. Right, on 'motorbike courier': the motorbike with one parcel, tags 'latency: minutes' and 'bandwidth: tiny'. Caption: 'independent · more ships, same weeks'."
         },
         {
           "id": "b3",
-          "say": "Memory can't be made low-latency: distance and physics are what they are. But enough memory requests in flight keep the pipe from running dry.",
-          "show": "Icons leave; the lanes return. The top lane's wait is tagged 'fixed by distance'. On 'memory requests in flight', the bottom tracks first send one packet at a time, each waiting for the last to arrive, so the tracks are mostly empty: grey tag 'one at a time: runs dry'. Then requests launch back to back and the tracks fill solid: teal tag 'many in flight: stays full'. The top lane's wait never gets shorter."
+          "say": "Memory can't be made low-latency: distance and physics are what they are. But enough requests in flight keep the pipe from running dry.",
+          "show": "Icons leave; the lanes return. The top lane's wait is tagged 'fixed by distance'. On 'requests in flight', the bottom tracks first send one packet at a time, each waiting for the last to arrive, so the tracks are mostly empty: grey tag 'one at a time: runs dry'. Then requests launch back to back and the tracks fill solid: teal tag 'many in flight: stays full'. The top lane's wait never gets shorter."
         },
         {
           "id": "b4",
-          "say": "Confusing the two produces most of the wrong intuitions in this field. Hold them apart.",
+          "say": "Confusing the two produces many of the wrong intuitions in this field. Hold them apart.",
           "show": "Everything fades except two words with a deliberate gap between them: 'latency' in grey, 'bandwidth' in coral. On 'Hold them apart', the gap widens slightly."
         }
       ]
@@ -250,13 +250,13 @@
         },
         {
           "id": "b2",
-          "say": "Memory capacity, eighty gigabytes: an amount. Bandwidth: a rate. Peak compute, nine hundred and eighty-nine teraflops, trillion operations a second: a rate. Power, seven hundred watts, energy per second: a rate too.",
+          "say": "Memory capacity, eighty gigabytes: an amount. Bandwidth: a rate. Peak compute, nine hundred and eighty-nine teraflops, tera meaning trillion: a rate. Power, seven hundred watts, energy per second: a rate too.",
           "show": "Rows land on their names, and each earlier row dims slightly as the next arrives. Row 1: 'Memory capacity' · blue pill '80 GB' · tag 'an amount'. Row 2: 'Memory bandwidth' · coral pill '3.35 TB/s' · tag 'a rate'. Row 3: 'Peak compute' · amber pill '989 TFLOP/s' · tag 'a rate', side note '16-bit · 989 trillion ≈ 10¹⁵'. Row 4: 'Power draw' · grey pill '700 W' · tag 'a rate', side note 'watt = energy per second'. As row 4 lands, the three 'a rate' tags glow together, then the single 'an amount' tag glows: 'three rates, one amount'."
         },
         {
           "id": "b3",
-          "say": "Confusing capacity with bandwidth is the most common error. Capacity says whether the model fits. Bandwidth says how fast it's read once it does. A chip can fail either.",
-          "show": "The other rows dim. The capacity row and the bandwidth row lift out of the sheet and stand side by side, larger. Under capacity, a container icon and 'does it fit?'. Under bandwidth, a pipe icon and 'how fast is it read?'. On 'fail either', a grey tag between them: 'separate limits'."
+          "say": "On a sheet, the commonest slip is mistaking capacity for bandwidth: count and rate again. Capacity says whether the model fits. Bandwidth says how fast it's read once it does. A chip can fail either.",
+          "show": "The other rows dim. The capacity row and the bandwidth row lift out of the sheet and stand side by side, larger. Under capacity, a container icon and 'does it fit?'. Under bandwidth, a pipe icon and 'how fast is it read?'. On 'count and rate again', the two tags at the top, 'an amount: gigabytes' and 'a rate: gigabytes per second', pulse once. On 'fail either', a grey tag between them: 'separate limits'."
         },
         {
           "id": "b4",
@@ -275,13 +275,13 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Two lines matter most: compute throughput, operations per second, and memory bandwidth, bytes per second from memory. A token needs both: fetch the weights, and multiply them.",
+          "say": "Two lines matter most: compute throughput, operations per second, and memory bandwidth, bytes per second. A token needs both: fetch the weights, and multiply them.",
           "show": "The sheet's compute and bandwidth rows grow into the two cards. Left: amber 'Compute throughput', sub-line 'operations per second'. Right: coral 'Memory bandwidth', sub-lines 'bytes per second' and 'off-chip memory → chip'. On 'fetch', a coral arrow runs from the right card into the left; on 'multiply', an amber loop arrow circles on the left card."
         },
         {
           "id": "b2",
-          "say": "Pretend the model fits on one H one hundred. A token's arithmetic takes about a seventh of a millisecond. Reading the weights, forty-two milliseconds.",
-          "show": "On 'Pretend', grey tag 'one token · H100 · if it fitted'. A time axis from 0 to 45 ms draws under the cards. On 'a seventh of a millisecond', the amber lane appears: '140 billion ops ÷ 989 trillion/s ≈ 0.14 ms', its bar a sliver at the far left. On 'Reading the weights', the coral lane grows from the left to almost the full width: '140 GB ÷ 3.35 TB/s ≈ 41.8 ms'. A small coral tag rides on it: 'moving the weights', the same name as the coral bar from earlier."
+          "say": "Pretend the model fits on one H one hundred. Unrounded, a token's arithmetic takes about a seventh of a millisecond. Reading the weights, forty-two milliseconds.",
+          "show": "On 'Pretend', grey tag 'one token · H100 · if it fitted'. A time axis from 0 to 45 ms draws under the cards. On 'a seventh of a millisecond', the amber lane appears: '140 billion ops ÷ 989 trillion/s ≈ 0.14 ms', its bar a sliver at the far left, with a small dim grey tag beside the label: 'rounded earlier: ≈ 0.1 ms'. On 'Reading the weights', the coral lane grows from the left to almost the full width: '140 GB ÷ 3.35 TB/s ≈ 41.8 ms'. A small coral tag rides on it: 'moving the weights', the same name as the coral bar from earlier."
         },
         {
           "id": "b3",
@@ -310,7 +310,7 @@
         },
         {
           "id": "b2",
-          "say": "Bandwidth is a product of three. The memory comes in stacks, towers of memory layers, wired to the chip through pins: rate per pin, times pins per stack, times stacks.",
+          "say": "Bandwidth is a product of three. The memory comes in stacks, towers of layers, wired to the chip through pins: rate per pin, times pins per stack, times stacks.",
           "show": "The compute tag dims. Right edge: the package zooms in and its grey 'generic GPU' tag changes to the blue label 'H100 · 80 GB'; coral towers of thin layers sit around the amber die, one site grey. A pointer labels one tower 'stack'; grey tag 'H100: 5 active stacks'. On 'pins', a close-up shows a dense field of fine connections under one stack. On 'rate per pin, times pins per stack, times stacks', the three coral cards build left to right with '×' between them."
         },
         {
@@ -320,8 +320,8 @@
         },
         {
           "id": "b4",
-          "say": "Each term has a ceiling. Pins switch only so fast before high and low blur. Only so many connections fit under a stack. And the package has edges. So memory is hard to make much faster.",
-          "show": "The result line and the stack tag dim. A dashed ceiling line drops over each coral card on its phrase. On 'switch only so fast': over card 1, a tiny voltage trace whose clean high and low edges smear together, tag 'signal integrity'. On 'connections fit under a stack': over card 2, the dense field of dots under one stack, tag 'only so many fit'. On 'the package has edges': over card 3, the package outline with stacks crowding the edges, tag 'package edges'. On 'hard to make much faster', the three dashed ceilings flash together and a small grey tag lands under the cards: 'why memory is hard to speed up'."
+          "say": "Each term has a ceiling. Pins switch only so fast before high and low blur. Only so many connections fit under a stack. And the package holding the stacks has edges. So memory is hard to make much faster.",
+          "show": "The result line and the stack tag dim. A dashed ceiling line drops over each coral card on its phrase. On 'switch only so fast': over card 1, a tiny voltage trace whose clean high and low edges smear together, tag 'signal integrity'. On 'connections fit under a stack': over card 2, the dense field of dots under one stack, tag 'only so many fit'. On 'the package holding the stacks': over card 3, the package outline with stacks crowding the edges; on 'has edges', tag 'package edges'. On 'hard to make much faster', the three dashed ceilings flash together and a small grey tag lands under the cards: 'why memory is hard to speed up'."
         },
         {
           "id": "b5",
@@ -418,7 +418,7 @@
       "result": "2073600"
     },
     {
-      "claim": "Fig 70 reconciled: atlas says 'millions of small multiplications with no dependencies' for one vector-by-matrix multiply; per token, at one multiplication per weight, that is about seventy billion, half of the 140 billion operations from ch05. They are independent only within one multiply (a batch); the 80 layers run in sequence, about 875 million multiplications each, every layer waiting for the one before, so the narration says 'in huge batches where none waits on another', not that the whole token is free of dependencies",
+      "claim": "Fig 70 reconciled: atlas says 'millions of small multiplications with no dependencies' for one vector-by-matrix multiply; per token, at one multiplication per weight, that is about seventy billion, half of the 140 billion operations from ch05. They are independent only within one multiply (a group; 'batch' is kept for many users' requests sharing one pass, as in ch03, ch09, ch10, ch12 and ch13); the 80 layers run in sequence, about 875 million multiplications each, every layer waiting for the one before, so the narration says 'in huge groups where none waits on another', not that the whole token is free of dependencies",
       "python": "140e9/2, 70e9/80",
       "result": "70000000000.0 875000000.0"
     },
@@ -488,9 +488,14 @@
       "result": "41.791044776119406 1.3930348258706469 1.3930348258706469"
     },
     {
-      "claim": "Fig 77 (added worked example): one token's arithmetic on an H100, 140 billion ops / 989 TFLOP/s = 0.14 ms, said as 'about a seventh of a millisecond' (1/7 ms = 0.143 ms)",
-      "python": "140e9/989e12*1e3, 1/7",
-      "result": "0.14155712841253792 0.14285714285714285"
+      "claim": "Fig 76 (added, on screen): a second identical ship doubles the goods carried in the same weeks, so 'bandwidth: x2' while latency is unchanged (x1)",
+      "python": "2*1/1, 1/1",
+      "result": "2.0 1.0"
+    },
+    {
+      "claim": "Fig 77 (added worked example): one token's arithmetic on an H100, 140 billion ops / 989 TFLOP/s = 0.14 ms, said as 'Unrounded, ... about a seventh of a millisecond' (1/7 ms = 0.143 ms); the rounded figure the film used earlier (ch00, ch05) is 10^11 / 10^15 s = 0.1 ms, and ch05_s06.b5 already flagged the unrounded value",
+      "python": "140e9/989e12*1e3, 1/7, 1e11/1e15*1e3",
+      "result": "0.14155712841253792 0.14285714285714285 0.1"
     },
     {
       "claim": "Fig 77 (added worked example): with the lanes overlapping, the token takes the larger time, 41.8 ms (sum would be 41.9, the average about 21, which is wrong)",
