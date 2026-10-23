@@ -579,7 +579,10 @@
     S.callout = (text, o = {}, p) => {
       const g = el('g', null, p || S.main);
       if (o.from) g.leader = S.line({ x1: o.from[0], y1: o.from[1], x2: o.x, y2: o.y, stroke: o.tone || 'muted', sw: 2, strokeOpacity: 0.7 }, g);
-      g.label = S.text(text, { x: o.x + (o.anchor === 'end' ? -10 : o.anchor === 'middle' ? 0 : 10), y: o.y, size: o.size || 26, color: o.tone || 'muted', anchor: o.anchor || 'start', weight: 550 }, g);
+      // a centred label sits just beyond the leader's end, on the side away from where the leader starts
+      const sz = o.size || 26, mid = o.anchor === 'middle';
+      const ly = mid && o.from ? o.y + (o.y <= o.from[1] ? -1 : 1) * sz * 0.75 : o.y;
+      g.label = S.text(text, { x: o.x + (o.anchor === 'end' ? -10 : mid ? 0 : 10), y: ly, size: sz, color: o.tone || 'muted', anchor: o.anchor || 'start', weight: 550 }, g);
       return g;
     };
 
@@ -789,7 +792,21 @@
   }
 
   // ================================================================ fx
+  // ---------------------------------------------------------------- predictable transforms
+  // GSAP's own svgOrigin/transformOrigin compensation can surprise when an element is scaled and moved
+  // several times. xform keeps an explicit plan per element: translate (x, y) then scale s about the
+  // origin (ox, oy), written straight to the transform attribute.
+  function applyXf(e, st) {
+    e.setAttribute('transform', `translate(${(+st.x).toFixed(3)},${(+st.y).toFixed(3)}) translate(${st.ox},${st.oy}) scale(${(+st.s).toFixed(5)}) translate(${-st.ox},${-st.oy})`);
+  }
+
   function installFx(S) {
+    /** Set an element's planned transform now (build time). st: {x, y, s, ox, oy} */
+    S.xset = (el, st) => {
+      el.__xf = { x: 0, y: 0, s: 1, ox: 0, oy: 0, ...(el.__xf || {}), ...st };
+      applyXf(el, el.__xf);
+      return el;
+    };
     const resolveDir = (from, dist) => ({
       up: { y: dist }, down: { y: -dist }, left: { x: dist }, right: { x: -dist },
     }[from] || {});
@@ -889,6 +906,26 @@
         ln.__strike = true;
         return gsap.fromTo(ln, { drawSVG: '0%', autoAlpha: 1 }, { drawSVG: '100%', duration: o.d ?? 0.4, ease: 'power2.out' });
       },
+      /**
+       * Move and/or scale an element predictably. to: {x, y, s, ox, oy} — translation in parent units,
+       * scale s about origin (ox, oy) in the element's own coordinates. Each call continues from the
+       * state the previous call (or S.xset) left, so schedule an element's xforms in time order.
+       * Do not mix with fx.in/fx.move/pop on the same element: wrap it in a group and xform the group.
+       */
+      xform(el, to, o = {}) {
+        const from = { x: 0, y: 0, s: 1, ox: 0, oy: 0, ...(el.__xf || {}), ...(o.from || {}) };
+        const end = { ...from, ...to };
+        if (to.scale !== undefined) end.s = to.scale;
+        delete end.scale;
+        el.__xf = end;
+        const p = { ...from };
+        applyXf(el, el.__xf0 || (el.__xf0 = from));
+        return gsap.fromTo(p, { ...from }, {
+          ...end, duration: o.d ?? 0.8, ease: o.ease || 'power3.inOut', immediateRender: false,
+          onUpdate: () => applyXf(el, p), onStart: () => applyXf(el, p),
+          onReverseComplete: () => applyXf(el, from),
+        });
+      },
       /** Run the dot of an S.cycle round the ring: from station i to station j (j may exceed n for extra laps). */
       orbit(cyc, o = {}) {
         const n = cyc.stations.length, from = o.from ?? 0, to = o.to ?? n;
@@ -982,8 +1019,8 @@
       const scale = ctm ? Math.hypot(ctm.a, ctm.b) : 1;
       const px = parseFloat(t.getAttribute('font-size') || '32') * scale;
       const label = t.textContent.trim().slice(0, 48);
+      if (t.closest('[data-audit="ignore"]')) continue;   // decorative: e.g. a shrunken grid that stands for "the file"
       if (px < (o.minPx || 20)) issues.push({ kind: 'small', text: label, px: Math.round(px) });
-      if (t.closest('[data-audit="ignore"]')) continue;
       if (r.left < SAFE - 24 || r.top < SAFE - 40 || r.right > W - SAFE + 24 || r.bottom > H - SAFE + 24)
         issues.push({ kind: 'offscreen', text: label, box: [r.left, r.top, r.right, r.bottom].map(Math.round) });
       vis.push({ t, r, label, op });

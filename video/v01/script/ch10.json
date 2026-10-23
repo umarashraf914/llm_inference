@@ -228,7 +228,7 @@
         },
         {
           "id": "b3",
-          "say": "Spreading a fixed cost over more work is amortising, a word you will hear constantly. It is just division: a hundred and forty gigabytes, over the tokens sharing the read.",
+          "say": "Spreading a fixed cost over more work is amortising, as with the start-up load. It is just division: a hundred and forty gigabytes, over the tokens sharing the read.",
           "show": "The lanes shrink into a thin dimmed strip along the top edge. Below it, the ladder's title band draws: 'amortise: spread a fixed cost over more work'. On 'just division', the formula box builds term by term: 'cost per token', '=', '140 GB' in coral, '÷', 'tokens sharing the read' in blue; small grey tag 'amortise = divide'."
         },
         {

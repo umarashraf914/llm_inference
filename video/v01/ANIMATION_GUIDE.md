@@ -9,8 +9,12 @@ conference keynote screen. Builders shared by several scenes of a chapter (the s
 the same chip drawing) go in `scenes/<chapter>_common.js`, which is loaded before every scene of that
 chapter; define them as plain functions taking `S` (e.g. `function ch01Tiles(S, o) {...}`).
 
-Engine: `video/engine/engine.js` (read it — it is the reference). Examples that render:
-`video/dev/scenes/ch01_s0*.js`. Run everything from `/home/user/llm_inference/video`.
+Engine: `video/engine/engine.js` (read it — it is the reference). **The exemplar for the film is
+`v01/scenes/ch01_s01.js` (with `v01/scenes/ch01_common.js`): read it before you start.** It shows the
+expected density and choreography: a camera pull-back, a lifted tile with `fx.xform`, a grid shrunk
+into "a picture of the file" between two panels, flows, a padlock swap, word-synced facts, a
+takeaway. Smaller API examples: `video/dev/scenes/ch01_s0*.js`. Run everything from
+`/home/user/llm_inference/video`.
 
 ## The loop you work in
 
@@ -96,6 +100,24 @@ the beat start: check the warnings printed by `stills`.
 `cam({x,y,scale,d})` (centre the view on a point at a zoom; return with `cam({})`).
 
 Raw GSAP is fine for anything else (`gsap.fromTo(...)`, `gsap.timeline()`), added with `S.add`.
+
+**Moving and scaling a group: `S.xset` + `fx.xform`.** GSAP's own `scale`/`svgOrigin` on a nested
+`<g>` can produce runaway matrices (a 3× tile ending up thousands of pixels off-screen). For any
+group you scale, or move more than once, use the engine's explicit transform instead:
+
+```js
+S.xset(big, { x: 300, y: 200, s: 0.12 });                       // initial state (translate, then scale)
+S.add(fx.xform(big, { x: 960, y: 450, s: 3 }, { d: 1.1 }), 'b2~parameter');   // animate to a new state
+S.add(fx.xform(grid, { y: 70, s: 0.36, ox: 960, oy: 470 }), 'b3~Training');    // scale about (ox, oy)
+S.add(fx.xform(grid, { x: 540 }), 'b4~Inference');              // later calls continue from the last state
+```
+
+The state is `{x, y, s, ox, oy}`: translate by (x, y), then scale by `s` about the point (ox, oy).
+Each `fx.xform` continues from the element's last planned state, so chain them in time order. Do
+not mix `fx.xform` with `fx.move`, `fx.pop` or a GSAP `x/y/scale` tween on the **same** element:
+wrap the element in a `S.g()` holder and xform the holder instead (ch01_s01 does this with
+`gridHolder`). A grid shrunk below readable size is a picture, not text: mark its holder
+`data-audit="ignore"`.
 
 ## Art direction
 

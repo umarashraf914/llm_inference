@@ -61,7 +61,7 @@ plain-language version and say it comes back later.
 | Term | Taught in |
 |---|---|
 | weight / parameter, token, logits, softmax, sampling, the generate loop | ch01 |
-| HBM / "memory beside the chip", load once, 140 GB ÷ bandwidth | ch02 |
+| HBM / "memory beside the chip", load once, 140 GB ÷ bandwidth; a one-line gloss of byte ("file sizes are counted in bytes", why two waits for ch06); the word amortising, named on the start-up load | ch02 |
 | server, data centre, the serving stack, statelessness, context, system prompt, tools, skills | ch03 |
 | streaming, open connection, round trip, "the cache" as a running record on the server (contents explained in ch13) | ch04 |
 | operation / FLOP, powers of ten, count vs rate, the 300× gap | ch05 |
@@ -69,7 +69,7 @@ plain-language version and say it comes back later.
 | vector, matrix, matrix–vector multiply, token IDs, embedding lookup, position | ch07 |
 | layer, attention, query / key / value, weighted average, context, residual stream, per-layer W_Q/W_K/W_V, parameter count | ch08 |
 | HBM physically, read-never-written | ch09 |
-| prefill, decode, 2 × parameters, arithmetic intensity of decode = 1, amortise | ch10 |
+| prefill, decode, 2 × parameters, arithmetic intensity of decode = 1, amortise (as a callback: ch02 names it first) | ch10 |
 | bound by, arithmetic intensity, log axes, roofline, ridge | ch11 |
 | KV cache, causal mask, quadratic vs linear, cache size formula | ch13 |
 | prefix match, cache hit, warm and cold | ch15–16 |

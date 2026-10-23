@@ -16,7 +16,7 @@
       "figs": [
         11
       ],
-      "visual": "Dark canvas, one continuous shot. It opens on the generate-loop panel rebuilt exactly as ch01_s05 left it: a large rounded panel (x 200-1720, y 300-800) titled 'the generate loop'. Inside, left to right: a blue box 'text so far' holding ch01's pills in two rows, 'the quick brown fox jumps' over 'over the lazy dog'; an arrow; a coral box 'run the whole model' with the small 40-tile weight grid inside it (coral means a weight being read); an arrow; a blue box 'one new token'. A return arrow runs from 'one new token' down and back along the panel's bottom edge to 'text so far', labelled 'append, go round again'. New here: a stopwatch icon at (1600, 215), above the panel's top right, showing '?'. From b2 the panel scales to 55% and parks in the top band (centre 960, 250), still turning slowly at 40% opacity; the centre band (y 560) becomes a one-second ruler and the bottom band (y 700-880) a compact copy of ch00's chat window. In b4 everything fades back except the stopwatch reading, and ch00's spec-sheet card returns. Colour: tokens blue, the expensive model step coral, the spec sheet's compute line amber and memory line coral, text white and grey. The idea: one turn is one token is about 30 ms; laid end to end that is a stream faster than reading; and the number can be derived.",
+      "visual": "Dark canvas, one continuous shot. It opens on the generate-loop panel rebuilt as it stood at the end of ch01_s05 b2, not as that scene ended: a large rounded panel (x 200-1720, y 300-800) titled 'the generate loop'. Inside, left to right: a blue box 'text so far' holding ch01's nine pills in two rows, 'the quick brown fox jumps' over 'over the lazy dog'; an arrow; a coral box 'run the whole model' with the small 40-tile weight grid inside it (coral means a weight being read); an arrow; a blue box 'one new token'. A return arrow runs from 'one new token' down and back along the panel's bottom edge to 'text so far', labelled 'append, go round again'. No 'model runs' counter, no '300', no equation and no takeaway. New here: a stopwatch icon at (1600, 215), above the panel's top right, showing '?'. From b2 the panel scales to 55% and parks in the top band (centre 960, 250), still turning slowly at 40% opacity; the centre band (y 560) becomes a one-second ruler and the bottom band (y 700-880) a compact copy of ch00's chat window. In b3 the chat window fades and two labels take the bottom band. In b4 everything fades back except the stopwatch reading, and ch00's spec-sheet card returns. Colour: tokens blue, the expensive model step coral, the spec sheet's compute line amber and memory line coral, text white and grey. The idea: one turn is one token is about 30 ms; laid end to end that is a stream at least as fast as reading, which is the target; and the number can be derived.",
       "beats": [
         {
           "id": "b1",
@@ -25,18 +25,18 @@
         },
         {
           "id": "b2",
-          "say": "That is about thirty-three tokens a second, so words stream out at least as fast as you read. Exactly the target.",
-          "show": "The '.' pill rides the return arrow and appends to the row. The panel scales to 55% and slides into the top band at 40% opacity, still turning slowly; the stopwatch keeps reading '30 ms'. In the centre band a ruler draws from x 260 to x 1660, '0' to '1 s', ticks every 0.1 s, so 1,400 px is one second. Blue pills drop onto it one every 42 px, which is every 30 ms, slowed 4× so the second fills in about four seconds; grey tag under the ruler's left end: 'slowed 4×'. A counter above the ruler's right end (1560, 480) runs 0 to 33 as the last pill lands, label 'tokens in 1 s'. In the bottom band ch00's chat window returns with 'Why is the sky blue?', its answer streaming in step with the ruler, each token landing as a blue pill and relaxing into text. On 'as fast as you read', a small eye icon follows the text at reading pace, about 6 tokens a second, so it falls steadily behind the newest word. On 'Exactly the target', a white check-circle icon and the label 'the target' land beside the counter."
+          "say": "That is about thirty-three tokens a second, words arriving at least as fast as you read.",
+          "show": "The '.' pill rides the return arrow and appends to the row. The panel scales to 55% and slides into the top band at 40% opacity, still turning slowly; the stopwatch keeps reading '30 ms'. In the centre band a ruler draws from x 260 to x 1660, '0' to '1 s', ticks every 0.1 s, so 1,400 px is one second. Blue pills drop onto it one every 42 px, which is every 30 ms, slowed 4× so the second fills in about four seconds; grey tag under the ruler's left end: 'slowed 4×'. On 'thirty-three tokens', a counter above the ruler's right end (1560, 480) starts, and it reaches 33 as the last pill lands, label 'tokens in 1 s'. In the bottom band ch00's chat window returns with 'Why is the sky blue?', its answer streaming on the same 4× clock as the ruler, each token landing as a blue pill and relaxing into text. On 'as fast as you read', the newest words glow softly as they land. Add no eye icon or reading-pace marker: real reading is far slower than this stream, and a marker would make 33 look far above the slowest acceptable pace."
         },
         {
           "id": "b3",
-          "say": "It is not arbitrary. As a rule of thumb, it is roughly the slowest a model can go and still feel responsive.",
-          "show": "The 'slowed 4×' tag fades and the chat window dims to 40%, still streaming. On 'not arbitrary', a grey label writes under the counter: 'not arbitrary'. On 'rule of thumb', a white label lands beneath it: 'rule of thumb: slowest that still feels responsive'. The ruler keeps its 30 ms beat throughout; the counter's '33' glows once on 'responsive'."
+          "say": "That is the target, and not an arbitrary one: roughly the slowest pace that still feels responsive.",
+          "show": "The 'slowed 4×' tag fades and the chat window fades out, its job done. On 'the target', a white check-circle icon and the label 'the target' land just right of the counter, left edge at (1640, 480). On 'not an arbitrary one', a grey label writes in the bottom band, centred at (960, 760): 'not arbitrary'. On 'roughly the slowest pace', a white label lands beneath it, centred at (960, 830): 'rule of thumb: slowest that still feels responsive'. The ruler keeps its 30 ms beat throughout; the counter's '33' glows once on 'responsive'."
         },
         {
           "id": "b4",
-          "say": "By the end, you will derive it from two numbers on a chip's specification sheet, for any model on any chip.",
-          "show": "The panel, ruler, chat window and labels fade to 20%. The stopwatch's '30 ms' lifts off, enlarges and settles centre top (960, 290) as a white stamp '≈ 30 ms per token', with a small grey line under it: 'the number this film is about'. On 'derive it', ch00's spec-sheet card slides up beneath it (x 700-1220, y 400-800): header 'chip spec sheet' and six grey placeholder lines. On 'two numbers', two of the lines brighten; on 'specification sheet', they resolve exactly as in ch00: amber 'operations per second: ?' and coral 'bytes per second: ?'. On 'any model on any chip', a fan of three faint chip icons and three model-file icons of different sizes riffles behind the card and settles. Hold."
+          "say": "In a few minutes, you will derive it from two numbers on a chip's specification sheet.",
+          "show": "The panel, ruler, counter, check-circle and labels fade to 20%. The stopwatch's '30 ms' lifts off, enlarges and settles centre top (960, 290) as a white stamp '≈ 30 ms per token', with a small grey line under it: 'the number this film is about'. On 'derive it', ch00's spec-sheet card slides up beneath it (x 700-1220, y 400-800): header 'chip spec sheet' and six grey placeholder lines. On 'two numbers', two of the lines brighten; on 'specification sheet', they resolve exactly as in ch00: amber 'operations per second: ?' and coral 'bytes per second: ?'. No chip-and-model riffle here; ch00 already played it. Hold."
         }
       ]
     },
@@ -46,32 +46,32 @@
       "figs": [
         12
       ],
-      "visual": "One continuous shot: three capacity bars on one true scale, then the read speeds of the two that hold the whole file. Top band: the equation (centred, y 165) and, under it, the model as a solid coral block (x 200-1200, y 235-285). Three rows, all starting at x 200, each with an icon and a two-part title above its bar: disk (title y 350, bar y 375-425), memory beside the chip (title y 545, bar y 570-620), the chip itself (title y 740, bar y 765-815). Scale: 1,000 px = 140 GB. The memory bar is exactly 1,000 px. The disk bar runs off the right edge of the frame: truncated, not shrunk, so the scale still holds. The chip bar at this scale is 0.87 px, drawn as a 1 px hairline. Right zone (x 1260-1820) holds the magnifier and the two stopwatches. Colour: bars are blue outlines (containers), the model's bytes coral, the chip's working areas amber outlines, text white and grey. The takeaway band (y 952) is used in b5. The idea: one file, three homes of wildly different size and speed, and once the model is running only the middle one matters.",
+      "visual": "One continuous shot: three capacity bars on one true scale, then the read speeds of the two that hold the whole file. Top band: the equation (centred, y 165) and, under it, the model as a solid coral block (x 200-1200, y 235-285). Three rows, all starting at x 200, each with an icon and a two-part title above its bar: disk (title y 350, bar y 375-425), memory beside the chip (title y 545, bar y 570-620), the chip itself (title y 740, bar y 765-815). Scale: 1,000 px = 140 GB. The memory bar is exactly 1,000 px: a memory sized to fit the model, schematic rather than a particular chip (real chips' capacities come in the three-chip scene). The disk bar runs off the right edge of the frame: truncated, not shrunk, so the scale still holds. The chip bar at this scale is 0.87 px, drawn as a 1 px hairline. Right zone (x 1260-1820) holds the magnifier and the two stopwatches. Colour: bars are blue outlines (containers), the model's bytes coral, the chip's working areas amber outlines, text white and grey. The takeaway band (y 952) is used in b5. The idea: one file, three homes of wildly different size and speed; once the model is running the disk drops out, and the story is the memory beside the chip.",
       "beats": [
         {
           "id": "b1",
-          "say": "At two bytes a weight, seventy billion weights make a hundred and forty billion bytes, a hundred and forty gigabytes.",
-          "show": "A file icon at (250, 165) opens into a small grid of coral weight tiles; on 'two bytes a weight', one tile enlarges with the tag '2 bytes'. The equation builds term by term at y 165: '70,000,000,000 weights' on 'seventy billion', '× 2 bytes', '= 140,000,000,000 bytes' on 'a hundred and forty billion bytes', which morphs into '= 140 GB' on 'gigabytes'; a grey note writes under its right end: '1 GB = 1 billion bytes'. The tile grid compresses into the solid coral block (x 200-1200, y 235-285) labelled '140 GB'."
+          "say": "File sizes are counted in bytes, and each weight takes two. So seventy billion weights make a hundred and forty billion bytes, a hundred and forty gigabytes.",
+          "show": "A file icon at (250, 165) opens into a small grid of coral weight tiles. On 'counted in bytes', a grey caption writes right of the grid, left-anchored at (420, 140): 'file sizes: counted in bytes'. On 'each weight takes two', one tile enlarges in place, and the tag '2 bytes' lands under the caption at (420, 200), with a small grey tag after it on the same line: 'why two: later'. On 'seventy billion', the caption and both tags fade, and the equation builds term by term, centred at y 165: '70,000,000,000 weights', then '× 2 bytes', then '= 140,000,000,000 bytes' on 'a hundred and forty billion bytes', which morphs into '= 140 GB' on 'gigabytes'; a grey note writes under its right end: '1 GB = 1 billion bytes'. The tile grid compresses into the solid coral block (x 200-1200, y 235-285) labelled '140 GB'."
         },
         {
           "id": "b2",
           "say": "It lives in three places. A disk stores it. The memory beside the chip holds it while the model runs. The chip itself, which does the arithmetic, holds almost nothing.",
-          "show": "The equation dims to 40% and its grey note fades. On 'A disk', a hard-drive icon and the title 'A disk · stores the file' appear and the disk bar draws from x 200 rightward and off the frame edge; a 60% copy of the coral block slides into its left end; grey tag at the frame's right edge, above the bar: 'far more →'. On 'the memory beside the chip', a memory-module icon and the title 'Memory beside the chip · in use' appear and its bar draws to exactly 1,000 px; on 'while the model runs', the top coral block drops into it and fills it edge to edge. On 'The chip itself', a cpu icon and the title 'The chip itself · does the arithmetic' appear; on 'almost nothing', its bar draws as a 1 px hairline at x 200, with a grey tag beside it: 'to scale: under 1 px'."
+          "show": "The equation and its grey note fade out, leaving the coral block and its '140 GB' label in the top band. On 'A disk', a hard-drive icon and the title 'A disk · keeps it between uses' appear and the disk bar draws from x 200 rightward and off the frame edge; a copy of the coral block at 60% opacity slides into its left end; grey tag at the frame's right edge, above the bar: 'far more →'. On 'the memory beside the chip', a memory-module icon and the title 'Memory beside the chip · in use' appear and its bar draws to exactly 1,000 px; on 'while the model runs', the top coral block drops into it and fills it edge to edge, and a grey tag writes just above the bar's right end, right-aligned at (1200, 548): 'sized to fit the model'. On 'The chip itself', a cpu icon and the title 'The chip itself · does the arithmetic' appear; on 'almost nothing', its bar draws as a 1 px hairline at x 200, with a grey tag beside it: 'to scale: under 1 px'."
         },
         {
           "id": "b3",
           "say": "A few hundred thousand bytes in each small working area, a tenth of a gigabyte in all.",
-          "show": "The disk tag and the chip's 'to scale' tag dim to 30%. A magnifier circle, radius 120, swings from the hairline to (1500, 800), joined to it by a thin line, and enlarges it: inside, a grid of many small amber-outlined squares, the chip's working areas. On 'each small working area', one square highlights and a label lands left of the circle, right-aligned at x 1360, y 840: 'each: a few hundred thousand bytes'. On 'a tenth of a gigabyte', a second label lands above it at y 780: '≈ 0.1 GB in all · ≈ 1/1,000 of the model'."
+          "show": "The disk tag, the 'sized to fit the model' tag and the chip's 'to scale' tag dim to 30%. A magnifier circle, radius 120, swings from the hairline to (1500, 800), joined to it by a thin line, and enlarges it: inside, a grid of many small amber-outlined squares, the chip's working areas. On 'each small working area', one square highlights and a label lands left of the circle, right-aligned at x 1360, y 840: 'each: a few hundred thousand bytes'. On 'a tenth of a gigabyte', a second label lands above it at y 780: '≈ 0.1 GB in all · ≈ 1/1,000 of the model'."
         },
         {
           "id": "b4",
           "say": "Reading it all off a fast disk takes about twenty seconds. From the memory beside the chip, tens of milliseconds.",
-          "show": "The magnifier and its labels dim to 30%; the three titles dim to 60%. Both reads run on one clock, time-compressed 10×; grey tag at (1500, 245): '10× time-compressed'. On 'off a fast disk', coral particles trickle out of the disk's block along a thin path down the left margin (x 170) into the chip's hairline, while a stopwatch above the disk bar at (1500, 300) counts up for two seconds of screen time to '≈ 20 s'; grey note right-aligned beside it at x 1450: 'fast drive ≈ 7 GB/s · varies'. On 'tens of milliseconds', the memory block fires one dense burst along its own short path into the hairline, over within a single frame (about 4 ms on the same 10× clock); its stopwatch at (1500, 595), right of the memory bar, snaps to 'tens of ms'. A white bracket joins the two stopwatches on their right (x 1790, y 300-595), with the label '≈ 500× faster' at (1620, 490), between the disk and memory rows."
+          "show": "The magnifier and its labels dim to 30%; the three titles dim to 60%. Both reads run on one clock, time-compressed 10×; grey tag at (1500, 245): '10× time-compressed'. On 'off a fast disk', coral particles trickle out of the disk's block along a thin path down the left margin (x 170) into the chip's hairline: the what-if of the chip reading the disk directly. A grey tag writes at the path's top, left-anchored at (215, 455) just under the disk bar: 'if read straight from disk'. Meanwhile a stopwatch above the disk bar at (1500, 300) counts up for two seconds of screen time to '≈ 20 s'; grey note right-aligned beside it at x 1450: 'fast drive ≈ 7 GB/s · varies'. On 'tens of milliseconds', the memory block fires one dense burst along its own short path into the hairline, over within a single frame (about 4 ms on the same 10× clock); its stopwatch at (1500, 595), right of the memory bar, snaps to 'tens of ms'. A white bracket joins the two stopwatches on their right (x 1790, y 300-595), with the label '≈ 500× faster' at (1620, 490), between the disk and memory rows."
         },
         {
           "id": "b5",
-          "say": "So the model is loaded once, at start-up, and stays put. The disk plays no part in making tokens. Everything happens in the middle tier.",
-          "show": "Stopwatches, bracket, notes and the 10× tag dim to 30%. On 'loaded once', a coral arrow draws from the disk's block down to the memory bar, labelled 'load once, at start-up', and the memory block flashes once. On 'stays put', a grey label writes under the memory bar at (200, 655): 'stays while the service runs'. On 'plays no part', the whole disk row fades to 20% and its tag swaps to 'start-up only, never per token'. On 'middle tier', the memory bar glows and the takeaway lands: 'the middle tier is where everything happens'."
+          "say": "So the model is loaded once, at start-up, and stays put. The disk plays no part in making tokens. This film lives in the memory beside the chip.",
+          "show": "Stopwatches, bracket, notes and the 10× tag dim to 30%; the disk-to-chip particle path and its 'if read straight from disk' tag fade out, since the real route is drawn next. On 'loaded once', a coral arrow draws from the disk's block down to the memory bar, labelled 'load once, at start-up', and the memory block flashes once. On 'stays put', a grey label writes under the memory bar at (200, 655): 'stays while the service runs'. On 'plays no part', the whole disk row fades to 20% and its 'far more →' tag swaps to 'start-up only, never per token'. On 'This film lives', the memory bar glows and the takeaway lands: 'memory beside the chip: this film's home'."
         }
       ]
     },
@@ -95,8 +95,8 @@
         },
         {
           "id": "b3",
-          "say": "A fixed cost stops mattering once spread over enough work. That is amortising. The rest of this film is about a cost that refuses to spread.",
-          "show": "The counter and the lower third dim to 30%. On 'a fixed cost', a teal label lands above the timeline: 'fixed cost ÷ lots of work → tiny'; on 'amortising', the word 'amortising' writes under it in teal. On 'refuses to spread', the teal labels dim and the camera pushes in on the timeline's right end: three consecutive ticks grow into blue token pills, each topped by its own coral block of the same size, with a '?' above the row and the label 'paid again, every token?'."
+          "say": "A fixed cost stops mattering once spread over enough work. That is amortising, and it comes back often. The rest of this film is about a cost that refuses to spread.",
+          "show": "The counter and the lower third dim to 30%. On 'a fixed cost', a teal label lands above the timeline: 'fixed cost ÷ lots of work → tiny'; on 'amortising', the word 'amortising' writes under it in teal; on 'comes back often', a small grey tag settles just right of the word: 'first of many'. On 'refuses to spread', the teal labels and the tag dim and the camera pushes in on the timeline's right end: three consecutive ticks grow into blue token pills, each topped by its own coral block as wide as the load block was before it shrank (180 px), labelled '140 GB': the same bytes the load moved, now apparently paid again by every token. A '?' sits above the row with the label 'paid again, every token?'."
         }
       ]
     },
@@ -111,7 +111,7 @@
         {
           "id": "b1",
           "say": "Here is that cost. Each token needs all seventy billion weights, which the chip cannot keep. So for one conversation, every token streams all hundred and forty gigabytes in from memory.",
-          "show": "The package fades in. On 'all seventy billion weights', the stacks fill with coral tiles. On 'cannot keep', a tiny region inside the die highlights with a grey tag '≈ 0.1 GB fits here'. On 'one conversation', a user icon with one blue pill appears just right of the die. On 'every token streams', coral particles flow along the bus in slices; as each slice arrives the die flashes amber for an instant and the slice fades. The counter 'bytes moved, this token' (1590, 400) runs 0 to 140 GB and a blue token pill pops out of the die; on 'from memory' it resets and runs again, faster, twice more, while 'tokens' (1590, 500) ticks 1, 2, 3. Label under the package: 'one conversation: all 140 GB, every token'; small grey tag at its right end: 'shared reads, many users: later'."
+          "show": "The package fades in. On 'all seventy billion weights', the stacks fill with coral tiles. On 'cannot keep', a tiny region inside the die highlights with a grey tag '≈ 0.1 GB fits here'. On 'one conversation', a user icon with one blue pill appears just right of the die. Three runs follow, each keyed to its own words. On 'every token streams', run 1 (about 1.2 s): coral particles flow along the bus in slices; as each slice arrives the die flashes amber for an instant and the slice fades; the counter 'bytes moved, this token' (1590, 400) runs 0 to 140 GB, a blue token pill pops out of the die, and 'tokens' (1590, 500) reads 1. On 'hundred and forty gigabytes', run 2 (about 0.8 s): the counter resets and runs 0 to 140 GB again, a second pill pops out, 'tokens' reads 2. On 'from memory', run 3 (about 0.6 s), the same, and 'tokens' reads 3 as the beat ends. As the beat ends, a label writes under the package: 'one conversation: all 140 GB, every token'; small grey tag at its right end: 'shared reads, many users: later'."
         },
         {
           "id": "b2",
@@ -121,7 +121,7 @@
         {
           "id": "b3",
           "say": "Bandwidth is one of those two specification numbers. The other, how fast the chip calculates, does not even appear.",
-          "show": "The line under the package fades and, as the beat begins, the spec-sheet card from the opening scene slides into the right column (x 1380-1800, y 380-720) with its two lines, amber 'operations per second: ?' and coral 'bytes per second: ?'. On 'Bandwidth is one', the coral line brightens and a thin coral connector draws from it up to the equation's 'bytes per second'. On 'the other', the amber line pulses; on 'does not even appear', a white highlight sweeps the equation left to right and finds no amber term, and the amber line dims to 40% with a grey tag 'not in the rule'. A small amber tag settles beside the die: 'arithmetic ≈ 0.1 ms · overlaps the reading (later)'."
+          "show": "The line under the package fades and, as the beat begins, the spec-sheet card from the opening scene slides into the right column (x 1380-1800, y 380-720) with its two lines, amber 'operations per second: ?' and coral 'bytes per second: ?'. On 'Bandwidth is one', the coral line brightens and a thin coral connector draws from it up to the equation's 'bytes per second'. On 'the other', the amber line pulses; on 'does not even appear', a white highlight sweeps the equation left to right and finds no amber term, and the amber line dims to 40% with a grey tag 'not in the rule'; at the same moment a small amber tag settles beside the die, saying why: 'arithmetic ≈ 0.1 ms · overlaps the reading (later)'."
         }
       ]
     },
@@ -131,32 +131,32 @@
       "figs": [
         14
       ],
-      "visual": "One continuous shot: one division done for three chips. Top band (y 165): 'time per token = 140 GB ÷ bandwidth', with 140 GB and bandwidth in coral. Directly below (y 255), a single centred worked-line band that holds one line at a time and is replaced row by row. A three-row table below it, rows centred at y 390, 530 and 670. Left column (x 120-500): chip cards, each a chip icon with name and bandwidth: 'H100 · 3.35 TB/s', 'H200 · 4.8 TB/s', 'B200 · 8 TB/s', with room for a small grey capacity tag under the name. Middle: coral bars from a common baseline at x 540, drawn to scale at 20 px per millisecond: 836, 583 and 350 px; each value sits at its bar's end. A dashed vertical line at 30 ms (x 1140, y 330-720), labelled '30 ms' at its foot. Grey tag under the table at (540, 760): 'bars to scale'. Right column (x 1620-1800): 'tokens / s', filled in the last two beats. Takeaway band (y 952) used in b5. The idea: thirty milliseconds is a division, and a figure that seems to clash with it is the same division on a different chip.",
+      "visual": "One continuous shot: one division done for three chips. Top band (y 165): 'time per token = 140 GB ÷ bandwidth', with 140 GB and bandwidth in coral. Directly below (y 245), a single centred worked-line band that holds one line at a time and is replaced row by row. A three-row table below it, rows centred at y 390, 530 and 670. Left column (x 120-500): chip cards, each a chip icon with name and bandwidth: 'H100 · 3.35 TB/s', 'H200 · 4.8 TB/s', 'B200 · 8 TB/s', with room for a small grey capacity tag under the name. Middle: coral bars from a common baseline at x 540, drawn to scale at 20 px per millisecond: 836, 583 and 350 px, ending at x 1376, 1123 and 890. Each value sits left-anchored 16 px past its bar's end, except the H200's '29.2 ms': that bar stops only 17 px short of the 30 ms line, so its value sits just past the line, left-anchored at x 1160, and nothing touches the line. A dashed vertical line at 30 ms (x 1140, y 340-720), labelled '30 ms' at its foot; the space just above its top, around (1140, 312), is kept free for the b2 stamp. Grey tag under the table at (540, 760): 'bars to scale'. Right column (x 1620-1800): 'tokens / s', filled in the last two beats, with about 42 px free under each cell for a small badge. The H100 value '41.8 ms' ends near x 1530, so nothing docks beside the cells. Takeaway band (y 952) used in b5. The idea: thirty milliseconds is a division, and a figure that seems to clash with it is the same division on a different chip.",
       "beats": [
         {
           "id": "b1",
           "say": "The memory on Nvidia's H one hundred delivers three point three five terabytes a second, a terabyte being a thousand gigabytes. So each token takes forty-one point eight milliseconds.",
-          "show": "On 'Nvidia's H one hundred', the three cards slide in, H100 bright and the other two at 50%. On 'a terabyte being a thousand gigabytes', the worked-line band writes '3.35 TB/s = 3,350 GB/s', with a small grey '1 TB = 1,000 GB' beneath. On 'forty-one point eight', the band swaps to '140 GB ÷ 3,350 GB/s = 0.0418 s' and the H100 bar grows to 836 px with '41.8 ms' at its end. As the beat ends, a grey tag settles under the H100 name: 'holds 80 GB: a what-if'."
+          "show": "On 'Nvidia's H one hundred', the three cards slide in, H100 bright and the other two at 50%. On 'a terabyte being a thousand gigabytes', the worked-line band writes '3.35 TB/s = 3,350 GB/s', with a small grey '1 TB = 1,000 GB' beneath. On 'forty-one point eight', the band swaps to '140 GB ÷ 3,350 GB/s = 0.0418 s' and the H100 bar grows to 836 px with '41.8 ms' just past its end. As the beat ends, a grey tag settles under the H100 name in two short lines: 'holds 80 GB: model won't fit' and 'a what-if'."
         },
         {
           "id": "b2",
-          "say": "The H two hundred takes twenty-nine point two. There are your thirty milliseconds, right on the target. The B two hundred, seventeen point five.",
-          "show": "On 'H two hundred', its card brightens; the band swaps to '140 GB ÷ 4,800 GB/s = 0.0292 s' and the bar grows to 583 px, '29.2 ms'. On 'thirty milliseconds', the row glows white and a stamp '≈ 30 ms' snaps onto the dashed line just past the bar's end; on 'the target', the white check-circle from the opening scene pops beside the stamp. A grey tag settles under the H200 name: 'holds 141 GB: a tight squeeze'. On 'B two hundred', its card brightens; the band swaps to '140 GB ÷ 8,000 GB/s = 0.0175 s' and the bar grows to 350 px, '17.5 ms'."
+          "say": "The H two hundred takes twenty-nine point two. There are your thirty milliseconds, right on target. The B two hundred, seventeen point five.",
+          "show": "On 'H two hundred', its card brightens; the band swaps to '140 GB ÷ 4,800 GB/s = 0.0292 s' and the bar grows to 583 px, with '29.2 ms' placed just past the dashed line at x 1160. On 'thirty milliseconds', the row glows white and a stamp '≈ 30 ms' lands on top of the dashed line, centred at (1140, 312), above the table rather than on the row; on 'right on target', the white check-circle from the opening scene pops just right of the stamp at (1225, 312). A grey tag settles under the H200 name: 'holds 141 GB: a tight squeeze'. On 'B two hundred', its card brightens; the band swaps to '140 GB ÷ 8,000 GB/s = 0.0175 s' and the bar grows to 350 px, '17.5 ms' just past its end."
         },
         {
           "id": "b3",
-          "say": "Not a guess, not a benchmark: a division, the best the chip can do, and it moves with the model's size and the memory's speed.",
-          "show": "The worked line clears and the capacity tags dim to 30%. In the band, one phrase at a time, each replacing the last: 'not a guess', 'not a benchmark', then 'a division: the best case'. On 'the model's size', the '140 GB' in the equation pulses and briefly reads '70 GB' while all three bars shrink to half (418, 292, 175 px), hold, and spring back as '140 GB' returns. On 'memory's speed', the 'bandwidth' term pulses and the three bandwidth labels on the cards pulse top to bottom."
+          "say": "Not a guess, not a benchmark: a division, the best the chip can do, and it moves with model size and memory speed.",
+          "show": "The worked line clears and the capacity tags dim to 30%. In the band, one phrase at a time, each replacing the last: 'not a guess', 'not a benchmark', then 'a division: the best case'. On 'model size', the '140 GB' in the equation pulses and briefly reads '70 GB' while all three bars shrink to half (418, 292, 175 px), hold, and spring back as '140 GB' returns. On 'memory speed', the 'bandwidth' term pulses and the three bandwidth labels on the cards pulse top to bottom."
         },
         {
           "id": "b4",
-          "say": "Later you will meet about twenty-four tokens a second. A clash? One second divided by forty-one point eight milliseconds is twenty-three point nine, the H one hundred row.",
-          "show": "The band clears. Two blue quote cards land in it: left '30 ms → 33 tokens/s', right '≈ 24 tokens/s · later'; on 'A clash?', a '≠' between them flickers. On 'one second divided by', the right column gets its header 'tokens / s' with a grey '= 1 s ÷ time' under it, and the H100 cell fills '23.9' on 'twenty-three point nine'. On 'the H one hundred row', the '24' quote card slides down and docks beside the H100 cell."
+          "say": "Later you will meet about twenty-four tokens a second, not thirty-three. A clash? One second divided by forty-one point eight milliseconds is twenty-three point nine, the H one hundred row.",
+          "show": "The band clears. On 'twenty-four tokens a second', a blue quote card lands in the band's right half: '≈ 24 tokens/s · later'; on 'not thirty-three', a second lands in its left half: '30 ms → 33 tokens/s'. On 'A clash?', a '≠' between them flickers. On 'one second divided by', the right column gets its header 'tokens / s' with a grey '= 1 s ÷ time' under it, and the H100 cell fills '23.9' on 'twenty-three point nine'. On 'the H one hundred row', the right quote card shrinks into a small badge '≈ 24 · later' and tucks under the H100 cell, centred at (1710, 432)."
         },
         {
           "id": "b5",
           "say": "Same division, different chip. Running down clashes like that is a habit worth having.",
-          "show": "On 'Same division', the H200 cell fills '34.3' and the B200 cell '57.1'; the left quote card slides down and docks on the H200 row, its '33' beside '34.3' with a grey tag 'rounded from 30 ms'. The '≠' left in the band morphs into '=' and fades. On 'a habit', the takeaway lands: 'same division, different chips'."
+          "show": "On 'Same division', the H200 cell fills '34.3' and the B200 cell '57.1'; the left quote card shrinks into a small badge '33 · rounded from 30 ms' and tucks under the H200 cell, centred at (1710, 572), so '33' sits just below '34.3'. The '≠' left in the band morphs into '=' and fades. On 'a habit', the takeaway lands: 'same division, different chips'."
         }
       ]
     },
@@ -166,7 +166,7 @@
       "figs": [
         15
       ],
-      "visual": "One continuous shot, calm and spacious. Two large rounded blue boxes on one line, centred at y 520: left (x 180-760) 'A trained checkpoint' with sub-label 'weights on disk' and, inside it, a small drive icon holding the coral 140 GB block; right (x 1160-1740) 'A service that responds' with sub-label 'a token every 30 ms', a chat bubble inside streaming words at a true 30 ms beat, and a user icon just outside its right edge (x 1790). The gap between the boxes (x 760-1160) stays empty until the last word, when the white word 'inference' fills it. The idea: the whole subject of the film sits in the gap between a file and a responsive service.",
+      "visual": "One continuous shot, calm and spacious. Two large rounded blue boxes on one line, centred at y 520: left (x 180-760) 'A trained checkpoint' with sub-label 'weights on disk' and, inside it, a small drive icon holding the coral 140 GB block; right (x 1160-1740) 'A service that responds' with sub-label 'a token every 30 ms', a chat bubble inside streaming words at a true 30 ms beat, and a user icon just outside its right edge (x 1790). The gap between the boxes (x 760-1160) stays unfilled, crossed only by the b2 arrow, until the last word, when the white word 'inference' fills it. The idea: the whole subject of the film sits in the gap between a file and a responsive service.",
       "beats": [
         {
           "id": "b1",
@@ -175,13 +175,13 @@
         },
         {
           "id": "b2",
-          "say": "Training made the checkpoint. Turning it into something a person can talk to, at a price that works, is a discipline of its own.",
+          "say": "Training made the checkpoint. Turning it into something a person can talk to, at a price that works, is its own discipline.",
           "show": "On 'Training made the checkpoint', a faded grey tag 'training: done' appears above the left box. On 'Turning it into', a white arrow draws from the left box to the right box across the gap. On 'talk to', the user icon pulses; on 'a price that works', a small price-tag icon settles on the arrow."
         },
         {
           "id": "b3",
-          "say": "Why the reading, not the arithmetic, holds that gap at thirty milliseconds, not far less, is the rest of this film. Everything between those two boxes is inference.",
-          "show": "On 'the reading', coral particles start flowing along the arrow. On 'not the arithmetic', a faint amber ghost label '0.1 ms?' flickers beside the right box's '30 ms' and fades. On 'thirty milliseconds', '30 ms' glows. On 'inference', a soft white band fills the gap under the arrow and the word 'inference' writes on inside it, large. Hold for two seconds."
+          "say": "Why does the reading, not the arithmetic, hold the gap between them at thirty milliseconds, not far less? That is the rest of this film. Everything between those two boxes is inference.",
+          "show": "On 'the reading', coral particles start flowing along the arrow. On 'not the arithmetic', a faint amber ghost label '0.1 ms?' flickers beside the right box's '30 ms' and fades. On 'the gap between them', a thin grey bracket draws under the arrow across the gap (x 760-1160, y 640). On 'thirty milliseconds', '30 ms' glows. On 'the rest of this film', the bracket fades. On 'inference', a soft white band fills the gap under the arrow and the word 'inference' writes on inside it, large. Hold for two seconds."
         }
       ]
     }
@@ -203,7 +203,7 @@
       "result": "33.333333333333336"
     },
     {
-      "claim": "'at least as fast as you read': at a common estimate of 250 words a minute and ~1.5 tokens per word (ch01), reading is ≈ 6 tokens/s, ≈ 160 ms per token; 33 tokens/s is ≈ 5× that, so the eye icon in s01.b2 falls behind (estimate, not from the atlas)",
+      "claim": "'at least as fast as you read': at a common estimate of 250 words a minute and ~1.5 tokens per word (ch01), reading is ≈ 6 tokens/s, ≈ 160 ms per token; 33 tokens/s is ≈ 5× that, so the claim holds with room to spare. Because real reading is that much slower, s01 shows no eye icon or reading-pace marker, which would make 33 look far above 'the slowest pace that still feels responsive' (a rule of thumb, kept on screen as one). Estimate, not from the atlas",
       "python": "250/60*1.5, 1000/(250/60*1.5), (1000/30)/(250/60*1.5)",
       "result": "6.25 160.0 5.333333333333334"
     },
@@ -238,7 +238,7 @@
       "result": "1150.9862439385777"
     },
     {
-      "claim": "CORRECTION to fig 12 'bars roughly to scale' (atlas draws the chip bar 60 px against the memory bar's 380 px): at true scale against a 1,000 px memory bar the chip bar is 0.87 px, so the film draws a 1 px hairline under a magnifier; the disk bar is truncated at the frame edge rather than shrunk",
+      "claim": "CORRECTION to fig 12 'bars roughly to scale' (atlas draws the chip bar 60 px against the memory bar's 380 px): at true scale against a 1,000 px memory bar the chip bar is 0.87 px, so the film draws a 1 px hairline under a magnifier; the disk bar is truncated at the frame edge rather than shrunk. The memory bar is exactly 1,000 px = 140 GB, tagged 'sized to fit the model' (fig 12's 'the memory holds exactly the model'): a schematic memory, not a specific chip; s05 gives real capacities (H100 80 GB, H200 141 GB)",
       "python": "1000*(132*(256+256)*1024 + 50*1024**2)/140e9, 1000/140",
       "result": "0.8688201142857143 7.142857142857143"
     },
@@ -258,7 +258,7 @@
       "result": "0.02314814814814815"
     },
     {
-      "claim": "s03 bars: load share against a 1,000 px bar for 30 ms ≈ a quarter of a pixel; the 20 s load on a 1,520 px 24-hour timeline ≈ 0.35 px",
+      "claim": "s03 bars: load share against a 1,000 px bar for 30 ms ≈ a quarter of a pixel; the 20 s load on a 1,520 px 24-hour timeline ≈ 0.35 px; in b3 each token's coral block is drawn at the load block's original 180 px, because each token reads the same 140 GB the load moved",
       "python": "1000*(20/2.88e6)/0.030, 1520*20/86400",
       "result": "0.2314814814814815 0.35185185185185186"
     },
@@ -281,6 +281,11 @@
       "claim": "bars at 20 px per ms: 836 / 583 / 350 px; 30 ms marker at 600 px (x 1140 from the x 540 baseline)",
       "python": "20*140e9/3.35e12*1e3, 20*140e9/4.8e12*1e3, 20*140e9/8e12*1e3, 20*30",
       "result": "835.820895522388 583.3333333333334 350.0 600"
+    },
+    {
+      "claim": "s05 layout: from the x 540 baseline the bars end at x 1376 / 1123 / 890 and the 30 ms line is at x 1140, so the H200 bar stops 17 px short of the line: its '29.2 ms' goes past the line (x 1160) and the '≈ 30 ms' stamp sits above the line's top, not on the row",
+      "python": "540+20*140e9/3.35e12*1e3, 540+20*140e9/4.8e12*1e3, 540+20*140e9/8e12*1e3, 540+20*30, 540+20*30-(540+20*140e9/4.8e12*1e3)",
+      "result": "1375.8208955223881 1123.3333333333335 890.0 1140 16.666666666666515"
     },
     {
       "claim": "s05.b3 what-if: a 70 GB model halves every bar to 418 / 292 / 175 px (20.9 / 14.6 / 8.75 ms)",
