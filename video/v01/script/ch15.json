@@ -52,8 +52,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "The cache holds neither text nor answers. Your words sit in the service's database, and travel with every turn.",
-          "show": "Heading draws. On 'neither text nor answers', a blue question pill 'What's the weather in Seoul?' and a blue answer pill 'Sunny tomorrow' drift towards the dashed 'cache' outline round the HBM stacks; ghost copies of both stop at its edge under a grey cross, tag 'not stored here'. On 'service's database', the building and its database draw at left and the two pills, with three more chat pills, slide into the database; the left label card appears. On 'travel with every turn', a blue pill runs from the laptop into the building and on into the GPU, tag 'sent every turn'."
+          "say": "The cache holds neither text nor answers. Your words sit in a database, away from the model's server, and travel with every turn.",
+          "show": "Heading draws. On 'neither text nor answers', a blue question pill 'What's the weather in Seoul?' and a blue answer pill 'Sunny tomorrow' drift towards the dashed 'cache' outline round the HBM stacks; ghost copies of both stop at its edge under a grey cross, tag 'not stored here'. On 'in a database', the building and its database draw at left and the two pills, with three more chat pills, slide into the database; the left label card appears. On 'travel with every turn', a blue pill runs from the laptop into the building and on into the GPU, tag 'sent every turn'."
         },
         {
           "id": "b2",
@@ -63,7 +63,7 @@
         {
           "id": "b3",
           "say": "Take the weather chat: four kilobytes of text, but a third of a gigabyte of keys and values, over eighty thousand times more. Making them is exactly what prefill does.",
-          "show": "Building and GPU shrink to icons, top-left and top-right; label cards and pill rows fade, and the heading dims to 30%. On 'the weather chat', a small grey tag draws at upper left (x 300–800, y 400–470), two lines: 'weather chat, 1,032 tokens' / 'to scale by area'. Then, on the common baseline at y 960: on 'four kilobytes', a tiny blue square, 2 px a side, at x 760, with a short pointer arrow from the label 'text: ≈ 4 KB' at its left (x 300–700, y 930). On 'a third of a gigabyte', a coral square grows up from the same baseline to 581 px a side (x 1100–1681, y 379–960), label inside its top-left corner 'keys and values: ≈ 1/3 GB'. On 'eighty thousand times', '> 80,000 ×' appears between the two squares (centred x 930, y 760). On 'exactly what prefill does', an amber arrow labelled 'prefill' arcs from the blue square to the left edge of the coral one (top of the arc near y 560), and an amber counter at left (x 300–800, y 600) runs to '≈ 140 billion operations per token'."
+          "show": "Building and GPU shrink to icons, top-left and top-right; label cards and pill rows fade, and the heading dims to 30%. On 'the weather chat', a small grey tag draws at upper left (x 300–800, y 400–470), led by the cloud-and-sun icon that marks the weather conversation here and in ch16 and ch17, two lines: 'weather chat, 1,032 tokens' / 'to scale by area'. Then, on the common baseline at y 960: on 'four kilobytes', a tiny blue square, 2 px a side, at x 760, with a short pointer arrow from the label 'text: ≈ 4 KB' at its left (x 300–700, y 930). On 'a third of a gigabyte', a coral square grows up from the same baseline to 581 px a side (x 1100–1681, y 379–960), label inside its top-left corner 'keys and values: ≈ 1/3 GB'. On 'eighty thousand times', '> 80,000 ×' appears between the two squares (centred x 930, y 760). On 'exactly what prefill does', an amber arrow labelled 'prefill' arcs from the blue square to the left edge of the coral one (top of the arc near y 560), and an amber counter at left (x 300–800, y 600) runs to '≈ 140 billion operations per token'."
         },
         {
           "id": "b4",
@@ -83,8 +83,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Earlier you saw keys and values are settled once made. Here is why. Token five's keys and values come from tokens one to four, and itself. Attention is causal, so nothing later can reach back.",
-          "show": "On 'Earlier you saw', the seven pills draw left to right and the empty tray draws under them. On 'Here is why', the heading draws on two lines: 'A token's keys and values' / 'depend only on what came before it'. On 'Token five's keys and values', t5 lifts slightly and brightens. On 'tokens one to four, and itself', arcs curve from t1, t2, t3 and t4 into t5, a small loop arc sits on t5 itself, and a bracket draws under the tray from t1 to t5, label 'token 5: from these five'; t6 and t7 dim grey. On 'nothing later', a thin wall rises just right of t5 with a left-pointing one-way arrow on top; arcs from t6 and t7 reach towards t5, hit the wall and fade."
+          "say": "Earlier you saw keys and values are settled once made, because attention is causal. Above layer one, token five's keys and values come from tokens one to four, and itself. Nothing later can reach back.",
+          "show": "On 'Earlier you saw', the seven pills draw left to right and the empty tray draws under them. On 'because attention is causal', the heading draws on two lines: 'A token's keys and values' / 'depend only on what came before it'. On 'Above layer one', a small grey tag 'above layer 1' fades in at upper left, between the heading and the pills (x 300, y 240). On 'token five's keys and values', t5 lifts slightly and brightens. On 'tokens one to four, and itself', arcs curve from t1, t2, t3 and t4 into t5, a small loop arc sits on t5 itself, and a bracket draws under the tray from t1 to t5, label 'token 5: from these five'; t6 and t7 dim grey. On 'Nothing later', a thin wall rises just right of t5 with a left-pointing one-way arrow on top; arcs from t6 and t7 reach towards t5, hit the wall and fade."
         },
         {
           "id": "b2",
@@ -93,18 +93,18 @@
         },
         {
           "id": "b3",
-          "say": "A kept value stays valid while its token, and every one before it, is unchanged. Causality again, on a third job: it made decode one at a time, halved the score grid, and here makes caching safe.",
-          "show": "Wall and arcs fade. On 'every one before it', the b1 bracket under t1 to t5 turns teal, a small '=' flashes under each of those five pills, and the bracket label becomes 'valid while these are unchanged'. On 'third job', the bottom band fills, one icon per phrase: on 'one at a time', a single-file arrow 'decode: one at a time'; on 'halved the score grid', a small grid with its lower-left triangle shaded, 'scores: a triangle'; on 'makes caching safe', a padlocked tile outlined in teal, 'caching: safe'."
+          "say": "A kept value stays valid while its token, and every one before it, is unchanged. Causality has now done three things: it made decode one at a time, halved the score grid, and here makes caching safe.",
+          "show": "Wall and arcs fade. On 'every one before it', the b1 bracket under t1 to t5 turns teal, a small '=' flashes under each of those five pills, and the bracket label becomes 'valid while these are unchanged'. On 'three things', the bottom band fills, one icon per phrase: on 'one at a time', a single-file arrow 'decode: one at a time'; on 'halved the score grid', a small grid with its lower-left triangle shaded, 'scores: a triangle'; on 'makes caching safe', a padlocked tile outlined in teal, 'caching: safe'."
         },
         {
           "id": "b4",
-          "say": "Now a prompt arrives with token two changed. Token three is unchanged, but its keys and values were made in a context holding the old token two. They are now wrong, as are those of four to seven.",
-          "show": "Bottom icons and the bracket fade. The heading changes to 'Change one token early,' / 'everything after is wrong', and the upper row gains the label 'cached' at its left. On 'a prompt arrives', the lower row draws left to right, label 'arriving': 't1', 'XX', 't3' to 't7'. On 'token two changed', 'XX' flashes and a vertical white line drops between columns 1 and 2, label 'differs here'; the cached t1 tile, left of the line, gains a small teal tick. As that sentence ends, the cached t2 tile swaps from coral to grey with a small tag 'old t2', and the amber counter appears: 'recompute: 1'. On 'Token three is unchanged', both t3 pills brighten with '=' between them. On 'holding the old token two', one thread draws from the cached t3 tile back to the cached t2 pill, and a stripe in t2's shade shows inside the t3 tile. On 'They are now wrong', the t3 tile cracks and turns grey with a dashed outline, counter 'recompute: 2', and the cracks run straight on through the t4, t5, t6 and t7 tiles, about 0.35 s apart, each lighting only its own thread back to t2 while the previous thread fades; the counter ticks 3, 4, 5, 6 and reaches 'recompute: 6 of 7' before the beat's last word. Hold the cracked row for 1 s before b5."
+          "say": "Back to the earlier case: a prompt arrives with token two changed. Token three is unchanged, but its keys and values were made in a context holding the old token two. They are now wrong, as are those of four to seven.",
+          "show": "Bottom icons and the bracket fade. The heading changes to 'Change one token early,' / 'everything after is wrong', and the upper row gains the label 'cached' at its left. On 'a prompt arrives', the lower row draws left to right, label 'arriving': 't1', 'XX', 't3' to 't7', the strip ch14 ended on, now seven long, with 'XX' blue. On 'token two changed', 'XX' flashes and a vertical white line drops between columns 1 and 2, label 'differs here'; the cached t1 tile, left of the line, gains a small teal tick. As that sentence ends, the cached t2 tile swaps from coral to grey with a small tag 'old t2', and the amber counter appears: 'recompute: 1'. On 'Token three is unchanged', both t3 pills brighten with '=' between them. On 'holding the old token two', one thread draws from the cached t3 tile back to the cached t2 pill, and a stripe in t2's shade shows inside the t3 tile. On 'They are now wrong', the t3 tile cracks and turns grey with a dashed outline, counter 'recompute: 2', and the cracks run straight on through the t4, t5, t6 and t7 tiles, about 0.35 s apart, each lighting only its own thread back to t2 while the previous thread fades; the counter ticks 3, 4, 5, 6 and reaches 'recompute: 6 of 7' before the beat's last word. Hold the cracked row for 1 s before b5."
         },
         {
           "id": "b5",
           "say": "The match cannot skip a difference and resume. Everything from the first mismatch is recomputed, identical or not. A prefix rule, not a search for pieces. Not a design choice: it follows from what keys and values are.",
-          "show": "On 'skip a difference', a dotted teal arrow tries to hop from column 1 over the white line to column 3, label 'skip and resume?', and is crossed out in grey. On 'identical or not', arriving pills t2 to t7 take amber outlines, label 'prefill again', and a small grey footnote appears bottom right (inside y 1000): 'layer 1 alone would survive: 1.25% of the work'. On 'A prefix rule', the heading becomes 'a prefix rule,' / 'not a search for pieces', and the columns settle into two blocks: column 1 a short teal block, columns 2 to 7 a longer amber block. On 'Not a design choice', a grey line appears under the heading: 'why the rule is unforgiving'."
+          "show": "On 'skip a difference', a dotted teal arrow tries to hop from column 1 over the white line to column 3, label 'skip and resume?', and is crossed out in grey. On 'identical or not', arriving pills t2 to t7 take amber outlines, label 'prefill again', and a small grey footnote appears bottom right (inside y 1000): 'layer 1 stays valid, but saves only ≈ 0.025%'. On 'A prefix rule', the heading becomes 'a prefix rule,' / 'not a search for pieces', and the columns settle into two blocks: column 1 a short teal block, columns 2 to 7 a longer amber block. On 'Not a design choice', a grey line appears under the heading: 'why the rule is unforgiving'."
         }
       ]
     },
@@ -123,8 +123,8 @@
         },
         {
           "id": "b2",
-          "say": "In the weather conversation's follow-up, one thousand and twenty-seven of one thousand and thirty-two tokens match. Only your five new ones are prefilled: a hit rate of ninety-nine point five percent.",
-          "show": "Heading, segment labels and b1's 'hit: reused', 'prefill' and 'the first difference' labels dim to 30%. On 'weather conversation's follow-up', a small grey tag at the left end: 'weather chat, a minute later'. On 'one thousand and twenty-seven', a teal counter runs 0 → 1,027 under the teal part, label 'matched'; on 'one thousand and thirty-two', a grey counter at the left reads 'arriving: 1,032'. On 'five new ones', an amber counter under 'new': 'prefill: 5'; on 'prefilled', a small grey note under the right end of the bars: 'bars schematic, not to scale'. On 'ninety-nine point five', the large teal figure '99.5%' appears at right with 'hit rate = 1,027 ÷ 1,032' small beneath it, both at the same moment, so the share that matched is what the number visibly means."
+          "say": "The weather chat's prompt was itself a follow-up: one thousand and twenty-seven of its one thousand and thirty-two tokens match. Only your five new ones are prefilled: a hit rate of ninety-nine point five percent.",
+          "show": "Heading, segment labels and b1's 'hit: reused', 'prefill' and 'the first difference' labels dim to 30%. On 'itself a follow-up', a small grey tag at the left end, led by the cloud-and-sun weather icon from the previous scene: 'weather chat, a minute later'. On 'one thousand and twenty-seven', a teal counter runs 0 → 1,027 under the teal part, label 'matched'; on 'one thousand and thirty-two', a grey counter at the left reads 'arriving: 1,032'. On 'five new ones', an amber counter under 'new': 'prefill: 5'; on 'prefilled', a small grey note under the right end of the bars: 'bars schematic, not to scale'. On 'ninety-nine point five', the large teal figure '99.5%' appears at right with 'hit rate = 1,027 ÷ 1,032' small beneath it, both at the same moment, so the share that matched is what the number visibly means."
         },
         {
           "id": "b3",
@@ -163,7 +163,7 @@
         },
         {
           "id": "b4",
-          "say": "If you take one thing from this chapter, take this. Shared vocabulary counts for nothing. Only a shared beginning counts.",
+          "say": "In short. Shared vocabulary counts for nothing. Only a shared beginning counts.",
           "show": "Rows, heading and lines dim to 30%. Centre, on 'Shared vocabulary', 'shared vocabulary: nothing' in grey; on 'a shared beginning', 'shared beginning: everything' in teal beneath it."
         }
       ]
@@ -189,7 +189,7 @@
         {
           "id": "b3",
           "say": "Order matters as much as content. Remember how a prompt is ordered: most shared first, then yours, the conversation, your newest message. This rule is why.",
-          "show": "On 'Order matters', the bar pairs and legend merge into one strip. On 'most shared first', the strip splits into four segments, each labelled on its phrase: 'provider's system prompt'; on 'then yours', 'specific to you'; on 'the conversation', 'conversation'; on 'your newest message', 'newest message'. A grey arrow beneath reads 'most stable → most variable'. On 'This rule is why', a teal sweep runs across the first three segments and stops at 'newest message', which turns amber."
+          "show": "On 'Order matters', the bar pairs and legend merge into one strip. On 'most shared first', the strip splits into four segments, each labelled on its phrase: 'provider's system prompt'; on 'then yours', 'your instructions'; on 'the conversation', 'conversation so far'; on 'your newest message', 'newest message'. A grey arrow beneath reads 'most shared → most specific', the same labels and arrow as the strip in ch03_s07. On 'This rule is why', a teal sweep runs across the first three segments and stops at 'newest message', which turns amber."
         },
         {
           "id": "b4",
@@ -201,9 +201,9 @@
   ],
   "checks": [
     {
-      "claim": "CORRECTION (fig 44): the atlas says 906 of 911 tokens match; per CHAPTER_NOTES Example A the film uses 1,027 of 1,032 so the warm and cold cases describe the same conversation. Hit rate 1,027 / 1,032 = 99.5% (the atlas's 906 / 911 = 99.45% also rounds to 99.5%).",
-      "python": "print(1027/1032*100, 906/911*100)",
-      "result": "99.51550387596899 99.45115257958288"
+      "claim": "CORRECTION (fig 44): the atlas says 906 of 911 tokens match; per CHAPTER_NOTES Example A the film uses 1,027 of 1,032 so the warm and cold cases describe the same conversation. Hit rate 1,027 / 1,032 = 99.5% (the atlas's 906 / 911 = 99.45% also rounds to 99.5%). Framing (s04.b2): ch04's 1,032-token weather prompt is itself the follow-up, so 1,027 of its tokens were cached from the turn before; a follow-up after ch04's 500-token answer would carry at least 1,533 tokens, so it cannot be described as 1,032.",
+      "python": "print(1027/1032*100, 906/911*100, 1032+500+1)",
+      "result": "99.51550387596899 99.45115257958288 1533"
     },
     {
       "claim": "Follow-up prefills 1,032 - 1,027 = 5 new tokens",
@@ -246,9 +246,9 @@
       "result": "1 6 5"
     },
     {
-      "claim": "Layer 1 alone is 1 / 80 = 1.25% of the prefill work (ch14's fig 43), shown as the footnote 'layer 1 alone would survive: 1.25% of the work'",
-      "python": "print(1/80*100, 79/80*100)",
-      "result": "1.25 98.75"
+      "claim": "s03.b5 footnote 'layer 1 stays valid, but saves only ≈ 0.025%', matching ch14_s06.b3: layer 1 is 1/80 = 1.25% of the prefill work, but only its W_K and W_V multiplications (2 x 8,192 x 1,024 of the layer's 855.6 M weights, about 2%) could be skipped, so the saving is 2% of 1.25% = 0.0245%, shown '≈ 0.025%' (ch14 shows 'saved: ≈ 0.025%'). Replaces the earlier footnote 'layer 1 alone would survive: 1.25% of the work', which read as a 1.25% saving.",
+      "python": "p=2*8192*1024/(2*8192*8192+2*8192*1024+3*8192*28672); print(1/80*100, p*100, p/80*100)",
+      "result": "1.25 1.9607843137254901 0.024509803921568627"
     },
     {
       "claim": "Causal mask keeps n(n+1)/2 of n^2 scores, 'the halved score grid' for long prompts (0.571 at 7 tokens, 0.5005 at 1,032)",

@@ -58,8 +58,8 @@
         },
         {
           "id": "b3",
-          "say": "That's where the thirty milliseconds went. Nothing is broken: the workload's shape leaves the chip able only to wait.",
-          "show": "The gauges and the '× 295' bracket fade. In the sidebar at y 620, the thesis bar from ch05 returns, 440 px wide from x 1400 to 1840: a 2 px amber sliver tagged 'arithmetic, under 1%' and the rest coral, with a small stopwatch icon reading '30 ms' above its left end. On 'thirty milliseconds went', a white label writes on over the coral part: 'waiting for weights'. On 'able only to wait', a small hourglass icon settles on the decode dot and the coral tint around it deepens from 10% to 25%."
+          "say": "That's where the ninety-nine percent went. Nothing is broken: the workload's shape leaves the chip able only to wait.",
+          "show": "The gauges and the '× 295' bracket fade. In the sidebar at y 620, the thesis bar from ch05 returns, 440 px wide from x 1400 to 1840: a 2 px amber sliver tagged 'arithmetic, under 1%' and the rest coral, with a small stopwatch icon reading '30 ms' above its left end. On 'ninety-nine percent went', a white label writes on over the coral part: 'waiting for weights'. On 'able only to wait', a small hourglass icon settles on the decode dot and the coral tint around it deepens from 10% to 25%."
         },
         {
           "id": "b4",
@@ -78,8 +78,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Decode's top speed is bandwidth over bytes per token: the thirty-millisecond division, upside down. On our what-if H one hundred, three point three five terabytes a second over a hundred and forty gigabytes: about twenty-four.",
-          "show": "The package draws on, coral particles start along both channels and the ring begins to fill. On 'Decode's top speed', the bus channels brighten while the die stays a dim amber, and blue 'max tokens per second' lands at the left of the equation row. On 'bandwidth over bytes per token', the rest of the equation builds term by term, each landing on its word: white '=', coral 'bandwidth', white '÷', coral 'bytes per token'. On 'thirty-millisecond division', the callout appears in the top-right slot: the stopwatch with '≈ 30 ms per token · H200' and, under it in coral, 'bytes ÷ bandwidth'. On 'upside down', that formula turns over in a half turn to read 'bandwidth ÷ bytes', and a white curved arrow draws from it to the equation's 'bandwidth ÷ bytes per token'. On 'what-if H one hundred', a grey tag writes on under the equation's left end, centred at (400, 270): 'H100: a what-if, needs 2 chips'. On 'three point three five terabytes a second', 'bandwidth' morphs into '3.35 TB/s'; on 'a hundred and forty gigabytes', 'bytes per token' morphs into '140 GB per token'. On 'twenty-four', the result writes on in the white-outlined box at the equation's right, '≈ 24 tokens/s'; blue pills start popping into the tray, one per ring, and the counter runs to '23.9' and holds."
+          "say": "Decode's top speed is bandwidth over bytes per token: the thirty-millisecond division, flipped. On an H one hundred, pretending the model fits, three point three five terabytes a second over a hundred and forty gigabytes: about twenty-four tokens a second.",
+          "show": "The package draws on, coral particles start along both channels and the ring begins to fill. On 'Decode's top speed', the bus channels brighten while the die stays a dim amber, and blue 'max tokens per second' lands at the left of the equation row. On 'bandwidth over bytes per token', the rest of the equation builds term by term, each landing on its word: white '=', coral 'bandwidth', white '÷', coral 'bytes per token'. On 'thirty-millisecond division', the callout appears in the top-right slot: the stopwatch with '≈ 30 ms per token · H200' and, under it in coral, 'bytes ÷ bandwidth'. On 'flipped', that formula turns over in a half turn to read 'bandwidth ÷ bytes', and a white curved arrow draws from it to the equation's 'bandwidth ÷ bytes per token'. On 'pretending the model fits', a grey tag writes on under the equation's left end, centred at (400, 270): 'H100: a what-if, needs 2 chips'. On 'three point three five terabytes a second', 'bandwidth' morphs into '3.35 TB/s'; on 'a hundred and forty gigabytes', 'bytes per token' morphs into '140 GB per token'. On 'twenty-four tokens a second', the result writes on in the white-outlined box at the equation's right, '≈ 24 tokens/s'; blue pills start popping into the tray, one per ring, and the counter runs to '23.9' and holds."
         },
         {
           "id": "b2",
@@ -103,13 +103,13 @@
       "beats": [
         {
           "id": "b1",
-          "say": "There are only three ways past it, one per condition. Raise bandwidth: a different chip. Or shrink the bytes: eight-bit weights give about forty-eight a second.",
-          "show": "On 'only three ways', the header writes on and three card outlines draw. On 'one per condition', a teal line draws from each card up to its chip, and that chip's grey line to its term turns teal: card 1 to 'this chip' and '3.35 TB/s', card 2 to '16-bit weights' and '140 GB', card 3 to 'one token per read' and 'per token'. On 'Raise bandwidth', card 1 fills with its title and sub, and its bars grow in turn: the grey H100 reference, then H200 and B200 in teal, readouts '24/s', '34/s', '57/s'. On 'shrink the bytes', card 1's example dims and card 2 fills; on 'eight-bit', the 200 px coral stack '140 GB' halves to '70 GB', readout '8-bit: ≈ 48/s'; at the end of the beat it halves again to '35 GB', readout '4-bit: ≈ 96/s'."
+          "say": "Only three ways past it, one per condition. Raise bandwidth: a different chip. Or shrink the bytes: eight-bit weights give about forty-eight a second.",
+          "show": "On 'Only three ways', the header writes on and three card outlines draw. On 'one per condition', a teal line draws from each card up to its chip, and that chip's grey line to its term turns teal: card 1 to 'this chip' and '3.35 TB/s', card 2 to '16-bit weights' and '140 GB', card 3 to 'one token per read' and 'per token'. On 'Raise bandwidth', card 1 fills with its title and sub, and its bars grow in turn: the grey H100 reference, then H200 and B200 in teal, readouts '24/s', '34/s', '57/s'. On 'shrink the bytes', card 1's example dims and card 2 fills; on 'eight-bit', the 200 px coral stack '140 GB' halves to '70 GB', readout '8-bit: ≈ 48/s'; at the end of the beat it halves again to '35 GB', readout '4-bit: ≈ 96/s'."
         },
         {
           "id": "b2",
-          "say": "Or amortise each read: ten batched requests make about two hundred and forty a second, counting the weights alone, each still at twenty-four. Or, by a trick for later, one answer gets several tokens per read.",
-          "show": "Card 2's example dims and card 3 fills. On 'ten batched requests', one coral read arrow fans out to ten blue pills in slightly different shades, one per request, and the line '140 GB ÷ 10 = 14 GB per token' writes on. On 'two hundred and forty', a bracket round all ten reads '≈ 240 tokens/s'; on 'counting the weights alone', the small grey tag 'weights only' attaches to it. On 'each still at twenty-four', every pill gets a tiny '24/s'. On 'a trick for later', a separate blue pill appears at the card's right edge with the tag 'several at once · later'; on 'several tokens per read', it splits into three pills of one answer, all fed by a single coral arrow."
+          "say": "Or amortise each read: ten batched requests make about two hundred and forty a second, counting the weights alone, each still at twenty-four. A later trick amortises within one answer: several tokens per read.",
+          "show": "Card 2's example dims and card 3 fills. On 'ten batched requests', one coral read arrow fans out to ten blue pills in slightly different shades, one per request, and the line '140 GB ÷ 10 = 14 GB per token' writes on. On 'two hundred and forty', a bracket round all ten reads '≈ 240 tokens/s'; on 'counting the weights alone', the small grey tag 'weights only' attaches to it. On 'each still at twenty-four', every pill gets a tiny '24/s'. On 'A later trick', a separate blue pill appears at the card's right edge with the tag 'several at once · later'; on 'several tokens per read', it splits into three pills of one answer, all fed by a single coral arrow."
         },
         {
           "id": "b3",
@@ -206,12 +206,12 @@
       "result": "0.14155712841253792 41.791044776119406"
     },
     {
-      "claim": "Decode on H200: 140 GB / 4.8 TB/s = 29.2 ms, the 'thirty milliseconds', shown once in this chapter as s03 b1's stopwatch callout '≈ 30 ms per token · H200' over 'bytes ÷ bandwidth'",
+      "claim": "Decode on H200: 140 GB / 4.8 TB/s = 29.2 ms, the 'thirty milliseconds', spoken once in this chapter, in s03 b1 ('the thirty-millisecond division, flipped', echoed by ch18_s03 b1), with the stopwatch callout '≈ 30 ms per token · H200' over 'bytes ÷ bandwidth'. s02 b3 is on the H100 chart, so it says 'ninety-nine percent', not 'thirty milliseconds': the H100's 295 and 0.34% are never tied to the H200's 30 ms (ch18_s01 b3 makes that distinction)",
       "python": "140e9/4.8e12*1e3",
       "result": "29.166666666666668"
     },
     {
-      "claim": "Hard ceiling on H100: 3.35 TB/s / 140 GB = 23.9, 'about 24 tokens per second'",
+      "claim": "Hard ceiling on H100: 3.35 TB/s / 140 GB = 23.9, said in full as 'about twenty-four tokens a second', paying off ch02_s05 b4's promise and matching ch13_s11 b2",
       "python": "3.35e12/140e9",
       "result": "23.928571428571427"
     },

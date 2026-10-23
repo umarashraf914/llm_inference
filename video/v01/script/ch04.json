@@ -25,13 +25,13 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Press send, and your words cross to a server, maybe an ocean away. The model runs once per token. Is your text re-sent each time, or the answer shipped once finished? Neither.",
+          "say": "Press send, and your words cross to a server, maybe an ocean away. The model runs once per token. Is your text re-sent for every token, or the answer shipped once finished? Neither.",
           "show": "Laptop and data centre fade in with their labels. On 'press send', a send-arrow pulses on the chat window. On 'an ocean away', the wave strip and the cable draw on from left to right. On 'once per token', the server's circular arrow ticks round once with a small grey tag 'one run per token'; the tag fades as the first thumbnail appears. On 're-sent', a ghosted grey thumbnail plays top-left, tag 'guess 1: resend per token': a grey parcel goes up, one pill comes back, a slightly longer parcel goes up, three quick cycles. On 'shipped once finished', a second thumbnail beside it, tag 'guess 2: finish, then send': a page fills inside a tiny server, then one block slides down. On 'Neither', both thumbnails take a grey cross and fade."
         },
         {
           "id": "b2",
-          "say": "One request goes up, once, carrying the prompt. Here, a new example: a weather chat whose whole prompt is one thousand and thirty-two tokens.",
-          "show": "Header above the cable: 'Up: once, at the start'. On 'carrying the prompt', a blue parcel leaves the laptop along the Up lane, labelled 'the whole prompt'. On 'one thousand and thirty-two', a counter on the parcel runs to '1,032 tokens', then a second tag appears under it, '≈ 4 KB', with a small legend under the lane: '1 byte ≈ 1 letter · ≈ 4 per token'. At the end of the beat the parcel is absorbed into the server; its label, tags and the legend fade with it."
+          "say": "One request goes up, once, carrying the prompt. A new example: a weather chat's follow-up, whose whole prompt is one thousand and thirty-two tokens.",
+          "show": "Header above the cable: 'Up: once, at the start'. On 'carrying the prompt', a blue parcel leaves the laptop along the Up lane, labelled 'the whole prompt'. On 'follow-up', the parcel shows its make-up, with no extra labels: a long blue block of earlier conversation and a short brighter block at its tail, the new message. On 'one thousand and thirty-two', a counter on the parcel runs to '1,032 tokens', then a second tag appears under it, '≈ 4 KB', with a small legend under the lane: '1 byte ≈ 1 letter · ≈ 4 per token'. At the end of the beat the parcel is absorbed into the server; its label, tags and the legend fade with it."
         },
         {
           "id": "b3",
@@ -141,8 +141,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Is the network at least busy? Count bytes, about a letter each. One turn sends four kilobytes up, then nothing, and twenty-two kilobytes down.",
-          "show": "Ledger title draws on. On 'Count bytes', a small grey legend appears under it: '1 byte ≈ 1 letter · 1 KB = 1,000 bytes'. Rows build on their words: on 'four kilobytes up', row 'Up, once', tiny grey bar, '≈ 4 KB of prompt'; on 'then nothing', row 'Up, during the answer', empty bar, 'nothing at all'; on 'twenty-two kilobytes down', row 'Down, 500 frames', slightly longer bar, '≈ 22 KB in total', with a sub-tag '≈ 44 bytes each, mostly packaging'. Ledger total underneath: '≈ 26 KB per turn'."
+          "say": "Is the network at least busy? Count bytes, about a letter each. One turn sends at most four kilobytes up, then nothing, and twenty-two kilobytes down.",
+          "show": "Ledger title draws on. On 'Count bytes', a small grey legend appears under it: '1 byte ≈ 1 letter · 1 KB = 1,000 bytes'. Rows build on their words: on 'at most four kilobytes up', row 'Up, once', tiny grey bar, '≤ 4 KB of prompt'; on 'then nothing', row 'Up, during the answer', empty bar, 'nothing at all'; on 'twenty-two kilobytes down', row 'Down, 500 frames', slightly longer bar, '≈ 22 KB in total', with a sub-tag '≈ 44 bytes each, mostly packaging'. Ledger total underneath: '≤ 26 KB per turn'."
         },
         {
           "id": "b2",
@@ -152,7 +152,7 @@
         {
           "id": "b3",
           "say": "On an H two hundred, at four point eight terabytes per second, that is about fifteen seconds, the fifteen you watched.",
-          "show": "On 'H two hundred', a small grey chip tag 'H200' appears on the package. On 'four point eight', the equation continues: '70 TB ÷ 4.8 TB/s ≈ 14.6 s'. On 'the fifteen you watched', the blue bar '15 s, streamed' from the round-trip chart slides in under the ledger; a connector line joins it to '≈ 14.6 s' and both pulse together."
+          "show": "On 'H two hundred', a small grey chip tag 'H200' appears on the package. On 'four point eight', the equation continues: '70 TB ÷ 4.8 TB/s ≈ 14.6 s'. On 'the fifteen you watched', the blue bar 'Streamed, one connection', reading '15 s', from the round-trip chart slides in under the ledger; a connector line joins it to '≈ 14.6 s' and both pulse together."
         },
         {
           "id": "b4",
@@ -177,7 +177,7 @@
         {
           "id": "b2",
           "say": "Second, into the cache: a running record the server keeps of everything it has already processed, the kept work promised earlier.",
-          "show": "The 'the stream: 1 of 3' tag fades. On 'into the cache', arrow 2 extends right to the stack and Sunny's slab drops onto it; label 'cache: a running record', sub-label 'of everything processed so far'. On 'kept work', the stack gives one slow pulse."
+          "show": "The 'the stream: 1 of 3' tag fades. On 'into the cache', arrow 2 extends right to the stack and Sunny's slab drops onto it; label 'cache: a running record', sub-label 'of everything processed so far'. On 'kept work', the stack gives one slow pulse and the sub-label swaps to the small 'kept work' tag with its clock, as on the coral slab stack in ch03_s07.b5."
         },
         {
           "id": "b3",
@@ -206,13 +206,13 @@
       "beats": [
         {
           "id": "b1",
-          "say": "That record untangles two things called re-sending. Within one answer, nothing is re-sent. The server holds the state, the conversation so far, in its cache.",
+          "say": "That record untangles two things called re-sending. Within one answer, nothing is re-sent. The server holds the state, its notes on the conversation so far, in its cache.",
           "show": "Title at the top: 'Two things called re-sending'. Both panels draw on, the right server empty. Left panel: blue frames stream down; the Up lane stays empty, tag '0 up'. On 'in its cache', the left server's coral stack grows one slab per frame. Verdict: 'nothing is re-sent' / 'the server holds the state'."
         },
         {
           "id": "b2",
-          "say": "Between turns, everything is. Your next message is a new request carrying the whole conversation, because the request is all the server gets. Officially, it keeps none of the conversation.",
-          "show": "Right panel: a parcel built from three blue blocks, 'question 1', 'answer 1', 'new', snapping together on 'the whole conversation', slides up the cable. Verdict: 'everything is re-sent'. On 'keeps none of the conversation', a dotted empty outline appears in its server, and a second verdict line: 'the server holds nothing'."
+          "say": "Between turns, everything is. Your next message is a new request carrying the whole conversation, because officially the server is stateless, as you saw.",
+          "show": "Right panel: a parcel built from three blue blocks, 'question 1', 'answer 1', 'new', snapping together on 'the whole conversation', slides up the cable. Verdict: 'everything is re-sent'. On 'stateless', a dotted empty outline appears in its server, and a second verdict line: 'stateless: remembers nothing'."
         },
         {
           "id": "b3",
@@ -221,8 +221,8 @@
         },
         {
           "id": "b4",
-          "say": "Per token, nothing repeats, and it costs nothing. Per turn, everything does, and that costs everything. Almost every misunderstanding here comes from mixing the two.",
-          "show": "The title and the four verdict lines fade. Under the left panel: 'per token: nothing repeats, costs nothing' in grey. Under the right: 'per turn: everything does, costs everything', with 'costs everything' in coral. The panel borders pulse in turn on 'Per token' and 'Per turn'."
+          "say": "Per token, nothing repeats, and it costs nothing. Per turn, everything does, and it all counts again. Almost every misunderstanding here comes from mixing the two.",
+          "show": "The title and the four verdict lines fade. Under the left panel: 'per token: nothing repeats, costs nothing' in grey. Under the right: 'per turn: everything does, all counts again', with 'all counts again' in coral. The panel borders pulse in turn on 'Per token' and 'Per turn'."
         }
       ]
     },
@@ -232,12 +232,12 @@
       "figs": [
         60
       ],
-      "visual": "New composition. A horizontal route of six station cards joined by a path, each with an icon and a short sub-label: 'router' (signpost icon, 'which machine'), 'scheduler' (queue icon, 'batch with others'), 'prefill' (document icon, 'read the prompt in'), 'KV transfer' (hand-off arrows icon, 'hand the notes over'), 'decode' (loop icon, 'one token at a time'), 'screen' (laptop icon, 'streamed to you'). Header: 'One token, end to end'. A single blue token pill travels the path, lighting each card as it is named; a card's sub-label appears as the pill arrives and fades when it moves on, so only one sub-label is ever up. At the end the route dims and the camera tilts down to a large '30 ms' with a stopwatch, the hand-off to the next chapter.",
+      "visual": "New composition. A horizontal route of six station cards joined by a path, each with an icon and a short sub-label: 'router' (signpost icon, 'which machine'), 'scheduler' (queue icon, as on ch03_s02's Scheduler card, 'batch with others'), 'prefill' (document icon, 'read the prompt in'), 'KV transfer' (hand-off arrows icon, 'hand the notes over'), 'decode' (loop icon, 'one token at a time'), 'screen' (laptop icon, 'streamed to you'). Header: 'One token, end to end'. A single blue token pill travels the path, lighting each card as it is named; a card's sub-label appears as the pill arrives and fades when it moves on, so only one sub-label is ever up. At the end the route dims and the camera tilts down to a large '30 ms' with a stopwatch, the hand-off to the next chapter.",
       "beats": [
         {
           "id": "b1",
           "say": "Now one token, end to end: the router and scheduler you met earlier, then prefill, reading your prompt in and making its notes.",
-          "show": "Header, then the six cards draw on left to right, names only. On 'router', the pill enters the first card and 'which machine' appears; on 'scheduler', it moves on, that sub-label fades, 'batch with others' appears and a few grey pills from other users join it; on 'prefill', the third card lights with 'read the prompt in' and a mini coral stack of K/V slabs builds inside it."
+          "show": "Header, then the six cards draw on left to right, names only. On 'router', the pill enters the first card and 'which machine' appears; on 'scheduler', it moves on, that sub-label fades, 'batch with others' appears and a few blue pills in slightly different shades, other people's requests as in ch03_s02, join it; on 'prefill', the third card lights with 'read the prompt in' and a mini coral stack of K/V slabs builds inside it."
         },
         {
           "id": "b2",
@@ -246,7 +246,7 @@
         },
         {
           "id": "b3",
-          "say": "Each box has its own problem and fix; most later videos in this series improve one of these boxes. A map worth returning to.",
+          "say": "Each box has its own problem and fix; most later videos in this series improve one of them. A map worth returning to.",
           "show": "The last sub-label fades and all six cards glow together. Text beneath the route, two lines: 'each box: its own problem, its own fix' / 'every term made precise as we go'. On 'later videos', a bracket over all six cards, tag 'later videos: one box each'. On 'A map', a pin icon drops onto the header."
         },
         {
@@ -262,6 +262,11 @@
       "claim": "1,032-token prompt is about 4 KB: roughly 4 bytes (letters) per token (shown '≈ 4 KB' and '≈ 4 per token')",
       "python": "4000/1032",
       "result": "3.875968992248062"
+    },
+    {
+      "claim": "The 1,032-token weather prompt is the conversation's follow-up (CHAPTER_NOTES Example A, as in ch15/ch16/ch17): 1,027 tokens of history + 5 new = 1,032, a 99.5% hit when warm",
+      "python": "print(1027+5, round(1027/1032*100,1))",
+      "result": "1032 99.5"
     },
     {
       "claim": "Seoul to US west coast round trip vs one token: 130 / 30 = 4.3 times (shown '≈ 4.3 × one token', said 'over four tokens' worth')",
@@ -319,7 +324,7 @@
       "result": "44.0 40.12403100775194"
     },
     {
-      "claim": "Whole turn on the network: 4 KB up + 22 KB down = 26 KB (shown '≈ 26 KB per turn')",
+      "claim": "Whole turn on the network: at most 4 KB up (less where the service stores the system prompt) + 22 KB down = 26 KB (shown '≤ 4 KB of prompt' and '≤ 26 KB per turn')",
       "python": "4e3+22e3",
       "result": "26000.0"
     },

@@ -27,7 +27,7 @@
         },
         {
           "id": "b2",
-          "say": "Each layer's W K is fixed once training ends, the same for every token, position, conversation and user, forever. So the projection really is independent of context.",
+          "say": "Each layer's W K is fixed once training ends, the same for every token, position, conversation and user, forever. So the matrix itself really is independent of context.",
           "show": "On 'each layer's', a deck of 80 faint tiles fans out behind 'W_K' with the grey label '80 layers, one each', then collapses back into one tile. On 'fixed', the white padlock snaps onto the tile. On the list, four small icon tags park around the tile in turn, one word each: a token-pill icon 'token', a map-pin icon 'position', a speech-bubble icon 'conversation', a person icon 'user'. On 'independent of context', the four tags fade together and one grey label settles under the tile: 'same for everyone, forever'."
         },
         {
@@ -148,8 +148,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "The same fact, from the other side. Take bank: the river bank, and the savings bank. Same token, same position, same W K.",
-          "show": "Header fades in. The top row 'the river bank' slides in, then the bottom row 'the savings bank'; the two 'bank' pills line up. Three short tags appear between the rows as spoken: 'same token', 'same position: 3', 'same W_K'."
+          "say": "The same fact, from the other side. Take bank again: the river bank, and the savings bank. Same token, same position, same W K.",
+          "show": "Header fades in. On 'bank again', the two rows return as a callback to the earlier context scene: the top row 'the river bank' slides in, then the bottom row 'the savings bank'; the two 'bank' pills line up. Three short tags appear between the rows as spoken: 'same token', 'same position: 3', 'same W_K'."
         },
         {
           "id": "b2",
@@ -194,7 +194,7 @@
         {
           "id": "b4",
           "say": "So serving systems stick to the prefix rule, right for layers two and up. Layer one's entries are still valid, but one layer in eighty is not worth an exception, or the bookkeeping.",
-          "show": "Top band: on 'prefix rule', starting at 'XX', a grey crack sweeps right through every remaining cache cell, including the teal-ticked bottom cells under 't3' to 't5', and the pills 'XX' to 't5' get amber outlines, labelled 'recompute from here'; the stack under 't1' stays teal. On 'right for layers two and up', the upper cells' grey label 'layers 2–80: invalid' brightens. On 'still valid', the three bottom cells glow teal for a moment beside their brightened label 'layer 1: still valid'; on 'not worth an exception', they fade back to grey and cracked, and the label dims. Everything else dims except the 80-segment bar. Two-line caption: 'observation right, conclusion unchanged' / 'one layer in 80: not worth the bookkeeping'. Grey tag at the right edge: 'next: the prefix rule'."
+          "show": "Top band: on 'prefix rule', starting at 'XX', a grey crack sweeps right through every remaining cache cell, including the teal-ticked bottom cells under 't3' to 't5', and the pills 'XX' to 't5' get amber outlines, labelled 'recompute from here'; the stack under 't1' stays teal. On 'right for layers two and up', the upper cells' grey label 'layers 2–80: invalid' brightens. On 'still valid', the three bottom cells glow teal for a moment beside their brightened label 'layer 1: still valid'; on 'not worth an exception', they fade back to grey and cracked, and the label dims. Everything else dims except the 80-segment bar. Two-line caption: 'observation right, conclusion unchanged' / 'one layer in 80: not worth the bookkeeping'."
         }
       ]
     }

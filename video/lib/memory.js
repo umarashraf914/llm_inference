@@ -723,7 +723,7 @@ function libKVCache(S, o = {}, parent) {
     });
     return t;
   };
-  g.prefix = (k, po = {}) => {
+  g.reuse = (k, po = {}) => {
     const t = gsap.timeline();
     const d = po.d ?? 0.8;
     const from = plan.prefix, to = Math.max(0, Math.min(n, k));

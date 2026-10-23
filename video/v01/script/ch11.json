@@ -34,18 +34,18 @@
         },
         {
           "id": "b3",
-          "say": "A chip has two such stations: memory delivering bytes, arithmetic using them. A workload, any job you hand the chip, is bound by whichever it runs out of first.",
+          "say": "A chip has the two stations you met earlier: memory delivering bytes, arithmetic using them. A workload is bound by whichever it runs out of first.",
           "show": "The laundry shrinks into the top strip over 1.2 s; its text fades and the dryer's white ring stays. On 'memory delivering bytes', the coral 'memory' card rises in at left; on 'arithmetic using them', the amber 'arithmetic' card at right; the pipe draws between them, coral particles stream along it and amber sparks fire at the arithmetic card, both at once on successive chunks. A white label above the pipe at y 420: 'two possible bottlenecks'. On 'whichever it runs out of first', the label swaps to 'bound by: whichever runs out first'."
         },
         {
           "id": "b4",
-          "say": "Memory bound, like decode: the arithmetic idles, waiting for data. Compute bound: the memory has capacity to spare. Both are wasteful, in different ways.",
-          "show": "The pipe label fades. On 'memory bound', the particle stream thins to a trickle, the arithmetic card greys with an hourglass icon, and a coral tag appears under the pipe at y 650: 'memory bound: arithmetic idle'; on 'like decode', a small blue pill 'decode' clips onto that tag. On 'compute bound', the stream turns dense, the unused width of the pipe shows as a dotted outline around the flow, the arithmetic card glows with a gauge at '100%', and the tag swaps, the decode pill leaving with it, to amber 'compute bound: memory spare'. On 'both are wasteful', the tag splits into two at y 760: coral 'memory bound wastes arithmetic' under the memory card, amber 'compute bound wastes bandwidth' under the arithmetic card."
+          "say": "Memory bound, like decode: the arithmetic idles, waiting for data. Compute bound: the memory has bandwidth to spare. Both are wasteful, in different ways.",
+          "show": "The pipe label fades. On 'memory bound', the particle stream thins to a trickle, the arithmetic card greys with an hourglass icon, and a coral tag appears under the pipe at y 650: 'memory bound: arithmetic idle'; on 'like decode', a small blue pill 'decode' clips onto that tag. On 'compute bound', the stream turns dense, the unused width of the pipe shows as a dotted outline around the flow, the arithmetic card glows with a gauge at '100%', and the tag swaps, the decode pill leaving with it, to amber 'compute bound: bandwidth spare'. On 'both are wasteful', the tag splits into two at y 760: coral 'memory bound wastes arithmetic' under the memory card, amber 'compute bound wastes bandwidth' under the arithmetic card."
         },
         {
           "id": "b5",
-          "say": "Nothing is ever bound by both at once, so the picture ahead has two regions.",
-          "show": "The chip band dims to 30%. The two tags slide to the centre at y 640 and shorten into two region labels, coral 'memory bound' left and amber 'compute bound' right, separated by one white vertical divider, with a grey tag above them: 'used constantly · rarely defined'. On 'two regions', a faint coral wash fills a wide panel left of the divider and an amber wash fills it right of the divider, a preview of the chart to come."
+          "say": "Except at one balance point, only one limit binds, so the picture ahead has two regions.",
+          "show": "The chip band dims to 30%. The two tags slide to the centre at y 640 and shorten into two region labels, coral 'memory bound' left and amber 'compute bound' right, separated by one white vertical divider. On 'one balance point', a small white dot pulses on the divider at y 640, the one place both limits meet. On 'only one limit binds', a grey tag lands above the labels: 'one limit at a time'. On 'two regions', a faint coral wash fills a wide panel left of the divider and an amber wash fills it right of the divider, a preview of the chart to come."
         }
       ]
     },
@@ -55,7 +55,7 @@
       "figs": [
         120
       ],
-      "visual": "Top centre (y 150 to 330): a formula card that builds term by term: white 'arithmetic intensity =', then a fraction with amber 'operations performed' over coral 'bytes moved'. Below it, two lanes across x 300 to 1500, the top lane at y 520 and the bottom lane at y 720, each a short pipe from a coral HBM-stack icon at left to an amber chip icon at right, with room for sparks and a tally beside the chip. A byte is a coral cube; an operation is an amber spark. In b3 the lanes fade and a worked fraction fills y 520 to 760. The emphasis colour for the formula is white, not teal. Idea: the same byte can pay for a lot of arithmetic or almost none, and the ratio is known from the shapes before anything runs.",
+      "visual": "Top centre (y 150 to 330): a formula card that builds term by term: white 'arithmetic intensity =', then a fraction with amber 'operations performed' over coral 'bytes moved'. Below it, two lanes across x 300 to 1500, the top lane at y 520 and the bottom lane at y 720, each a short pipe from a coral HBM-stack icon at left to an amber chip icon at right, with room for sparks and a tally beside the chip. A byte is a coral cube; an operation is an amber spark. In b3 the lanes fade and one recall line sits at y 600, a blue pill and a white result pill, with a grey tag under them at y 680: a callback to the last chapter's result, not a new derivation, since the next chapter builds the full decode fraction. The emphasis colour for the formula is white, not teal. Idea: the same byte can pay for a lot of arithmetic or almost none, and the ratio is known from the shapes before anything runs.",
       "beats": [
         {
           "id": "b1",
@@ -69,8 +69,8 @@
         },
         {
           "id": "b3",
-          "say": "Decode's intensity is one, from the shapes alone: two operations per two-byte weight. That ratio is the single most useful number in this story.",
-          "show": "The lanes fade. On 'intensity is one', a blue pill 'decode · one token' appears left of centre, and beside it a worked fraction builds: amber '140 billion ops' over coral '140 billion bytes', then white '= 1 op per byte'. On 'two operations per two-byte weight', a grey tag beneath it: '2 ops per weight ÷ 2 bytes per weight'. On 'single most useful number', the formula card scales up 15% and a white underline sweeps beneath it."
+          "say": "Decode's, as you found, is one: two operations per two-byte weight, from the shapes alone. That ratio is the single most useful number in this story.",
+          "show": "The lanes fade. On 'as you found', a blue pill 'decode · one token' slides in left of centre at y 600, recalled, not rebuilt. On 'is one', a white result pill lands beside it, already complete: '1 op per byte'. On 'two operations per two-byte weight', a grey tag beneath them at y 680: '2 ops per weight ÷ 2 bytes per weight'. On 'from the shapes alone', that tag brightens briefly to white. On 'single most useful number', the formula card scales up 15% and a white underline sweeps beneath it."
         }
       ]
     },
@@ -89,7 +89,7 @@
         },
         {
           "id": "b2",
-          "say": "On a logarithmic scale, each equal step means ten times, not plus ten. So three, thirty and three hundred sit evenly spaced.",
+          "say": "On the logarithmic scale from earlier, each step means ten times, not plus ten. So three, thirty and three hundred sit evenly spaced.",
           "show": "The top chart dims to 40%. The bottom lane draws with its title 'log scale', its ticks dropping in 375 px apart: '1', '10', '100', '1,000', '10,000'. On 'ten times', each gap gains a white tag '× 10'; on 'not plus ten', a grey ghost '+ 10' appears over the first gap and is struck out. On 'three, thirty and three hundred', blue markers drop at 179, 554 and 929 px, labelled '3', '30', '300'; on 'evenly spaced', white brackets show the 3-to-30 and 30-to-300 spans as the same 375 px."
         },
         {
@@ -284,7 +284,7 @@
       "result": "40"
     },
     {
-      "claim": "Decode intensity: (2 x 70e9 operations) / (70e9 x 2 bytes) = 1 operation per byte; 140 billion ops over 140 billion bytes",
+      "claim": "Decode intensity, recalled in s02.b3 from ch10 as '1 op per byte' (ch12 builds the worked fraction on screen): (2 x 70e9 operations) / (70e9 x 2 bytes) = 1 operation per byte; 140 billion ops over 140 billion bytes",
       "python": "(2*70e9)/(70e9*2), 2*70e9/1e9, 70e9*2/1e9",
       "result": "1.0 140.0 140.0"
     },
