@@ -211,6 +211,8 @@ def main():
     ap.add_argument("--step", type=float, default=0.5, help="audit sampling step, seconds")
     a = ap.parse_args()
     film = Path(a.film).resolve()
+    # keep the icon bundle in step with the scene files (cheap, and self-heals concurrent edits)
+    subprocess.run([sys.executable, str(Path(__file__).with_name("build_icons.py"))], capture_output=True)
     timing = json.loads((film / "build" / "timing.json").read_text())
     ids = select(timing, a.scenes)
     if a.mode == "stills":
