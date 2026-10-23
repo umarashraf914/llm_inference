@@ -29,7 +29,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "What fills the coral ninety-nine percent of each token? Start with the chip.",
+          "say": "So what fills the coral ninety-nine percent? Start with the chip.",
           "show": "The 30 ms bar fades up centre on an empty canvas: 1,500 px wide, the 5 px amber sliver labelled 'arithmetic, under 1%', and the coral '?' name tag from the previous chapter fading back onto the coral remainder. No title, no teal arrows. On 'the coral ninety-nine percent', the coral part pulses once and the '?' tag brightens. On 'Start with the chip', the bar shrinks to the top-right corner and parks there, dimmed, still coral with its '?'. The empty top and bottom bands draw in with the faint divider between them."
         },
         {
@@ -49,7 +49,7 @@
         },
         {
           "id": "b5",
-          "say": "The graphics in its name is historical: colouring pixels is the same shape of work. Its weakness is chains, where each step needs the last, like writing one token at a time.",
+          "say": "The graphics in its name is historical: colouring pixels is the same shape of work. Its weakness is chains, each step needing the last, like writing one token at a time.",
           "show": "Queues clear. On 'graphics', the label 'GPU' at the left of the bottom band expands briefly to 'graphics processing unit' and back. On 'colouring pixels', the grid morphs into a monitor icon full of pixels, label '1920 × 1080 ≈ 2 million pixels', every pixel lighting at the same instant, then morphs back into the grid. On 'chains', five blue token pills appear over the bottom band joined by arrows; pill 1 lights, then pill 2 only after pill 1 is done, then 3, 4, 5, while all but one square of the grid sit dark. Grey tags: 'each waits for the last' and, smaller, 'returns later'."
         },
         {
@@ -100,7 +100,7 @@
       "beats": [
         {
           "id": "b1",
-          "say": "What crosses is bits, single yes-or-no signals. A wire carries a voltage, an electrical level. Ten levels could hold a digit, but telling ten apart, billions of times a second, on a warm chip, is far too hard.",
+          "say": "What crosses is bits, single yes-or-no signals, each a voltage on a wire. Ten levels could hold a digit, but telling ten apart, billions of times a second, on a warm chip, is far too hard.",
           "show": "Left half: the trace steps between ten levels; readout above it '7 2 9 4'. On 'a warm chip', a thermometer icon at the top warms from blue to orange and the trace picks up a jitter. The level meant to be 7 sags into the band for 6; the readout's '7' turns grey, is struck through and becomes '6'. It happens again to the 4."
         },
         {
@@ -145,8 +145,8 @@
         },
         {
           "id": "b4",
-          "say": "Memory gets faster mostly by getting wider, and that many wires can't be long, so it sits against the chip. Why it's hard to make faster comes in a few minutes.",
-          "show": "On 'getting wider', the equation brightens again and the word 'wires' in it is underlined in teal. On 'can't be long', the pipes shrink into the bottom-left corner; the GPU package returns at centre with its 'generic GPU' tag, its bus redrawn as thousands of hair-thin lines, and the coral memory blocks slide inward until they nearly touch the amber die. Label 'wide needs short'. On 'hard to make faster', a small grey tag on the equation: 'why it's hard: in a few minutes'."
+          "say": "Memory gets faster mostly by getting wider, and that many wires can't be long, so it sits against the chip. Why it's hard to make faster comes later.",
+          "show": "On 'getting wider', the equation brightens again and the word 'wires' in it is underlined in teal. On 'can't be long', the pipes shrink into the bottom-left corner; the GPU package returns at centre with its 'generic GPU' tag, its bus redrawn as thousands of hair-thin lines, and the coral memory blocks slide inward until they nearly touch the amber die. Label 'wide needs short'. On 'hard to make faster', a small grey tag on the equation: 'why it's hard: later this chapter'."
         }
       ]
     },
@@ -190,8 +190,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Off the chip, every request the chip sends for data makes a trip. How long one takes, from ask to arrive, is latency. Bandwidth is how much travels at once: more wires, more side by side.",
-          "show": "Top lane: on 'sends for data', a small amber chip outline at the left edge emits a blue pill 'ask'; a dashed segment stretches right with a stopwatch counting above it; on 'arrive', a blue pill 'arrive' lands at the right end. Heading 'Latency: how long one request takes'. On 'Bandwidth', the bottom lane draws six parallel coral tracks filled with packets moving at the same pace as the top lane. On 'more wires', the six tracks become twelve and the arrivals counter at the right doubles. Heading 'Bandwidth: how much travels at once'."
+          "say": "Every request the chip sends to memory makes a trip. How long one takes, from ask to arrive, is latency. Bandwidth is how much travels at once.",
+          "show": "Top lane: on 'sends to memory', a small amber chip outline at the left edge emits a blue pill 'ask'; a dashed segment stretches right with a stopwatch counting above it; on 'arrive', a blue pill 'arrive' lands at the right end. Heading 'Latency: how long one request takes'. On 'Bandwidth', the bottom lane draws six parallel coral tracks filled with packets moving at the same pace as the top lane, and an arrivals counter at the right end ticks up six at a time. On 'at once', the six tracks become twelve and the arrivals counter doubles its pace, while the top lane's wait stays exactly as long. Heading 'Bandwidth: how much travels at once'."
         },
         {
           "id": "b2",
@@ -260,8 +260,8 @@
         },
         {
           "id": "b4",
-          "say": "Ours fails the first: a hundred and forty gigabytes won't fit in eighty, so it needs at least two chips. Every number ahead comes off a sheet like this, and telling amount from rate sorts most claims.",
-          "show": "On 'a hundred and forty gigabytes', a coral block '140 GB' drops into the '80 GB' container and overflows its rim. On 'at least two chips', tag '140 ÷ 80 = 1.75 → at least 2 chips' and, smaller, 'splitting: later in the series'. On 'a sheet like this', the rows return to the sheet, which re-forms whole with all four tags lit."
+          "say": "Ours fails the first: a hundred and forty gigabytes won't fit in eighty, so it needs two chips. Every number ahead comes off a sheet like this, and telling amount from rate sorts most claims.",
+          "show": "On 'a hundred and forty gigabytes', a coral block '140 GB' drops into the '80 GB' container and overflows its rim. On 'two chips', tag '140 ÷ 80 = 1.75 → at least 2 chips' and, smaller, 'splitting: later in the series'. On 'a sheet like this', the rows return to the sheet, which re-forms whole with all four tags lit."
         }
       ]
     },
@@ -275,18 +275,18 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Two lines matter most: compute throughput, operations per second, and memory bandwidth, bytes per second from the off-chip memory. A token needs both: fetch the weights, and multiply them.",
+          "say": "Two lines matter most: compute throughput, operations per second, and memory bandwidth, bytes per second from memory. A token needs both: fetch the weights, and multiply them.",
           "show": "The sheet's compute and bandwidth rows grow into the two cards. Left: amber 'Compute throughput', sub-line 'operations per second'. Right: coral 'Memory bandwidth', sub-lines 'bytes per second' and 'off-chip memory → chip'. On 'fetch', a coral arrow runs from the right card into the left; on 'multiply', an amber loop arrow circles on the left card."
         },
         {
           "id": "b2",
-          "say": "Pretend, for now, that the model fits on one H one hundred. Its arithmetic takes about a seventh of a millisecond. Reading the weights, forty-two milliseconds.",
+          "say": "Pretend the model fits on one H one hundred. Its arithmetic takes about a seventh of a millisecond. Reading the weights, forty-two milliseconds.",
           "show": "On 'Pretend', grey tag 'one token · H100 · if it fitted'. A time axis from 0 to 45 ms draws under the cards. On 'a seventh of a millisecond', the amber lane appears: '140 billion ops ÷ 989 trillion/s ≈ 0.14 ms', its bar a sliver at the far left. On 'Reading the weights', the coral lane grows from the left to almost the full width: '140 GB ÷ 3.35 TB/s ≈ 41.8 ms'. A small coral tag rides on it: 'moving the weights', the same name as the coral bar from earlier."
         },
         {
           "id": "b3",
-          "say": "The two overlap: while one slice of weights is multiplied, the next is on its way. Whichever is slower sets the pace, and the other sits idle; here, the arithmetic. Forty-two milliseconds, not an average of twenty-one.",
-          "show": "On 'one slice of weights is multiplied', the coral lane splits into slices, each labelled faintly as a block of weight tiles, and the amber work redistributes as a tiny amber tick under the end of each slice, ticks and slices advancing together. On 'Whichever is slower sets the pace', a white vertical marker 'token done ≈ 42 ms' drops at the end of the coral lane, and a small grey tag between the cards reads 'slower one sets the pace'. On 'the other sits idle; here, the arithmetic', the amber card greys out with a small hourglass icon and tag 'idle, waiting'. On 'not an average', a dashed ghost marker at '≈ 21 ms · average' appears at 630 px, then a grey strike-through crosses it out."
+          "say": "They overlap: while one slice of weights is multiplied, the next is on its way. The slower one sets the pace and leaves the other idle, here the arithmetic. Forty-two milliseconds, not an average of twenty-one.",
+          "show": "On 'one slice of weights is multiplied', the coral lane splits into slices, each drawn faintly as a block of weight tiles, and the amber work redistributes as a tiny amber tick under the end of each slice, ticks and slices advancing together. On 'The slower one sets the pace', a white vertical marker 'token done ≈ 42 ms' drops at the end of the coral lane, and a small grey tag between the cards reads 'slower one sets the pace'. On 'leaves the other idle, here the arithmetic', the amber card greys out with a small hourglass icon and tag 'idle, waiting'. On 'not an average', a dashed ghost marker at '≈ 21 ms · average' appears at 630 px, then a grey strike-through crosses it out."
         },
         {
           "id": "b4",
@@ -310,7 +310,7 @@
         },
         {
           "id": "b2",
-          "say": "Bandwidth is a product of three. The memory comes in stacks, towers of memory layers, wired to the chip through pins: rate per pin, times pins per stack, times stacks.",
+          "say": "Bandwidth is a product of three. The memory comes in stacks, towers of layers, wired to the chip through pins: rate per pin, times pins per stack, times stacks.",
           "show": "The compute tag dims. Right edge: the package zooms in and its grey 'generic GPU' tag changes to the blue label 'H100 · 80 GB'; coral towers of thin layers sit around the amber die, one site grey. A pointer labels one tower 'stack'; grey tag 'H100: 5 active stacks'. On 'pins', a close-up shows a dense field of fine connections under one stack. On 'rate per pin, times pins per stack, times stacks', the three coral cards build left to right with '×' between them."
         },
         {
@@ -340,8 +340,8 @@
       "beats": [
         {
           "id": "b1",
-          "say": "Measured on top-tier server G P Us from twenty twelve to twenty twenty-two, on a log axis where each step multiplies, compute rose about eighty times.",
-          "show": "Axes draw on. Horizontal labels '2012' and '2022'. On 'log axis', horizontal gridlines at '1×', '10×' and '100×' on the vertical axis, 300 px apart, land and a small note appears: 'each step up: ×10'. A white dot sits at '2012, 1×' and splits into an amber and a coral dot. On 'eighty times', the amber line rises steadily to the top-right, label 'compute, ×80'."
+          "say": "Across one decade of top-tier server G P Us, on a log axis where each step multiplies, compute rose about eighty times.",
+          "show": "Axes draw on. On 'one decade', horizontal-axis labels '2012' and '2022' land at its two ends. On 'log axis', horizontal gridlines at '1×', '10×' and '100×' on the vertical axis, 300 px apart, land and a small note appears: 'each step up: ×10'. A white dot sits at '2012, 1×' and splits into an amber and a coral dot. On 'eighty times', the amber line rises steadily to the top-right, label 'compute, ×80'."
         },
         {
           "id": "b2",
