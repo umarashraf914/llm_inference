@@ -9,7 +9,7 @@ Writes, under video/v01/build/:
   timing.json           order of scenes (title cards included), durations, beat and word times
 Synthesis is cached per sentence in build/tts_cache, so re-running after an edit only redoes what changed.
 """
-import hashlib, json, math, re, sys, wave
+import os, hashlib, json, math, re, sys, wave
 from pathlib import Path
 
 import numpy as np
@@ -155,7 +155,9 @@ def main(argv):
         timing["scenes"][sid]["globalStart"] = round(t, 3)
         t += timing["scenes"][sid]["duration"]
     timing["total"] = round(t, 3)
-    tpath.write_text(json.dumps(timing, indent=1))
+    tmp = tpath.with_suffix(".json.tmp")          # atomic: renderers may be reading it
+    tmp.write_text(json.dumps(timing, indent=1))
+    os.replace(tmp, tpath)
     print(f"total {t/60:.1f} min across {len(timing['order'])} scenes -> {tpath}")
 
 

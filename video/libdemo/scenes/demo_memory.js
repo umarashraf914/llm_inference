@@ -56,12 +56,12 @@ V.scene('demo_memory', S => {
 
   // ---------------------------------------------------------------- b4: bytes moving
   const p4 = S.g();
-  const bus = libByteStream(S, { x1: 560, y1: 380, x2: 1120, rate: '0.00 TB/s', rateSub: 'bandwidth', meter: true,
+  const bus = libByteStream(S, { x1: 520, y1: 380, x2: 1070, rate: '0.00 TB/s', rateSub: 'bandwidth', meter: true,
     source: { w: 180, h: 180, sub: '140 GB' }, sink: { w: 170, h: 170 } }, p4);
-  const bucket = libMemoryBar(S, { vertical: true, x: 1560, y: 330, w: 130, h: 480, capacity: 150, capLabel: false, free: false, title: 'in 30 ms',
+  const bucket = libMemoryBar(S, { vertical: true, x: 1500, y: 330, w: 130, h: 480, capacity: 150, capLabel: false, free: false, title: 'in 30 ms',
     segments: [{ id: 'fill', name: '', gb: 0, dec: 1 }] }, p4);
-  const pour = libByteStream(S, { x1: 1625, y1: 150, x2: 1625, y2: 318, width: 44, source: false, sink: false, rate: '3.35 TB/s', rateSide: 'left', rateSize: 30 }, p4);
-  const laptop = libByteStream(S, { x1: 520, y1: 760, x2: 1120, width: 12, rate: '≈ 0 GB/s', rateSize: 30,
+  const pour = libByteStream(S, { x1: 1565, y1: 150, x2: 1565, y2: 318, width: 44, source: false, sink: false, rate: '3.35 TB/s', rateSide: 'left', rateSize: 30 }, p4);
+  const laptop = libByteStream(S, { x1: 480, y1: 760, x2: 1070, width: 12, rate: '≈ 0 GB/s', rateSize: 30,
     source: { w: 150, h: 120, label: 'laptop', sub: 'memory', layers: 4, size: 28 }, sink: { w: 120, h: 120 } }, p4);
   S.add(fx.in(p4, { from: 'fade', d: 0.4 }), 'b4-0.3');
   S.add(bus.countRate(4.8, { d: 0.9 }), 'b4');

@@ -118,7 +118,26 @@ var _libMem = (function () {
     t.width = () => sp.reduce((a, n) => a + S.measure(n.textContent, { size, weight, family: n.getAttribute('font-family') ? 'mono' : 'sans' }), 0);
     return t;
   }
-  return { GRAD, DARK, BASE, GREY, mix, solid, card, rr, hatch, num, decFor, sel, drive, setAttr, setVis, crack, vlabel, id: p => `${p}-${++uid}` };
+  /** '140 GB' → [{t: '140', f: 'mono'}, {t: ' GB'}]: an amount's number in mono, its unit in sans; else null */
+  function amountParts(text) {
+    const m = String(text).match(/^([≈~+\-−]?\s*[\d.,]+)(\s+\S.*)?$/);
+    return m ? [{ t: m[1], f: 'mono' }, { t: m[2] || '' }] : null;
+  }
+  /** an <text> for a label that may be an amount; returns it with .set(text) and .width() */
+  function amountText(S, text, o, p) {
+    const parts = o.family === 'mono' ? amountParts(text) : null;
+    const t = S.text(parts || String(text), { ...o, family: parts ? 'sans' : o.family }, p);
+    const fam = n => (n.getAttribute && n.getAttribute('font-family') ? 'mono' : (parts ? 'sans' : o.family || 'sans'));
+    t.set = str => {
+      const q = parts ? amountParts(str) : null;
+      if (q && t.childNodes.length === 2) { t.childNodes[0].textContent = q[0].t; t.childNodes[1].textContent = q[1].t; }
+      else t.textContent = str;
+    };
+    t.width = () => (t.childNodes.length > 1 ? [...t.childNodes].reduce((a, n) => a + S.measure(n.textContent, { size: o.size, weight: o.weight, family: fam(n) }), 0)
+      : S.measure(t.textContent, { size: o.size, weight: o.weight, family: parts ? 'mono' : o.family }));
+    return t;
+  }
+  return { GRAD, DARK, BASE, GREY, mix, solid, card, rr, hatch, num, decFor, sel, drive, setAttr, setVis, crack, vlabel, amountText, id: p => `${p}-${++uid}` };
 })();
 
 
@@ -189,7 +208,7 @@ function libMemBlock(S, o = {}, parent) {
   // amounts ('140 GB') in mono, names ('memory') in sans
   const fam = o.family || (style !== 'card' && label != null && /^[≈~+\-−]?\s*[\d.,]/.test(String(label)) ? 'mono' : 'sans');
   const ty = outside ? y + h + 34 : y + h / 2 - (o.sub ? subSize * 0.62 : 0);
-  if (label != null) g.labelEl = S.text(label, { x: x + w / 2, y: ty, size, weight: 650, anchor: 'middle', color: outside ? c : inkMain, family: fam }, g);
+  if (label != null) g.labelEl = M.amountText(S, label, { x: x + w / 2, y: ty, size, weight: 650, anchor: 'middle', color: outside ? c : inkMain, family: fam }, g);
   if (o.sub) g.subEl = S.text(o.sub, { x: x + w / 2, y: outside ? ty + size * 0.98 : y + h / 2 + size * 0.58, size: subSize, weight: 500, anchor: 'middle', color: outside ? 'muted' : inkSub, family: style === 'card' ? 'mono' : 'sans' }, g);
   Object.assign(g, { x, y, w, h, l: x, r: x + w, t: y, b: y + h, cx: x + w / 2, cy: y + h / 2, gb: gb0, tone, style });
 
@@ -208,8 +227,8 @@ function libMemBlock(S, o = {}, parent) {
       if (lines) lines.setAttribute('d', layerPath(nx, ny, nw, nh));
       if (g.labelEl) {
         const L = g.labelEl;
-        L.textContent = f(v);
-        const tw = S.measure(L.textContent, { size: L.__size, weight: 650, family: fam });
+        L.set(f(v));
+        const tw = L.width();
         const fits = outside || (axis === 'x' ? nw >= tw + 28 : nh >= (o.sub ? size * 2.3 : size * 1.4) && nw >= tw + 20);
         if (outside) { L.setAttribute('x', nx + nw / 2); L.setAttribute('y', ny + nh + 34); }
         else if (fits) { L.setAttribute('x', nx + nw / 2); L.setAttribute('y', ny + nh / 2 - (o.sub ? subSize * 0.62 : 0)); L.setAttribute('text-anchor', 'middle'); L.setAttribute('fill', S.tone(inkMain)); }
@@ -587,7 +606,7 @@ function libKVCache(S, o = {}, parent) {
   const ri = Math.min(2, r);
   const sgap = Math.max(2, Math.round(Math.min(cw * 0.06, 4)));
   const hw = (cw - sgap) / 2;
-  const letters = o.letters ?? (hw >= 22 && ch >= 34);
+  const letters = o.letters ?? (hw >= 26 && ch >= 40);
   const lsz = Math.min(30, Math.max(24, Math.round(Math.min(hw, ch) * 0.8)));
   const shadeAmt = o.shade ?? 0;
   const rnd = S.rand(7919 + n * 31 + NL);
@@ -697,7 +716,7 @@ function libKVCache(S, o = {}, parent) {
   const faceEl = (c, t) => (t ? tintFace(c, t) : c.base);
   const inv = c => c.invEl || (c.invEl = (() => {
     const e = face(c, 'invalid', c.over);
-    S.rect({ x: c.x - 3, y: c.y - 3, w: cw + 6, h: ch + 6, r: r + 2, stroke: M.GREY.edge, sw: 2, dash: '5 4' }, e);
+    if (ch >= 30 && cw >= 30) S.rect({ x: c.x - 3, y: c.y - 3, w: cw + 6, h: ch + 6, r: r + 2, stroke: M.GREY.edge, sw: 2, dash: '5 4' }, e);
     e.crack = S.path({ d: M.crack(c.x, c.y, cw, ch), stroke: M.DARK, sw: Math.max(2, Math.min(3.5, cw / 18)) }, e);
     e.crack.setAttribute('data-audit', 'ignore');
     gsap.set(e, { autoAlpha: 0 });
@@ -1103,12 +1122,12 @@ function libByteStream(S, o = {}, parent) {
     const text = po.label ?? `${M.num(amount)} ${unit}`;
     const tsz = po.size ?? Math.min(30, Math.max(24, Math.round(ph * 0.6)));
     const tw = text ? S.measure(text, { size: tsz, weight: 700, family: 'mono' }) : 0;
-    if (text && slices === 0 && horiz && tw + 22 <= plen && ph >= 30) pk.labelEl = S.text(text, { x: 0, y: 1, size: tsz, weight: 700, family: 'mono', anchor: 'middle', color: M.DARK }, pk);
+    if (text && slices === 0 && horiz && tw + 22 <= plen && ph >= 30) pk.labelEl = M.amountText(S, text, { x: 0, y: 1, size: tsz, weight: 700, family: 'mono', anchor: 'middle', color: M.DARK }, pk);
     else if (text) {
       // too thin (or sideways) for text inside: it rides beside the packet
       const off = W / 2 + 26;
-      pk.labelEl = horiz ? S.text(text, { x: 0, y: -(off + 4), size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'middle', color: tone }, pk)
-        : S.text(text, { x: off, y: 0, size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'start', color: tone }, pk);
+      pk.labelEl = horiz ? M.amountText(S, text, { x: 0, y: -(off + 4), size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'middle', color: tone }, pk)
+        : M.amountText(S, text, { x: off, y: 0, size: Math.max(24, tsz), weight: 700, family: 'mono', anchor: 'start', color: tone }, pk);
     }
     gsap.set(pk, { autoAlpha: 0 });
     const s0 = -plen / 2 - 4, s1 = len + plen / 2 + 4;
