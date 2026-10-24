@@ -92,10 +92,20 @@ def ensure_packages(reqs, tag):
 
 
 def fetch(url, dst=None):
-    """Download url (to dst, with progress, or into memory)."""
-    import ssl, urllib.request, certifi
-    ctx = ssl.create_default_context(cafile=certifi.where())
-    with urllib.request.urlopen(url, context=ctx) as r:
+    """Download url (to dst, with progress, or into memory). Trusts the system's certificates first (they include
+    any proxy's), then certifi's (python.org builds on macOS ship without a store)."""
+    import ssl, urllib.error, urllib.request, certifi
+    try:
+        return _fetch(url, dst, ssl.create_default_context())
+    except urllib.error.URLError as e:
+        if not isinstance(e.reason, ssl.SSLCertVerificationError):
+            raise
+        return _fetch(url, dst, ssl.create_default_context(cafile=certifi.where()))
+
+
+def _fetch(url, dst, ctx):
+    import urllib.request
+    with urllib.request.urlopen(url, context=ctx, timeout=60) as r:
         size, got, buf = int(r.headers.get("Content-Length") or 0), 0, io.BytesIO()
         out = open(dst, "wb") if dst else buf
         try:
@@ -260,3 +270,6 @@ if __name__ == "__main__":
     except subprocess.CalledProcessError as e:
         sys.exit(f"\nA step failed (exit code {e.returncode}). Fix what it reports and run the same command again; "
                  f"finished work is kept.")
+    except OSError as e:            # includes urllib's URLError
+        sys.exit(f"\nA download or file operation failed: {e}. Check the internet connection and disk, then run the "
+                 f"same command again; finished work is kept.")

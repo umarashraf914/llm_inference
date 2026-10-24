@@ -147,7 +147,9 @@ def main():
         cmd += ["-filter_complex", "[1:a]highpass=f=60,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[n]", "-map", "0:v", "-map", "[n]", "-map", "2:s",
                 "-metadata:s:a:0", "language=eng"]
     cmd += ["-map_metadata", "3", "-map_chapters", "3", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
-            "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-movflags", "+faststart", "-shortest", str(final)]
+            "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-movflags", "+faststart", str(final)]
+    # (no -shortest: it counts the subtitle track, which ends at the last word, and so cut the film's final second;
+    #  amix duration=first already ends the mixed track with the narration, which is exactly as long as the picture)
     subprocess.run(cmd, check=True)
     size = final.stat().st_size / 1e6
     print(f"{final}  {timing['total']/60:.1f} min  {size:.0f} MB  {len(cues)} subtitle cues  {len(starts)} chapters")
