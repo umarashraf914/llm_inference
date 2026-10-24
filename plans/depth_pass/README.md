@@ -1,7 +1,48 @@
 # Depth pass: plan for all nine atlases
 
 Reviewed 2026-10-24. One reviewer per atlas read the whole atlas against its whole transcript and
-wrote the file for that atlas here. No atlas has been changed by this plan yet.
+wrote the file for that atlas here. The pass was built the same day; the outcome comes first below,
+and the plan follows as it was approved.
+
+## Outcome
+
+| Atlas | Before | After | Widgets |
+|---|---|---|---|
+| V1 The Memory Wall | 147 | 179 | 8 |
+| V2 Inside the GPU | 100 | 123 | 4 |
+| V3 Kernels and Memory | 100 | 129 | 3 |
+| V4 Quantization | 83 | 118 | 6 |
+| V5 Parallelism | 25 | 68 | 6 |
+| V6 Mixture of Experts | 23 | 70 | 5 |
+| V7 Serving in Production | 26 | 101 | 10 |
+| V8 Speculative Decoding and Long Context | 32 | 101 | 4 |
+| V9 The Whole Stack | 15 | 50 | 4 |
+| **Series** | **551** | **939** | **50** |
+
+- Every proposal in the nine reviews was built, or replaced by a link where an earlier atlas
+  already teaches it, and every problem they list was fixed. The decisions below were taken as
+  recommended: V1's prompt-cache figures now follow the KV cache (Parts 12–14), prerequisites
+  are recapped with links, and widgets sit inline.
+- The foundations each sit in the earliest atlas that uses them: place value, unit prefixes,
+  kilo against kibi, the dot product, softmax, heads and the feed-forward block in V1; matrix ×
+  matrix and a float decoded by hand in V2. Later atlases link to them by permanent id.
+- Every number was recomputed in the scripts under `figures/V0N/src/`, and every script
+  reproduces its figures exactly. Where a review's number was wrong, the builders' commits say so.
+- Checks at the end: `check_atlas.py` clean on all nine; every widget driven through every control
+  with no script error, and its Reset restoring what is visible; the widget tests kept in V2, V4,
+  V6, V7 (Parts 1–5) and V9 matching Python at every setting.
+
+Left out for want of a source the builder could read, so drawn schematic or not stated: the NCCL
+per-step toll (V5), B300 and MI355X figures (V5), the H200's stack count and the InfiniBand lane
+breakdown (V2), the source of V1's "quoted" 80× and 17× growth figures, and DeepSeek V4's size
+(V1). Two proposals became links instead of figures: V2's place value points to V1's, and V4's
+entry 31 to V3 Fig 117, which draws the same bars. V2's BF16 sum that stops at 256 (p31) is a
+static figure rather than the widget proposed.
+
+Worth doing next:
+- V3 after 16:00 is still the thinnest stretch, at 1.9 figures a minute against 4.1 before it.
+- V1, V3, V5, V8 and V7 Parts 6–11 were tested by scripts the builders did not keep. A widget
+  test in each `src/`, like V2's `test_widgets.py`, would let a later edit be checked the same way.
 
 ## The standard
 
@@ -15,7 +56,7 @@ logarithms, linear functions and their graphs, coordinates, e^x, averages, basic
 basic geometry. Anything above it is built before it is used, or recapped with a link to the atlas
 that builds it.
 
-## Where each atlas stands
+## Where each atlas stood before the pass
 
 | Atlas | Video | Figures now | Per minute | New figures | Merged or cut | After the pass | Widgets |
 |---|---|---|---|---|---|---|---|
