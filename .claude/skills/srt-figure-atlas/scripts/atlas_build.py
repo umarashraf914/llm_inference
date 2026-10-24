@@ -35,6 +35,7 @@ NAME = re.compile(r"[a-z][a-z0-9_-]*$")
 WIDGET_CSS = """
 /* widgets */
 :where(svg text){fill:var(--ink)}
+svg text.halo{paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round}
 .wg{margin:0 0 4px;padding:16px 18px 6px;border:1px solid var(--rule);border-radius:10px}
 .wg .ctl{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 10px;font-size:13px;color:var(--muted)}
 .wg label{display:flex;align-items:center;gap:10px;flex:1 1 340px}

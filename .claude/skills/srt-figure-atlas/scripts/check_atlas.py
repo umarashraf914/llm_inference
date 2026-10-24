@@ -258,8 +258,11 @@ def source_checks(f, src):
         texts = [html.unescape(re.sub(r"<[^>]+>", "", x)) for x in re.findall(r"<text[^>]*>(.*?)</text>", fg, re.S)]
         for a, b in zip(texts, texts[1:]):
             if a and b and a[-1].isalpha() and b[0].isalpha() and b[0].islower():
-                wa = re.findall(r"[A-Za-z'-]+$", a)[0]
-                wb = re.findall(r"^[A-Za-z'-]+", b)[0]
+                wa = re.findall(r"[A-Za-z'-]+$", a)
+                wb = re.findall(r"^[A-Za-z'-]+", b)
+                if not wa or not wb:              # Greek and other non-Latin letters: not a split
+                    continue
+                wa, wb = wa[0], wb[0]
                 if words.get((wa + wb).lower(), 0) >= 2 and min(words.get(wa.lower(), 0), words.get(wb.lower(), 0)) <= 2:
                     out.append(f'  [split-word] fig {no}: "{a[-24:]}" | "{b[:24]}"')
     ids = re.findall(r"\sid=['\"]([^'\"]+)['\"]", src)
