@@ -13,6 +13,9 @@
   numbering   figure numbers not running 1, 2, 3 …
   ids         an id used twice
 
+Elements hidden on arrival (display:none, visibility:hidden) are skipped: a widget's other states are
+checked by driving the widget, not here.
+
 An atlas built from figures/V0N/ is fixed at its source: --fix writes into the items and rebuilds.
 
 Deliberately allowed (do not "fix" these):
@@ -224,6 +227,13 @@ FIGNO = """() => { window.__fn = (svg, i) => { const f = svg.closest('figure');
   const ts = f && f.querySelector('.ts'); const m = ts && ts.textContent.match(/Fig\\s+(\\d+)/);
   return m ? m[1] : '#' + (i + 1); }; }"""
 
+# A widget's other states sit in the page hidden. Measure only what the reader sees on arrival: the
+# widget's own test drives the other states. Runs after --fix has written, so nothing is lost.
+HIDDEN = """() => document.querySelectorAll('svg[viewBox] *').forEach(e => {
+  if (!e.isConnected) return;
+  const cs = getComputedStyle(e);
+  if (cs.display === 'none' || cs.visibility === 'hidden') e.remove(); })"""
+
 SVGS = """() => [...document.querySelectorAll('svg[viewBox]')].map(s =>
   [s.closest('figure') ? s.closest('figure').id : '', s.outerHTML])"""
 
@@ -313,6 +323,7 @@ def main():
                     write_fix(f, before, r["html"])
                     pg.goto(f"file://{os.path.abspath(f)}"); pg.wait_for_timeout(800)
                     pg.evaluate(FIGNO)
+            pg.evaluate(HIDDEN)
             found = source_checks(f, open(f, encoding="utf-8").read())
             for label, js, arg in [("bounds", BOUNDS, None), ("collisions", COLLIDE, None),
                                    ("padding", PAD, True), ("alignment", ALIGN, None),

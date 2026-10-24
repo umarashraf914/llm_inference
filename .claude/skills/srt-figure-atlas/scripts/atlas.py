@@ -111,7 +111,7 @@ def stamp(srt, phrase):
 
 def brace(x1, x2, y, label):
     return (ln(x1, y, x2, y, "tick") + ln(x1, y, x1, y + 6, "tick") + ln(x2, y, x2, y + 6, "tick")
-            + txt((x1 + x2) / 2, y + 22, label, "cap", "middle"))
+            + txt((x1 + x2) / 2, y + 22, label, "sub2", "middle"))
 
 
 CSS = """
