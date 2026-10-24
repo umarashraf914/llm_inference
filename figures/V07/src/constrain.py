@@ -439,7 +439,7 @@ def b70():
     assert [round(100 * v, 2) for v in after] == [0.0, 97.22, 2.66, 0.12]
     b = [hd(40, 46, "What a mask buys, exactly")]
     b.append(box(40, 66, 285, 60, "s", "The output will parse", "guaranteed"))
-    b.append(box(355, 66, 285, 60, "h", "Nothing about it is true", "not guaranteed at all"))
+    b.append(box(355, 66, 285, 60, "h", "That it is true", "not guaranteed at all"))
     b.append(hd(40, 166, "Suppose the format forbids cat, the model's favourite"))
     b.append(txt(170, 188, "the model's shares", "sub2")); b.append(txt(400, 188, "after the mask", "sub2"))
     for i, ((nm, _), p0, p1) in enumerate(zip(CONF, before, after)):

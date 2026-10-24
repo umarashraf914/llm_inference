@@ -130,7 +130,8 @@ r4 = resolve(4)
 assert [ok for _, _, ok in r4[3]] == [False, True, True, True, False] and round(r4[4], 2) == 0.55
 assert [round(a, 3) for a in r4[5] if a is not None] == [0.545, 0.364, 0.091]
 assert round(.30 / .20, 2) == 1.5 and round(.30 / .05, 2) == 6.0
-assert all(ok for _, _, ok in resolve(14)[3]) and all(ok for _, _, ok in resolve(22)[3])   # free text: no help
+assert all(ok for _, _, ok in resolve(14)[3]) and all(ok for _, _, ok in resolve(30)[3])   # free text: no help
+assert TOKENS[4] == "edit" and TOKENS[14] == "parser" and TOKENS[30] == " +"     # tokens 5, 15, 31 in the prose
 VOCAB = 163840                                            # Kimi K2's vocabulary (config.json)
 
 
@@ -359,7 +360,7 @@ def n27w():
         "candidates and their probabilities are illustrative; whether each one survives is computed by "
         "checking the text so far, plus that token, against the format.",
         "Watch token 5, the tool's name: the model's favourite, pytest, is not a listed tool, so it goes, "
-        "and edit wins. Watch tokens 15 and 22: inside a free string every candidate survives, so the "
+        "and edit wins. Watch tokens 15 and 31: inside a free string every candidate survives, so the "
         "format cannot stop a wrong file name or a wrong fix. The arithmetic was checked against Python "
         "at every step.",
     ])

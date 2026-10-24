@@ -104,11 +104,12 @@ def o055():
     curves = [("pl-m", lambda B: 4 * B, "weights only"), ("pl-h", lambda B: intensity(B, 0.5), "16-bit cache"),
               ("pl-s", lambda B: intensity(B, 0.5, 0.25), "4-bit cache")]
     for cls, fn, lab in curves:
-        pts = [(X(B), Y(fn(B))) for B in Bs if fn(B) <= 1000]
+        pts = [(X(B), Y(fn(B))) for B in Bs if fn(B) <= 400]
         b.append(poly(pts, cls, dash="5 4" if cls == "pl-m" else None))
     b.append(text(X(64) - 8, Y(4 * 64) - 10, "weights alone: ridge at batch 74", "sub2 halo", "end"))
-    b.append(text(X(4096), Y(intensity(4096, 0.5, 0.25)) - 10, "4-bit cache: ridge at batch 200",
+    b.append(text(X(4096), Y(intensity(4096, 0.5, 0.25)) - 12, "4-bit cache: ridge at batch 200",
                   "sub2 halo", "end"))
+    assert X(4096) - 6 * 31 > X(400 / 4) + 10           # the label starts right of where the dashed line ends
     b.append(text(X(4096), Y(intensity(4096, 0.5)) + 18, "16-bit cache: stops near 112", "sub2 halo", "end"))
     body, y = prose(370, [
         "{{fig:v01-o116}} worked decode's intensity from the weights alone: at batch B it is B "

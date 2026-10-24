@@ -17,6 +17,8 @@ import fp8
 from common import *  # noqa: F401,F403
 
 BPX = 36                                             # pixels per bit, as in o024
+SUP = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
+sup = lambda e: str(e).translate(SUP)
 
 
 def bits(x0, y, fields):
@@ -64,17 +66,17 @@ def p22():
     for name, vals, y in (("E4M3", fp8.E4M3_POS, 80), ("E5M2", fp8.E5M2_POS, 150)):
         b.append(txt(40, y - 10, name, "cap"))
         for v in vals:
-            b.append(tline(L(v), y, L(v), y + 26))
+            b.append(tline(L(v), y, L(v), y + 22))
     ya = 210
     b.append(tline(X0, ya, X1, ya, "axis"))
     for e in range(-16, 17, 4):
         x = L(2.0 ** e)
         b.append(tline(x, ya, x, ya + 5))
-        b.append(txt(x, ya + 20, f"2^{e}" if e else "1", "sub2", "middle"))
-    b.append(txt(L(2.0 ** -9), 72 + 46, "2⁻⁹, the smallest", "sub2", "middle"))
-    b.append(txt(L(448), 72 + 46, "448", "sub2", "middle"))
-    b.append(txt(L(57344), 142 + 46, "57,344", "sub2", "end"))
-    b.append(txt(L(2.0 ** -16), 142 + 46, "2⁻¹⁶", "sub2", "middle"))
+        b.append(txt(x, ya + 20, ("2" + sup(e)) if e else "1", "sub2", "middle"))
+    b.append(txt(L(2.0 ** -9), 122, "2⁻⁹, the smallest", "sub2", "middle"))
+    b.append(txt(L(448), 122, "448", "sub2", "middle"))
+    b.append(txt(L(57344), 192, "57,344", "sub2", "end"))
+    b.append(txt(L(2.0 ** -16), 192, "2⁻¹⁶", "sub2", "middle"))
     body, yb = prose(ya + 56, [
         f"Each tick is one value. Within every doubling, from 1 to 2 or from 64 to 128, E4M3 has the same "
         f"{per_doubling} values, because its three fraction bits split each doubling into eight equal steps. "
@@ -245,22 +247,26 @@ def p25():
     after = np.mean([e[1] for e in errs])
     assert round(100 * before, 1) == 3.8 and round(100 * after, 2) == 0.57 and 6 < before / after < 7
     Q, K = fp8.outlier_case(0)
-    prod = Q[0] * K[1]
-    prod_r = (Q[0] @ M) * (K[1] @ M)
-    assert abs(prod.sum() - prod_r.sum()) < 1e-9
-    b = [hd(40, 46, "The 128 products inside one score, before and after the rotation")]
-    for k, (title, pr, y0) in enumerate((("before: two channels carry the score", prod, 70),
-                                          ("after: 128 comparable products, same sum", prod_r, 196))):
+    row, row_r = Q[0], Q[0] @ M
+    assert abs(np.linalg.norm(row) - np.linalg.norm(row_r)) < 1e-9
+    top = np.abs(row).max()
+    b = [hd(40, 46, "One row of Q, coordinate by coordinate, before and after the rotation (same scale)")]
+    for k, (title, vec, y0, cls) in enumerate((("before: two channels 20 times the rest", row, 70, "h"),
+                                              ("after: the same length, spread over all 128", row_r, 178, "s"))):
         b.append(txt(40, y0, title, "cap"))
-        top = max(abs(prod).max(), abs(prod_r).max())
-        mid = y0 + 56
-        b.append(tline(40, mid, 640, mid, "axis"))
+        mid = y0 + 52
         for c in range(128):
             x = 40 + c * (600 / 128)
-            h = 46 * pr[c] / top
+            h = 40 * vec[c] / top
             b.append(f'<rect x="{x:.1f}" y="{min(mid, mid - h):.1f}" width="{600 / 128 - 1:.2f}" height="{max(abs(h), 0.6):.1f}" '
-                     f'fill="var({"--h-fill" if k == 0 else "--s-fill"})" stroke="var({"--h" if k == 0 else "--s"})" stroke-width="0.4"/>')
-    body, yb = prose(196 + 56 + 66, [
+                     f'fill="var(--{cls}-fill)" stroke="var(--{cls})" stroke-width="0.4"/>')
+        b.append(tline(40, mid, 640, mid, "axis"))
+    ye = 178 + 52 + 66
+    b.append(txt(40, ye, "error in the scores, one scale per tensor, E4M3", "cap"))
+    SC = 380 / before
+    b.append(hbar(220, ye + 12, before * SC, 24, "h", f"before: {100 * before:.1f}%", 120))
+    b.append(hbar(220, ye + 44, after * SC, 24, "s", f"after: {100 * after:.2f}%", 120))
+    body, yb = prose(ye + 104, [
         "In transformers a few channels of Q and K run far larger than the rest, and they run large in "
         "every token. Then each score, a sum of 128 products, is carried by the two or three products of "
         "those channels. Rounding each number to E4M3 costs it up to a few percent, so the score inherits "
@@ -275,9 +281,9 @@ def p25():
     ])
     figure("p25", st("rotations cancel inside"),
            "Spreading an outlier channel across all 128 lets rounding errors cancel", yb + 30, b + [body],
-           esc("The bars are the products of one query with one key; both panels sum to the same score. The "
-               "simulation is an illustration of the mechanism, averaged over five random draws; the paper's "
-               "own measurement is in the next figure."))
+           esc("Both rows have the same length, and every score they make is unchanged; only how the size is "
+               "shared among coordinates differs. The simulation illustrates the mechanism, averaged over five "
+               "random draws; the paper's own measurement is in the next figure."))
 
 
 # ---- o076: what it bought -----------------------------------------------------------------------------------------

@@ -221,7 +221,7 @@ def p05():
     body, yb = prose(yo + 44, [
         "The H100's roofline ({{fig:v01-o123}}): at I operations per byte a kernel can run at most "
         f"3.35 × I trillion operations a second, until the 989 ceiling at I = {RIDGE:.0f} "
-        "({{fig:v02-o075}}). Divided by 989, that is the most of peak it can ever reach: I ÷ 295 below "
+        "({{fig:v02-o074}}). Divided by 989, that is the most of peak it can ever reach: I ÷ 295 below "
         "the ridge, all of it past it.",
         f"The points are one head of attention done the naive way (Part {PART['naive']}). Each matrix-multiply "
         f"pass does 2·n²·d operations on its inputs and its n × n output: {f(P[0][2], 1)} per byte at "
