@@ -192,3 +192,42 @@ function ch16Score(S, o, parent) {
   Object.assign(g, { l: right - W, r: right, t: top, rowY: i => top + 44 + RH * i + RH / 2 + 2 });
   return g;
 }
+
+/**
+ * ch16Lay — lay out a row of cells left to right: items [{label, w?}] (w defaults to the label's measured width
+ * at `size` plus padding, at least minW). o: {x0 = 260, gap = 6, size = 24, pad = 24, minW = 48}.
+ * Returns [{x, w, r, cx, label}] (plus .end, the right edge of the last cell).
+ */
+function ch16Lay(S, items, o = {}) {
+  const x0 = o.x0 ?? 260, gap = o.gap ?? 6, size = o.size ?? 24, pad = o.pad ?? 24, minW = o.minW ?? 48;
+  let x = x0;
+  const out = items.map(it => {
+    const w = it.w ?? Math.max(minW, Math.round(S.measure(it.label, { size, weight: 650 }) + pad));
+    const c = { x, w, r: x + w, cx: x + w / 2, label: it.label };
+    x += w + gap;
+    return c;
+  });
+  out.end = x - gap;
+  return out;
+}
+
+/**
+ * ch16Cursor — the white scan cursor: a vertical line with a soft glow spanning y1..y2 that runs from x0 to x1
+ * over [at, at + d] (linear, so pass times are exact), then stays (or fades at `out`).
+ * Returns <g> with .passAt(x) → the time the cursor reaches x.
+ */
+function ch16Cursor(S, o) {
+  const K = libKit(S);
+  const g = S.g();
+  g.setAttribute('data-audit', 'ignore');
+  S.rect({ x: -26, y: o.y1 - 6, w: 52, h: o.y2 - o.y1 + 12, fill: 'url(#pglow-struct)', opacity: 0.8 }, g);
+  S.rect({ x: -2, y: o.y1, w: 4, h: o.y2 - o.y1, r: 2, fill: '#ffffff' }, g);
+  const passAt = x => o.at + o.d * K.cl((x - o.x0) / (o.x1 - o.x0));
+  K.whole(t => {
+    const k = K.cl((t - o.at) / o.d);
+    g.setAttribute('transform', `translate(${(o.x0 + (o.x1 - o.x0) * k).toFixed(1)},0)`);
+    K.setO(g, K.cl((t - o.at + 0.2) / 0.2) * (o.out != null ? 1 - K.cl((t - o.out) / 0.35) : 1));
+  });
+  g.passAt = passAt;
+  return g;
+}
