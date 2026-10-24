@@ -305,7 +305,7 @@ def p30():
         for name, cls in parts:
             w = dd[name] * SC
             if w:
-                b.append(cell(x, y, w - 1, 26, cls, label=f"{dd[name]:,}" if w > 40 else None))
+                b.append(cell(x, y, w - 1, 26, cls, label=f"{dd[name]:,}" if w > 30 else None))
                 x += w
         b.append(txt(x + 8, y + 18, f"{tot:,}", "sub2"))
     xm = X0 + mma * SC
@@ -413,27 +413,27 @@ def o081():
     X0, X1 = 200, 480
     sc = lambda p: X0 + p * (X1 - X0)
     b = [hd(40, 46, "Fraction of peak, on the chip each version was built for")]
-    b.append(txt(510, 66, "ceiling", "sub2"))
-    b.append(txt(640, 66, "reached", "sub2", "end"))
+    b.append(txt(575, 64, "trillion operations a second", "sub2", "middle"))
+    b.append(txt(510, 80, "ceiling", "sub2"))
+    b.append(txt(640, 80, "reached", "sub2", "end"))
+    b.append(dashed(sc(0.75), 84, sc(0.75), 92 + 5 * 34 - 4, "--m"))
     for k, (ver, chip, ceil, lo, hi, cls) in enumerate(rows):
-        y = 78 + k * 34
+        y = 92 + k * 34
         b.append(txt(40, y + 16, ver, "cap"))
         b.append(txt(110, y + 16, chip, "sub2"))
         b.append(f'<rect x="{X0}" y="{y}" width="{X1 - X0}" height="22" rx="3" fill="none" '
                  f'stroke="var(--rule)" stroke-dasharray="3 3"/>')
-        w = max(sc(hi) - sc(lo), 3)
-        b.append(cell(sc(lo), y, w, 22, cls))
+        w = sc(hi) - sc(lo)
+        b.append(cell(sc(lo), y, w, 22, cls) if w > 6 else cell(sc(lo) - 3, y, 6, 22, cls))
         lab = f"{100 * lo:.0f}–{100 * hi:.0f}%" if hi > lo else f"{100 * lo:.0f}%"
-        b.append(txt(sc(lo) - 6, y + 16, lab, "sub2", "end") if lo > 0.45 else txt(sc(hi) + 8, y + 16, lab, "sub2"))
+        b.append(txt(sc(lo) - 8, y + 16, lab, "sub2", "end") if lo > 0.45 else txt(sc(hi) + 8, y + 16, lab, "sub2"))
         b.append(txt(510, y + 16, f"{ceil:,}", "sub2"))
         got = (f"{lo * ceil:,.0f}–{hi * ceil:,.0f}" if hi > lo else f"{lo * ceil:,.0f}")
         b.append(txt(640, y + 16, got, "sub2", "end"))
-    yz = 78 + 5 * 34
+    yz = 92 + 5 * 34
     for p in (0, 0.5, 0.75, 1):
         b.append(tline(sc(p), yz, sc(p), yz + 4))
         b.append(txt(sc(p), yz + 18, f"{100 * p:.0f}%", "sub2", "middle"))
-    b.append(dashed(sc(0.75), 70, sc(0.75), yz, "--m"))
-    b.append(txt(510, yz + 18, "trillion operations a second", "sub2"))
     body, yb = prose(yz + 56, [
         "Fraction of peak, the measure this atlas has tracked since {{fig:v03-p03}}, for each version on the "
         "chip it was built for. On the A100 the first two versions climbed from 25–40% to 50–73%. On the H100, "
