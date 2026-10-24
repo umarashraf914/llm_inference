@@ -12,10 +12,20 @@ V3's p24 (rotation from cosine and sine) and p25 (FlashAttention 3's Hadamard) c
 """
 import json, math
 import numpy as np
-from common import (emit, emit_widget, hd, cell, ghost, eq, ln, prose, text, tick, hline, dot, rect, f, fi,
+from common import (emit, emit_widget, hd, cell, ghost, eq, ln, text, tick, hline, dot, rect, f, fi,
                     nb, MINUS, esc, st)
 
 # ---- shared ---------------------------------------------------------------------------------------------
+import re
+from common import prose as _prose
+
+TUPLE = re.compile(r"\((?:[^()\s,]+, )+[^()\s,]+\)")
+
+
+def prose(y, paras, **kw):
+    """common.prose, with small tuples such as (5.66, 5.66) kept on one line."""
+    return _prose(y, [TUPLE.sub(lambda m: nb(m.group(0)), s) for s in paras], **kw)
+
 
 
 def hadamard(n):
@@ -53,7 +63,7 @@ def pair(p):
 # ---- p25: the rotation widget ---------------------------------------------------------------------------
 CX, CY, U = 170, 204, 14             # the plane: origin, pixels per unit
 RL = 8 * U + 22                       # where the label v sits, beyond the circle
-BX, BW = 364, 230                     # coordinate bars: start, length of 8
+BX, BW = 404, 210                     # coordinate bars: start, length of 8
 BY = (164, 190)                       # their tops
 T0 = 45
 
@@ -125,9 +135,10 @@ def p25():
     for v in (-8, -4, 4, 8):
         s = str(v).replace("-", MINUS)
         b.append(tick(CX + v * U, CY, CY + 5))
-        b.append(text(CX + v * U, CY + 20, s, "sub2", "middle"))
+        c = "sub2 halo" if abs(v) == 8 else "sub2"
+        b.append(text(CX + v * U, CY + 20, s, c, "middle"))
         b.append(f'<line class="tick" x1="{CX - 5}" y1="{CY - v * U}" x2="{CX}" y2="{CY - v * U}"/>')
-        b.append(text(CX - 8, CY - v * U + 4, s, "sub2", "end"))
+        b.append(text(CX - 8, CY - v * U + 4, s, c, "end"))
     b.append(text(CX + R + 4, CY + 4, "x", "sub2"))
     b.append(text(CX + 6, CY - R + 2, "y", "sub2"))
     b.append(f'<circle cx="{CX}" cy="{CY}" r="{8 * U}" fill="none" stroke="var(--u)" stroke-width="1" '
@@ -153,7 +164,7 @@ def p25():
         y = BY[k]
         b.append(text(x0, y + 11, lab, "sub2"))
         b.append(f'<g class="m"><rect data-g="{key}" x="{BX}" y="{y}" width="{w}" height="14" rx="1"/></g>')
-        b.append(f'<text class="sub2" x="{BX + BW + 10}" y="{y + 11}" text-anchor="start">'
+        b.append(f'<text class="sub2" x="{BX - 8}" y="{y + 11}" text-anchor="end">'
                  f'{tspan("a" + lab, fr["a" + lab])}</text>')
     b.append(f'<line class="mark" x1="{BX + BW}" y1="{BY[0] - 6}" x2="{BX + BW}" y2="{BY[1] + 20}"/>')
     b.append(text(BX + BW, BY[1] + 34, "8, the size before turning", "sub2", "end"))
@@ -168,7 +179,8 @@ def p25():
         "length, and a′ · b′ stays 5, because it changes no angle between vectors either. A layer's outputs "
         "are dot products like that one, so they cannot tell that anything was turned ({{fig:v04-o066}}).",
         "What a turn does change is how the length is shared between the coordinates. At 0° all of v's 8 "
-        "sits in x. At 45° it is split evenly: each coordinate is 8 ÷ √2 = 5.66, and 32 + 32 = 64 = 8². "
+        "sits in x. At 45° it is split evenly: each coordinate is " + nb("8 ÷ √2 = 5.66") + ", and "
+        + nb("32 + 32 = 64 = 8²") + ". "
         "The largest coordinate has fallen from 8 to 5.66, as low as it can go for this vector, and the "
         "largest value is what sets a quantization scale ({{fig:v04-o034}}): the same levels now sit 1.41 "
         "times closer together. At 90° v is (0, 8), as bad as at the start, so a turn helps only if it "
@@ -228,7 +240,7 @@ def p26():
     for i, (lab, lhs, mid, rhs) in enumerate(rows):
         y = y0 + 16 + i * 22
         b.append(text(40, y, lab, "sub2"))
-        b.append(text(180, y, f"{lhs}  =  {mid}  =  {rhs}", "cap"))
+        b.append(text(180, y, f"{lhs}  =  {mid}  =  {rhs}", "cap", extra=' style="fill:var(--s-text)"' if i == 1 else ""))
     y1 = y0 + 16 + 4 * 22 + 14
     b.append(text(40, y1, "0.707 stands for 1/√2, which is cos 45° and sin 45°; 1/√2 × 1/√2 = ½ exactly.", "sub2"))
     y2 = y1 + 34
@@ -244,7 +256,7 @@ def p26():
         "itself it gives 1; the two stay at right angles, so dotted with each other they give 0. That holds "
         "at every angle and in any number of dimensions. A matrix whose columns have length 1 and stand at "
         "right angles to each other is called orthogonal, and for it QᵀQ = I.",
-        "I is the identity, the matrix that changes nothing: I × (x, y) = (1x + 0y, 0x + 1y) = (x, y). So "
+        "I is the identity, the matrix that changes nothing: " + nb("I × (x, y) = (1x + 0y, 0x + 1y) = (x, y)") + ". So "
         "QᵀQ = I says that Qᵀ undoes Q; it is Q's inverse. Q turns (8, 0) to (5.66, 5.66), and Qᵀ turns "
         "it back.",
     ])
@@ -361,8 +373,8 @@ def o068():
         "QuaRot, from Saleh Ashkboos and colleagues (2024), uses a Hadamard matrix ({{fig:v04-p27}}): only "
         "plus and minus ones, so applying it takes additions and subtractions, n log₂ n of them "
         "({{fig:v04-p28}}). It first flips the signs of the channels at random. Without that, a vector "
-        "shaped like one of the matrix's own rows, such as (1, −1, 1, −1), would turn into a spike, "
-        "(0, 2, 0, 0), the very thing the rotation is meant to remove; random signs make that bad luck "
+        "shaped like one of the matrix's own rows, such as (1, −1, 1, −1), would be gathered into a spike, "
+        "(0, 2, 0, 0), the opposite of what the rotation is for; random signs make that bad luck "
         "vanishingly rare.",
         "Most of the rotations are folded into the weights before serving ({{fig:v04-o066}}). The few that "
         "must act on activations as they are made, such as the input to each MLP's last matrix, are applied "
@@ -411,7 +423,7 @@ def p27():
         b.append(text(qx + j * 2 * (cw + gp) + cw + gp / 2, gy - 12, s, "sub2", "middle"))
     for (j, s) in ((0, "H₂"), (1, f"{MINUS}H₂")):
         b.append(text(qx + j * 2 * (cw + gp) + cw + gp / 2, gy + 4 * (ch + gp) + 12, s, "sub2", "middle"))
-    b.append(ghost(qx + 2 * (cw + gp) - 2, gy + 2 * (ch + gp) - 2, 2 * cw + gp + 4, 2 * ch + gp + 4))
+    b.append(ghost(qx + 2 * (cw + gp) - 5, gy + 2 * (ch + gp) - 5, 2 * cw + gp + 10, 2 * ch + gp + 10, rx=6))
     rx = qx + 4 * (cw + gp) + 18
     b.append(text(rx, gy - 12, "½ H₄ × (1, −1, 1, 20), row by row", "sub2"))
     sums = [(1, -1, 1, 20), (1, 1, 1, -20), (1, -1, -1, -20), (1, 1, -1, 20)]
@@ -490,15 +502,17 @@ def p28():
     for c, h in zip(cols, heads):
         b.append(text(c + cw / 2, y0 - 12, h, "sub2", "middle"))
     vals = S + [out]
-    for k in range(4):                                              # wires, drawn under the cells
-        d = 1 << k if k < 3 else 0
-        for i in range(n):
-            ends = [i] if k == 3 else [i, i ^ d]
-            for j in ends:
+    for want in (False, True):                                      # wires under the cells, hot ones on top
+        for k in range(4):
+            d = 1 << k if k < 3 else 0
+            for i in range(n):
                 hot = vals[k][i] != 0
-                col = "var(--h)" if hot else "var(--rule)"
-                b.append(f'<line x1="{cols[k] + cw}" y1="{y0 + i * pitch + ch / 2}" x2="{cols[k + 1]}" '
-                         f'y2="{y0 + j * pitch + ch / 2}" stroke="{col}" stroke-width="{1.5 if hot else 1}"/>')
+                if hot != want:
+                    continue
+                for j in ([i] if k == 3 else [i, i ^ d]):
+                    col = "var(--h)" if hot else "var(--rule)"
+                    b.append(f'<line x1="{cols[k] + cw}" y1="{y0 + i * pitch + ch / 2}" x2="{cols[k + 1]}" '
+                             f'y2="{y0 + j * pitch + ch / 2}" stroke="{col}" stroke-width="{1.5 if hot else 1}"/>')
     for k, col in enumerate(vals):
         for i, v in enumerate(col):
             s = (f(v, 2) if k == 4 else fi(v)) if v else "0"
@@ -506,7 +520,7 @@ def p28():
     yb = y0 + n * pitch + 30
     body, yy = prose(yb, [
         "Each stage has 4 pairs, and each pair costs one addition and one subtraction: 8 operations. There "
-        "are three stages because 8 = 2³, so 24 operations in all, against 8 × 8 = 64 multiply-adds for a "
+        "are three stages because 8 = 2³, so 24 operations in all, against " + nb("8 × 8 = 64") + " multiply-adds for a "
         "general 8 × 8 rotation.",
         "log₂ n counts how many times n can be halved before it reaches 1: 3 for 8, and 12 for 4,096. The "
         "butterfly has that many stages, and stage k pairs values 2ᵏ⁻¹ apart. The channels holding the spike "
@@ -595,8 +609,9 @@ def p29():
     assert f(mag, 1) == "17.5"
     b.append(text(X1, A1 + 40, f"this axis magnified {f(mag, 1)} times; ticks mark the 15 INT4 levels in both rows",
                   "sub2", "end"))
+    b.append(text(X1, A1 + 56, "each histogram is scaled to its own tallest bar", "sub2", "end"))
     # the error
-    E = A1 + 76
+    E = A1 + 92
     b.append(text(40, E, "rms error per value, measured after turning back, to scale", "sub2"))
     BL = 420
     for k, (lab, r, cl) in enumerate([("no rotation", d["r0"], "h"), ("Hadamard first", d["r1"], "s")]):

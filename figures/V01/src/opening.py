@@ -30,7 +30,7 @@ def o011():
         "than anyone reads.",
         "The figure is a round one for a large model serving real traffic, not a law of nature. By the "
         "end of this atlas the time per token can be worked out from two numbers printed on a chip's "
-        "specification sheet, for any model on any chip.",
+        "specification sheet, for any model on any chip ({{fig:v01-p36}}).",
     ])
     emit("o011", "0:00", "Thirty milliseconds, per token", yb + 26, b + [body],
          "One turn of the generate-one-token loop. The whole atlas is about where those 30 "

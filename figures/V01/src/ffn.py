@@ -235,8 +235,8 @@ def p18():
     b.append(cell(40 + wa, y1 + 16, wf, 30, "m", rx=3,
                   label=f"feed-forward, 3 × {g(D)} × {g(FF)} = {f(FFN / 1e6, 1)} M, {round(FFN / LAYER * 100)}%"))
     body, yb = prose(y1 + 16 + 30 + 58, [
-        "The block of {{fig:v01-p15}} has two matrices with a bend between them: the original design, and the "
-        "one the lecture describes. Llama, like most current models, uses a gated version with three. The vector "
+        "The block of {{fig:v01-p15}} has two matrices with a bend between them, the original design of 2017. "
+        "Llama, like most current models, uses a gated version with three. The vector "
         "is multiplied by two matrices side by side, gate and up; SiLU bends the gate's result; the two results "
         "are multiplied number by number; and a third matrix, down, brings 28,672 numbers back to 8,192.",
         "The gate decides, number by number, how much of up's result gets through: above, the first number is "

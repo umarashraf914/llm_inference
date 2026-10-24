@@ -235,9 +235,9 @@ def p30():
         "Kilo means a thousand everywhere except in computer memory, which is built in powers of two: 2^10 = "
         "1,024 is close to a thousand, so it borrowed the name. To keep them apart, 1,024 bytes is written KiB, "
         "a kibibyte, and 1,000 bytes kB ({{fig:v01-p05}}).",
-        "The cache per token is 327,680 bytes: exactly 320 KiB, or 327.68 kB. The lecture's '320 kilobytes' is "
-        "the binary one. Multiplied by a thousand tokens it is 312.5 MiB or 327.7 MB; the lecture's 320 MB, "
-        "3.2 GB and 32 GB mix the two, and this atlas's 0.33, 3.3 and 33 GB are decimal.",
+        "The cache per token is 327,680 bytes: exactly 320 KiB, or 327.68 kB. The '320 kilobytes' often quoted "
+        "is the binary one. Multiplied by a thousand tokens it is 312.5 MiB or 327.7 MB; round figures such as "
+        "320 MB, 3.2 GB and 32 GB mix the two, and this atlas's 0.33, 3.3 and 33 GB are decimal.",
         "The difference is 2.4% per factor of 1,024, so it never changes a conclusion. It only explains why two "
         "correct sources can print different numbers for the same memory.",
     ])

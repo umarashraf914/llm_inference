@@ -47,8 +47,9 @@ def o077():
         b.append(txt(640, y + 10 + 47, "doubled" if bw > h else "unchanged", "sub2", "end"))
         y += 10 + 2 * 30 + 26
     body, yb = prose(y + 6, [
-        "From the H100 to the B200 the tensor cores' BF16 throughput rises from about 1 quadrillion operations "
-        "a second to 2.25 quadrillion. Per multiprocessor per clock they exactly double, 4,096 to 8,192; more "
+        "From the H100 to the B200 the tensor cores' throughput in BF16, the 16-bit format that keeps FP32's "
+        "range with fewer fraction bits ({{fig:v02-o088}}), rises from about 1 quadrillion operations a second "
+        "to 2.25 quadrillion. Per multiprocessor per clock they exactly double, 4,096 to 8,192; more "
         "multiprocessors supply most of the rest. The multi-function unit that computes exponentials does not grow at "
         "all, and neither does the rate at which a multiprocessor reads its own shared memory.",
         "When one unit gets faster and its neighbours do not, the bottleneck moves rather than disappearing. "
@@ -317,14 +318,14 @@ def p30():
         b.append(cell(40 + k * 152, ky - 10, 12, 12, cls))
         b.append(txt(58 + k * 152, ky, lab, "sub2"))
     body, yb = prose(ky + 40, [
-        "In 2-CTA mode two thread blocks on neighbouring multiprocessors drive one matrix multiply of 256 "
-        "rows. Each keeps its own 128 rows of A and its own slice of the result, and stages only half of "
-        "operand B; the hardware reads both halves for the one multiply. A single copy of the shared data "
-        "serves both blocks.",
+        "CTA, cooperative thread array, is NVIDIA's name for a thread block. In 2-CTA mode two of them, on "
+        "neighbouring multiprocessors, drive one matrix multiply C = A × B of 256 rows. Each keeps its own 128 "
+        "rows of A and its own slice of C, and stages only half of B in its shared memory; the hardware reads "
+        "both halves for the one multiply. A single copy of the shared data serves both blocks.",
         f"In the backward pass, where shared memory is the wall, the paper's cycle count per block falls from "
         f"{t1:,} to {t2:,}, against {mma:,} cycles of matrix multiply: from 30% over the tensor cores' time to "
-        "5%. Operand B's share of the reads halves, and so does the traffic for the gradient dQ; swapping "
-        "half of the dS tile with the partner adds a new 384. The total falls 19%: the halving is of those "
+        "5%. Operand B's share of the reads halves, and so does the traffic for dQ, the gradient training "
+        "computes for the queries; swapping half of the scores' gradient dS with the partner adds a new 384. The total falls 19%: the halving is of those "
         "terms, not of the whole.",
         "Both bars already count the backward pass's use of TMEM, which holds two of the ten matrix operands "
         "so they need not be read from shared memory at all.",

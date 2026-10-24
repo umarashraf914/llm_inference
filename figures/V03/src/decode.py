@@ -45,7 +45,8 @@ def n03():
         "query rows for one head of one sequence in the batch ({{fig:v03-o039}}). The number of blocks is the "
         "number of multiprocessors it can keep busy.",
         f"Prefill produces thousands. At {N_CTX:,} tokens, blocks of {TILE} query rows and {HEADS} heads, that "
-        f"is {N_CTX // TILE} × {HEADS} = {prefill:,} blocks, more than enough to go round. Decode produces "
+        f"is {N_CTX // TILE} × {HEADS} = {prefill:,} blocks, about {prefill / H100_SMS:.1f} waves, a wave being "
+        "one round in which every multiprocessor takes a block. Decode produces "
         "almost none. Its query is one new token, a single row, so the query dimension contributes exactly "
         f"one block, and the count collapses to batch × heads. One request on a {HEADS}-head model gives "
         f"{decode} pieces of work, and {H100_SMS - decode} multiprocessors stand idle.",

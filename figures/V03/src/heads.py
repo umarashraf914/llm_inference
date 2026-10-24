@@ -59,7 +59,8 @@ def p35():
         f"{gb[64] / 1e9:.1f} GB, {ms[64]:.1f} ms, eight times the bill; with a single shared head, "
         f"{gb[1] / 1e9:.2f} GB.",
         f"A batch multiplies it. Thirty-two such sequences reread {batch * gb[8] / 1e9:.0f} GB every step with "
-        f"8 KV heads; with 64 they would hold {batch * gb[64] / 1e9:.0f} GB, more than any single GPU's memory.",
+        f"8 KV heads, the whole cache of {{{{fig:v03-o082}}}}; with 64 they would hold {batch * gb[64] / 1e9:.0f} "
+        "GB, more than any single GPU's memory.",
     ])
     figure("p35", st("In 2019, Noam Shazeer"), "Every new token rereads the whole cache, so head count is a "
            "bandwidth bill", yb + 30, b + [body],
@@ -181,9 +182,10 @@ def o091():
         "full keys and values are rebuilt from the latent, by two learned decompression matrices, only for "
         "the tokens being attended to.",
     ])
-    figure("o091", st("In DeepSeek V2, there are 128"), "Multi-head latent attention", yb + 30, b + [body],
+    figure("o091", st("Multi-head latent attention does not"), "Multi-head latent attention", yb + 30, b + [body],
            esc("Compression built into the architecture rather than applied afterwards. The next figures show "
-               "why the rebuilding is nearly free, and where the extra 64 comes from."))
+               "how a latent can rebuild keys at all, why the rebuilding is nearly free, and where the extra 64 "
+               "comes from."))
 
 
 # ---- n09: a literal rebuild ---------------------------------------------------------------------------------------------

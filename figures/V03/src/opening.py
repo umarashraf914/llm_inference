@@ -48,7 +48,7 @@ def p01():
         f"matrix-multiply kernel gives each thread block one {TILE}\u00a0×\u00a0{TILE} tile of them, so the grid is "
         f"{side}\u00a0×\u00a0{side} = {blocks:,} blocks. At {THREADS} threads a block that is {threads:,} threads, "
         f"close to the {resident:,} an H100 can hold at once ({{{{fig:v02-o044}}}}).",
-        "The tile and block sizes are the author's choices, and other kernels choose differently. What "
+        "The tile and block sizes are the kernel writer's choices, and other kernels choose differently. What "
         "does not change is the shape of it: one line, one launch, and the next line is a separate "
         "launch with its own grid.",
     ])

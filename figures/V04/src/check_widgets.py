@@ -155,7 +155,48 @@ def check_p23(page):
     return bad == 0 and len(got) == 21
 
 
-CHECKS = {"p02w": check_p02w, "p14": check_p14, "p19": check_p19, "p23": check_p23}
+def check_p25(page):
+    """Every whole-degree angle, 0 to 360: the readouts, and the vector, label and bars as drawn."""
+    from part7_rotate import p25_frame
+    got = page.evaluate("""() => {
+      const fig = document.getElementById('v04-p25'), sl = fig.querySelector('input[type=range]'); const out = [];
+      const g = k => fig.querySelector(`[data-g="${k}"]`);
+      for (let d = 0; d <= 360; d++) {
+        sl.value = d; sl.dispatchEvent(new Event('input'));
+        const r = {d: sl.value, val: fig.querySelector('.val').textContent};
+        fig.querySelectorAll('[data-k]').forEach(e => r[e.dataset.k] = e.textContent);
+        r.px = g('v').getAttribute('x2'); r.py = g('v').getAttribute('y2');
+        r.cx = g('tip').getAttribute('cx'); r.cy = g('tip').getAttribute('cy');
+        r.fx = [g('fx').getAttribute('x1'), g('fx').getAttribute('y1'), g('fx').getAttribute('x2')];
+        r.fy = [g('fy').getAttribute('x1'), g('fy').getAttribute('y1'), g('fy').getAttribute('y2')];
+        r.lx = g('lab').getAttribute('x'); r.ly = g('lab').getAttribute('y');
+        r.wx = g('bx').getAttribute('width'); r.wy = g('by').getAttribute('width');
+        out.push(r);
+      }
+      fig.querySelector('button').click();
+      out.push({reset: sl.value, val: fig.querySelector('.val').textContent});
+      return out;
+    }""")
+    bad = 0
+    for r in got[:-1]:
+        fr = p25_frame(int(r["d"]))
+        want = {k: fr[k] for k in ("deg", "x", "y", "len", "max", "a", "b", "dot", "ax", "ay", "lx", "ly", "wx", "wy")}
+        want.update(val=fr["deg"], px=fr["px"], py=fr["py"], cx=fr["px"], cy=fr["py"],
+                    fx=[fr["px"], fr["py"], fr["px"]], fy=[fr["px"], fr["py"], fr["py"]])
+        for k, v in want.items():
+            if r[k] != v:
+                bad += 1
+                if bad < 8:
+                    print("  p25", r["d"], k, r[k], "!=", v)
+    if got[-1] != {"reset": "45", "val": "45°"}:
+        bad += 1
+        print("  p25 reset", got[-1])
+    print(f"p25: {len(got) - 1} angles checked, {bad} mismatches")
+    return bad == 0 and len(got) == 362
+
+
+CHECKS = {"p02w": check_p02w, "p14": check_p14, "p19": check_p19, "p23": check_p23,
+          "p25": check_p25}
 
 
 def main():

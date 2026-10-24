@@ -74,8 +74,8 @@ def p20():
         "just to hold its weights.",
     ])
     emit("p20", st("2 bytes per weight"), "140 GB does not fit in one H100's 80 GB", yb + 26, b + [body],
-         "The rest of this atlas works with one 70-billion-parameter model on one H100, as the lecture does, "
-         "because the arithmetic per chip is the same. In practice that model needs at least two.")
+         "The rest of this atlas works with one 70-billion-parameter model on one H100, because the "
+         "arithmetic per chip is the same. In practice that model needs at least two.")
 
 
 def o106():

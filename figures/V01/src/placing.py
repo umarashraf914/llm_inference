@@ -55,7 +55,7 @@ def o128():
         "one read of the weights, which all 2,000 tokens share.",
         "Decode reads the identical bytes and gets one operation out of each. The keys and values kept are the "
         "subject of Part 11; the intermediate results, which the layers hand each other, add a few gigabytes "
-        "that the lecture rounds into its 146.",
+        "more, which bring the total to about 146.",
     ])
     emit("o128", st("Now we place prefill and decode on the same diagram"), "The two numbers", yb + 26, b + [body],
          "Same model, same chip. Two thousand operations per byte against one, and the difference is only how "

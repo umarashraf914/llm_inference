@@ -74,7 +74,7 @@ def p05():
         "Each row is a thousand times the one below it, so converting is moving the decimal point three "
         "places: 0.1 ms = 100 µs, and 989 TFLOP/s = 0.989 PFLOP/s.",
         "In computer memory k, M and G are sometimes powers of two instead, 1,024 rather than 1,000 for k. "
-        "Part 11 shows where that difference becomes visible.",
+        "{{fig:v01-p30}} shows where that difference becomes visible.",
     ])
     emit("p05", "2:43", "Unit prefixes are powers of ten with names", yb + 26, b + [body],
          "Eight prefixes cover every quantity in this series, from nanoseconds to petaflops. Reading them "

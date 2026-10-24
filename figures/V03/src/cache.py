@@ -112,10 +112,10 @@ def o083():
 
 # ---- o085: restamp, new caption ------------------------------------------------------------------------------------
 def o085():
-    patch("o085", [("Recognising the fragmentation as a problem somebody solved in the 1960s was most of the "
-                    "work. The mechanism was already standard.",
-                    "Contiguity becomes something the table maintains rather than something memory has to "
-                    "provide. Nothing physical needs to sit side by side.")],
+    patch("o085", [("Contiguity becomes something the table maintains rather than something memory has to "
+                    "provide. Nothing physical needs to sit side by side.",
+                    "Every operating system does this for every program it runs. Paged attention only had to "
+                    "notice that the KV cache had the same problem.")],
           stamp_to=st("Operating systems also solved"))
 
 
@@ -267,7 +267,7 @@ def o087():
         "Nothing has to be copied to make this safe, because a token's keys and values never change once "
         "computed. Each block keeps a count of the tables that point at it, so it is freed only when the last "
         "one lets go, and a shared block is copied only when one sequence must write into it: the partly "
-        "filled block where the sequences part ways.",
+        "filled block where the sequences part ways. Operating systems call this copy-on-write.",
     ])
     figure("o087", st("Sometimes many sequences begin"), "Sharing comes free with the table", yb + 30, b + [body],
            esc("Immutability is what makes pointing at the same block safe; the count is what makes freeing it "
@@ -307,9 +307,9 @@ def p34():
         b.append(hbar(X1 + 60, y, v * SC, 24, "s", f"{v:g}×", 60))
     body, yb = prose(y2 + 74 + 2 * 32 + 30, [
         "Sometimes a server explores several candidate continuations of one prompt at once and keeps the "
-        "most promising: beam search. Every candidate gets its own block table, and the tables share every "
-        "block the candidates have in common. Each block carries a count of the tables pointing at it. A block "
-        "is copied only when a candidate writes into one it shares, and freed when its count falls to zero.",
+        "most promising: beam search. Every candidate gets its own block table, and with the counts and the "
+        "copy-on-write rule of {{fig:v03-o087}}, the tables share every block the candidates have in common: "
+        "the prompt three ways, the next block two ways, and only the newest blocks are private.",
         "Measured on OPT-13B with the Alpaca dataset, sharing saved 37.6% to 55.2% of the cache memory on beam "
         "search. That memory goes straight back into batch size. Against Orca (Oracle), an earlier system "
         "given the true output lengths in advance, vLLM sustained 1.3 times the request rate at the same "
@@ -317,8 +317,8 @@ def p34():
     ])
     figure("p34", st("a strategy called"), "Beam search keeps several answers alive over one stored prompt",
            yb + 30, b + [body],
-           esc("The vLLM paper calls the copying rule copy-on-write, after the operating-system technique it "
-               "borrows. The more the candidates share, the larger the saving."))
+           esc("Beam search shares more than plain sampling does, which is why its gain is the larger of the "
+               "two."))
 
 
 def patches():

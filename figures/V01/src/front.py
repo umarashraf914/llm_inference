@@ -70,7 +70,7 @@ def p02():
         "Only the bottom of the division is engineering. The hourly price is set by the market; how many "
         "tokens a chip makes in a second is what every technique in this series changes.",
         "The $3 is a typical rental for one high-end chip and the 100 tokens a second is a round number "
-        "for illustration. Part 15 works the same division with rates derived for a real chip.",
+        "for illustration. {{fig:v01-p34}} works the same division with rates derived for a real chip.",
     ])
     emit("p02", st("comes down to one number, cost per token"),
          "Cost per token is an hourly price divided by the tokens made in that hour", yb + 26,
