@@ -4,3 +4,4 @@ video/node_modules/
 video/engine/vendor/
 video/*/build/
 figures/*/.order.lock
+figures/*/order.tmp

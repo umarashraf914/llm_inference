@@ -223,7 +223,9 @@ def edit_order(v: str, cmd: str, args: list[str]) -> None:
                 k = where(i)
                 lines.pop(k)
                 ids.pop(k)
-        p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        tmp = p.with_suffix(".tmp")                       # readers never see half a file
+        tmp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        tmp.replace(p)
     print(f"{v}: {cmd} {' '.join(args)}")
 
 
