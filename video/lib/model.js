@@ -1438,7 +1438,8 @@ function libLayerStack(S, o = {}, parent) {
  *    self false (an arc from the query to itself, weight weights[query]), maskGap 56 (extra room around
  *    the mask wall), maskLabel 'mask',
  *    size 30 (chip text), gap 26 (row) / 16 (col) between chips, w (fixed chip width; col: the widest),
- *    state 'token' (libToken state of the chips), arcMax 230 (tallest arc), arcScale 0.42 (row) / 0.6 (col),
+ *    state 'token' (libToken state of the chips; decorative: true passes on to them for chips under 24 px),
+ *    arcMax 230 (tallest arc), arcScale 0.42 (row) / 0.6 (col),
  *    tone 'compute' (arcs, weights), valueTone 'struct' (the blended values),
  *    wfmt 'pct' ('62%') | 'dec' ('.62') | (w) => string, labels true (weight labels beside the keys),
  *    labelSize 26, bars false | true (amber bars to scale beside each key; barMax 110, barW 26, barScale:
@@ -1492,7 +1493,7 @@ function libAttention(S, o = {}, parent) {
     ul += ext(i) + gap + (i === q ? wallGap : 0);
     const [cx, cy] = P(cu, W0);
     const tk = typeof libToken === 'function'
-      ? libToken(S, { text: t, x: cx, y: cy, size, h: chH, w: widths[i], state: o.state || 'token' }, tokG)
+      ? libToken(S, { text: t, x: cx, y: cy, size, h: chH, w: widths[i], state: o.state || 'token', decorative: o.decorative }, tokG)
       : S.pill(String(t).trim(), { x: cx, y: cy, h: chH, size, w: widths[i] }, tokG);
     Object.assign(tk, { cx, cy, cu, l: cx - widths[i] / 2, r: cx + widths[i] / 2, t: cy - chH / 2, b: cy + chH / 2, i, ua: cu - ext(i) / 2, ub: cu + ext(i) / 2 });
     return tk;

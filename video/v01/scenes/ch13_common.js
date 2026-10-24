@@ -34,7 +34,8 @@ function ch13Retext(t, from, to, d = 0.35) {
  * o: x 500 (left edge of the pills), y 360 (centre of the first row), rows [4, 5, 6] (pills per row),
  *    size 36 (pill text px; the rest scales with it: pill w 2.8·size, gap 0.83·size, row pitch 4.9·size,
  *    tag text 0.75·size; below size 32 the tags fall under 24 px, so treat a smaller staircase as a picture
- *    and mark its holder data-audit="ignore"), w, gap, pitch (override the derived sizes).
+ *    and mark its holder data-audit="ignore"; decorative: true then keeps its pills from warning), w, gap,
+ *    pitch (override the derived sizes).
  * Returns the root <g> with:
  *    .rows[i] = {g (the row: dim it, fade it), at (libAttention), toks[] (libToken chips), q (newest pill),
  *               arcs[] (to earlier pills, nearest first), self (loop), tag (pill), y, l, r (newest pill's
@@ -82,7 +83,7 @@ function ch13Staircase(S, o = {}, parent) {
     const y = rowY(i), total = n * w + (n - 1) * gap;
     const g = S.g(null, rowsG);
     const at = libAttention(S, { x: X0 + total / 2, y, tokens: Array.from({ length: n }, (_, k) => `t${k + 1}`), size, w, gap,
-      tone: 'bytes', labels: false, arcMax: size * 2.8, arcScale: 0.08 }, g);
+      tone: 'bytes', labels: false, arcMax: size * 2.8, arcScale: 0.08, decorative: o.decorative }, g);
     const toks = at.tokens, q = toks[n - 1];
     toks.forEach(tk => hideNow(tk));
     const arcs = [];
