@@ -134,13 +134,12 @@ function ch03Tag(S, text, o = {}, parent) {
   const iw = icons.length ? icons.length * is + (icons.length - 1) * ig + Math.round(size * 0.4) : 0;
   const padX = Math.round(size * 0.8), w = padX * 2 + iw + tw;
   const x = (o.anchor || 'middle') === 'middle' ? o.x - w / 2 : o.x, y = o.y - h / 2;
-  const col = tone === 'neutral' ? 'ink' : tone;
   const g = S.g(null, parent);
   const body = S.g(null, g);
   S.rect({ x, y, w, h, r: h / 2, fill: '#0c1326' }, body);
   S.rect({ x, y, w, h, r: h / 2, fill: `url(#card-${tone})`, stroke: tone === 'neutral' ? '#ffffff' : tone, strokeOpacity: tone === 'neutral' ? 0.45 : 0.85, sw: 2.5 }, body);
   icons.forEach((id, i) => S.icon(id, { x: x + padX + is / 2 + i * (is + ig), y: o.y, size: is, color: tone === 'neutral' ? 'ink' : tone }, body));
-  g.label = S.text(text, { x: x + padX + iw, y: o.y + 1, size, weight: 650, color: col === 'ink' ? 'ink' : 'ink' }, body);
+  g.label = S.text(text, { x: x + padX + iw, y: o.y + 1, size, weight: 650, color: 'ink' }, body);
   const ring = S.rect({ x, y, w, h, r: h / 2, stroke: tone === 'neutral' ? '#ffffff' : tone, sw: 2 }, g);
   ring.setAttribute('data-audit', 'ignore');
   ring.style.opacity = 0; ring.style.visibility = 'hidden';
@@ -180,7 +179,7 @@ function ch03Stamp(S, text, o = {}, parent) {
  * o: {x, y (centre of the tray), n = 8, shape = 'pill' | 'square', h = 34 (chip height), gap = 10, pad = 12,
  *     label = 'batch' (above the tray's left end; null for none), labelSize = 26, seed = 7}
  * Returns <g> (root) with .tray (outline rect), .labelEl, .chips[] (libToken; visible as built: fly them in
- *   with chip.flyIn([x, y]) or chip.pop(), or fx.in the root), .slot(i) → {x, y} (chip centre),
+ *   with chip.flyIn([x, y]) or chip.pop(), or fx.in the root), .slotAt(i) → {x, y} (chip centre; not .slot, which every DOM element already has),
  *   .w .h .l .r .t .b .cx .cy.
  */
 function ch03Batch(S, o = {}, parent) {
@@ -192,8 +191,8 @@ function ch03Batch(S, o = {}, parent) {
   S.rect({ x, y, w: W, h: H, r: Math.min(18, H / 2), fill: '#0c1326' }, g);
   g.tray = S.rect({ x, y, w: W, h: H, r: Math.min(18, H / 2), fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.3, sw: 2 }, g);
   if (o.label !== null) g.labelEl = S.text(o.label ?? 'batch', { x: x + 4, y: y - (o.labelSize ?? 26) * 0.85, size: o.labelSize ?? 26, weight: 600, color: 'muted' }, g);
-  g.slot = i => ({ x: x + pad + i * (cw + gap) + cw / 2, y: o.y });
-  g.chips = Array.from({ length: n }, (_, i) => libToken(S, { text: '', x: g.slot(i).x, y: o.y, w: cw, h, r: Math.round(h * 0.3), state: { color: ch03Shade(S, i, o.seed ?? 7) }, decorative: true }, g));
+  g.slotAt = i => ({ x: x + pad + i * (cw + gap) + cw / 2, y: o.y });
+  g.chips = Array.from({ length: n }, (_, i) => libToken(S, { text: '', x: g.slotAt(i).x, y: o.y, w: cw, h, r: Math.round(h * 0.3), state: { color: ch03Shade(S, i, o.seed ?? 7) }, decorative: true }, g));
   Object.assign(g, { w: W, h: H, l: x, r: x + W, t: y, b: y + H, cx: o.x, cy: o.y });
   return g;
 }
@@ -221,11 +220,13 @@ function ch03Crowd(S, o = {}, parent) {
   }
   const eg = S.g({ opacity: 0.35 }, g);
   g.edge = [];
-  const ne = o.edge ?? 14;
+  // each edge square gets its own vertical slot on its side (so none overlap), alternating near / far
+  const ne = o.edge ?? 14, per = Math.max(1, Math.ceil(ne / 2)), slotH = H / per;
   for (let k = 0; k < ne; k++) {
-    const left = k % 2 === 0, rI = Math.floor(k / 2) % Math.max(1, rows + 1);
-    const cx = left ? X - cw * (0.15 + 0.5 * r()) : X + W + cw * (0.15 + 0.5 * r());
-    g.edge.push(mk(cx, Y + (rI + r()) * H / (rows + 1), n + k, eg));
+    const left = k % 2 === 0, j = Math.floor(k / 2);
+    const cy = Y + (j + 0.5) * slotH + (r() * 2 - 1) * Math.max(0, slotH - sz * 1.3) / 2;
+    const off = cw * ((j + (left ? 0 : 1)) % 2 ? 0.55 : 0.2) + cw * 0.15 * r();
+    g.edge.push(mk(left ? X - off : X + W + off, cy, n + k, eg));
   }
   g.all = g.squares.concat(g.edge);
   return g;

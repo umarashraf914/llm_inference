@@ -76,7 +76,11 @@ V.scene('ch00_s01', {
     const mix = w => `rgb(${INK.map((v, i) => Math.round(v + (BLUE[i] - v) * w)).join(',')})`;
 
     // the bracket between two slow-motion ticks (drawn on "thirty"), riding left with them
-    const K2 = N + 1;                              // the newer of the two ticks that are newest on "thirty"
+    // the two newest ticks on "thirty": K2 is the newest one landed by then (one gap clear of the speed tag,
+    // so the label never meets 'slowed 20×' however close the next landing is)
+    const TTH = S.t('b2~thirty');
+    const K2 = N + Math.max(1, Math.floor((TTH - TS) / SLOW)) - 1;
+    const TBR = TTH;
     const BR = { y: 846, leg: 10 };
     const bracketG = S.g(null, track);
     const bracket = S.path({ d: `M-60,${BR.y + BR.leg} V${BR.y} H0 V${BR.y + BR.leg}`, stroke: 'muted', sw: 2.5 }, bracketG);
@@ -98,8 +102,8 @@ V.scene('ch00_s01', {
     scrim.setAttribute('data-audit', 'ignore');
     S.set(scrim, { autoAlpha: 0 }, 0);
     const stamp = ch00Stamp(S, {}, S.layers.front);
-    const LBL = { y: 822, s: 30 / 96 };            // the stamp's number starts life as the bracket's 30 px label
-    const TLBL = S.t('b2~thirty') + 0.15;          // label fades in as the bracket draws
+    const LBL = { y: 820, s: 34 / 96 };            // the stamp's number starts life as the bracket's 34 px label
+    const TLBL = TBR + 0.15;                       // label fades in as the bracket draws
     const TL = S.t('b3');                          // "That number": it lifts off
     const DL = 1.1;
     const ease3 = q => 1 - Math.pow(1 - q, 3);
@@ -159,6 +163,7 @@ V.scene('ch00_s01', {
     // ---------------------------------------------------------------- b1: ask, and the answer streams at true speed
     S.add(chat.drawOn({ d: 0.8 }), 'b1~Ask-0.2');
     S.add(chat.typeQuestion({ d: 0.85 }), 'b1~chatbot');
+    S.add(chat.blink({ n: 2, period: 0.8 }), 'b1~question+0.35');   // the assistant 'thinks' until the stream starts
     S.add(fx.pulse(chat.sparkle, { scale: 1.35, d: 0.6 }), 'b1~answer-0.1');
     S.add(gsap.fromTo(line, { drawSVG: '100% 100%' }, { drawSVG: '0% 100%', duration: 0.7, ease: 'power2.inOut' }), 'b1~streams-0.15');
     S.add(sw.in({ d: 0.5 }), 'b1~streams+0.05');
@@ -186,7 +191,7 @@ V.scene('ch00_s01', {
     S.add(chat.stream({ from: N, count: NS, times: Array.from({ length: NS }, (_, i) => (i + 1) * SLOW) }), TS);
     S.add(sw.laps(Math.ceil((S.duration - TS) / SLOW), 30, { every: SLOW }), TS);
     // "thirty milliseconds": a bracket between the two newest ticks; its label is the stamp-to-be
-    S.add(gsap.fromTo(bracket, { autoAlpha: 1, drawSVG: '50% 50%' }, { autoAlpha: 1, drawSVG: '0% 100%', duration: 0.45, ease: 'power2.out' }), 'b2~thirty');
+    S.add(gsap.fromTo(bracket, { autoAlpha: 1, drawSVG: '50% 50%' }, { autoAlpha: 1, drawSVG: '0% 100%', duration: 0.45, ease: 'power2.out' }), TBR);
 
     // ---------------------------------------------------------------- b3: that number
     S.add(fx.dim(stage, { to: 0.18, d: 0.5 }), 'b3');

@@ -11,6 +11,8 @@
      row 4271 of the embedding table in s04-s06, and 'dog' looks the same at both positions in s07.
    - The embedding / output table (s04, s05, s06): ch07Table, rows are those same strips, row numbers in
      grey mono down the left edge, ellipses where rows are skipped (CH07.tableRows).
+   - "No arithmetic here" is a grey calculator with a slash drawn through it (ch07NoCalc): s03's arrows,
+     s04 above the table.
    - Colour = meaning: blue = values, tokens, table rows; grey = stored weights at rest, unused rows,
      things multiplied by zero; amber = multiply-and-add only (first seen in s01.b3); coral = memory
      reads (copying a row, a gather, rows read); teal = zero operations, the position fix.
@@ -107,6 +109,10 @@ function ch07Heading(S, o = {}) {
   return g;
 }
 
+/** A row number / token ID as printed: '4271' (four digits, no comma, as in 'ID 4271' and '#4271'), '128,254'. */
+function ch07RowNum(k) { return k < 10000 ? String(k) : ch07Comma(k); }
+function ch07Comma(k) { return String(k).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
 /** A stable seed for a token: a word ('fox' maps to its ID in CH07.ids) or a token ID / row number. */
 function ch07Seed(token) {
   const key = String(token).trim().toLowerCase();
@@ -119,7 +125,8 @@ function ch07Seed(token) {
 
 /**
  * A token's vector as a shaded strip (libVector style 'heat'), its pattern fixed by the token:
- * ch07Vec(S, {token: 'fox'}) and row 4271 of ch07Table are the same strip.
+ * ch07Vec(S, {token: 'fox', n: 20}) and row 4271 of ch07Table (n 20 by default) are the same strip; with
+ * a different n the first cells still match, but pass the table's n when the two are shown together.
  * o: token (word or ID), n 16 cells, and any libVector option (x, y, anchor, dir, cw, ch, gap, gain,
  *    length, label, lengthLabel, hidden ...). Returns the libVector (helpers .pop .in .flash .sweep .paint).
  */
@@ -132,6 +139,7 @@ function ch07Vec(S, o = {}, parent) {
  * grey mono down the left edge, vertical ellipses where rows are skipped.
  * o: x, y (top-left of the strips; the numbers hang to the left of x), rows (CH07.tableRows; IDs and '…'),
  *    n 20 cells per row, cw 22, rowH 40, gap 12, ellH 56, gain (strip contrast), numbers true,
+ *    numFmt (row number -> text; default ch07RowNum: '4271', '128,254'),
  *    widthLabel (e.g. '8,192 numbers per row': a bracket across the top), hidden false.
  * Returns <g> with .rows[] (each a <g> holding .strip and .num, with .k .t .b .cy), .rowAt(k), .ells[],
  *    .widthG (bracket + .widthEl) and geometry .x .y .w .h .l .r .t .b .cx .cy (strips only).
@@ -162,7 +170,7 @@ function ch07Table(S, o = {}, parent) {
     }
     const rg = S.g(null, g);
     rg.strip = ch07Vec(S, { token: k, n, cw, ch: rowH, gap: 3, anchor: 'start', x, y: yy, gain: o.gain }, rg);
-    if (o.numbers !== false) rg.num = S.text(S.fmt.int(k), { x: x - 18, y: yy + rowH / 2 + 1, size: 24, family: 'mono', anchor: 'end', color: 'muted' }, rg);
+    if (o.numbers !== false) rg.num = S.text((o.numFmt || ch07RowNum)(k), { x: x - 18, y: yy + rowH / 2 + 1, size: 24, family: 'mono', anchor: 'end', color: 'muted' }, rg);
     Object.assign(rg, { k, t: yy, b: yy + rowH, cy: yy + rowH / 2 });
     g.rows.push(rg);
     yy += rowH + gap;
@@ -186,5 +194,35 @@ function ch07Table(S, o = {}, parent) {
     const r = g.rowAt(k);
     return ch07Vec(S, { token: k, n, cw, ch: rowH, gap: 3, anchor: 'start', x, y: r ? r.t : y, gain: o.gain }, co.parent ?? parent);
   };
+  return g;
+}
+
+/**
+ * A crossed-out calculator: "no arithmetic here" (s03 on each arrow, s04 above the table). Grey by default:
+ * it marks an absence, so it takes no meaning colour.
+ * o: x, y (centre), size 56, tone 'muted' (icon), slashTone 'muted'. Hidden until .show().
+ * Returns <g> with .icon .slash and helpers (return tweens; call in time order):
+ *   .show({d 0.7})   the icon fades in, then the slash draws through it, top-left to bottom-right
+ *   .hide({d 0.35})  fade it all out
+ *   const nc = ch07NoCalc(S, { x: 760, y: 330, size: 48 });
+ *   S.add(nc.show(), 'b3~Neither');
+ */
+function ch07NoCalc(S, o = {}, parent) {
+  const x = o.x ?? 960, y = o.y ?? 540, sz = o.size ?? 56, h = sz * 0.5;
+  const g = S.g(null, parent);
+  g.icon = S.icon('ph:calculator-duotone', { x, y, size: sz, color: o.tone || 'muted' }, g);
+  const pts = { x1: x - h, y1: y - h, x2: x + h, y2: y + h }, L = Math.hypot(2 * h, 2 * h);
+  const keyline = S.line({ ...pts, stroke: '#0b1224', sw: Math.max(7, sz * 0.16) }, g);   // so the slash reads over the icon
+  g.slash = S.line({ ...pts, stroke: o.slashTone || 'muted', sw: Math.max(3.5, sz * 0.07) }, g);
+  const lines = [keyline, g.slash];
+  lines.forEach(l => { l.setAttribute('stroke-linecap', 'round'); l.setAttribute('stroke-dasharray', L.toFixed(2)); l.setAttribute('stroke-dashoffset', L.toFixed(2)); });
+  ch07Hide(g);
+  g.show = (so = {}) => {
+    const d = so.d ?? 0.7, tl = gsap.timeline();
+    tl.add(ch07Fade(g, 0, 1, { d: d * 0.5 }), 0);
+    tl.add(ch07Drive(d * 0.55, k => lines.forEach(l => l.setAttribute('stroke-dashoffset', (L * (1 - k)).toFixed(2))), 'power2.inOut'), d * 0.45);
+    return tl;
+  };
+  g.hide = (ho = {}) => ch07Fade(g, 1, 0, { d: ho.d ?? 0.35, ease: 'power2.in' });
   return g;
 }

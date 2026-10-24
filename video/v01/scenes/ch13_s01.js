@@ -1,6 +1,7 @@
 /* ch13_s01 · every step reads more than the last (fig 131)
-   b1: the weights are read every step (a reference tag that shrinks into the corner); the conversation is
-       read too, and it grows (the staircase's empty silhouette).
+   b1: one decode step reads every weight (the film's byte stream: 140 GB crosses into the chip), which folds
+       into a reference tag in the corner; the conversation is read too, and it grows (the staircase's empty
+       silhouette).
    b2: one row per decode step; the newest (amber) token's coral read arcs reach back over every earlier
        token and itself: reads 4, 5, 6. The staircase, and the square it stands for.
    b3: no memory between steps: row 1's work evaporates, row 2 redraws all of it. Two ways out: recompute
@@ -14,23 +15,35 @@ V.scene('ch13_s01', S => {
   const CARD = { w: 500, h: 136, y: 812, gap: 220 }; // the two cards in the bottom third
 
   // ---------------------------------------------------------------- b1: weights every step, then the conversation
-  // the reference tag: built at its corner spot, first shown large in the centre, then shrunk into the corner
+  // "Each decode step reads every weight": the film's picture of it (ch10-12), one step, the 140 GB crossing
+  // the bus into the chip. Then it folds away into a small reference tag in the corner: the known cost.
+  const BS = { x1: 730, x2: 1190, y: 452 };
+  const bsHold = S.g();                              // xform target (the fold into the corner)
+  const bsFade = S.g(null, bsHold);                  // fx.in / fade target
+  const bus = libByteStream(S, { x1: BS.x1, x2: BS.x2, y1: BS.y, width: 56, rate: null,
+    source: { style: 'stack', w: 200, h: 200, label: 'weights', sub: '140 GB' },
+    sink: { title: 'one decode step', w: 190, h: 190, size: 30 } }, bsFade);
+  S.add(fx.in(bsFade, { from: 'scale', scale: 0.94, d: 0.7 }), 'b1-0.25');
+  S.add(bus.pass({ amount: 140, d: 1.05, length: 170 }), 'b1~reads-0.2');
+
+  // the reference tag, at its corner spot; it fades in as the byte stream folds into it
   const TAG = { x: 96, y: 224, h: 48, size: 26, pad: 22 };
   const segs = [{ t: 'weights: ', c: 'muted' }, { t: '140', c: 'bytes', f: 'mono', w: 600 }, { t: ' GB', c: 'bytes', w: 600 }, { t: ' every step', c: 'muted' }];
   const tagW = segs.reduce((a, s) => a + S.measure(s.t, { size: TAG.size, weight: s.w || 550, family: s.f || 'sans' }), 0) + 2 * TAG.pad;
   const wHold = S.g();
   const wTag = S.g(null, wHold);
   S.rect({ x: TAG.x, y: TAG.y - TAG.h / 2, w: tagW, h: TAG.h, r: TAG.h / 2, fill: '#0c1326' }, wTag);
-  const wTagBg = S.rect({ x: TAG.x, y: TAG.y - TAG.h / 2, w: tagW, h: TAG.h, r: TAG.h / 2, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.22, sw: 2 }, wTag);
+  S.rect({ x: TAG.x, y: TAG.y - TAG.h / 2, w: tagW, h: TAG.h, r: TAG.h / 2, fill: 'url(#card-neutral)', stroke: 'bytes', strokeOpacity: 0.55, sw: 2 }, wTag);
   S.text(segs, { x: TAG.x + TAG.pad, y: TAG.y + 1, size: TAG.size, weight: 550 }, wTag);
   const tcx = TAG.x + tagW / 2, tcy = TAG.y;
-  S.xset(wHold, { x: 960 - tcx, y: 470 - tcy, s: 1.65, ox: tcx, oy: tcy });
-  S.add(fx.in(wTag, { from: 'scale', scale: 0.9, d: 0.6 }), 'b1+0.05');
-  // "reads every weight": the 140 GB lights up coral as it is said
-  S.add(gsap.fromTo(wTagBg, { attr: { stroke: '#ffffff', 'stroke-opacity': 0.22 } },
-    { attr: { stroke: S.tone('bytes'), 'stroke-opacity': 0.9 }, duration: 0.3, yoyo: true, repeat: 1, repeatDelay: 0.35, ease: 'sine.inOut', immediateRender: false }), 'b1~every-0.1');
-  S.add(fx.xform(wHold, { x: 0, y: 0, s: 1 }, { d: 1.0, ease: 'power3.inOut' }), 'b1~It also-0.05');
-  S.add(gsap.fromTo(wHold, { opacity: 1 }, { opacity: 0.3, duration: 0.6, ease: 'power1.inOut', immediateRender: false }), 'b1~conversation-0.2');
+  // "It also reads": the stream shrinks into the tag's place and hands over to it
+  const BSC = [(BS.x1 + BS.x2) / 2, BS.y + 26];      // centre of the stream with its labels
+  S.xset(bsHold, { s: 1.12, ox: BSC[0], oy: BSC[1] });
+  bsHold.setAttribute('data-audit', 'ignore');       // a picture while it shrinks
+  S.add(fx.xform(bsHold, { x: tcx - BSC[0], y: tcy - BSC[1], s: 0.16 }, { d: 0.9, ease: 'power3.inOut' }), 'b1~It also-0.15');
+  S.add(gsap.fromTo(bsFade, { opacity: 1 }, { opacity: 0, duration: 0.4, ease: 'power1.in', immediateRender: false }), 'b1~It also+0.12');
+  S.add(fx.in(wTag, { from: 'scale', scale: 0.85, d: 0.55 }), 'b1~It also+0.25');
+  S.add(gsap.fromTo(wHold, { opacity: 1 }, { opacity: 0.3, duration: 0.6, ease: 'power1.inOut', immediateRender: false }), 'b1~so far-0.1');
 
   // the header writes on (left to right, so it is laid out from its left edge)
   const HEAD = 'Every new token re-reads the whole conversation';

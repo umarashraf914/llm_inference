@@ -3,13 +3,21 @@
    b2  one small chip against a few GPUs; the laptop closes, the server never switches off.
    b3  the camera pulls back to a data centre (powered, cooled, day and night), then pushes into one server:
        a question arrives and is handled in a fraction of a second.
-   b4  shared by many, always on, paid by the hour: production.
+   b4  shared by many (requests from several people, each handled in a fraction of a second), always on,
+       paid by the hour: production.
    World coordinates equal screen coordinates in b1-b2 (camera at rest). From the push-in in b3 the server
-   is shown at 1.2x, centred at (960, 480); everything around it from then on lives in the HUD. */
+   is shown at 1.25x, centred at (960, 515); everything around it from then on lives in the HUD. */
 V.scene('ch03_s01', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
   const LX = 340, SX = 1580, Y = 470, SW = 440;          // laptop centre x, server centre x, the line's y, server width
+  const hide = el => { el.style.opacity = 0; el.style.visibility = 'hidden'; };
+  // width of a libToken chip before it is placed (so a chip can sit flush against something on its right)
+  const chipW = (text, size) => { const t = libToken(S, { text, size }); const w = t.w; t.remove(); return w; };
+  // a chip sinks into the thing it reached: shrinks and fades (its pop is long finished, so .body is free)
+  const sink = (tok, d = 0.3) => gsap.timeline()
+    .fromTo(tok.body, { scale: 1, transformOrigin: '50% 50%' }, { scale: 0.35, duration: d, ease: 'power2.in', transformOrigin: '50% 50%', immediateRender: false }, 0)
+    .add(tok.out({ d }), 0);
 
   // ================================================================ the server: one unit of a data-centre hall
   // The hall is built around the scene's server (heroAt) and stays hidden until the pull-back in b3.
@@ -29,23 +37,31 @@ V.scene('ch03_s01', S => {
   S.add(wire.drawOn({ d: 1.1 }), 0.75);
   S.add(lap.ping({ d: 0.6 }), 'b1~laptop-0.1');
 
-  // "your question" appears on the screen, rides the line through the globe and is taken in by the server
-  const scr = lap.port('screen');
-  const q = libToken(S, { text: 'your question', x: scr.x, y: scr.y, size: 26 });
+  // "your question" grows over the user's bubble on the screen (libDevice's chat bubble sits 21.6% down the
+  // glass, right-aligned; the pill is centred on the glass so it stays inside it), rides the line through the
+  // globe and is taken in by the server
+  const G = lap.glass, scr = lap.port('screen');
+  const q = libToken(S, { text: 'your question', x: G.x + G.w / 2, y: G.y + G.h * 0.216, size: 26 });
   const qEnd = srv.l - 14 - q.w / 2;
-  S.add(q.pop({ d: 0.45 }), 'b1~question-0.3');
+  S.add(q.pop({ d: 0.5, from: 0.45 }), 'b1~question-0.3');
   S.add(q.travel(`M${q.cx},${q.cy} L${wire.x1 + q.w / 2 + 6},${Y} L${qEnd},${Y}`, { d: 1.45, ease: 'power1.inOut' }), 'b1~crosses-0.15');
   S.add(wire.pulseGlobe(), 'b1~network-0.2');
   S.add(q.moveBy(34, 0, { d: 0.3, ease: 'power2.in' }), 'b1~server-0.1');
   S.add(q.out({ d: 0.3 }), 'b1~server-0.1');
   S.add(srv.activity({ d: 1.0, rate: 7, seed: 3 }), 'b1~server');
-  // a smaller "answer" leaves the server and comes back to the screen
-  const ans = libToken(S, { text: 'answer', x: srv.l - 14, y: Y, size: 24, anchor: 'start' });
-  ans.style.opacity = 0; ans.style.visibility = 'hidden';
-  S.add(ans.pop({ d: 0.4 }), 'b1~answer-0.2');
-  S.add(ans.travel(`M${ans.cx},${ans.cy} L${wire.x1 + ans.w / 2 + 6},${Y} L${scr.x},${scr.y}`, { d: 0.85, ease: 'power2.inOut' }), 'b1~answer');
-  S.add(lap.ping({ d: 0.6 }), 'b1~back');
-  S.add(ans.out({ d: 0.35 }), 'b1>');
+  // a smaller "answer" leaves the server's front and comes back into the screen
+  const AW = chipW('answer', 24);
+  const ans = libToken(S, { text: 'answer', x: srv.l - 14 - AW / 2, y: Y, size: 24 });
+  hide(ans);
+  S.add(ans.pop({ d: 0.4 }), 'b1~answer-0.25');
+  S.add(ans.travel(`M${ans.cx},${ans.cy} L${wire.x1 + ans.w / 2 + 6},${Y} L${scr.x},${scr.y}`, { d: 0.75, ease: 'power2.inOut' }), 'b1~answer-0.05');
+  S.add(sink(ans), 'b1>-0.28');
+  S.add(lap.ping({ d: 0.6 }), 'b1>-0.3');
+
+  // the chips that carry a question or an answer pass over the lid, the globe and the server's front while in
+  // flight; they are opaque and on top, so the audit's edge checks do not apply to them
+  const messenger = el => el.setAttribute('data-audit', 'ignore');
+  [q, ans].forEach(messenger);
 
   // ================================================================ b2: one small chip; a few GPUs, never off
   const card = (cx, title, sub) => S.card({ x: cx - 240, y: 680, w: 480, h: 128, tone: 'neutral', title, sub, size: 38, subSize: 28, layout: 'center' });
@@ -138,44 +154,51 @@ V.scene('ch03_s01', S => {
   S.add(gsap.fromTo(dc.racksG, { opacity: 1 }, { opacity: 0.5, duration: 0.6, immediateRender: false }), 'b3~everything');
   S.add(fx.out(hall, { d: 0.4 }), 'b3~inside-0.7');
 
-  // the push-in: the hall falls away and one server is left, centred
-  const C2 = { x: SX, y: Y + 50, scale: 1.2 };            // the server lands at screen (960, 480)
+  // the push-in: the hall falls away and one server is left, centred at (960, SVY) at scale SC
+  const SC = 1.25, SVY = 515;
+  const C2 = { x: SX, y: Y + (540 - SVY) / SC, scale: SC };
   S.add(fx.cam({ ...C2, d: 1.6, ease: 'power3.inOut' }), 'b3~inside-0.45');
   S.add(gsap.fromTo(dc.buildingG, { opacity: 1 }, { opacity: 0, duration: 0.6, immediateRender: false }), 'b3~inside-0.4');
   S.add(gsap.fromTo(dc.racksG, { opacity: 0.5 }, { opacity: 0, duration: 0.8, immediateRender: false }), 'b3~inside-0.1');
   S.add(srv.unglow({ d: 0.6 }), 'b3~one+0.5');
-  const sv = toScr(C2, SX, Y), sL = sv.x - SW * C2.scale / 2, sR = sv.x + SW * C2.scale / 2;
+  const sv = toScr(C2, SX, Y), sL = sv.x - SW * SC / 2;
 
   // the user's end comes back small at the far left; a question arrives; the stopwatch barely moves
   const mini = S.g(null, S.hud);
   const ml = libDevice(S, { x: 236, y: sv.y, w: 170 }, mini);
-  const NET = { x: 506, y: sv.y };                         // the globe: every user's line runs through it
-  const mw = ch03Wire(S, { x1: 318, y1: sv.y, x2: sL - 16, y2: sv.y, globe: NET, globeSize: 44 }, S.hud);
+  const W1 = 318, W2 = sL - 16;                            // the small line: laptop to server
+  const NET = { x: Math.round((W1 + W2) / 2), y: sv.y };   // its globe: every user's line runs through it
+  const mw = ch03Wire(S, { x1: W1, y1: sv.y, x2: W2, y2: sv.y, globe: NET, globeSize: 44 }, S.hud);
   S.add(fx.in(ml, { from: 'left', d: 0.6 }), 'b3~one-0.1');
   S.add(mw.drawOn({ d: 0.6 }), 'b3~one+0.15');
+  // ('b3~in a' would match "sits in a data centre": time everything here from 'fraction')
+  const tF = T('b3~fraction');
   const q2 = libToken(S, { text: 'your question', x: 326, y: sv.y, size: 24, anchor: 'start' }, S.hud);
-  q2.style.opacity = 0; q2.style.visibility = 'hidden';
+  hide(q2);
   const q2End = sL - 12 - q2.w / 2;
-  S.add(q2.travel(`M${q2.cx},${q2.cy} L${q2End},${sv.y}`, { d: 0.6, ease: 'power2.inOut', appear: true }), 'b3~in a-0.45');
-  S.add(q2.moveBy(30, 0, { d: 0.25, ease: 'power2.in' }), 'b3~in a+0.15');
-  S.add(q2.out({ d: 0.25 }), 'b3~in a+0.15');
+  S.add(q2.travel(`M${q2.cx},${q2.cy} L${q2End},${sv.y}`, { d: 0.6, ease: 'power2.inOut', appear: true }), tF - 0.6);
+  S.add(q2.moveBy(30, 0, { d: 0.25, ease: 'power2.in' }), tF - 0.02);
+  S.add(q2.out({ d: 0.25 }), tF - 0.02);
 
-  const sw = libStopwatch(S, { x: 1470, y: sv.y - 10, size: 150, span: 1000, readout: 'none', tone: 'struct' }, S.hud);
-  const swLabel = S.text('a fraction of a second', { x: 1470, y: sv.y + 96, size: 28, weight: 550, color: 'muted', anchor: 'middle' }, S.hud);
+  const SWX = 1490;
+  const sw = libStopwatch(S, { x: SWX, y: sv.y - 10, size: 150, span: 1000, readout: 'none', tone: 'struct' }, S.hud);
+  const swLabel = S.text('a fraction of a second', { x: SWX, y: sv.y + 96, size: 28, weight: 550, color: 'muted', anchor: 'middle' }, S.hud);
   S.add(sw.in({ d: 0.5 }), 'b3~one');
-  S.add(sw.run(0, 240, { d: 0.45 }), 'b3~in a+0.2');
-  S.add(srv.activity({ d: 0.6, rate: 9, seed: 12 }), 'b3~in a+0.2');
-  S.add(fx.in(swLabel, { from: 'up', d: 0.5 }), 'b3~fraction-0.05');
-  // and the answer goes back
-  const a2 = libToken(S, { text: 'answer', x: sL - 14, y: sv.y, size: 24, anchor: 'start' }, S.hud);
-  a2.style.opacity = 0; a2.style.visibility = 'hidden';
-  S.add(a2.travel(`M${a2.cx},${a2.cy} L${336 + a2.w / 2},${sv.y}`, { d: 0.6, ease: 'power2.inOut', appear: true }), 'b3~second-0.35');
-  S.add(a2.out({ d: 0.3 }), 'b3~second+0.35');
+  S.add(sw.run(0, 240, { d: 0.45 }), tF);
+  S.add(srv.activity({ d: 0.6, rate: 9, seed: 12 }), tF);
+  S.add(fx.in(swLabel, { from: 'up', d: 0.5 }), tF + 0.1);
+  // and the answer goes back into the small screen
+  const a2 = libToken(S, { text: 'answer', x: sL - 14 - AW / 2, y: sv.y, size: 24 }, S.hud);
+  hide(a2);
+  const ms = ml.port('screen');
+  S.add(a2.travel(`M${a2.cx},${a2.cy} L${W1 + a2.w / 2 + 4},${sv.y} L${ms.x},${ms.y}`, { d: 0.65, ease: 'power2.inOut', appear: true }), 'b3~second-0.4');
+  S.add(sink(a2, 0.25), 'b3~second+0.22');
   S.add(ml.ping({ d: 0.5 }), 'b3~second+0.2');
+  [q2, a2].forEach(messenger);
 
   // ================================================================ b4: shared, always on, paid by the hour
-  S.add(fx.out(swLabel, { d: 0.4 }), 'b4-0.3');
-  S.add(fx.dim(sw, { to: 0.55, d: 0.5 }), 'b4-0.3');
+  S.add(fx.out(swLabel, { d: 0.4 }), 'b4-0.45');
+  S.add(fx.dim(sw, { to: 0.7, d: 0.5 }), 'b4-0.45');
 
   // shared by many: more people, on more devices, through the same network, into the same server
   const more = [
@@ -188,11 +211,30 @@ V.scene('ch03_s01', S => {
   ];
   S.add(fx.in(more, { from: 'left', d: 0.6, stagger: 0.12 }), 'b4~Shared-0.2');
   mw2.forEach((w, i) => S.add(w.drawOn({ d: 0.5 }), T('b4~Shared') + 0.1 + i * 0.12));
-  // requests keep arriving from all three, until the end
-  [[mw2[0].x1, mw2[0].y1, 0.62], [326, sv.y, 0.47], [mw2[1].x1, mw2[1].y1, 0.71]].forEach(([x0, y0, every], i) => {
-    S.flow({ d: `M${x0},${y0} L${NET.x},${NET.y} L${sL - 6},${sv.y}`, from: T('b4~Shared') + 0.45 + i * 0.17, to: 'end', speed: 330, every, size: 6, color: 'struct', shape: 'chip' }, S.hud);
+
+  // requests from three people (three blues) arrive one after another; each is handled in a fraction of a
+  // second, so the stopwatch runs once per arrival and the server never sits idle
+  const into = { x: sL - 8, y: sv.y };
+  const SRC = [
+    { x: mw2[0].x1, y: mw2[0].y1, via: true },              // phone
+    { x: 326, y: sv.y, via: false },                        // the first laptop (its line already runs through the globe)
+    { x: mw2[1].x1, y: mw2[1].y1, via: true },              // second laptop
+  ].map((p, i) => {
+    const d = p.via ? `M${p.x},${p.y} L${NET.x},${NET.y} L${into.x},${into.y}` : `M${p.x},${p.y} L${into.x},${into.y}`;
+    const len = p.via ? Math.hypot(NET.x - p.x, NET.y - p.y) + Math.hypot(into.x - NET.x, into.y - NET.y) : into.x - p.x;
+    return { ...p, d, len, color: ch03Shade(S, i, 5) };
   });
-  S.add(srv.activity({ d: 5.2, rate: 4, seed: 21 }), 'b4~Shared');
+  const ORDER = [1, 0, 2, 1, 2, 0, 1, 0, 2];
+  const A0 = T('b4~Shared') + 0.95, PER = 0.46, SPEED = 520;
+  ORDER.forEach((si, k) => {
+    const s = SRC[si], at = A0 + k * PER, dur = s.len / SPEED;
+    const c = libToken(S, { text: '', x: s.x, y: s.y, w: 30, h: 16, r: 8, state: { color: s.color }, decorative: true, hidden: true }, S.hud);
+    S.add(c.travel(s.d, { d: dur, ease: 'power1.inOut', appear: true }), at - dur);
+    S.add(c.moveBy(16, 0, { d: 0.2, ease: 'power2.in' }), at - 0.04);
+    S.add(c.out({ d: 0.2 }), at - 0.04);
+    S.add(sw.run(0, 240, { d: 0.3, ease: 'power2.out' }), at);
+  });
+  S.add(srv.activity({ d: 5.0, rate: 4, seed: 21 }), 'b4~Shared+0.4');
 
   // three tags stamp in under the server, one per phrase
   const tagRow = S.g(null, S.hud);

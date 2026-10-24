@@ -17,7 +17,7 @@ V.scene('ch12_s01', S => {
   const row = dy => ({ dy, head: 160 + dy, opsL: 244 + dy, opsY: 262 + dy, bytesL: 334 + dy, bytesY: 352 + dy,
     sub: 408 + dy, pill: 466 + dy, num: 450 + dy, fbar: 468 + dy, den: 487 + dy });
   const P = row(0), D = row(400);             // prefill row, decode row
-  const GRID = { x: 96, y: 196, cols: 40, rows: 50, px: 8, py: 6, w: 6, h: 4 };   // 2,000 pills, x 96–414, y 196–494
+  const GRID = { x: 96, y: 194, cols: 40, rows: 50, px: 8, py: 5.6, w: 6, h: 4 };   // 2,000 pills, x 96–414, y 194–472
   const COLX = 255;                           // centre of the input column
   const STK = { x: 487, w: 64, h: 40, step: 5, n: 5 };   // the weight stacks, x 445–529
   const FX = 1200;                            // centre of the fraction slots
@@ -126,6 +126,13 @@ V.scene('ch12_s01', S => {
     tl.add(fx.type(h.b, { d: d * n2 / (n1 + n2) }), d * n1 / (n1 + n2));
     return tl;
   };
+  /** Draw a line on that stays hidden (to the eye and to the audit) until its draw starts. */
+  const drawOn = (el, o = {}) => {
+    const tl = gsap.timeline();
+    tl.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, ease: 'none' }, 0);
+    tl.fromTo(el, { drawSVG: '0%' }, { drawSVG: '100%', duration: o.d ?? 0.5, ease: o.ease || 'power2.inOut' }, 0);
+    return tl;
+  };
   /** A particle train: `n` bytes leave a stack and run along a lane (the same bus speed in both rows). */
   const SPEED = 520, EVERY = 0.03, TRAIN = 10;
   function train(t0, cy, laneY, parent = flowG) {
@@ -141,8 +148,8 @@ V.scene('ch12_s01', S => {
   const finD = resultPill([{ t: '= about ', c: 'muted' }, { t: '1', c: 'bytes', w: 700 }, { t: ' op per byte', c: 'ink' }], LX, D.pill, 'bytes');
   const phP = placeholder(finP), phD = placeholder(finD);
   [phP, phD].forEach((ph, i) => {
-    S.add(fx.draw(ph.bg, { d: 0.8, ease: 'power2.inOut' }), 'b1~Operations-0.15' + (i ? '+0.2' : ''));
-    S.add(fx.in(ph.label, { from: 'fade', d: 0.5 }), `b1~Operations+${0.35 + i * 0.2}`);
+    S.add(fx.draw(ph.bg, { d: 0.8, ease: 'power2.inOut' }), at('b1~Operations') - 0.15 + i * 0.2);
+    S.add(fx.in(ph.label, { from: 'fade', d: 0.5 }), at('b1~Operations') + 0.35 + i * 0.2);
   });
   S.add(fx.pulse(phP, { scale: 1.07, d: 0.45 }), 'b1~phase-0.05');
   S.add(fx.pulse(phD, { scale: 1.07, d: 0.45 }), 'b1~phase#2-0.05');
@@ -264,19 +271,36 @@ V.scene('ch12_s01', S => {
   const denPc = S.text('about 146 GB', { x: FX, y: P.den, size: 26, weight: 600, color: 'bytes', anchor: 'middle', tnum: true }, fracP);
   const fbarP = S.line({ x1: FX - 160, y1: P.fbar, x2: FX + 160, y2: P.fbar, stroke: 'ink', sw: 2.5, strokeOpacity: 0.8 }, fracP);
   [numP, denP, denPc, fbarP].forEach(hide);
-  const fly = at('b2~record') + 0.3;
-  S.add(fx.dim(subP, { to: 0.4, d: 0.4 }), fly - 0.2);
-  S.add(gsap.fromTo(numP, { autoAlpha: 1, x: TAGX + w290 / 2 - FX, y: P.opsY + BH / 2 - P.num }, { autoAlpha: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.inOut' }), fly);
-  S.add(gsap.fromTo(denPc, { autoAlpha: 1, x: TAGX + w146 / 2 - FX, y: P.bytesY + BH / 2 - P.den }, { autoAlpha: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.inOut' }), fly + 0.12);
-  S.add(gsap.to(denPc, { autoAlpha: 0, duration: 0.2 }), fly + 0.62);
-  S.add(fx.in(denP, { from: 'fade', d: 0.25 }), fly + 0.62);
-  S.add(fx.draw(fbarP, { d: 0.35 }), fly + 0.35);
-  // the fraction collapses leftward into the pill, which replaces its placeholder
-  const col = fly + 1.0;
-  S.add(fx.xform(fracP, { x: finP.cx - FX, y: finP.cy - P.fbar, s: 0.3, ox: FX, oy: P.fbar }, { d: 0.45, ease: 'power2.in' }), col);
-  S.add(gsap.to(fracP, { opacity: 0, duration: 0.3, ease: 'power1.in' }), col + 0.1);
-  S.add(fx.out(phP, { d: 0.15 }), col + 0.25);
+  // The two end tags fly into the slot and stack. What flies are copies: the tag itself blinks out as its
+  // copy appears in the same place, and fades back in at the bar's end once the pill has landed (b3 and b4
+  // still need it). Both copies drop first and turn left only once clear of the bar ends, so neither
+  // crosses a bar, the other tag or the sub-label.
+  const fly = at('b2~record') - 0.05;
+  const flyTag = (el, dx, dy, t0, lag) => {
+    const tl = gsap.timeline();
+    tl.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.08, ease: 'none' }, 0);
+    tl.fromTo(el, { y: dy }, { y: 0, duration: 0.55, ease: 'power2.inOut' }, 0);
+    tl.fromTo(el, { x: dx }, { x: 0, duration: 0.6, ease: 'power2.inOut' }, lag);
+    S.add(tl, t0);
+  };
+  const blink = (w, t0) => S.add(gsap.fromTo(w, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.08, ease: 'none', immediateRender: false }), t0);
+  S.add(fx.dim(subP, { to: 0.4, d: 0.4 }), fly - 0.3);
+  flyTag(denPc, TAGX + w146 / 2 - FX, P.bytesY + BH / 2 - P.den, fly, 0.12);
+  blink(tagPbW, fly);
+  flyTag(numP, TAGX + w290 / 2 - FX, P.opsY + BH / 2 - P.num, fly + 0.3, 0.3);
+  blink(tagPoW, fly + 0.3);
+  S.add(drawOn(fbarP, { d: 0.35 }), fly + 0.75);
+  // '146 GB' spells itself out as '146 billion bytes' once it lands
+  S.add(gsap.fromTo(denPc, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2, immediateRender: false }), fly + 1.0);
+  S.add(fx.in(denP, { from: 'fade', d: 0.3 }), fly + 1.0);
+  // the fraction holds while 'about two thousand' is said, then collapses leftward into the pill
+  const col = at('b2~operations') - 0.15;
+  S.add(fx.xform(fracP, { x: finP.cx - FX, y: finP.cy - P.fbar, s: 0.8 }, { d: 0.45, ease: 'power2.in', from: { ox: FX, oy: P.fbar } }), col);
+  S.add(gsap.to(fracP, { opacity: 0, duration: 0.32, ease: 'power2.in' }), col + 0.1);
+  S.add(fx.out(phP, { d: 0.15 }), col + 0.1);
   S.add(fx.pop(finP, { from: 0.8, d: 0.5 }), col + 0.32);
+  // the end tags return to their bars
+  S.add(gsap.fromTo([tagPoW, tagPbW], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, stagger: 0.1, immediateRender: false }), col + 0.55);
 
   // ================================================================ b3 · decode: one token, the same lanes
   S.add(fx.dim([gridG, gridTag, stkP, lblPo, lblPb], { to: 0.4, d: 0.5 }), 'b3-0.2');
@@ -289,6 +313,8 @@ V.scene('ch12_s01', S => {
   S.add(fx.in(trkDb, { from: 'fade', d: 0.4 }), 'b3~Decode+0.55');
   const pillD = libToken(S, { text: '', x: COLX, y: MIDD, w: 44, h: 24, hidden: true }, leftG);
   S.add(pillD.in({ from: 'down', d: 0.55, dist: 40 }), 'b3~one-0.1');
+  const pillTag = label('1 token', { x: COLX, y: MIDD + 36, anchor: 'middle' });
+  S.add(fx.in(pillTag, { from: 'up', d: 0.45, dist: 12 }), 'b3~request-0.1');
   const stkD = weightStack(MIDD);
   S.add(fx.in(stkD, { from: 'fade', d: 0.5 }), 'b3~next-0.1');
   // a copy of the token runs through the weights and comes out as 140 billion operations
@@ -312,7 +338,7 @@ V.scene('ch12_s01', S => {
   S.add(fx.in(scaleTag, { from: 'up', d: 0.5, dist: 12 }), 'b3~operations-0.1');
 
   // the same 140 GB: one pass grows the bar under the prefill weights; then twice more, every time
-  const t1 = at('b3~on') - 0.3;
+  const t1 = at('b3~on the') - 0.3;
   const trD = [train(t1, MIDD, D.bytesY + BH / 2), train(at('b3~every') - 0.15, MIDD, D.bytesY + BH / 2), train(at('b3~every') + 0.7, MIDD, D.bytesY + BH / 2)];
   const bytesD = bar(D.bytesY, 'bytes');
   drive(t => bytesD.setAttribute('width', wTrail(trD[0], t).toFixed(2)));
@@ -337,22 +363,25 @@ V.scene('ch12_s01', S => {
   });
   // a thin white guide: the decode bar ends exactly under the prefill weights segment
   const guide = S.line({ x1: LX + W140, y1: D.bytesY - 4, x2: LX + W140, y2: P.bytesY + BH + 4, stroke: 'ink', sw: 1.5, strokeOpacity: 0.6 }, tracksG);
-  S.add(fx.draw(guide, { d: 0.6, ease: 'power2.out' }), growD[1] + 0.1);
+  S.add(drawOn(guide, { d: 0.6, ease: 'power2.out' }), growD[1] + 0.1);
   const subD = label('the same weights, every time', { x: LEND, y: D.sub, anchor: 'end' });
   S.add(fx.type(subD, { d: 0.8 }), 'b3~every+0.1');
 
   // the chip itself holds about a tenth of a gigabyte (beside the stack that stands for 140 GB)
-  const chip = libChip(S, { x: 335, y: MIDD + 76, size: 40, style: 'outline', tone: 'compute' }, labelG);
-  const chipTag = label('chip holds ≈ 0.1 GB', { x: 335, y: MIDD + 124, anchor: 'middle' });
+  const chip = libChip(S, { x: 372, y: MIDD + 80, size: 44, style: 'outline', tone: 'compute' }, labelG);
+  const chipTag = label('chip holds ≈ 0.1 GB', { x: 372, y: MIDD + 128, anchor: 'middle' });
   S.add(chip.drawOn({ d: 0.6 }), 'b3~chip-0.1');
   S.add(fx.in(chipTag, { from: 'up', d: 0.5, dist: 12 }), 'b3~tenth-0.25');
+  S.add(fx.swap(stkD.label, '140 GB'), 'b3~tenth-0.1');
   S.add(fx.out([chip, chipTag], { d: 0.4 }), 'b3>-0.1');
 
   // ================================================================ b4 · decode's fraction: 1 op per byte
   // clear the stage down to the headings, the bars with their end tags and the result pills
-  const gone = [gridG, gridTag, stkP, stkD, pillD, lblPo, lblPb, lblDo, lblDb, subD, eqG, attnTag, scaleTag];
+  const gone = [gridG, gridTag, stkP, stkD, pillD, pillTag, lblPo, lblPb, lblDo, lblDb, subD, eqG, attnTag, scaleTag];
   S.add(fx.out(gone, { d: 0.45, stagger: 0.02 }), 'b4-0.25');
   S.add(lens.close({ d: 0.6 }), 'b4-0.25');
+  S.add(gsap.to(lens.leader, { autoAlpha: 0, duration: 0.01 }), 'b4+0.4');
+  S.add(fx.out(trkDo, { d: 0.4 }), 'b4+0.1');
   S.add(gsap.fromTo(tagDo, { x: 0, y: 0 }, { x: LX + 18 - 845, y: BH / 2 - 2, duration: 0.6, ease: 'power3.inOut', immediateRender: false }), 'b4+0.15');
 
   const fracD = S.g(null, labelG);
@@ -361,7 +390,7 @@ V.scene('ch12_s01', S => {
   const fbarD = S.line({ x1: FX - 140, y1: D.fbar, x2: FX + 140, y2: D.fbar, stroke: 'ink', sw: 2.5, strokeOpacity: 0.8 }, fracD);
   hide(fbarD);
   S.add(fx.in(numD.parts, { from: 'down', d: 0.45, dist: 14, stagger: 0.06 }), 'b4~both-0.1');
-  S.add(fx.draw(fbarD, { d: 0.3 }), 'b4~both+0.1');
+  S.add(drawOn(fbarD, { d: 0.3 }), 'b4~both+0.1');
   S.add(fx.in(denD.parts, { from: 'up', d: 0.45, dist: 14, stagger: 0.06 }), 'b4~both+0.15');
   // cancel: the two 2s, then the two 70 billions (a slash through each, and the cancelled terms grey out)
   const slash = (eqG_, part) => {
@@ -374,21 +403,21 @@ V.scene('ch12_s01', S => {
   };
   const cancel = (pairs, when) => pairs.forEach(([eg, part], i) => {
     const ln = slash(eg, part);
-    S.add(fx.draw(ln, { d: 0.25, ease: 'power2.out' }), `${when}+${i * 0.1}`);
-    S.add(gsap.to(part, { opacity: 0.4, duration: 0.3 }), `${when}+${i * 0.1 + 0.15}`);
+    S.add(drawOn(ln, { d: 0.25, ease: 'power2.out' }), when + i * 0.1);
+    S.add(gsap.to(part, { opacity: 0.4, duration: 0.3 }), when + i * 0.1 + 0.15);
   });
-  cancel([[numD, numD.parts[0]], [denD, denD.parts[2]]], 'b4~shapes-0.15');
-  cancel([[numD, numD.parts[2]], [denD, denD.parts[0]]], 'b4~alone-0.2');
-  const colD = at('b4~alone') + 0.25;
-  S.add(fx.xform(fracD, { x: finD.cx - FX, y: finD.cy - D.fbar, s: 0.3, ox: FX, oy: D.fbar }, { d: 0.42, ease: 'power2.in' }), colD);
-  S.add(gsap.to(fracD, { opacity: 0, duration: 0.28, ease: 'power1.in' }), colD + 0.08);
-  S.add(fx.out(phD, { d: 0.15 }), colD + 0.22);
+  cancel([[numD, numD.parts[0]], [denD, denD.parts[2]]], at('b4~shapes') - 0.1);
+  cancel([[numD, numD.parts[2]], [denD, denD.parts[0]]], at('b4~alone') - 0.15);
+  const colD = at('b4~alone') + 0.35;
+  S.add(fx.xform(fracD, { x: finD.cx - FX, y: finD.cy - D.fbar, s: 0.8 }, { d: 0.42, ease: 'power2.in', from: { ox: FX, oy: D.fbar } }), colD);
+  S.add(gsap.to(fracD, { opacity: 0, duration: 0.3, ease: 'power2.in' }), colD + 0.08);
+  S.add(fx.out(phD, { d: 0.15 }), colD + 0.1);
   S.add(fx.pop(finD, { from: 0.8, d: 0.5 }), colD + 0.28);
 
   // two thousand against one
-  S.add(fx.pulse([finP, finD], { scale: 1.07, d: 0.5 }), 'b4~two+0.1');
+  S.add(fx.pulse([finP, finD], { scale: 1.07, d: 0.5 }), 'b4~against-0.1');
   const take = S.takeaway('Same model, same chip: 2,000 against 1', { tone: 'ink' });
-  S.add(fx.in(take, { from: 'up', d: 0.6 }), 'b4~against-0.25');
+  S.add(fx.in(take, { from: 'up', d: 0.6 }), 'b4~one-0.2');
 
   // one operation from each identical byte: the decode bar becomes a row of bytes, each with one amber dot
   const NB = 48, pitch = W140 / NB;
