@@ -135,6 +135,19 @@ numbers, or whether a figure contradicts another atlas.
    - Run the checker and update `atlases/index.html`.
    - Open one pull request per atlas.
 
+## Resuming after a pause
+
+The builders save as they go: every new figure is a file in `figures/V0N/items/`, named for the plan
+entry that proposed it (`p15`, `n36`, `a07`, `b12`), and progress is committed to the `atlases`
+branch every 15 minutes while they run. To pick up after a stop (a usage limit, a closed session):
+
+1. For each atlas, compare the review's §4 entries with the items that exist and with `order.txt`.
+   An item file that is missing from `order.txt` was interrupted mid-build-up: finish it or delete it.
+2. Start a builder for each unfinished atlas with `BUILD.md` and a note listing what is already done.
+   Split V7 and V8 between two builders at Part 6, as before (ids `a…` before, `b…` after).
+3. When an atlas is finished, build it into `atlases/`, run the checker, look at the new figures,
+   update `atlases/index.html` (`atlas_build.py index`) and commit.
+
 ## Files
 
 - `V01_review.md` … `V09_review.md`, one per atlas, each with six sections:
