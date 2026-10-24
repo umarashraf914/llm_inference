@@ -8,7 +8,9 @@
    b1  the equation builds term by term (ch12Ceiling), the 30 ms callout flips, the numbers land: ≈ 24 tokens/s
    b2  a faster kernel: arithmetic 0.14 ms → 0 ms, and nothing changes; the die just waits for bytes
    b3  the bus is the limit; a ceiling locks over the tray; the three conditions land under their terms */
-V.scene('ch12_s03', S => {
+V.scene('ch12_s03', {
+  fadeOut: false,                                  // s04 opens on this scene's last frame
+  build: S => {
   const { fx } = S;
   const at = spec => S.t(spec);
 
@@ -277,4 +279,4 @@ V.scene('ch12_s03', S => {
   S.tl.fromTo(clock, { t: 0 }, { t: S.duration, duration: S.duration, ease: 'none', immediateRender: true,
     onUpdate: () => drivers.forEach(f => f(clock.t)) }, 0);
   drivers.forEach(f => f(0));
-});
+}});
