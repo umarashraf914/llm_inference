@@ -32,13 +32,13 @@ assert [float(v) for v in __import__("numfmt").values("E2M1")] == FP4
 
 # ---- Fig 73: how many values share a scale, on a log axis ---------------------------------------------------
 def o073():
-    rows = [("Per tensor", "one scale for a whole 4,096 × 4,096 matrix", 4096 * 4096, "h", "most fragile"),
+    rows = [("Per tensor", "one scale for a whole", 4096 * 4096, "h", "most fragile"),
             ("Per channel or per token", "the grain SmoothQuant and the KV cache methods work at", 4096, "m",
              "spoils one row or one column"),
             ("Microscaling", "blocks of 16 or 32 values", 16, "s", "spoils its own block only")]
     assert math.log2(4096 * 4096) == 24 and math.log2(4096) == 12
-    PX = 15                                                  # pixels per doubling
-    x0 = 300
+    PX = 11                                                  # pixels per doubling
+    x0 = 260
     b = [hd(40, 40, "How many numbers share a single scale?")]
     for k, (name, sub, n, cls, note) in enumerate(rows):
         y = 70 + k * 72
@@ -46,6 +46,8 @@ def o073():
         b.append(text(40, y + 38, sub if k != 1 else "the grain SmoothQuant and the", "sub2"))
         if k == 1:
             b.append(text(40, y + 54, "KV cache methods work at", "sub2"))
+        if k == 0:
+            b.append(text(40, y + 54, "4,096 × 4,096 matrix", "sub2"))
         w = math.log2(n) * PX
         if k == 2:
             b.append(rect(x0, y, 5 * PX, 34, "s", rx=3))     # 32: the longer of the two
@@ -98,9 +100,9 @@ def o074():
         for k in range(cols // blk):
             b.append(ghost(x0 - 2 + k * blk * pitch, y2 - 3 + i * rh, blk * pitch + 2, ch_ + 6, rx=3))
     yl = y2 + rows * rh + 26
-    b.append(text(40, yl, "!  the outlier;  red: values its scale rounds away;  teal: values kept at the precision "
-                  "their own scale allows", "sub2"))
-    b.append(text(40, yl + 18, "Dashed outlines: values that share one scale.", "sub2"))
+    b.append(text(40, yl, "!  the outlier;  red: values the outlier's scale rounds away", "sub2"))
+    b.append(text(40, yl + 18, "teal: values kept at the precision their own scale allows;  dashed: values that "
+                  "share one scale", "sub2"))
     body, y = prose(yl + 58, [
         "Same data, same outlier, entirely different blast radius. With one scale for the tensor, the "
         "outlier sets the step for every value, and the ordinary ones round to 0 ({{fig:v04-p29}} measured "
@@ -273,8 +275,9 @@ def tsp(key, s):
 
 def p32():
     fr = p32_frame(A0)
-    b = [hd(40, 30, "The same 16 values as one block in each format: dots above the line are the values, below it")]
-    b.append(text(40, 48, "where each is stored", "hd"))
+    b = [hd(40, 30, "The same 16 values as one block in each format")]
+    b.append(text(40, 48, "dots above each line: the values;  below it: where each is stored;  ticks: the 8 levels",
+                  "sub2"))
     panels = [("mx", "MXFP4: the largest power of two not above the block's largest value, ÷ 4 (the OCP rule)"),
               ("nv", "NVFP4: the block's largest value ÷ 6, rounded to the nearest FP8 (E4M3) number")]
     for k, (key, title) in enumerate(panels):
@@ -389,7 +392,7 @@ def p34():
     assert [r[1] for r in rows][2:] == [4.125, 4.25, 4.5]
     assert f(16 / 4.125, 2) == "3.88" and f(16 / 4.25, 2) == "3.76" and f(16 / 4.5, 2) == "3.56"
     assert f(8 / 4.5, 1) == "1.8" and 32 / (4096 * 4096) < 2e-6
-    K = 26                                                     # pixels per bit
+    K = 24                                                     # pixels per bit
     x0 = 230
     b = [hd(40, 30, "Bits stored per value, scales included, to scale")]
     for i, (name, bits, note, cls) in enumerate(rows):
@@ -398,11 +401,13 @@ def p34():
         b.append(rect(x0, y, bits * K, 24, cls, rx=2))
         lab = f"{bits:g}" + ("" if bits >= 8 else f", {f(16 / bits, 2)}× smaller than FP16")
         b.append(text(x0 + bits * K + 8, y + 17, lab, "sub2"))
-    for k in (4, 8, 16):
-        b.append(f'<line class="mark" x1="{x0 + k * K}" y1="46" x2="{x0 + k * K}" y2="{52 + 5 * 40 - 8}"/>'
-                 if k == 4 else "")
-    b.append(text(x0 + 4 * K, 52 + 5 * 40 + 8, "4 bits: no scale at all", "sub2", "middle"))
-    body, y = prose(52 + 5 * 40 + 50, [
+    ya = 52 + 5 * 40 - 4
+    b.append(hline(x0, x0 + 16 * K, ya))
+    for k in range(0, 17, 4):
+        b.append(tick(x0 + k * K, ya, ya + 5))
+        b.append(text(x0 + k * K, ya + 19, str(k), "sub2", "middle"))
+    b.append(text(x0 + 16 * K, ya + 37, "bits per value", "sub2", "end"))
+    body, y = prose(52 + 5 * 40 + 76, [
         "Each block pays for its own scale. An 8-bit scale shared by 32 values costs a quarter of a bit "
         "per value, shared by 16 half a bit. NVFP4's FP32 number per tensor adds 32 bits to a 4,096 × "
         "4,096 matrix, 32 ÷ 16,777,216, about two millionths of a bit per value: nothing. INT4 with an FP16 "
