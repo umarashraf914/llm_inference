@@ -67,6 +67,7 @@ measured length that way), and figure stamps checked against the text agree.
 Because they come from speech recognition, the captions carry `[music]` marks mid-sentence and the
 odd misheard word (V1 5:57 has "bite-hungry" for "byte-hungry"), so search for a nearby phrase if a
 term does not hit.
+
 Read the window around a timestamp with:
 
 ```bash
@@ -84,8 +85,8 @@ yt-dlp --js-runtimes node --extractor-args "youtube:player_client=ios,web_embedd
   "https://www.youtube.com/watch?v=30IRJQ49M2g"
 ```
 
-The per-video Python scripts that generated each atlas were not migrated either; only the HTML
-output exists. Edit the HTML directly, using `scripts/atlas.py` helpers to produce any new SVG.
+The per-video Python scripts that generated each atlas were not migrated; only the HTML output
+exists. Edit the HTML directly, using `scripts/atlas.py` helpers to produce any new SVG.
 
 ## Running the checker
 
