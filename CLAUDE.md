@@ -90,16 +90,19 @@ exists. Edit the HTML directly, using `scripts/atlas.py` helpers to produce any 
 
 ## Running the checker
 
-`check_atlas.py` drives headless Chromium through Python Playwright. In the cloud container the
-browser is preinstalled under `/opt/pw-browsers` (build 1194), so pin the matching package rather
-than running `playwright install`:
+`check_atlas.py` drives headless Chromium through Python Playwright. The cloud container preinstalls
+the browser under `/opt/pw-browsers`, so install the Python Playwright release that expects that
+build rather than running `playwright install`. The build is in the folder name: 1243 on 2026-10-24,
+which Playwright 1.63.0 expects (at migration it was 1194, for 1.56.0). If the pin is wrong, the
+launch error names the build it looked for.
 
 ```bash
-pip install "playwright==1.56.0"
+ls /opt/pw-browsers                # chromium_headless_shell-1243
+pip install "playwright==1.63.0"
 python3 .claude/skills/srt-figure-atlas/scripts/check_atlas.py atlases/V0*.html
 ```
 
-At migration it reported six existing faults, all minor:
+At migration it reported six existing faults, all minor, and still did on 2026-10-24:
 
 - V01 fig 14 — one element outside the canvas
 - V02 fig 86 — "plus or minus" collides with "roughly how big"
