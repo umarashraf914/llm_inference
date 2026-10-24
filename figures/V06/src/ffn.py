@@ -127,7 +127,7 @@ def p07():
     emit("p07", at("Each key recognizes a pattern"),
          "Each row of the first matrix is a key; each column of the second is a value", yy + 32, b + [body],
          "These keys and values are fixed weights, learned in training and read like a table. They have "
-         "nothing to do with attention's keys and values or the KV cache of Part 5: same words, different "
+         "nothing to do with attention's keys and values or the KV cache of {{ref:v06-o012}}: same words, different "
          "objects.")
 
 

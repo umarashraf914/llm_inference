@@ -82,11 +82,11 @@ def o001():
 
 
 def n01():
-    b = []
-    L = (40, 70, 270, 132)
-    R = (370, 70, 270, 132)
-    tools = ["run_tests(path): run a test file", "read_file(path): return its text",
-             "edit_file(path, patch): change it"]
+    b = [hd(40, 46, "One turn of the loop: text in, text out, and software in between")]
+    L = (40, 70, 258, 132)
+    R = (382, 70, 258, 132)
+    tools = ["run_tests(path): runs a test", "read_file(path): returns a file",
+             "edit_file(path, patch): edits it"]
     call = ['{"name": "edit_file",', ' "arguments": {', '   "path": "tests/test_parser.py",',
             '   "patch": "…" }}']
     b.append(cont(*L, "u", "In the prompt: the tools"))
@@ -127,7 +127,7 @@ def n01():
 
 
 def n02():
-    b = []
+    b = [hd(40, 46, "Eight seats share each step; every seat holds cache blocks of its own")]
     C = (40, 66, 420, 0)
     seats, SW, SG = 8, 40, 8
     blocks = [5, 9, 7, 3, 11, 6, 2, 8]                  # cache blocks held per seat (schematic)
