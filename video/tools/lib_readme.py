@@ -66,6 +66,21 @@ def main():
         if d.get("usedIn"):
             out.append(f"*Used in:* {', '.join(d['usedIn'])}\n")
     (VIDEO / "lib" / "README.md").write_text("\n".join(out))
+    # INDEX.md: the compact version (signature, one-line purpose, helper names) for quick reference
+    idx = ["# Shared film components: compact index",
+           "Full docs: lib/README.md and the doc comment above each function. Helpers return tweens: S.add(h, at).", ""]
+    for fam in ORDER:
+        d = by.get(fam)
+        if not d:
+            continue
+        idx.append(f"## {fam} (lib/{fam}.js)")
+        for f in d["functions"]:
+            purpose = f["purpose"].split(". ")[0].rstrip(".") + "."
+            idx.append(f"- `{f['signature'].splitlines()[0][:400]}`  \n  {purpose}")
+            if f.get("helpers") and f["helpers"].strip().lower() not in ("none", "none (pure function)"):
+                idx.append(f"  Helpers: {f['helpers'][:700]}")
+        idx.append("")
+    (VIDEO / "lib" / "INDEX.md").write_text("\n".join(idx))
     print(VIDEO / "lib" / "README.md", sum(len(by[f]["functions"]) for f in by), "functions")
 
 
