@@ -12,7 +12,12 @@ Each atlas has a folder figures/V0N/:
   python3 atlas_build.py split V06            one-time: carve atlases/V06_*.html into figures/V06/
   python3 atlas_build.py build V06 [--out F]  assemble, renumber, set ids, resolve refs; writes the atlas
   python3 atlas_build.py list V06             figure numbers, stamps, ids and titles, in order
+  python3 atlas_build.py insert V06 o013 p15 p16   put new items after o013, in that order
+  python3 atlas_build.py move V06 o009 o010   move o009 to just after o010
+  python3 atlas_build.py drop V06 o002        take o002 out of the order (its file stays)
   python3 atlas_build.py index                update the counts in atlases/index.html
+
+insert, move and drop lock order.txt, so two people can work on one atlas at once.
 
 Every figure and part heading gets a permanent id, v06-o013 or v06-p15, so links survive renumbering.
 In an item, {{ref:v01-o084}} becomes a link reading "V1 Fig 91", and {{fig:v01-o084}} the same words
@@ -29,10 +34,13 @@ REF = re.compile(r"\{\{(ref|fig):(v\d\d)-([a-z][a-z0-9_-]*)\}\}")
 NAME = re.compile(r"[a-z][a-z0-9_-]*$")
 WIDGET_CSS = """
 /* widgets */
+:where(svg text){fill:var(--ink)}
 .wg{margin:0 0 4px;padding:16px 18px 6px;border:1px solid var(--rule);border-radius:10px}
 .wg .ctl{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 10px;font-size:13px;color:var(--muted)}
-.wg label{display:flex;align-items:center;gap:10px;flex:1 1 240px}
+.wg label{display:flex;align-items:center;gap:10px;flex:1 1 340px}
+.wg label.opt{flex:0 0 auto;gap:6px}
 .wg input[type=range]{flex:1;min-width:110px;accent-color:var(--m)}
+.wg input[type=radio],.wg input[type=checkbox]{accent-color:var(--m)}
 .wg button{font:500 12.5px var(--sans);color:var(--ink);background:var(--u-fill);
 border:1px solid var(--u);border-radius:6px;padding:5px 12px;cursor:pointer}
 .wg button:disabled{opacity:.45;cursor:default}
@@ -161,6 +169,9 @@ def build(v: str, out: Path | None) -> None:
         c = resolve(set_id(c, hid), v, cache)
         parts.append(c)
     shell = (d / "shell.html").read_text(encoding="utf-8")
+    a = shell.find("/* widgets */")                      # keep the shared widget styles current
+    if a >= 0:
+        shell = shell[:a] + WIDGET_CSS.lstrip("\n") + shell[shell.index("</style>", a):]
     page = resolve(shell, v, cache).replace("<!--ITEMS-->", "".join(parts))
     target = out or atlas_file(v)
     target.write_text(page, encoding="utf-8")
@@ -182,6 +193,40 @@ def listing(v: str) -> None:
             print(f"\n      {i:>7}  {html.unescape(part.group(1)) if part else ''}: {title}")
 
 
+def edit_order(v: str, cmd: str, args: list[str]) -> None:
+    """insert AFTER NEW…, move ID AFTER, drop ID…: read, change and write order.txt under a lock."""
+    import fcntl
+    p = src_dir(v) / "order.txt"
+    with open(src_dir(v) / ".order.lock", "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        lines = p.read_text(encoding="utf-8").splitlines()
+        ids = [ln.split("#", 1)[0].strip() for ln in lines]
+        where = lambda i: ids.index(i) if i in ids else sys.exit(f"{v}: {i} is not in order.txt")
+        if cmd == "insert":
+            after, new = args[0], args[1:]
+            clash = [i for i in new if i in ids]
+            if not new or clash:
+                sys.exit(f"{v}: nothing to insert, or already in order.txt: {clash}")
+            bad = [i for i in new if not NAME.match(i) or not (src_dir(v) / "items" / f"{i}.html").exists()]
+            if bad:
+                sys.exit(f"{v}: write items/<id>.html first (ids: lowercase letters, digits, - or _): {bad}")
+            k = where(after) + 1
+            lines[k:k] = new
+        elif cmd == "move":
+            item, after = args
+            line = lines.pop(where(item))
+            ids = [ln.split("#", 1)[0].strip() for ln in lines]
+            k = where(after) + 1
+            lines[k:k] = [line]
+        else:
+            for i in args:
+                k = where(i)
+                lines.pop(k)
+                ids.pop(k)
+        p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"{v}: {cmd} {' '.join(args)}")
+
+
 def index() -> None:
     p = ROOT / "atlases" / "index.html"
     t = p.read_text(encoding="utf-8")
@@ -190,10 +235,10 @@ def index() -> None:
         f = atlas_file(f"V{k:02d}")
         n = len(re.findall(r"<figure\b", f.read_text(encoding="utf-8")))
         total += n
-        t, hit = re.subn(rf"(href='{re.escape(f.name)}'>.*?<span class='n'>)\d+( figures)", rf"\g<1>{n}\2", t, 1)
+        t, hit = re.subn(rf"(href='{re.escape(f.name)}'>.*?<span class='n'>)\d+( figures)", rf"\g<1>{n}\2", t, count=1)
         if not hit:
             sys.exit(f"index.html: no row for {f.name}")
-    t, hit = re.subn(r"(<span><b>)[\d,]+(</b> figures</span>)", rf"\g<1>{total:,}\2", t, 1)
+    t, hit = re.subn(r"(<span><b>)[\d,]+(</b> figures</span>)", rf"\g<1>{total:,}\2", t, count=1)
     if not hit:
         sys.exit("index.html: no figure total")
     p.write_text(t, encoding="utf-8")
@@ -202,8 +247,9 @@ def index() -> None:
 
 def main() -> None:
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    a.add_argument("cmd", choices=["split", "build", "list", "index"])
+    a.add_argument("cmd", choices=["split", "build", "list", "insert", "move", "drop", "index"])
     a.add_argument("video", nargs="?", help="V01 … V09")
+    a.add_argument("ids", nargs="*", help="insert: AFTER NEW…; move: ID AFTER; drop: ID…")
     a.add_argument("--out", type=Path, help="build: write here instead of atlases/")
     x = a.parse_args()
     if not (ROOT / "atlases").is_dir():
@@ -212,6 +258,11 @@ def main() -> None:
         return index()
     if not x.video or not re.fullmatch(r"V0[1-9]", x.video):
         sys.exit("give a video: V01 … V09")
+    if x.cmd in ("insert", "move", "drop"):
+        need = {"insert": len(x.ids) >= 2, "move": len(x.ids) == 2, "drop": len(x.ids) >= 1}[x.cmd]
+        if not need:
+            sys.exit(f"{x.cmd}: see --help for the arguments")
+        return edit_order(x.video, x.cmd, x.ids)
     {"split": lambda: split(x.video), "build": lambda: build(x.video, x.out),
      "list": lambda: listing(x.video)}[x.cmd]()
 

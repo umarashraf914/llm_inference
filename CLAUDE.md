@@ -12,7 +12,8 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | Path | What it is |
 |---|---|
 | `atlases/index.html` | Landing page linking every atlas, with figure counts and durations |
-| `atlases/V0N_Title.html` | One atlas per video (the deliverables) |
+| `atlases/V0N_Title.html` | One atlas per video (the deliverables), built from `figures/V0N/` |
+| `figures/V0N/` | Each atlas's source: one file per figure and part heading, their order, and the Python that drew the new ones |
 | `atlases/*_animation.html` | Interactive companions, linked from the index |
 | `.claude/skills/srt-figure-atlas/` | The workflow: `SKILL.md`, design reference, drawing library, checker |
 | `transcripts/` | Caption files, one per video (see below) |
@@ -36,8 +37,10 @@ Use the `srt-figure-atlas` skill for anything touching an atlas: building one, a
 answering a timestamp question (`V3 18:42 why?`), or fixing layout. Read its `SKILL.md` first. The
 rules that most often matter:
 
-- One file per video, named `V0N_Title.html`. To add depth, edit that file in place, insert figures
-  where they belong in the video's order, and renumber. Never create `_v2`, `_final` or addendum files.
+- One file per video, named `V0N_Title.html`, built from `figures/V0N/` with
+  `scripts/atlas_build.py` (see the skill's "Building from source"). To add depth, add items there,
+  insert them where they belong in the video's order, and rebuild; the build renumbers. Never
+  hand-edit a built atlas, and never create `_v2`, `_final` or addendum files.
 - When an atlas's figure count changes, update its row and the totals in `atlases/index.html`.
 - Verify every number in Python before it goes into a figure.
 - Run the checker on every atlas you touch and fix what it reports before committing.

@@ -1,0 +1,34 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 8:31</div><h3>Move the token and watch the router change its mind</h3><div class='wg'><div class='ctl'><label>x₁ <input type='range' min='-2' max='2' step='0.25' value='1'><span class='val'>1.00</span></label><label>x₂ <input type='range' min='-2' max='2' step='0.25' value='-0.5'><span class='val'>−0.50</span></label><label>x₃ <input type='range' min='-2' max='2' step='0.25' value='2'><span class='val'>2.00</span></label><label>x₄ <input type='range' min='-2' max='2' step='0.25' value='0.5'><span class='val'>0.50</span></label></div><div class='ctl'><label class='opt'><input type='radio' name='v06-p18-fn' value='softmax' checked> softmax</label><label class='opt'><input type='radio' name='v06-p18-fn' value='sigmoid'> sigmoid</label><button type='button'>Reset</button></div><svg viewBox='0 0 680 534' role='img'><title>Move the token and watch the router change its mind</title><text class="hd" x="40" y="34">Scores, shares and the top two, recomputed as you move the token</text><text class="sub2" x="150" y="62" text-anchor="start">score</text><text class="sub2" x="230" y="62" data-head="">softmax share</text><text class="sub2" x="600" y="62" text-anchor="start">gate</text><text class="cap" x="40" y="92" text-anchor="start">expert 1</text><text class="sub2" x="150" y="92" data-z="0">2.25</text><g class="m"><rect x="230" y="74" width="145.3" height="26" rx="3" data-bar="0"/></g><text class="sub2" x="385.3" y="92" data-p="0">0.581</text><text class="sub2" x="600" y="92" data-g="0">0.622</text><text class="cap" x="40" y="132" text-anchor="start">expert 2</text><text class="sub2" x="150" y="132" data-z="1">−0.75</text><g class="u"><rect x="230" y="114" width="7.2" height="26" rx="3" data-bar="1"/></g><text class="sub2" x="247.2" y="132" data-p="1">0.029</text><text class="sub2" x="600" y="132" data-g="1">—</text><text class="cap" x="40" y="172" text-anchor="start">expert 3</text><text class="sub2" x="150" y="172" data-z="2">1.75</text><g class="m"><rect x="230" y="154" width="88.1" height="26" rx="3" data-bar="2"/></g><text class="sub2" x="328.1" y="172" data-p="2">0.353</text><text class="sub2" x="600" y="172" data-g="2">0.378</text><text class="cap" x="40" y="212" text-anchor="start">expert 4</text><text class="sub2" x="150" y="212" data-z="3">−0.50</text><g class="u"><rect x="230" y="194" width="9.3" height="26" rx="3" data-bar="3"/></g><text class="sub2" x="249.3" y="212" data-p="3">0.037</text><text class="sub2" x="600" y="212" data-g="3">—</text><text class="cap" x="40" y="275" text-anchor="start">layer output</text><g class="m"><rect x="230" y="256" width="56" height="28" rx="3"/><text class="sub" x="258" y="270" text-anchor="middle" dominant-baseline="central" data-y="0">0.54</text></g><g class="m"><rect x="292" y="256" width="56" height="28" rx="3"/><text class="sub" x="320" y="270" text-anchor="middle" dominant-baseline="central" data-y="1">0.10</text></g><g class="m"><rect x="354" y="256" width="56" height="28" rx="3"/><text class="sub" x="382" y="270" text-anchor="middle" dominant-baseline="central" data-y="2">0.14</text></g><g class="m"><rect x="416" y="256" width="56" height="28" rx="3"/><text class="sub" x="444" y="270" text-anchor="middle" dominant-baseline="central" data-y="3">0.19</text></g><text class="cap" x="40" y="328" text-anchor="start">Each expert's row rewards some entries of the token's vector and penalises others:</text><text class="cap" x="40" y="348" text-anchor="start">expert 1 leans on the third entry, expert 4 on the first two. Drag x₁ down to −2 and</text><text class="cap" x="40" y="368" text-anchor="start">expert 1 drops out of the top two; expert 2 takes its place.</text><text class="cap" x="40" y="408" text-anchor="start">Switch to the sigmoid and the bars stop competing for one budget. The same two experts</text><text class="cap" x="40" y="428" text-anchor="start">always win, because both functions rank experts by score, but their gates come out</text><text class="cap" x="40" y="448" text-anchor="start">closer together.</text><text class="cap" x="40" y="488" text-anchor="start">The expert outputs are illustrative. The arithmetic is the same as in the figures above,</text><text class="cap" x="40" y="508" text-anchor="start">and was checked against them in Python.</text></svg></div><figcaption>Four dot products, one squashing function, a cut to two and a rescale: that is the whole router. Move any entry and every later number follows.</figcaption><script>(() => {
+  const fig = document.currentScript.closest('figure');
+  const W = [[0.5, 0, 1, -0.5], [-1, 0.5, 0, 1], [0, -1, 0.5, 0.5], [1, 1, -0.5, 0]], E = [[0.8, -0.2, 0.4, 0.0], [-0.4, 0.3, 0.6, -0.1], [0.1, 0.6, -0.3, 0.5], [0.2, -0.5, 0.1, 0.7]], X0 = [1.0, -0.5, 2.0, 0.5], XB = 230, SC = 250;
+  const sl = [...fig.querySelectorAll('input[type=range]')], val = [...fig.querySelectorAll('.val')];
+  const rad = [...fig.querySelectorAll('input[type=radio]')], q = s => fig.querySelector(s);
+  const fmt = (v, d = 2) => (v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+  function draw() {
+    const x = sl.map(s => +s.value), sig = rad[1].checked;
+    x.forEach((v, i) => val[i].textContent = fmt(v));
+    const z = W.map(w => w.reduce((a, wk, k) => a + wk * x[k], 0));
+    let p;
+    if (sig) p = z.map(v => 1 / (1 + Math.exp(-v)));
+    else { const m = Math.max(...z), e = z.map(v => Math.exp(v - m)), t = e.reduce((a, b) => a + b);
+           p = e.map(v => v / t); }
+    const top = [0, 1, 2, 3].sort((a, b) => p[b] - p[a]).slice(0, 2);
+    const kept = top.reduce((a, i) => a + p[i], 0);
+    const g = [0, 1, 2, 3].map(i => top.includes(i) ? p[i] / kept : 0);
+    q('[data-head]').textContent = sig ? 'sigmoid of the score' : 'softmax share';
+    for (let r = 0; r < 4; r++) {
+      const w = Math.max(p[r] * SC, 2), bar = q(`[data-bar="${r}"]`), t = q(`[data-p="${r}"]`);
+      q(`[data-z="${r}"]`).textContent = fmt(z[r]);
+      bar.setAttribute('width', w.toFixed(1));
+      bar.parentNode.setAttribute('class', top.includes(r) ? 'm' : 'u');
+      t.textContent = fmt(p[r], 3); t.setAttribute('x', (XB + w + 10).toFixed(1));
+      q(`[data-g="${r}"]`).textContent = top.includes(r) ? fmt(g[r], 3) : '—';
+    }
+    for (let k = 0; k < 4; k++)
+      q(`[data-y="${k}"]`).textContent = fmt(top.reduce((a, i) => a + g[i] * E[i][k], 0));
+  }
+  sl.forEach(s => s.addEventListener('input', draw));
+  rad.forEach(r => r.addEventListener('change', draw));
+  q('button').addEventListener('click', () => { sl.forEach((s, i) => s.value = X0[i]); rad[0].checked = true; draw(); });
+  draw();
+})();</script></figure>
