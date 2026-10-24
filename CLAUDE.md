@@ -16,6 +16,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | `atlases/*_animation.html` | Interactive companions, linked from the index |
 | `.claude/skills/srt-figure-atlas/` | The workflow: `SKILL.md`, design reference, drawing library, checker |
 | `transcripts/` | Caption files, one per video (see below) |
+| `plans/depth_pass/` | The plan for deepening every atlas to high-school maths: one review per atlas, and a README |
 
 | # | Atlas | Figures | Video |
 |---|---|---|---|
@@ -41,6 +42,8 @@ rules that most often matter:
 - Verify every number in Python before it goes into a figure.
 - Run the checker on every atlas you touch and fix what it reports before committing.
 - Never answer a timestamp question from memory; read the transcript window first.
+- Before deepening an atlas, read `plans/depth_pass/README.md` and that atlas's review. Recompute
+  every number the review gives; it is a plan, not a source.
 
 ## Transcripts
 
