@@ -134,7 +134,7 @@ V.scene('ch12_s02', S => {
   S.line({ x1: SB.l + 1, y1: TB.y + TB.h / 2 + 6, x2: SB.l + 1, y2: TB.y + TB.h / 2 + 26, stroke: 'compute', sw: 2, strokeOpacity: 0.8 }, tagG);
   S.text('arithmetic, under 1%', { x: SB.l - 5, y: TB.y + TB.h / 2 + 48, size: 26, weight: 600, color: 'compute' }, tagG);
   const waitLbl = S.text('waiting for weights', { x: SB.l + TB.sliver + 1 + (GW - TB.sliver - 1) / 2, y: TB.y + 1, size: 30, weight: 650, anchor: 'middle', color: 'ink' }, thesisG);
-  const sw = libStopwatch(S, { x: SB.l + 38, y: TB.y - TB.h / 2 - 62, size: 76, value: 30, readout: 'right', readoutSize: 28, tone: 'neutral' }, thesisG);
+  const sw = libStopwatch(S, { x: SB.l + 38, y: TB.y - TB.h / 2 - 62, size: 76, text: 'one token', readout: 'right', readoutSize: 28, tone: 'neutral' }, thesisG);
   hideEl(barG); hideEl(tagG);
 
   // ================================================================ the hourglass that settles on decode (drawn, seek-safe sand)
