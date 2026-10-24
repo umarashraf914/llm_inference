@@ -45,8 +45,8 @@ def p01():
         "written in advance for that one job, and launches it as a grid of thread blocks "
         "({{fig:v03-o004}}).",
         f"Multiplying two {N:,} × {N:,} matrices produces {outputs / 1e6:.1f} million outputs. A typical "
-        f"matrix-multiply kernel gives each thread block one {TILE} × {TILE} tile of them, so the grid is "
-        f"{side} × {side} = {blocks:,} blocks. At {THREADS} threads a block that is {threads:,} threads, "
+        f"matrix-multiply kernel gives each thread block one {TILE}\u00a0×\u00a0{TILE} tile of them, so the grid is "
+        f"{side}\u00a0×\u00a0{side} = {blocks:,} blocks. At {THREADS} threads a block that is {threads:,} threads, "
         f"close to the {resident:,} an H100 can hold at once ({{{{fig:v02-o044}}}}).",
         "The tile and block sizes are the author's choices, and other kernels choose differently. What "
         "does not change is the shape of it: one line, one launch, and the next line is a separate "
@@ -71,14 +71,14 @@ def o003():
     verdict = [f"{traffic:.1f}× less", f"{speed:.1f}× faster", f"{100 * flops:.0f}% more"]
     for k, (lab, a, c, unit) in enumerate(rows):
         top = max(a, c)
-        b.append(txt(40, y + 34, lab, "cap"))
+        b.append(txt(40, y + 32, lab, "cap"))
         for j, (who, v, cls) in enumerate([("standard", a, "h"), ("FlashAttention", c, "s")]):
             yy = y + j * 30
             w = v / top * SC
             b.append(cell(X0, yy + 6, w, 22, cls))
             b.append(txt(X0 + w + 8, yy + 22, f"{v:g} {unit}", "sub2"))
             b.append(txt(X0 - 12, yy + 22, who, "sub2", "end"))
-        b.append(txt(640, y + 52, verdict[k], "sub2", "end"))
+        b.append(txt(40, y + 54, verdict[k], "sub2"))
         y += 84
     body, yb = prose(y + 26, [
         "Both kernels compute the same attention. The fused one moves about a ninth of the bytes, "
@@ -103,7 +103,7 @@ def p02():
             ("at what precision", "16-bit or 8-bit numbers; exponentials by polynomial", f"Parts {PART['fp8']}–{PART['fa4']}"),
             ("where each result is written", "the output stays on chip until it is finished", f"Parts {PART['tiling']}, {PART['fa2']}")]
     b = [hd(40, 46, "The formula fixes the answer and nothing else")]
-    b.append(box(40, 64, 600, 40, "u", "softmax( Q Kᵀ ) V  — one output row per token, the same for every kernel"))
+    b.append(box(40, 64, 600, 40, "u", f"softmax( Q Kᵀ ) V,  built in Part {PART['attention']}: every kernel must produce exactly this"))
     b.append(txt(40, 134, "the kernel decides", "sub2"))
     b.append(txt(262, 134, "for attention, the choice", "sub2"))
     b.append(txt(640, 134, "where", "sub2", "end"))
@@ -147,10 +147,10 @@ def p03():
     b.append(txt(140, 204, f"if the kernel takes {t * 1e3:.3f} ms:  {ops / 1e12:.2f} × 10¹² ÷ {t:.6f} s"
                  f" = {rate / 1e12:.0f} × 10¹² per second", "sub2"))
     b.append(txt(40, 238, "4  divide", "cap"))
-    b.append(eq(140, 218, 322, f"{rate / 1e12:.0f} ÷ {H100_PEAK / 1e12:.0f} = {100 * frac:.0f}% of peak", "s", 34))
+    b.append(eq(140, 218, 322, f"{rate / 1e12:.0f} ÷ {H100_PEAK / 1e12:.0f} = {100 * frac:.0f}% of peak", "u", 34))
     b.append(txt(470, 240, "989: the H100's ceiling", "sub2"))
     # the track, drawn to scale on 0-100%
-    TX0, TX1, ty = 200, 600, 292
+    TX0, TX1, ty = 200, 600, 310
     sc = lambda p: TX0 + p / 100 * (TX1 - TX0)
     b.append(hd(40, ty - 16, "The number tracked from here on"))
     track = [("version 1, A100", 25, 40), ("version 2, A100", 50, 73), ("version 2, H100", 35, 35),
@@ -203,8 +203,9 @@ def p04():
         "FlashAttention is the one kernel followed through all four of its versions. The other five "
         "levers come after it, and each is a different answer to the same question: which bytes can be "
         "made smaller, rarer, or cheaper to move.",
-        "Only two of the six change the model itself: keeping fewer keys and values, and narrower numbers. "
-        "The others change nothing about what is computed.",
+        "Two of the six change the answer on purpose: a model that keeps fewer keys and values is a "
+        "different model, and fewer bits round more coarsely. The other four compute the same attention, "
+        f"up to the order of additions (Part {PART['fixed']}).",
     ])
     figure("p04", st("After it come the other levers"), "Six levers, one target", yb + 30, b + [body],
            esc(f"A map for the whole atlas. The recap in Part {PART['fixed']} comes back to this list and sorts "

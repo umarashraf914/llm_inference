@@ -71,7 +71,7 @@ def o007():
     b.append(txt(196, 158, "every wire carries one bit at a time, all of them at once", "sub2"))
     b.append(eq(40, 180, 600, "bandwidth  =  wires  ×  bits per second on each wire  ÷  8 bits per byte"))
     b.append(hd(40, 270, "Two real buses, drawn to scale"))
-    SC = 560 / HBM_BITS                                  # px per wire
+    SC = 470 / HBM_BITS                                  # px per wire
     b.append(txt(40, 306, "RTX 4090", "cap"))
     b.append(rect(150, 292, GD_BITS * SC, 22, "h"))
     b.append(txt(150 + GD_BITS * SC + 10, 307, f"{GD_BITS} wires at {f(gd_wire / 1e9, 1)} Gb/s each", "sub2"))
@@ -150,13 +150,16 @@ def o010():
         y = 74 + k * 52
         w = logx(v, V0, V1, X0, X1) - X0
         b.append(txt(40, y + 17, lab, "cap"))
-        b.append(rect(X0, y, w, 24, c))
-        b.append(txt(X0 + w + 10, y + 17, note, "sub2"))
+        if w > tw(note) + 30:
+            b.append(cell(X0, y, w, 24, c, label=note))
+        else:
+            b.append(rect(X0, y, w, 24, c))
+            b.append(txt(X0 + w + 10, y + 17, note, "sub2"))
     r1, r2 = hbm_ns * 1e-9 / TICK, 30e-3 / (hbm_ns * 1e-9)
     body, yb = prose(318, [
         f"Each equal step along the axis is ten times longer. A load from HBM lasts about {round(r1, -1):.0f} "
-        f"ticks, and one token lasts about {round(r2, -4):,.0f} loads, so the three are not a thousand apart "
-        "each but about 500 and about 100,000.",
+        f"ticks, and one token lasts about {round(r2, -4):,.0f} loads. The three are not a thousand apart "
+        f"each: the steps are about {round(r1, -2):.0f} and about {round(r2, -4):,.0f}.",
         "A tick is the chip's clock: the H100's tensor cores are rated at 1.83 billion ticks a second, "
         "so one tick is 0.55 ns. The load time was measured on a Hopper GPU, 479 ticks at its 1.755 GHz "
         "clock. Almost every timing argument below compares the first two rows.",
@@ -197,12 +200,15 @@ def p01():
         b.append(txt(round(x, 1), ax2 + 20, f"{v:,}", "sub2", "middle"))
     for k, (lab, v, c, note) in enumerate([
             ("decode delivers", intensity, "h", "1 operation per byte"),
-            ("the chip needs", ridge, "m", f"{ridge:.0f} per byte to keep busy")]):
+            ("the chip needs", ridge, "m", f"{ridge:.0f} operations per byte")]):
         y = 236 + k * 40
         w = logx(v, W0, W1, X0, X1) - X0
         b.append(txt(40, y + 17, lab, "cap"))
-        b.append(rect(X0, y, w, 24, c))
-        b.append(txt(X0 + w + 10, y + 17, note, "sub2"))
+        if w > tw(note) + 30:
+            b.append(cell(X0, y, w, 24, c, label=note))
+        else:
+            b.append(rect(X0, y, w, 24, c))
+            b.append(txt(X0 + w + 10, y + 17, note, "sub2"))
     b.append(eq(40, 360, 600, f"{f(t_mem * 1e3, 1)} ms  ÷  {f(t_ops * 1e3, 3)} ms  =  {ratio:.0f}  =  "
                               f"(989.4 T ÷ 3.352 T)  ÷  1"))
     body, yb = prose(440, [
@@ -226,8 +232,9 @@ def o011():
          box(245, 50, 190, 88, "u", "Why is a byte", "so expensive", "next to an operation?"),
          box(450, 50, 190, 88, "u", "What can the", "hardware do", "to fight back?")]
     body, yb = prose(178, [
-        "Parts 2 to 5 answer the first: one bet about the workload, and the multiprocessor built around "
-        "it. Parts 6 and 7 answer the second, from the memory cell up to the four-rung ladder.",
+        "Parts 2 to 5 answer the first: one bet about the workload, the multiprocessor built around it, "
+        "and the two habits it punishes. Parts 6 and 7 answer the second, from the memory cell up to the "
+        "four-rung ladder.",
         "Parts 8 to 15 answer the third: latency hiding, coalescing, tensor cores, lower precision and "
         "more chips.",
     ])
@@ -238,24 +245,28 @@ def o011():
 
 # ---- o019: energy, on a log scale, moved to 0:58 --------------------------------------------------
 def o019():
-    b = [hd(40, 46, "Energy per operation at 45 nm, relative to one 32-bit float add (log axis)")]
-    X0, X1 = 250, 600
+    b = [hd(40, 46, "Energy per operation at 45 nm, in picojoules (log axis)")]
+    X0, X1, E0, E1 = 250, 610, 0.1, 1000
     rel = {k: v / PJ["fadd"] for k, v in PJ.items()}
     assert round(rel["fmul"], 1) == 4.1 and round(rel["sram"], 1) == 5.6 and round(rel["dram"]) == 711
     ax = 290
     b.append(ln(X0, ax, X1, ax, "axis"))
-    for v in (1, 10, 100, 1000):
-        x = logx(v, 1, 1000, X0, X1)
+    for v in (0.1, 1, 10, 100, 1000):
+        x = logx(v, E0, E1, X0, X1)
         b.append(vline(x, ax, ax + 5))
-        b.append(txt(round(x, 1), ax + 20, f"{v:,}×", "sub2", "middle"))
+        b.append(txt(round(x, 1), ax + 20, f"{v:g} pJ", "sub2", "middle"))
     rows = [("32-bit float add", "fadd", "m"), ("32-bit float multiply", "fmul", "m"),
             ("32-bit read, SRAM cache", "sram", "s"), ("32-bit read, DRAM", "dram", "h")]
     for k, (lab, key, c) in enumerate(rows):
         y = 70 + k * 52
-        w = max(logx(rel[key], 1, 1000, X0, X1) - X0, 3)
+        w = logx(PJ[key], E0, E1, X0, X1) - X0
+        note = f"{PJ[key]:g} pJ, {f(rel[key], 1) if rel[key] < 10 else n(rel[key])}×"
         b.append(txt(40, y + 20, lab, "cap"))
-        b.append(rect(X0, y, w, 30, c))
-        b.append(txt(X0 + w + 10, y + 20, f"{f(rel[key], 1) if rel[key] < 10 else n(rel[key])}×  ({PJ[key]:g} pJ)", "sub2"))
+        if w > tw(note) + 30:
+            b.append(cell(X0, y, w, 30, c, label=note))
+        else:
+            b.append(rect(X0, y, w, 30, c))
+            b.append(txt(X0 + w + 10, y + 20, note, "sub2"))
     body, yb = prose(352, [
         f"Fetching one 32-bit number from DRAM took {PJ['dram']:g} picojoules, {n(rel['dram'])} times the "
         f"energy of adding two such numbers once they have arrived. A read from a small on-chip SRAM cache "
@@ -265,9 +276,9 @@ def o019():
     ])
     emit("o019", stamp(SRT, "Why does moving a byte"), "Fetching a number from DRAM costs 700 times the energy of adding it",
          yb + 24, b + [body],
-         "Figures from Han et al. 2015, after Horowitz, for a 45 nm process; the add bar is one unit "
-         "wide by definition. Absolute energies have shrunk since. The ordering has not, and it shapes "
-         "every accelerator.")
+         "Energies from Han et al. 2015, after Horowitz, for a 45 nm process; the multiples are against "
+         "the add. Absolute energies have shrunk since. The ordering has not, and it shapes every "
+         "accelerator.")
 
 
 if __name__ == "__main__":

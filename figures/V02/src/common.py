@@ -136,3 +136,43 @@ def rect(x, y, w, h, cls, rx=3, extra=""):
 
 def vline(x, y1, y2, cls="tick"):
     return ln(round(x, 1), y1, round(x, 1), y2, cls)
+
+
+# ---- editing existing items ----------------------------------------------------------------------
+import re as _re
+
+
+def edit_item(name, from_y=None, paras=None, caption=None, title=None, ts=None, extra_h=24,
+              replace=(), cls=None):
+    """Rewrite parts of an existing item in place.
+
+    from_y   body prose starts at this baseline: every `cap` text at x=40 with y >= from_y is removed
+             and `paras` is laid out from there; the canvas ends `extra_h` below the last line.
+    replace  (old, new) pairs applied to the raw item first; each old must occur exactly once."""
+    p = OUT / f"{name}.html"
+    s = p.read_text(encoding="utf-8")
+    for old, new in replace:
+        assert s.count(old) == 1, (name, old, s.count(old))
+        s = s.replace(old, new)
+    if paras is not None:
+        pat = _re.compile(r'<text class="cap" x="40" y="([\d.]+)" text-anchor="start">.*?</text>')
+        hits = [m for m in pat.finditer(s) if float(m.group(1)) >= from_y]
+        assert hits, (name, "no prose at or below", from_y)
+        for m in reversed(hits):
+            s = s[:m.start()] + s[m.end():]
+        svg_body, yb = prose(from_y, paras)
+        k = s.index("</svg>")
+        s = s[:k] + svg_body + s[k:]
+        s = _re.sub(r"viewBox=(['\"])0 0 680 [\d.]+\1", f"viewBox='0 0 680 {round(yb + extra_h)}'", s, count=1)
+    if caption is not None:
+        s = _re.sub(r"<figcaption>.*?</figcaption>", lambda m: f"<figcaption>{esc(caption)}</figcaption>", s,
+                    count=1, flags=_re.S)
+    if title is not None:
+        s = _re.sub(r"<h3>.*?</h3>", lambda m: f"<h3>{esc(title)}</h3>", s, count=1, flags=_re.S)
+        s = _re.sub(r"<title>.*?</title>", lambda m: f"<title>{esc(title)}</title>", s, count=1, flags=_re.S)
+    if ts is not None:
+        s = _re.sub(r"(<div class=['\"]ts['\"]>Fig [^ &<]+ &nbsp;&middot;&nbsp; )[0-9:]+", lambda m: m.group(1) + ts, s, count=1)
+    if cls is not None:
+        s = _re.sub(r"^<figure[^>]*>", f"<figure class='{cls}'>" if cls else "<figure>", s, count=1)
+    p.write_text(s, encoding="utf-8")
+    print(f"{name:6s} edited")

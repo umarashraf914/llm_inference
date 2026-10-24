@@ -78,7 +78,7 @@ def a02():
     for i in range(6):
         y = 70 + i * 16
         b.append(cell(40, y, 34, 11, "u", rx=2))
-        b.append(arr(80, y + 5.5, 168, 112))
+        b.append(arr(80, y + 5.5, 168, 84 + i * 13))
     b.append(txt(40, 184, "users, arriving whenever they like", "sub2"))
     b.append(f'<g class="u"><rect x="174" y="66" width="466" height="96" rx="14"/>'
              f'<text class="lbl" x="196" y="92">a fixed set of GPUs, all running the same model</text></g>')
@@ -87,8 +87,8 @@ def a02():
     # one request's two clocks
     b.append(hd(40, 236, "One user's request, start to finish"))
     AX, Y = 60, 300
-    q0, q1, p1 = AX, 150, 252                        # queue, prefill, first token
-    gap = 38                                          # one decode step, drawn evenly
+    q0, q1, p1 = AX, 186, 280                        # queue, prefill, first token
+    gap = 35                                          # one decode step, drawn evenly
     b.append(ghost(q0, Y - 13, q1 - q0, 26, label="waits in a queue"))
     b.append(cell(q1, Y - 13, p1 - q1, 26, "m", label="prefill"))
     toks = [p1 + k * gap for k in range(10)]
@@ -109,8 +109,9 @@ def a02():
         "Each user is promised two things ({{fig:v01-o143}}). Time to first token covers the wait in "
         "the queue plus the prefill of the whole prompt. Time per output token is the gap between "
         "tokens after that: one decode step each, so every user in a step waits for the whole step. "
-        "Typical targets are a fraction of a second for the first and tens of milliseconds for the "
-        "second.",
+        "The targets depend on the product: DistServe's chatbot settings ask for the first token "
+        "within 0.25 to 4 seconds and each later one within 0.1 to 0.2 seconds, looser for bigger "
+        "models.",
         "Putting more users in each step raises the tokens out of every read of the weights; the two "
         "targets set how far that can be pushed. Every technique in this document trades inside "
         "those two limits.",
@@ -177,10 +178,11 @@ def a03():
     b.append(halo(round(xr, 1) + 8, round(A.py(PEAK / 1e12)) + 26, f"ridge, {R}"))
     x1, y1 = A.px(1), A.py(ATTAIN1)
     b.append(dot(round(x1, 1), round(y1, 1), "h"))
-    b.append(halo(round(x1, 1) - 10, round(y1, 1) - 12, f"decode, one request: 1 op per byte, {f(ATTAIN1)}", anchor="start"))
-    yb_ = round(y1 + 26, 1)
-    b.append(ln(round(x1, 1), yb_, round(xr, 1), yb_, "conn") .replace("/>", ' marker-end="url(#arw)"/>'))
-    b.append(halo(round((x1 + xr) / 2, 1), yb_ + 16, f"a factor of {R}", anchor="middle"))
+    b.append(halo(round(x1, 1) - 4, round(y1, 1) + 22,
+                  f"decode, batch one: {f(ATTAIN1)} TFLOP/s", anchor="start"))
+    b.append(arr(round(x1 + 9, 1), round(y1, 1), round(xr - 3, 1), round(y1, 1)))
+    xm = A.px(math.sqrt(RIDGE))                        # the midpoint of a log axis is the geometric mean
+    b.append(halo(round(xm, 1), round(y1 - 8, 1), f"{R} times further right", anchor="middle"))
     body, yb = prose(A.Y0 + 78, [
         "Arithmetic intensity is the useful work done per byte moved ({{fig:v01-o120}}). In decode at "
         "batch one, each 2-byte weight that is read feeds one multiply-add, 2 operations, so the "

@@ -67,8 +67,13 @@ def pct(v, d=1):
     return f(100 * v, d) + "%"
 
 
-def emit(name, ts, title, h, body, caption, cls=None):
-    (OUT / f"{name}.html").write_text(item(ts, title, h, body, caption, cls), encoding="utf-8")
+def emit(name, ts, title, h, body, caption, cls=None, link=None):
+    """Write one figure item. `link` leaves <!-- link: … --> in the item for the final pass, for a
+    pointer to a figure another builder has not made yet."""
+    html = item(ts, title, h, body, caption, cls)
+    if link:
+        html = html.replace("</figure>", f"<!-- link: {link} --></figure>")
+    (OUT / f"{name}.html").write_text(html, encoding="utf-8")
     print(f"{name:6s} {ts:>6s}  H={h:<4}  {title}")
 
 
