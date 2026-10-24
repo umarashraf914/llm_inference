@@ -24,7 +24,7 @@ In an item, {{ref:v01-o084}} becomes a link reading "V1 Fig 91", and {{fig:v01-o
 without the link (for SVG text). Run from the repository root.
 """
 from __future__ import annotations
-import argparse, html, re, sys
+import argparse, html, re, signal, sys
 from pathlib import Path
 
 ROOT = Path.cwd()
@@ -252,6 +252,7 @@ def index() -> None:
 
 
 def main() -> None:
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)      # `list V01 | head` ends quietly
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     a.add_argument("cmd", choices=["split", "build", "list", "insert", "move", "drop", "index"])
     a.add_argument("video", nargs="?", help="V01 … V09")
