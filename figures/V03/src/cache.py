@@ -64,26 +64,26 @@ def p32():
 
 # ---- o083: external fragmentation, and the measured cost (redrawn) -------------------------------------------------
 def o083():
-    runs = [("request A", 4096, "s"), (None, 1536, None), ("request B", 2048, "s"), (None, 1024, None),
+    runs = [("A", 4096, "s"), (None, 1536, None), ("B", 2048, "s"), (None, 1024, None),
             ("C", 3072, "s"), (None, 512, None)]
     total = sum(n for _, n, _ in runs)
     free = sum(n for lab, n, _ in runs if lab is None)
     need = 2048
     assert (total, free) == (12288, 3072) and free >= need and max(n for lab, n, _ in runs if lab is None) < need
-    b = [hd(40, 46, "The cache region after requests of different lengths have come and gone")]
+    b = [hd(40, 46, "The cache region after requests have come and gone: A, B, C, in token slots")]
     X0, SC = 40, 600 / total
     x = X0
     for lab, n, cls in runs:
         w = n * SC
         if lab:
-            b.append(cell(x, 66, w - 2, 34, cls, label=f"{lab}, {n:,}" if w > 120 else lab))
+            b.append(cell(x, 66, w - 2, 34, cls, label=f"{lab}: {n:,}"))
         else:
             b.append(ghost(x, 66, w - 2, 34))
             b.append(txt(x + (w - 2) / 2, 118, f"{n:,}", "sub2", "middle"))
         x += w
     b.append(txt(40, 140, f"free in total: 1,536 + 1,024 + 512 = {free:,} slots", "cap"))
-    b.append(ghost(40, 154, need * SC, 30, label=f"new request: {need:,} in one run"))
-    b.append(txt(40 + need * SC + 12, 174, "no single gap holds it", "sub2"))
+    b.append(ghost(40, 154, need * SC, 30, label=f"{need:,}"))
+    b.append(txt(40 + need * SC + 12, 174, f"a new request needs {need:,} slots in one run, and no gap is that large", "sub2"))
     y2 = 222
     b.append(hd(40, y2, "Share of cache memory holding token states, in the serving systems of the time"))
     X1, X2 = 40, 600
@@ -129,9 +129,9 @@ def o086():
     for i, pb in enumerate(TABLE_A):
         b.append(cell(40 + i * 46, 66, 40, 30, "s", label=f"A{i}"))
     for i, pb in enumerate(table_b):
-        b.append(cell(420 + i * 46, 66, 40, 30, "m", label=f"B{i}"))
+        b.append(cell(380 + i * 46, 66, 40, 30, "m", label=f"B{i}"))
     b.append(txt(40 + 4 * 46 + 6, 86, f"A's table: {', '.join(map(str, TABLE_A))}", "sub2"))
-    b.append(txt(420 + 3 * 46 + 6, 86, f"B's table: {', '.join(map(str, table_b))}", "sub2"))
+    b.append(txt(380 + 3 * 46 + 6, 86, f"B's table: {', '.join(map(str, table_b))}", "sub2"))
     yp = 186
     for k in range(16):
         cls = "s" if k in TABLE_A else ("m" if k in table_b else None)
@@ -142,7 +142,7 @@ def o086():
     for i, pb in enumerate(TABLE_A):
         b.append(ln(40 + i * 46 + 20, 98, px(pb) + W / 2, yp - 2))
     for i, pb in enumerate(table_b):
-        b.append(ln(420 + i * 46 + 20, 98, px(pb) + W / 2, yp - 2))
+        b.append(ln(380 + i * 46 + 20, 98, px(pb) + W / 2, yp - 2))
     b.append(txt(40, yp + 52, "physical blocks in HBM, 16 tokens each; dashed blocks are free, and any of them will do",
                  "sub2"))
     body, yb = prose(yp + 92, [
@@ -183,8 +183,8 @@ def p33():
     b.append(txt(40, 192, f"physical block {pb}", "cap"))
     for s in range(BLOCK):
         x = 160 + s * 28
-        b.append(cell(x, 176, 24, 24, "s" if s == off else "u", label=str(pb * BLOCK + s) if s == off else None))
-    b.append(txt(160, 220, f"slots {pb * BLOCK} to {pb * BLOCK + BLOCK - 1} of the pool", "sub2"))
+        b.append(cell(x, 176, 24, 24, "s" if s == off else "u", label=str(off) if s == off else None))
+    b.append(txt(160, 220, f"slots {pb * BLOCK} to {pb * BLOCK + BLOCK - 1} of the pool; offset {off} is slot {slot}", "sub2"))
     b.append(eq(40, 236, 600, f"slot = {pb} × {BLOCK} + {off} = {slot}", "s", 34))
     y2 = 306
     b.append(hd(40, y2, f"The waste bound, for the {USED}-token answer"))
@@ -246,7 +246,7 @@ def o087():
     ta, tb = [2, 5, 8, 11], [2, 5, 8, 13]
     shared = [p for p, q in zip(ta, tb) if p == q]
     assert shared == [2, 5, 8]
-    b = [hd(40, 46, "Two requests that begin with the same system prompt")]
+    b = [hd(40, 46, "Two requests that begin with the same system prompt (×2: two tables point there)")]
     for r, (name, t, cls) in enumerate((("A", ta, "s"), ("B", tb, "m"))):
         y = 66 + r * 40
         b.append(txt(40, y + 19, f"{name}'s table", "cap"))
@@ -258,7 +258,7 @@ def o087():
     b.append(txt(40, yp + 19, "physical blocks", "cap"))
     for k, v in enumerate([2, 5, 8, 11, 13]):
         x = 140 + k * 92
-        lab = f"block {v}" if v not in shared else f"block {v}: 2 tables"
+        lab = f"block {v}" if v not in shared else f"block {v}  ×2"
         b.append(cell(x, yp, 86, 28, "u" if v in shared else ("s" if v == 11 else "m"), label=lab))
     body, yb = prose(yp + 70, [
         "Sometimes many sequences begin identically: requests that share a system prompt or a long "
@@ -276,10 +276,10 @@ def o087():
 
 # ---- p34: beam search ---------------------------------------------------------------------------------------------------
 def p34():
-    b = [hd(40, 46, "Three candidate answers to one prompt, as blocks; the number is how many tables point there")]
-    nodes = {"p0": (40, 92, "prompt 0", 3), "p1": (150, 92, "prompt 1", 3),
-             "c12": (260, 70, "shared 2", 2), "c3a": (260, 132, "own 2", 1),
-             "c1": (390, 52, "candidate 1", 1), "c2": (390, 96, "candidate 2", 1), "c3": (390, 140, "candidate 3", 1)}
+    b = [hd(40, 46, "Three candidates for one prompt, as blocks: ×3 means three tables point there")]
+    nodes = {"p0": (40, 116, "prompt 0", 3), "p1": (150, 116, "prompt 1", 3),
+             "c12": (260, 94, "shared 2", 2), "c3a": (260, 156, "own 2", 1),
+             "c1": (390, 72, "candidate 1", 1), "c2": (390, 116, "candidate 2", 1), "c3": (390, 160, "candidate 3", 1)}
     edges = [("p0", "p1"), ("p1", "c12"), ("p1", "c3a"), ("c12", "c1"), ("c12", "c2"), ("c3a", "c3")]
     for a, z in edges:
         xa, ya = nodes[a][0] + 96, nodes[a][1] + 13
@@ -288,7 +288,7 @@ def p34():
     for key, (x, y, lab, cnt) in nodes.items():
         w = 110 if key.startswith("c") and key[1:].isdigit() else 96
         b.append(cell(x, y, w, 26, "u" if cnt > 1 else "s", label=f"{lab}  ×{cnt}" if cnt > 1 else lab))
-    y2 = 202
+    y2 = 230
     b.append(hd(40, y2, "Measured on OPT-13B, Alpaca dataset (bars to scale)"))
     X1, X2 = 260, 620
     sc = lambda p: X1 + p * (X2 - X1)
@@ -308,8 +308,8 @@ def p34():
     body, yb = prose(y2 + 74 + 2 * 32 + 30, [
         "Sometimes a server explores several candidate continuations of one prompt at once and keeps the "
         "most promising: beam search. Every candidate gets its own block table, and the tables share every "
-        "block the candidates have in common. A block is copied only when a candidate writes into one it "
-        "shares, and a block whose count falls to zero is freed.",
+        "block the candidates have in common. Each block carries a count of the tables pointing at it. A block "
+        "is copied only when a candidate writes into one it shares, and freed when its count falls to zero.",
         "Measured on OPT-13B with the Alpaca dataset, sharing saved 37.6% to 55.2% of the cache memory on beam "
         "search. That memory goes straight back into batch size. Against Orca (Oracle), an earlier system "
         "given the true output lengths in advance, vLLM sustained 1.3 times the request rate at the same "

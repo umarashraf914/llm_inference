@@ -143,11 +143,12 @@ import re as _re
 
 
 def edit_item(name, from_y=None, paras=None, caption=None, title=None, ts=None, extra_h=24,
-              replace=(), cls=None):
+              replace=(), cls=None, at=None):
     """Rewrite parts of an existing item in place.
 
     from_y   body prose starts at this baseline: every `cap` text at x=40 with y >= from_y is removed
              and `paras` is laid out from there; the canvas ends `extra_h` below the last line.
+    at       lay the new prose out from this baseline instead of from_y.
     replace  (old, new) pairs applied to the raw item first; each old must occur exactly once."""
     p = OUT / f"{name}.html"
     s = p.read_text(encoding="utf-8")
@@ -162,7 +163,7 @@ def edit_item(name, from_y=None, paras=None, caption=None, title=None, ts=None, 
         assert hits, (name, "no prose at or below", from_y)
         for m in reversed(hits):
             s = s[:m.start()] + s[m.end():]
-        svg_body, yb = prose(from_y, paras)
+        svg_body, yb = prose(from_y if at is None else at, paras)
         k = s.index("</svg>")
         s = s[:k] + svg_body + s[k:]
         s = _re.sub(r"viewBox=(['\"])0 0 680 [\d.]+\1", f"viewBox='0 0 680 {round(yb + extra_h)}'", s, count=1)
