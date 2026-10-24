@@ -9,7 +9,7 @@
  *   K.pulse(el, at, peak, d)  attribute opacity 0 → peak → 0 (for flash rects created with opacity 0)
  *   K.track(el, keys, ox, oy) keyframed translate / scale (about ox, oy) / attribute opacity; keys from K.K(t, {x, y, s, o, e});
  *     a key keeps every value an earlier key set unless it sets its own
- *   K.draw(path, len, at, d)  a stroke drawing on (dash offset), seek-safe
+ *   K.draw(path, len, at, d)  a stroke drawing on (dash offset), seek-safe; len is a floor, the measured length wins
  */
 function libKit(S) {
   const T = s => S.t(s);
@@ -45,6 +45,7 @@ function libKit(S) {
     el.setAttribute('opacity', o.toFixed(3));
     el.style.visibility = o > 0.002 ? 'inherit' : 'hidden';
   }); };
-  const draw = (p, len, at, d) => { p.setAttribute('stroke-dasharray', `${len} ${len}`); whole(t => p.setAttribute('stroke-dashoffset', (len * (1 - EIO(cl((t - at) / d)))).toFixed(1))); };
+  // len is a floor: the path's measured length wins when longer, so an underestimate never leaves a tail showing
+  const draw = (p, len, at, d) => { const L = Math.max(len || 0, p.getTotalLength ? Math.ceil(p.getTotalLength()) + 2 : 0); p.setAttribute('stroke-dasharray', `${L} ${L}`); whole(t => p.setAttribute('stroke-dashoffset', (L * (1 - EIO(cl((t - at) / d)))).toFixed(1))); };
   return { T, cl, lerp, E, EIO, drive, clock, whole, setO, hide, fade, ignore, pulse, stateAt, track, K: (t, st) => [t, st], draw };
 }
