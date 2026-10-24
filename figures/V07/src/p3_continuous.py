@@ -87,7 +87,8 @@ def o006():
     body, yb = prose(266, [
         "Orca (Yu et al., presented in 2022 at OSDI, a leading systems conference) changed what the "
         "scheduler hands to the engine. Rather than a batch to run to completion, it hands over a batch "
-        "and asks for exactly one iteration: one token for every active request. The engine runs that "
+        "and asks for exactly one iteration, or step: one token for every active request. The engine "
+        "runs that "
         "step and returns.",
         "Between steps the scheduler drops whatever just emitted an end-of-sequence token, returning it "
         "to its user at once, admits whatever has been waiting, and rebuilds the batch. Orca called "
@@ -294,7 +295,8 @@ def a18():
     assert round(ratio, 2) == 36.81
     body, yb = prose(70 + 2 * 40 + 36, [
         "Orca's paper set it against NVIDIA's FasterTransformer, a fast engine that batched whole "
-        "requests. Throughput only means something at a stated latency, because any system can serve "
+        "requests, both serving GPT-3 175B on A100s, the GPU generation before the H100. Throughput "
+        "only means something at a stated latency, because any system can serve "
         "more by making everyone wait longer ({{fig:v01-o142}}); so both were held to the same median, "
         "190 ms per generated token.",
         f"At that latency FasterTransformer served {f(FT, 3)} requests a second and Orca {f(ORCA, 2)}: "

@@ -175,8 +175,8 @@ def n19():
     emit("n19", stamp(SRT, "A prompt of a few thousand tokens"),
          "Seventy kilobytes a token: what one prompt makes, and what 12.9 terabytes holds", yb + 30,
          b + [body],
-         "Bars to scale. Per conversation the cache is small; across a rack's worth of conversations it is "
-         "the main tenant.")
+         "Bars to scale. Per conversation the cache is small; tens of thousands of conversations at once "
+         "are what fill the rack.")
 
 
 def n20():

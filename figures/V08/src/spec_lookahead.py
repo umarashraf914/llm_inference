@@ -84,6 +84,10 @@ assert PSETS == [0, 1, 2, 5, 6] and PUSED[3] == ("cat", "sat", "on")   # pool: t
 LUCKY = [(k, i) for k in range(len(ROWS) - 1) for i in range(N)
          if i >= SETS[k] and ROWS[k][i] == C[i] and ROWS[k + 1][i] != C[i]]
 assert LUCKY == [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)]              # a right word lands, then is overwritten
+assert all(i == SETS[k] + 1 for k, i in LUCKY)                        # just beyond the next position to settle
+HELP_N = 40                                                           # random starts, seeds 1 to 40
+HELP = sum(len(run(start_guess(k), True)[1]) < len(run(start_guess(k), False)[1]) for k in range(1, HELP_N + 1))
+assert HELP == 16                                                    # the pool helps often, not always
 DIAG = [(0, 2), (1, 3), (2, 4)]                                       # 'on the mat', one place early
 assert [ROWS[r][i] for r, i in DIAG] == ["on", "the", "mat"] and C[3:6] == ["on", "the", "mat"]
 
@@ -237,9 +241,11 @@ def a31():
         "has nothing to its left but the prompt, so it is right after one round; position 2 is right "
         "once position 1 was, and so on. A position only settles once everything before it has.",
         "So alone the method settles one word a round, no faster than ordinary decoding, and each "
-        "round a right word lands one place past the settled ones and is overwritten the next. Switch "
-        "on the pool and the same rounds finish sooner (two figures on explain why). New starting "
-        "guesses are drawn at random; the stepping was checked against the same rules in Python.",
+        "round a right word lands just beyond the next position to settle, and the next round "
+        "overwrites it. Switch "
+        f"on the pool and this start finishes in {len(PSETS) - 1} rounds instead of {len(SETS) - 1}; over "
+        f"{HELP_N} random starts the pool saved rounds in {HELP} (two figures on explain why). The stepping "
+        "was checked against the same rules in Python.",
     ])
     ctl1 = ("<label class='opt'><input type='radio' name='v08-a31-mode' value='alone' checked> Jacobi alone</label>"
             "<label class='opt'><input type='radio' name='v08-a31-mode' value='pool'> with the pool</label>"
@@ -281,8 +287,8 @@ def a32():
         "That fragment is right; it is just in the wrong place, one position early, and the next "
         "round writes over it. A guess in the wrong position is not the same as a wrong guess: the "
         "words still form a real continuation the model would produce somewhere.",
-        "The ✓ marks show the other waste: in every round a right word lands one place past the "
-        "settled ones, and the next round overwrites it.",
+        "The ✓ marks show the other waste: in every round a right word lands just beyond the next "
+        "position to settle, and the next round overwrites it.",
     ])
     emit("a32", at("But a guess in the wrong position is not the same as a wrong guess"),
          "A right fragment in the wrong place is still a right fragment", yb + 30, b + [body],
@@ -347,7 +353,7 @@ EAGLE3_V13B = [("MT-Bench, chat", 5.58), ("HumanEval, code", 6.47), ("GSM8K, mat
 
 def a34():
     assert len(CATS) * 10 == 80
-    b = [hd(40, 46, "MT-Bench: 80 fixed questions, ten in each of eight categories")]
+    b = [hd(40, 46, "MT-Bench: 80 fixed questions in eight categories")]
     for r, cat in enumerate(CATS):
         y = 64 + r * 22
         b.append(txt(40, y + 14, cat, "sub2"))
@@ -355,9 +361,9 @@ def a34():
             b.append(cell(150 + j * 20, y, 16, 16, "u", rx=2))
     b.append(txt(150, 64 + 8 * 22 + 16, "each question has a follow-up turn", "sub2"))
     xr, S = 400, 20
-    b.append(txt(xr, 60, "EAGLE-3, one 13B model, five benchmarks", "sub2"))
+    b.append(txt(xr, 76, "EAGLE-3, one 13B model, five benchmarks", "sub2"))
     for k, (lab, v) in enumerate(EAGLE3_V13B):
-        y = 72 + k * 30
+        y = 88 + k * 30
         b.append(txt(xr, y + 15, lab, "sub2"))
         b.append(cell(xr + 124, y, v * S, 22, "m" if v == max(x for _, x in EAGLE3_V13B) else "u", label=f"{v:.2f}×"))
     assert max(v for _, v in EAGLE3_V13B) == 6.47 and min(v for _, v in EAGLE3_V13B) == 5.01

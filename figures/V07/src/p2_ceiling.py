@@ -65,8 +65,9 @@ def o005():
     b.append(txt(372, 222, "one read per request, on every step", "sub2"))
     body, yb = prose(270, [
         "The weights are identical for every request, which is why one read of them serves the whole "
-        "batch. A KV cache is the opposite: every request carries its own keys and values, the running "
-        "record of its own sequence ({{fig:v01-o136}}).",
+        "batch. A KV cache is the opposite: every request carries its own keys and values, the vectors "
+        "attention computed for each of its earlier tokens and keeps so that it never recomputes them, "
+        "the running record of its own sequence ({{fig:v01-o136}}).",
         "So attention has to read each request's cache separately, one read per request on every step. "
         "Those reads grow with the batch, and none of them is shared. Two consequences follow, and the "
         "next figures work out both: attention's reads never amortise, and the caches decide how many "
@@ -312,7 +313,8 @@ def a10():
             b.append(ghost(round(xk + used * SC, 2), y, round(left * SC, 2), 24))
     assert round((POOL - 13 * cache(32768)) / 1e9, 2) == 4.11
     body, yb = prose(150 + 3 * 46 + 30, [
-        "Model weights are a fixed cost and activations take little, so whatever is left of the card "
+        "Model weights are a fixed cost and activations, the intermediate numbers a forward pass "
+        "computes and discards, take little, so whatever is left of the card "
         "holds caches ({{fig:v01-o141}}). Setting aside 4 GB for activations and working buffers, an "
         f"assumption, leaves 80 − {gb(W8)} − 4 = {gb(POOL)} GB.",
         f"Requests that fit = that pool ÷ one request's cache, rounded down: {gb(POOL)} GB ÷ "
@@ -400,7 +402,8 @@ def a12():
             b.append(ghost(round(xs, 2), YB, round(w, 2), 30, label=f"{lab} {f(n / total * 100, 1)}%"))
         xs += w
     body, yb = prose(YB + 30 + 40, [
-        "Before paging, a system gave each request one unbroken run of memory, sized for the longest "
+        "The systems before paged memory, the next figure, gave each request one unbroken run of "
+        "memory, sized for the longest "
         "answer it might produce, because the cache had to sit in one contiguous stretch and could not "
         "grow ({{fig:v03-o083}}).",
         f"That wastes memory twice. Inside each run are slots reserved for tokens not yet written, and "
@@ -585,7 +588,8 @@ def a14():
         b.append(txt(X[4], y, f"{f(e / (nb * BS) * 100, 1)}%", "sub2", "end"))
     assert max(blocks(n) * BS - n for n in range(1, 5000)) == BS - 1
     body, yb = prose(TY + 24 + 3 * 24 + 22, [
-        "A block is taken from the free list only when the request's last block fills, so a request "
+        "A block is taken from the free list, the engine's list of unused blocks, only when the "
+        "request's last block fills, so a request "
         "holds ⌈tokens ÷ 16⌉ blocks: the token count divided by 16 and rounded up, because a part-filled "
         "block is still a whole block.",
         "Only the last block can be part empty, so the waste is at most 15 slots per request, whatever "
@@ -618,7 +622,8 @@ def a15():
     lo, hi = 96.3 / 38.2, 96.3 / 20.4
     assert round(lo, 2) == 2.52 and round(hi, 2) == 4.72
     body, yb = prose(70 + 4 * 36 + 30, [
-        "The vLLM paper (Kwon et al., SOSP 2023) measured this directly. Its authors built three "
+        "The vLLM paper (Kwon et al., SOSP 2023, a leading systems conference) measured this directly. "
+        "Its authors built three "
         "versions of Orca's contiguous reservation: one reserving the model's maximum length, one up to "
         "twice the true answer, one exactly the true answer, which no real system can know in advance. "
         "Under those rules 20.4% to 38.2% of the memory held real tokens. Under paging 96.3% did, "

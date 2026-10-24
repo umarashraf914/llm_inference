@@ -47,7 +47,7 @@ def a01():
     b.append(txt(X0, y2 + 66, f"busy {f(busy * 100)}%: the sliver at the left edge", "sub2"))
     body, yb = prose(y2 + 112, [
         "One token needs a multiply and an add for each of the 70 billion weights: 140 billion "
-        "operations, which the H100's 989 trillion a second get through in 0.142 ms. Reading the 140 GB "
+        "operations, which an H100 GPU's 989 trillion a second get through in 0.142 ms. Reading the 140 GB "
         "of weights at 3.35 TB/s takes 41.8 ms ({{fig:v01-o126}} has both specifications).",
         f"So the arithmetic units work for 0.142 ms of every 41.8: {f(busy * 100)}% of the time, idle "
         f"the other {f((1 - busy) * 100)}%. The ratio of the two times, {RIDGE:.0f}, is the chip's ridge: "

@@ -57,7 +57,7 @@ def b51():
     b.append(cell(60, 196, 12, 12, "s")); b.append(txt(78, 206, "A's request", "sub2"))
     b.append(cell(170, 196, 12, 12, "m")); b.append(txt(188, 206, "B's request", "sub2"))
     body, yb = prose(246, [
-        f"Two customers share one deployment. A sends short requests, {A_TOK} tokens of prompt and "
+        f"Two customers, or tenants, share one deployment. A sends short requests, {A_TOK} tokens of prompt and "
         "answer each; B sends long ones. A scheduler that takes one request from each in turn looks "
         "fair: each gets half the requests.",
         f"But the machine's work is tokens, not requests. With B's requests five times A's, B gets 6 × "
@@ -272,17 +272,18 @@ def b53():
         b.append(cell(340, y, 120, 24, "h" if lab == "on time" else "u", label=v2))
     body, yb = prose(348, [
         f"Take Llama 3 8B on one H100, every request holding {g(CTX8K)} tokens of context, "
-        f"{f(per / 1e9, 2)} GB of cache each, and a target of 20 ms per output token. Requests in a "
-        "batch advance together, so they share one step time: the weights read once, plus every "
-        "request's cache.",
+        f"{f(per / 1e9, 2)} GB of cache each ({{{{fig:v07-a07}}}}), and a target of 20 ms per output "
+        "token. Requests in a batch advance together, so they share one step time: the weights read "
+        "once, plus every request's cache ({{fig:v07-a23}}).",
         f"47 requests make a step of (16.06 + 47 × {f(per / 1e9, 2)}) GB ÷ 3.35 TB/s = "
-        f"{f(t47 * 1e3, 1)} ms, and all are on time. 55, all that memory holds, make "
+        f"{f(t47 * 1e3, 1)} ms, and all are on time. 55, all that memory holds ({{{{fig:v07-a10}}}}), make "
         f"{f(t55 * 1e3, 1)} ms, and every one is late. The GPU turns out {pc(thr55 / thr47 - 1, 0)} more "
         f"tokens and goodput falls from {g(thr47)} tokens a second to none, while utilisation, the "
         "share of time the GPU is busy, reads 100% throughout.",
         "Admission control refuses the excess instead. The scheduler can predict that a 48th request "
         "would push every step past 20 ms, and reject or defer it so the 47 still land. Mooncake, the "
-        "platform serving Kimi, does this with a prediction-based early rejection policy: when a "
+        "platform that serves Kimi, Moonshot AI's language-model service, does this with a "
+        "prediction-based early rejection policy: when a "
         "request arrives it predicts the load that request will add to the decode pool once its "
         "prefill is done, and turns it away before spending anything on it.",
     ])
@@ -337,7 +338,8 @@ def b54():
     emit("b54", stamp(SRT, "And when the pools themselves are the"),
          "The right split between the pools follows the traffic", yb + 32, b + [body],
          "Rates borrowed from one measured run and applied to other mixes, so illustrative. The point "
-         "survives any rates: the split is a property of the traffic, not of the model.")
+         "survives any rates: the split is a property of the traffic, not of the model.",
+         links=["the 96-GPU SGLang run (P35, Part 5): point the per-GPU rates at it once it exists"])
 
 
 if __name__ == "__main__":

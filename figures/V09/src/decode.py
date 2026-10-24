@@ -88,7 +88,7 @@ def n22():
     b.append(txt(40, ya + 70, f"so the arithmetic units sit idle {f(100 * IDLE, 2)}% of the step", "sub2"))
     body, yb = para(ya + 114, [
         "Reading a gigabyte at 8 terabytes a second takes one eight-thousandth of a second: 125 "
-        "microseconds. The gigabyte holds two billion 4-bit weights, which offer 4 billion operations, "
+        "microseconds, or millionths of a second, written µs. The gigabyte holds two billion 4-bit weights, which offer 4 billion operations, "
         "and at 10 quadrillion a second those take 0.4 microseconds.",
         "So the arithmetic for each gigabyte is done 312.5 times sooner than the gigabyte arrives, and "
         "the units wait for the rest: the same picture as the first episode's 30-millisecond token "

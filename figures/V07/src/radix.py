@@ -477,7 +477,8 @@ def b43():
     s.append(f'<text class="sub2" x="40" y="{ybot + 18}" data-freed="">freed 0 tokens; '
              f'{g(sum(tok.values()))} still cached</text>')
     body, yb = prose(ybot + 58, [
-        "When memory runs short the tree gives up the least recently used leaf first. Only a leaf can "
+        "Times are seconds on an illustrative clock. When memory runs short the tree gives up the "
+        "least recently used leaf first. Only a leaf can "
         "go, because removing a node from the middle would cut off everything below it; once a leaf "
         "is gone its parent may become a leaf, so eviction works inward toward the shared trunk.",
         "A count on each node says how many running requests are using it. B's second turn is running "

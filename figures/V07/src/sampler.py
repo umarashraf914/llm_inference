@@ -240,7 +240,8 @@ def b56():
     for line in textwrap.wrap(PURE, 92):
         b.append(txt(40, y, line, "sub2")); y += 17
     body, yb = prose(y + 30, [
-        "Both continuations come from GPT-2 Large, a model of 774 million parameters, given the same "
+        "Both continuations come from GPT-2 Large, a 774-million-parameter model OpenAI released in "
+        "2019, given the same "
         "two-sentence opening (Holtzman et al., 2020, Figure 1). Beam search finds text the model rates "
         "as highly probable, and it is one university's name, five times over and starting a sixth.",
         "Models do assign high probability to well-formed text, but the highest-scoring long "
@@ -582,7 +583,7 @@ def b71():
         style = '' if kept else ' style="fill:none;stroke:var(--rule);stroke-dasharray:3 3"'
         s.append(f'<g data-row="{i}"{"" if vis else " style=" + chr(34) + "display:none" + chr(34)}>'
                  f'<text class="cap" x="40" y="{y + 15}" data-nm="{i}">{nm}</text>'
-                 f'<text class="sub2" x="92" y="{y + 15}" data-lt="{i}">{f(lv / DEF["T"], 2)}</text>'
+                 f'<text class="sub2" x="92" y="{y + 15}" data-lt="{i}">{f(lv / DEF["T"], 2) if vis else ""}</text>'
                  f'<g class="{"s" if kept else "u"}"><rect x="160" y="{y + 1}" width="{w:.2f}" height="18" rx="2" data-sh="{i}"{style}/></g>'
                  f'<text class="sub2" x="{160 + w + 6:.2f}" y="{y + 15}" data-sv="{i}">{pc(sh[i], 2 if vis and sh[i] < 0.01 else 1) if vis else ""}</text>'
                  f'<g class="m"><rect x="440" y="{y + 1}" width="{max(wf, 1.5 if kept else 0):.2f}" height="18" rx="2" data-fb="{i}"/></g>'

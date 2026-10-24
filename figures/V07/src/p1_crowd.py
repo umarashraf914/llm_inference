@@ -54,14 +54,17 @@ def a01():
         b.append(cell(TX[2] - 64, y + 4, 64, 26, "m" if last else "u", label=lab))
     b.append(txt(TX[0], 100 + 4 * 44 + 12, f"about {R} tokens per expert reach the ridge", "sub2"))
     body, yb = prose(gy + 64, [
-        f"In DeepSeek V3, each token's router picks {ACTIVE} of the {EXPERTS} experts in every "
-        "mixture-of-experts layer ({{fig:v06-o009}}), while all of them stay resident in memory. A step "
+        "A mixture-of-experts layer holds many small networks, the experts, and a router that sends "
+        "each token to a few of them ({{fig:v06-o010}}). "
+        f"In DeepSeek V3 the router picks {ACTIVE} of the {EXPERTS} experts in every such layer "
+        "({{fig:v06-o009}}), while all of them stay resident in memory. A step "
         f"that carries N tokens hands out {ACTIVE}N expert visits, so each expert sees N × {ACTIVE} ÷ "
         f"{EXPERTS} = N ÷ {EXPERTS // ACTIVE} tokens on average.",
         "Whenever an expert runs, its whole weight matrix is read from memory, whether one token uses "
         f"it or three hundred. Only at about {R} tokens per expert does the arithmetic keep pace with "
         "that read: the ridge, {{fig:v07-a03}}.",
-        f"In decode each request adds one token per step, so {R} tokens per expert means "
+        "In decode, the token-by-token phase of generation ({{fig:v01-o109}}), each request adds one "
+        f"token per step, so {R} tokens per expert means "
         f"{fc(N_RIDGE)} requests generating at the same moment across the deployment. Creating that "
         "crowd is the serving system's job.",
     ])
@@ -107,7 +110,8 @@ def a02():
         "A serving system takes a fixed set of GPUs running a model, a trillion parameters in the "
         "largest cases, and serves as many users as it can without missing anyone's latency target.",
         "Each user is promised two things ({{fig:v01-o143}}). Time to first token covers the wait in "
-        "the queue plus the prefill of the whole prompt. Time per output token is the gap between "
+        "the queue plus the prefill, the single pass that reads the whole prompt. Time per output "
+        "token is the gap between "
         "tokens after that: one decode step each, so every user in a step waits for the whole step. "
         "The targets depend on the product: DistServe's chatbot settings ask for the first token "
         "within 0.25 to 4 seconds and each later one within 0.1 to 0.2 seconds, looser for bigger "
@@ -146,7 +150,8 @@ def o001():
         "series' 70-billion-parameter example that is 140 GB of reading against 140 billion operations "
         "({{fig:v01-o114}}).",
         f"The read takes {ms(T_READ70, 1)} ms and the arithmetic {ms(T_MATH70, 3)} ms, so the arithmetic "
-        f"units are busy {f(SHARE * 100, 2)}% of the step: the tensor cores barely warm up. (140 GB is "
+        f"units are busy {f(SHARE * 100, 2)}% of the step: the tensor cores, the chip's matrix-multiply "
+        "units, barely warm up. (140 GB is "
         "more than one 80 GB card holds. Split over two cards, both times halve and their ratio stays.)",
         "Nothing about that read was specific to the request. The same 140 GB would have crossed the "
         "bus whether one user was connected or 64.",
@@ -188,7 +193,7 @@ def a03():
         "batch one, each 2-byte weight that is read feeds one multiply-add, 2 operations, so the "
         "intensity is 1 ({{fig:v01-o116}}).",
         f"Memory delivers 3.35 trillion bytes a second, so at 1 operation per byte the chip reaches "
-        f"{f(ATTAIN1)} TFLOP/s of its 989: the same {f(SHARE * 100, 2)}% as the previous figure, seen "
+        f"{f(ATTAIN1)} TFLOP/s, trillion operations a second, of its 989: the same {f(SHARE * 100, 2)}% as the previous figure, seen "
         f"from the other side. The ridge, where memory and arithmetic run out together, is at 989 ÷ "
         f"3.35 = {R} operations per byte ({{{{fig:v01-o126}}}}).",
         "Moving the point to the right means getting more operations out of every byte read. Nothing "

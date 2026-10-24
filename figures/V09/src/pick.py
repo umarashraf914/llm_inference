@@ -253,7 +253,8 @@ def n27():
         "nests, it also keeps a stack of the braces still open.",
         f"After the opening brace, the format allows only the field it requires first, \"name\", or a "
         f"space. Of the {n(VOCAB)} tokens in the vocabulary, every other one gets a score of minus "
-        "infinity, which softmax turns into a probability of exactly zero ({{fig:v07-o023}}).",
+        "infinity. Softmax raises e to each score, and e to the minus infinity is zero, so their "
+        "probability is exactly zero ({{fig:v07-o023}}).",
         "The survivors' probabilities are then divided by their total, 0.65, so they add up to one "
         "again. The probabilities are illustrative; which candidates survive is computed by checking each "
         "against the format.",
@@ -373,8 +374,8 @@ def n27w():
     js = N27_JS.replace("__S__", json.dumps(data, ensure_ascii=False))
     emit_widget("n27w", stamp(SRT, "field names the format allows are still"),
                 "Step through the call: what the format allows at each token", ctl, s + [body], yb + 26,
-                "Most steps leave one sensible choice; a few leave the model free. The mask decides only "
-                "whether the call can parse, never whether it is the right call.", js)
+                "Most steps leave one sensible choice and a few leave the model free. The free ones, "
+                "inside the strings, are where a wrong call would come from.", js)
 
 
 def n28():
@@ -391,7 +392,7 @@ def n28():
         "the same dividing by a total that softmax does ({{fig:v01-o009}}), and the sampler then draws "
         "from the result.",
         "So the mask can delete the token the model most wanted and push it down a path it would not "
-        "have taken ({{fig:v07-o024}}). What it guarantees is that the call parses.",
+        "have taken ({{fig:v07-b70}}). What it guarantees is that the call parses.",
     ])
     emit("n28", stamp(SRT, "The model picks from what is left."),
          "The mask can delete the model's favourite, and what is left is rescaled to sum to one", yb + 30,

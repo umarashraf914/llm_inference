@@ -48,7 +48,7 @@ def o075():
         "E5M2 holds 247. A couple of hundred values, to stand in for every number a tensor might hold.",
     ])
     figure("o075", st("compute in FP8"), "What FP8 is", yb + 30, b + [body],
-           esc("Two formats, one width. Which values those 253 patterns land on, and how far apart, decides "
+           esc("Two formats, one width. Where those values sit, and how far apart, decides "
                "everything that follows in this part."))
 
 
@@ -293,7 +293,7 @@ def o076():
     frac = 740e12 / H100_PEAK
     assert round(100 * frac) == 75
     b = [hd(40, 46, "Error against an exact reference: FlashAttention 3's own test, FP8")]
-    SC = 380 / rmse["baseline"]
+    SC = 360 / rmse["baseline"]
     rows = [("per-tensor scale, no rotation", rmse["baseline"], "h"),
             ("version 3: block scales and rotation", rmse["fa3"], "s"),
             ("without the block scales", rmse["no_block"], "s"),
@@ -301,7 +301,7 @@ def o076():
     for k, (lab, v, cls) in enumerate(rows):
         y = 66 + k * 34
         b.append(txt(40, y + 18, lab, "cap"))
-        b.append(hbar(250, y + 2, v * SC, 24, cls, f"{v * 1e3:.1f} × 10⁻³", 120))
+        b.append(hbar(280, y + 2, v * SC, 24, cls, f"{v * 1e3:.1f} × 10⁻³", 120))
     y2 = 66 + 4 * 34 + 28
     b.append(hd(40, y2, "Speed on an H100"))
     speed = [("FP16, against version 2", "1.5 to 2.0 times faster"),
@@ -310,11 +310,11 @@ def o076():
     for k, (lab, v) in enumerate(speed):
         y = y2 + 24 + k * 24
         b.append(txt(40, y, lab, "cap"))
-        b.append(txt(250, y, v, "sub2"))
+        b.append(txt(280, y, v, "sub2"))
     body, yb = prose(y2 + 24 + 3 * 24 + 26, [
-        "The paper filled Q, K and V with ordinary numbers plus, in one entry in a thousand, an extra one ten "
-        "times larger, and measured the root-mean-square error of the attention output against a 64-bit "
-        "reference. With one scale per tensor and no rotation the error was 2.4 × 10⁻²; with both fixes, "
+        "The paper filled Q, K and V with ordinary random numbers plus, in one entry in a thousand, an extra "
+        "term with ten times the spread, and measured the root-mean-square error of the attention output against a 64-bit "
+        "reference. With one scale per tensor and no rotation the error was 24 × 10⁻³; with both fixes, "
         "9.1 × 10⁻³, 2.6 times lower.",
         "Its ablation says which fix did the work in that test: dropping the block scales barely moved the "
         "error, while dropping the rotation put it straight back to the baseline. In 16 bits, version 3 runs "

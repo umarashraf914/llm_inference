@@ -63,7 +63,9 @@ def o016():
     emit("o016", stamp(SRT, "What all of it optimizes is not"),
          "Goodput counts only the requests that met both targets", yb + 32, b + [body],
          "Bars to scale, latencies illustrative. Two filters applied together: missing either "
-         "target is a miss, so attainment is always at or below the worse of the two.")
+         "target is a miss, so attainment is always at or below the worse of the two.",
+         links=["P32 (Part 5, 13:47), the both-targets table: point 'a request counts only if it meets "
+                "both at once' at it once it exists, and check the two examples agree"])
 
 
 # ---- b48: per-GPU goodput, read off a queue -----------------------------------------------------
@@ -181,7 +183,9 @@ def b48():
                 yb + 26,
                 "A toy queue, exact for its assumptions. Utilisation climbs in a straight line while "
                 "the share on time falls off a cliff: the GPU is busiest exactly when it is least "
-                "useful.", js)
+                "useful.", js,
+                links=["P35 (Part 5, 15:05), twenty cents per million: point the $2.01 per GPU-hour "
+                       "derivation at it once it exists"])
 
 
 if __name__ == "__main__":

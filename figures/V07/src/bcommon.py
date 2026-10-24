@@ -55,19 +55,25 @@ def tw(s, cls="sub"):
     return len(s) * {"lbl": 7.0, "sub": 6.0, "sub2": 6.0, "cap": 6.5, "hd": 7.0}[cls]
 
 
-def emit(name, ts, title, h, body, caption, cls=None):
-    (OUT / f"{name}.html").write_text(item(ts, title, h, body, caption, cls), encoding="utf-8")
+def emit(name, ts, title, h, body, caption, cls=None, links=()):
+    """Write a figure item. `links` become <!-- link: ... --> notes for the final pass: pointers to
+    figures that another builder has not made yet."""
+    html_ = item(ts, title, h, body, caption, cls)
+    if links:
+        html_ = html_.replace("</figure>", "".join(f"<!-- link: {l} -->" for l in links) + "</figure>")
+    (OUT / f"{name}.html").write_text(html_, encoding="utf-8")
     print(name, ts, title)
 
 
-def emit_widget(name, ts, title, controls, svg, h, caption, js):
+def emit_widget(name, ts, title, controls, svg, h, caption, js, links=()):
     """A widget figure, following V06's p18: controls in .ctl rows, one SVG, caption, inline script.
     `controls` is a list of HTML strings, one per .ctl row; `svg` is the drawing's inner SVG."""
     rows = "".join(f"<div class='ctl'>{c}</div>" for c in controls)
     html_ = (f"<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; {ts}</div>"
              f"<h3>{esc(title)}</h3><div class='wg'>{rows}"
              f"<svg viewBox='0 0 680 {h}' role='img'><title>{esc(title)}</title>{svg}</svg></div>"
-             f"<figcaption>{esc(caption)}</figcaption>{js}</figure>")
+             f"<figcaption>{esc(caption)}</figcaption>{js}"
+             + "".join(f"<!-- link: {l} -->" for l in links) + "</figure>")
     (OUT / f"{name}.html").write_text(html_, encoding="utf-8")
     print(name, ts, title, "(widget)")
 

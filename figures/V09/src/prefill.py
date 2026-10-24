@@ -182,8 +182,9 @@ def n12():
     body, yb = para(y + 132, [
         "One number of a matrix multiply's output is a row of weights times the activations, multiplied "
         "pair by pair and added ({{fig:v01-o085}}). In a block of 16, every weight is its 4-bit value "
-        "times the block's scale, and so is every activation, because this chip's 4-bit rate needs both "
-        "sides in 4 bits ({{fig:v04-o056}}).",
+        "times the block's scale, and so is every activation, one of the numbers that carry a token "
+        "through the model ({{fig:v01-o099}}). This chip's 4-bit rate needs both sides in 4 bits "
+        "({{fig:v04-o056}}).",
         "Factors can be multiplied in any order, and a factor shared by every term comes out of a sum: "
         "s·a + s·b = s·(a + b). So the 16 products can be taken on the 4-bit values themselves, and the "
         "two scales applied once to the block's partial sum. The answer is identical: −0.00375 both ways.",
@@ -276,7 +277,8 @@ def n14():
     assert 2 * 61 == 122
     body, yb2 = para(yb + 52, [
         "Tensor parallelism cuts each weight matrix into slices, one per GPU ({{fig:v05-o009}}). "
-        "Attention divides by heads; the feed-forward block cuts its first matrix by columns and its "
+        "Attention divides by heads, the independent attention computations a layer runs side by side "
+        "({{fig:v03-o013}}); the feed-forward block cuts its first matrix by columns and its "
         "second by rows. Each GPU ends up holding part of the layer's answer, and an all-reduce adds the "
         "parts and hands every GPU the total ({{fig:v05-o007}}).",
         "Nothing can continue until the slowest GPU has finished and the sum has arrived, so a layer "

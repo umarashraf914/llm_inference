@@ -75,11 +75,13 @@ def b49():
     b.append(ghost(X0 + 300, 208, 12, 12, rx=2)); b.append(txt(X0 + 318, 218, "needed, not there", "sub2"))
     body, yb = prose(262, [
         f"On one H100 serving Llama 3 8B, take {f(POOL / 1e9)} GB for caches: 80 GB, less 16.06 GB of "
-        f"weights and an assumed 4 GB of working space. In blocks of {BLOCK} tokens, 2 MiB each, that "
+        f"weights and an assumed 4 GB of working space ({{{{fig:v07-a10}}}}). In blocks of {BLOCK} "
+        f"tokens, 2 MiB each, that "
         f"is {g(blocks)} blocks. A request holding about {g(CTX)} tokens needs {CTX // BLOCK} of them, so "
         f"{n} requests fit, with {free} blocks to spare.",
         f"Every step adds one token to every request, and a request needs a fresh block each time its "
-        f"length passes a multiple of {BLOCK}. Their lengths differ, so about {n} ÷ {BLOCK} ≈ "
+        f"length passes a multiple of {BLOCK} ({{{{fig:v07-a14}}}}). Their lengths differ, so about "
+        f"{n} ÷ {BLOCK} ≈ "
         f"{round(n / BLOCK)} need one at each step. The {free} spare blocks last two steps; on the "
         f"third, {steps[-1][1]} requests need a block and {steps[-1][2]} are left.",
         f"At about {f(step_s * 1e3, 0)} ms a step, that is under a tenth of a second. Admitting work "
@@ -114,7 +116,8 @@ def o017():
         "vLLM evicts a whole sequence at a time, all of its blocks or none, because attention needs "
         "all of them together anyway: a sequence missing one block cannot take its next step. Getting "
         "it back costs one of two things.",
-        "Swapping copies the blocks out to CPU memory and back again when the sequence resumes. "
+        "Swapping copies the blocks out to CPU memory, the server's ordinary main memory, larger and "
+        "slower than the GPU's own, and back again when the sequence resumes. "
         "Recomputing discards them and rebuilds them later.",
         "Recomputing is cheaper than it sounds. The tokens the request has already generated are "
         "appended to its original prompt, and the whole cache is rebuilt in a single prefill pass "
@@ -158,7 +161,8 @@ def b50():
         b.append(txt(xs(v) + 8, y + 17, note, "sub2"))
     assert xs(by_token) + 8 + 50 < 640
     body, yb = prose(270, [
-        f"Swapping moves {round(cache / 1e6)} MB over PCIe, the bus between CPU and GPU "
+        f"The request keeps {g(tokens)} × {g(KV8)} bytes = {round(cache / 1e6)} MB of keys and values "
+        f"({{{{fig:v07-a07}}}}). Swapping moves them over PCIe, the bus between CPU and GPU "
         "({{fig:v02-o007}}). A Gen5 link has 16 lanes, each carrying 32 billion bits a second, 128 of "
         f"every 130 of them data: 16 × 32 × 128/130 ÷ 8 = {f(gen5 / 1e9, 1)} GB/s each way. Out and "
         f"back takes 2 × {f(cache / gen5 * 1e3, 1)} = {f(swap5 * 1e3, 1)} ms; on a Gen4 link, half as "

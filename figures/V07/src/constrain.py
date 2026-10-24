@@ -68,7 +68,9 @@ def o023():
         "Sampling chooses among the tokens the model proposes. Constrained decoding changes which "
         "tokens are on offer in the first place, one stage earlier: before the sampler runs, the "
         "engine sets the logit of every token that would break the format to minus infinity.",
-        "It is needed whenever the output will be read by a machine rather than a person. A schema is "
+        "It is needed whenever the output will be read by a machine rather than a person. JSON is a "
+        "plain-text format for structured data, names and values in braces such as {\"city\": "
+        "\"Paris\"}; SQL is the language databases are queried in. A schema is "
         "a written description of the shape data must have: which fields, in what order, of what "
         "type. To type-check is to confirm each value has the type the schema demands, a number "
         "where a number is required.",
@@ -140,7 +142,8 @@ def b64():
     assert abs(math.exp(-100) / 1e-44 - 3.72) < 0.01
     body, yb = prose(ye + 32 + 40, [
         "Softmax raises e to each logit, and e to a very negative number is very small: the row of "
-        "boxes shows it shrinking toward zero. In a computer's floating-point arithmetic e to minus "
+        "boxes shows it shrinking toward zero. In a computer's floating-point arithmetic "
+        "({{fig:v02-o086}}) e to minus "
         "infinity is 0 itself, not merely small, so the forbidden token's share is exactly 0.",
         f"The others are renormalised over what remains: cat rises from {pc(before[0])} to "
         f"{pc(after[0], 2)}, the from {pc(before[2], 2)} to {pc(after[2], 2)}. A token with probability "
@@ -182,7 +185,8 @@ def o022():
         b.append(cell(x, yt + 32, 44, 26, "h" if st == REJECT else "s",
                       label="✗" if st == REJECT else f"{st}"))
     body, yb = prose(yt + 58 + 40, [
-        "What decides which tokens would break the format is an automaton that tracks the output so "
+        "What decides which tokens would break the format is an automaton, a machine that reads text "
+        "one character at a time and changes state as it goes, tracking the output so "
         f"far. For output shaped like a regular expression, a pattern language for text in which "
         f"{PATTERN} means four digits, a dash and two digits (a year and a month, like 2025-10), a "
         "finite state machine is enough.",
@@ -275,7 +279,9 @@ def b66():
         x = 160 + i * 60
         b.append(cell(x, yt, 50, 26, "h" if st == REJECT else "u", label="✗" if st == REJECT else f"{st}"))
     body, yb = prose(yt + 26 + 40, [
-        "Grammars that nest, like JSON or SQL, need more, because a state machine cannot remember how "
+        "A grammar is a set of rules for which texts are valid. Grammars that nest, like JSON's or "
+        "SQL's, which let a structure sit inside another to any depth, need more, because a state "
+        "machine cannot remember how "
         "many brackets are still open. To track depth it needs a state for each depth: an opening "
         "bracket moves it one state right, a closing one one state left.",
         f"With states for depths 0 to {depth_max}, the machine follows three open brackets and refuses "

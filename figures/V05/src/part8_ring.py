@@ -101,12 +101,11 @@ def o021():
     b.append(arr(x0 + 17, y0 + 66, x0 + 17, y0 + BH + 4))
     b.append(hd(40, 222, "What the busiest GPU sends, for eight GPUs and a message of S bytes"))
     X0, S = 230, 26
-    for k, (name, v, note) in enumerate(plans):
+    for k, (name, v, _) in enumerate(plans):
         y = 238 + k * 40
         b.append(txt(40, y + 18, f"{'abc'[k] + '. ' if k < 3 else ''}{name}", "cap"))
         b.append(cell(X0, y, v * S, 26, "h" if k < 3 else "s"))
         b.append(txt(X0 + v * S + 10, y + 18, f"{f(v, 2) if v % 1 else f(v, 0)} S", "sub2"))
-        b.append(txt(X0, y + 38, note, "sub2") if False else "")
     body, yb = prose(420, [
         "Tensor parallelism fires an all-reduce twice in every layer, and training-time data "
         "parallelism syncs its gradients with one. Both are affordable for the same reason. Every GPU "
@@ -159,8 +158,8 @@ PANEL_X = [64, 262, 460]
 
 
 def sends_text(sends):
-    a = ", ".join(f"G{x + 1}→G{z + 1}: {n(v)}" for x, z, _, v in sends[:2])
-    z = ", ".join(f"G{x + 1}→G{zz + 1}: {n(v)}" for x, zz, _, v in sends[2:])
+    a = ", ".join(f"G{x + 1}→G{z + 1}: {v}" for x, z, _, v in sends[:2])
+    z = ", ".join(f"G{x + 1}→G{zz + 1}: {v}" for x, zz, _, v in sends[2:])
     return a + ",", z
 
 
@@ -172,7 +171,7 @@ def n37():
         phase, sends, state = STEPS[i]
         got = {(z, j) for _, z, j, _ in sends}
         last = i == 2
-        vals = [[n(state[r][c]) for c in range(G)] for r in range(G)]
+        vals = [[str(state[r][c]) for c in range(G)] for r in range(G)]
         tone = (lambda r, c, got=got: "s" if (r, c) in got and r == c else "m" if (r, c) in got else "u") if last \
             else (lambda r, c, got=got: "m" if (r, c) in got else "u")
         b.append(txt(PANEL_X[i], 70, f"after step {i + 1}", "sub2"))
@@ -193,7 +192,7 @@ def n37():
     ])
     emit("n37", stamp(SRT, "First, the reduce scatter"),
          "Reduce-scatter: each slice makes one lap, collecting", yb + 26, b + [body],
-         "Read the digits: 3033 is 3 from G1, 30 from G2 and 3,000 from G4, with G3's 300 still to "
+         "Read the digits: 3033 is 3 from G1, 30 from G2 and 3000 from G4, with G3's 300 still to "
          "come. Every step, every link carries one slice, all at the same time.")
 
 
@@ -208,7 +207,7 @@ def n38():
         got = {(z, j) for _, z, j, _ in sends}
         for z, j in got:
             known[z][j] = True
-        vals = [[n(state[r][c]) if known[r][c] else None for c in range(G)] for r in range(G)]
+        vals = [[str(state[r][c]) if known[r][c] else None for c in range(G)] for r in range(G)]
         b.append(txt(PANEL_X[i], 70, f"after step {i + 4}", "sub2"))
         b += grid(PANEL_X[i], 82, vals, cw=CW, ch=24, gap=GP,
                   cls=lambda r, c, got=got: "m" if (r, c) in got else "s")
@@ -260,11 +259,15 @@ def labels(n, t):
     return ph, tally
 
 
-GX, GY, CHH = 120, 76, 30
+GX, GY, CHH = 120, 76, 36
 
 
 def cellw(n):
-    return min(56, (520 - (n - 1) * 4) // n)
+    return min(72, (520 - (n - 1) * 4) // n)
+
+
+def pipw(n):
+    return min(7, (cellw(n) - 6 - 2 * (n - 1)) // n)
 
 
 WIDGET38 = r"""<script>(() => {
@@ -292,7 +295,10 @@ WIDGET38 = r"""<script>(() => {
   function draw() {
     const n = +sl.value, total = 2 * (n - 1); val.textContent = n;
     if (t > total) t = total;
-    const [have, changed] = run(n, t), cw = Math.min(56, Math.floor((520 - (n - 1) * 4) / n));
+    const [have, changed] = run(n, t), cw = Math.min(72, Math.floor((520 - (n - 1) * 4) / n));
+    const pw = Math.min(7, Math.floor((cw - 6 - 2 * (n - 1)) / n)), dy = (n - C.n0) * (C.CH + 4);
+    q('[data-below]').setAttribute('transform', `translate(0,${dy})`);
+    fig.querySelector('svg').setAttribute('viewBox', `0 0 680 ${C.H0 + dy}`);
     const layer = q('[data-grid]'); layer.replaceChildren();
     for (let j = 0; j < n; j++) layer.appendChild(el('text', {class: 'sub2', x: C.GX + j * (cw + 4) + cw / 2,
       y: C.GY - 8, 'text-anchor': 'middle'}, `s${j + 1}`));
@@ -303,8 +309,8 @@ WIDGET38 = r"""<script>(() => {
         const x = C.GX + j * (cw + 4), m = have[g][j], full = m === (1 << n) - 1;
         const cls = changed.includes(`${g}-${j}`) ? 'm' : full ? 's' : 'u';
         const gr = el('g', {class: cls}); gr.appendChild(el('rect', {x, y, width: cw, height: C.CH, rx: 3}));
-        const pw = 4, pg = 2, w0 = n * pw + (n - 1) * pg, x0 = x + (cw - w0) / 2;
-        for (let p = 0; p < n; p++) gr.appendChild(el('rect', {x: (x0 + p * (pw + pg)).toFixed(1), y: y + C.CH / 2 - 2,
+        const pg = 2, w0 = n * pw + (n - 1) * pg, x0 = x + (cw - w0) / 2;
+        for (let p = 0; p < n; p++) gr.appendChild(el('rect', {x: (x0 + p * (pw + pg)).toFixed(1), y: y + (C.CH - pw) / 2,
           width: pw, height: pw, rx: 1, style: (m >> p) & 1 ? 'fill:var(--ink);stroke:none' : 'fill:none;stroke:var(--muted)'}));
         layer.appendChild(gr);
       }
@@ -336,9 +342,11 @@ def n38w_grid(n, t):
             x = GX + j * (cw + 4)
             m = state[g][j]
             cls = "m" if (g, j) in changed else "s" if m == (1 << n) - 1 else "u"
+            pw = pipw(n)
             pips = "".join(
-                f'<rect x="{x + (cw - (n * 4 + (n - 1) * 2)) / 2 + p * 6:.1f}" y="{y + CHH / 2 - 2}" width="4" '
-                f'height="4" rx="1" style="{"fill:var(--ink);stroke:none" if (m >> p) & 1 else "fill:none;stroke:var(--muted)"}"/>'
+                f'<rect x="{x + (cw - (n * pw + (n - 1) * 2)) / 2 + p * (pw + 2):.1f}" y="{y + (CHH - pw) / 2}" '
+                f'width="{pw}" height="{pw}" rx="1" '
+                f'style="{"fill:var(--ink);stroke:none" if (m >> p) & 1 else "fill:none;stroke:var(--muted)"}"/>'
                 for p in range(n))
             o.append(f'<g class="{cls}"><rect x="{x}" y="{y}" width="{cw}" height="{CHH}" rx="3"/>{pips}</g>')
     return o
@@ -350,9 +358,9 @@ def n38w():
             st, ch, _ = masks(nn, t)
         assert all(all(m == (1 << nn) - 1 for m in row) for row in st)
     ph, tally = labels(N0, 0)
-    H = GY + NMAX * (CHH + 4)
+    H = GY + N0 * (CHH + 4)                              # the drawing grows with N; see the script
     s = [hd(40, 34, "Each dot is one GPU's contribution; a full row of dots is a finished slice"),
-         f'<g data-grid="">{"".join(n38w_grid(N0, 0))}</g>',
+         f'<g data-grid="">{"".join(n38w_grid(N0, 0))}</g>', '<g data-below="">',
          f'<text class="sub2" x="40" y="{H + 16}" data-ph="">{esc(ph)}</text>',
          f'<text class="sub2" x="40" y="{H + 36}" data-tally="">{esc(tally)}</text>']
     body, yb = prose(H + 80, [
@@ -362,12 +370,12 @@ def n38w():
         "So the tally always ends at 2(N − 1) slices of S/N: 1.5 S for four GPUs, 1.75 S for eight. "
         "The steps were checked against the same ring in Python for every group from two to eight.",
     ])
-    s.append(body)
+    s += [body, "</g>"]
     ctl = [f"<label>GPUs in the ring <input type='range' min='2' max='{NMAX}' step='1' value='{N0}'>"
            f"<span class='val'>{N0}</span></label>",
            "<button type='button'>Back</button><button type='button'>Step</button>"
            "<button type='button'>Reset</button>"]
-    C = {"GX": GX, "GY": GY, "CH": CHH, "n0": N0}
+    C = {"GX": GX, "GY": GY, "CH": CHH, "n0": N0, "H0": yb + 24}
     js = WIDGET38.replace("__C__", json.dumps(C))
     emit_raw("n38w", widget("n38w", stamp(SRT, "Then the all gather"),
                             "Step through the whole ring, for any number of GPUs", ctl, yb + 24, s,
@@ -396,7 +404,7 @@ def o022():
         x += w
     b.append(txt(x + 8, 78, "=", "sub2"))
     b.append(cell(x + 22, 58, 640 - x - 22, 32, "h", label="2(N − 1)/N × S"))
-    X0, S = 200, 150
+    X0, S = 160, 120
     for k, ((n_, lab), v) in enumerate(zip(rows, vals)):
         y = 134 + k * 40
         b.append(txt(40, y + 18, lab, "cap"))

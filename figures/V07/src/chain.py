@@ -25,7 +25,7 @@ def o026():
     one, crowd = 1 / step, 64 / step
     assert round(step * 1e3, 1) == 41.8 and round(one, 1) == 23.9 and round(crowd) == 1531
     b = [hd(40, 46, "Tokens a second from the same reads of Llama 3 70B's weights, drawn to scale")]
-    X0, SC = 210, 400 / crowd
+    X0, SC = 210, 280 / crowd
     for k, (lab, v, cls, note) in enumerate([("one user", one, "h", f"{f(one, 1)} tokens a second"),
                                              ("64 users, the same reads", crowd, "s", f"{g(crowd)} tokens a second")]):
         y = 66 + k * 40

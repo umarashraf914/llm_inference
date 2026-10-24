@@ -308,8 +308,8 @@ def a23():
         "left: dog would see cat, and ran would see cat and sat, as if the text read ‘the cat dog’.",
         "The tree mask lets each token see only the tokens on its own path: dog sees ‘the’ and "
         "itself, ran sees ‘the’ and ‘dog’. Each token is also given the position it has in its own "
-        "path, so cat and dog both sit at position 2, and every path gets exactly the predictions it "
-        "would get alone.",
+        "path ({{fig:v01-o090}} shows why a model needs positions), so cat and dog both sit at "
+        "position 2, and every path gets exactly the predictions it would get alone.",
     ])
     emit("a23", at("An attention mask lets each token see only its own ancestors"),
          "Flattened into one sequence, the tree needs a mask that shows each token only its ancestors",
@@ -393,8 +393,8 @@ def a25():
         f"0.3 × e^(−H), the defaults in Medusa's code: 0.09 here, {tf:.3f} there, and it only starts "
         f"to fall once H passes {hfall:.2f}.",
         "There is no replacement step and no p-over-q test, so the output is no longer the target's "
-        "distribution. The paper reports that quality held on benchmarks, a weaker claim than an "
-        "identical distribution.",
+        "distribution. The paper reports that quality held on benchmarks ({{fig:v08-a34}}), a "
+        "weaker claim than an identical distribution.",
     ])
     emit("a25", at("Medusa also changed the acceptance test"),
          "Typical acceptance lowers the bar where the target is unsure", yb + 30, b + [body],

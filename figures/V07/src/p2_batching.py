@@ -353,7 +353,8 @@ def o004():
         "collect a batch, run it, and hold its membership until every sequence has emitted its "
         "end-of-sequence token, the stop signal a model produces when its answer is done "
         "({{fig:v01-o029}}).",
-        f"Here the batch is locked for {T} steps, because that is when the last request finishes. The "
+        f"Each request holds one of the batch's four seats, its place in every step. Here the batch is "
+        f"locked for {T} steps, because that is when the last request finishes. The "
         f"first is done after {NEED[0]} and its seat keeps running for the remaining {T - NEED[0]}; for "
         f"the final {T - NEED[2]} steps one request runs alone.",
         f"Seats used: {' + '.join(map(str, NEED))} = {used} of 4 × {T} = {fc(cap)}, which is "

@@ -58,7 +58,7 @@ def o014():
         "attention, the split between prefill and decode, and 4-bit microscaled numbers were all published "
         "in 2023 and 2024, within eight months of one another.",
         "The memory wall they answer was named in 1995 ({{fig:v01-o082}}), more than twenty years before "
-        "the transformer existed. The trend was there all along. What changed was a workload hungry enough "
+        "the transformer, the model design this whole series runs on, existed. The trend was there all along. What changed was a workload hungry enough "
         "for bytes to make it the dominant concern.",
         "Inference is forecast to reach about two thirds of all AI compute in 2026, up from a third in 2023 "
         "and half in 2025. That is Deloitte's projection, and projections are uncertain "

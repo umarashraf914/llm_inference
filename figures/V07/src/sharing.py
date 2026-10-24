@@ -73,7 +73,7 @@ def b44():
                                    (2, 3, "m", "32–40 · count 1"), (3, 9, "m", "copy · count 1")])
     body, yb = prose(y2 + 170 + 40, [
         f"With paged memory a sequence's cache lives in blocks of {BLOCK} tokens, and its block table "
-        f"lists which physical block holds each one ({{{{fig:v03-o086}}}}). Two sequences sharing a "
+        f"lists which physical block holds each one ({{{{fig:v07-a13}}}}). Two sequences sharing a "
         f"{shared}-token prefix simply list the same physical blocks: {shared} = {full} × {BLOCK} + "
         f"{part}, so two blocks are full and the third holds {part} tokens. A count on each block "
         "records how many tables point at it.",
@@ -294,8 +294,9 @@ def b47():
     s.append(f'<text class="hd" x="40" y="{y + 42}" data-ratio="">{f(sent / cost)} times cheaper</text>')
     body, yb = prose(y + 84, [
         "Step k sends everything before it plus its own new tokens, so n steps of t new tokens send "
-        "t × (1 + 2 + … + n) = t × n(n + 1) ÷ 2 tokens. At every step all but the newest t were sent "
-        "before: t × n(n − 1) ÷ 2 of them.",
+        "t × (1 + 2 + … + n) = t × n(n + 1) ÷ 2 tokens: pair the first term with the last, the second "
+        "with the one before last, and each pair makes n + 1, with n ÷ 2 pairs. At every step all but "
+        "the newest t were sent before: t × n(n − 1) ÷ 2 of them.",
         f"Priced at {f(WRITE5)} to write each step's new tokens and {f(READ)} to read the rest, twenty "
         f"steps of 1,000 tokens cost 25,000 + 19,000 = {g(cost)} units against {g(sent)}, "
         f"{f(sent / cost)} times less. With no starting context the tokens per step cancel out of that "

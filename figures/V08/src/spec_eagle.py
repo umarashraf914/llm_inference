@@ -86,9 +86,10 @@ def a27():
         "the next token, EAGLE-1 predicts the target's own hidden state at the top of its layer stack: "
         "the vector the decoding head reads, which the paper calls the second-to-top layer, counting "
         "the head as the top. The target's head then turns it into a token.",
-        "The drafter is small: one layer that mixes that vector with the next token's embedding, then "
-        "one transformer layer, under a billion trainable weights for a 70B target (0.99 billion). Its "
-        "embedding table and head are the target's own, borrowed rather than trained.",
+        "The drafter is small: one layer that mixes that vector with the next token's embedding, its "
+        "row of the embedding table ({{fig:v01-o087}}), then one layer of the kind the target stacks "
+        "80 of ({{fig:v01-o091}}): under a billion trainable weights for a 70B target (0.99 billion). "
+        "Its embedding table and head are the target's own, borrowed rather than trained.",
         "EAGLE-1 arranges its guesses into a tree the same way Medusa does, and checks them with the "
         "rule of Part 3, so the output stays exact.",
     ])
@@ -232,8 +233,9 @@ def a29():
     body, yb = prose(yt + 24 + 2 * 22 + 36, [
         "EAGLE-2 leaves the drafting alone and changes the shape of the tree. A guess deep in the tree "
         "counts only if every guess above it survives, so its worth is the product of the chances along "
-        "its path. EAGLE-2 estimates each chance with the drafter's own confidence, which the authors "
-        "found tracks the real acceptance rate closely, then keeps the highest-valued nodes.",
+        "its path. EAGLE-2 estimates each chance with the drafter's own confidence, the probability "
+        "it gave its guess, which the authors found tracks the real acceptance rate closely, then "
+        "keeps the highest-valued nodes.",
         "In an easy stretch, confidences of 0.9 keep one line worth extending: six deep is still worth "
         "0.53. In a hard one the best first guess is 0.4 and its best child 0.4 × 0.5 = 0.2, so the "
         "budget goes into alternatives at the first position. The expected count of accepted guesses "
@@ -320,14 +322,16 @@ def o013():
         b.append(txt(x + BW_ / 2, YB - h - 6, f"{v:.2f}", "sub2", "middle"))
         b.append(txt(x + BW_ / 2, YB + 18, f"{B}", "sub2", "middle"))
     b.append(ln(84, YB, 90 + len(SWEEP) * PITCH - 8, YB, "axis"))
-    b.append(txt(90, YB + 40, "requests in the batch; 8B Llama in SGLang on one H100, MT-Bench prompts", "sub2"))
+    b.append(txt(90, YB + 40, "requests in the batch; 8B Llama in SGLang on one H100, chat prompts", "sub2"))
     body, yb = prose(YB + 86, [
         "Those two numbers both describe EAGLE-3. The 6.5 is one request on an idle machine; the 1.38 "
         "is a machine with 64 requests already competing for its compute.",
         "They also come from different setups: the 6.5 is the paper's best case, Vicuna 13B writing "
-        "code, and the 1.38 was measured by the SGLang team serving an 8-billion-parameter Llama. "
-        "Holding that second setup fixed, the gain falls from 2.36× at one request to 1.38× at 64: the "
-        "ceiling of {{fig:v08-o009}}, measured.",
+        "code, and the 1.38 was measured by the team behind SGLang, an open-source serving system, "
+        "running an 8-billion-parameter Llama on MT-Bench's chat prompts ({{fig:v08-a34}}). It "
+        "counts throughput, tokens a second across the whole batch ({{fig:v01-o142}}). Holding that "
+        "setup fixed, the gain falls from 2.36× at one request to 1.38× at 64: the ceiling of "
+        "{{fig:v08-o009}}, measured.",
         "Medusa's authors simulated the same effect for their method: past a batch of about 32 the "
         "speed-up shrinks, and can become a slowdown, as the layers stop being bound by memory.",
     ])

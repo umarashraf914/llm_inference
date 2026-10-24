@@ -152,13 +152,13 @@ def n02():
     b.append(txt(x0, C[1] + H + 22, "seat 3, outlined, is this request. Each red block holds the keys and values", "sub2"))
     b.append(txt(x0, C[1] + H + 38, "for a run of one request's tokens.", "sub2"))
     body, yb = para(C[1] + H + 82, [
-        "The decode machines run their requests as one batch, and every step advances each of them by one "
-        "token ({{fig:v07-o006}}). A slot is one seat in that batch. With the seat comes memory for the "
+        "The decode machines run their requests as one batch ({{fig:v07-o002}}), and every step advances "
+        "each of them by one token ({{fig:v07-o006}}). A slot is one seat in that batch. With the seat comes memory for the "
         "request's cache, held in fixed-size blocks that need not sit side by side ({{fig:v03-o086}}).",
         "Seats are limited by memory, not by arithmetic. Each seat's cache grows with its conversation, "
         "and once the memory left over after the weights is full, newcomers wait ({{fig:v07-o005}}).",
-        "This request is prefilled on another machine first, then takes a seat and keeps it until its "
-        "last token. Then the seat goes to the head of the queue ({{fig:v09-o013}}).",
+        "This request is first prefilled on another machine, its prompt read through the model in one "
+        "pass ({{fig:v01-o109}}), then takes a seat here and keeps it until its last token. Then the seat goes to the head of the queue ({{fig:v09-o013}}).",
     ])
     emit("n02", stamp(SRT, "answer, the request occupies a slot"),
          "A slot is a seat in the running batch, with cache memory held for it", yb + 30, b + [body],
@@ -215,8 +215,11 @@ def o003():
     body, yb = para(yc, [
         "A rack is a metal cabinet about the height of a person, filled with trays of hardware and "
         f"plumbed for power and liquid cooling. In this one, {TRAYS} compute trays each hold "
-        f"{GPU_PER_TRAY} Blackwell GPUs and {CPU_PER_TRAY} Grace CPUs: {GPUS} GPUs in all.",
-        f"Nine more trays hold nothing but NVLink switches, {SW_CHIPS} switch chips in each. Every GPU "
+        f"{GPU_PER_TRAY} Blackwell GPUs, the chips that do the arithmetic ({{{{fig:v01-o070}}}}), and "
+        f"{CPU_PER_TRAY} Grace CPUs, general-purpose processors that run the tray's software: {GPUS} GPUs "
+        "in all.",
+        f"Nine more trays hold nothing but switches for NVLink, NVIDIA's links between GPUs "
+        f"({{{{fig:v02-o092}}}}), {SW_CHIPS} switch chips in each. Every GPU "
         f"has {LINKS} links, {LINKS // SW_TRAYS} into each switch tray, so any GPU reaches any other "
         "through a single switch without going out to the building's network. That mesh of links is "
         "the fabric ({{fig:v02-o093}}).",
@@ -264,13 +267,15 @@ def n03():
         b.append(ln(px(v), ya, px(v), ya + 4, "tick"))
         b.append(txt(px(v), ya + 18, s, "sub2", "middle"))
     body, yb = para(ya + 62, [
-        "The fabric's 130 terabytes a second is a total. Each GPU's share is 1.8 TB/s, and NVIDIA counts "
-        "both directions, so 0.9 TB/s each way. Because the fabric moves data that fast, NVIDIA describes "
-        "the whole rack as a single, massive GPU.",
+        "The fabric's 130 terabytes a second is a bandwidth, bytes moved per second ({{fig:v01-o074}}), "
+        "and a total. Each GPU's share is 1.8 TB/s, and NVIDIA counts both directions, so 0.9 TB/s each "
+        "way. Because the fabric moves data that fast, NVIDIA describes the whole rack as a single, "
+        "massive GPU.",
         f"In one sense that is fair: any GPU can reach any other's memory directly. In another it is not. "
         f"Reaching a neighbour's memory is about {f(R_LINK, 0)} times slower than reaching your own, and "
         f"leaving the rack through the network card is {f(R_NIC, 0)} times slower again "
-        "({{fig:v05-o008}}).",
+        "({{fig:v05-o008}}). Network cards are rated in bits: 400 gigabits a second is 50 gigabytes, at "
+        "eight bits to the byte ({{fig:v01-o073}}).",
         "Those two drops decide where the heavy traffic in this trace is allowed to run: the experts' "
         "exchange stays inside the rack (Part 5), and the one transfer that must leave it is made as "
         "small as possible (Part 6).",
@@ -295,8 +300,9 @@ def o004():
     b.append(txt(40, 198, f"the weights: {n(W_GB)} GB as 4-bit codes, {f(WS_GB, 1)} GB with their block "
                  f"scales, {f(P_WS * 100, 1)}% of the rack", "sub2"))
     body, yb = para(244, [
-        f"A trillion parameters stored at 4 bits, half a byte each, come to {n(W_GB)} gigabytes "
-        f"({{{{fig:v01-o073}}}}): {f(P_W * 100, 1)}% of the rack's {RACK_TB} terabytes, under 4%.",
+        f"A trillion parameters, the model's learned numbers, stored at 4 bits, half a byte each, come to "
+        f"{n(W_GB)} gigabytes ({{{{fig:v01-o073}}}}): {f(P_W * 100, 1)}% of the rack's {RACK_TB} terabytes "
+        "of HBM, the fast memory packaged beside each GPU ({{fig:v01-o107}}). Under 4%.",
         f"That counts the 4-bit codes alone. Every block of 16 weights also carries an 8-bit scale (Part "
         f"5), half a bit more per weight: 0.5625 bytes each, or {f(WS_GB, 1)} GB, about "
         f"{f(P_WS * 100, 1)}% ({{{{fig:v04-o058}}}}). The bar above includes them. The picture does "

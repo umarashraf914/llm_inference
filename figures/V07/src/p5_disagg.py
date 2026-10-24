@@ -47,13 +47,14 @@ def a31():
     b.append(poly([(A.px(1 / (BW / 1e12)), A.py(1)), (A.px(RIDGE), A.py(PEAK / 1e12)), (A.px(1e4), A.py(PEAK / 1e12))], "pl-h"))
     xr = round(A.px(RIDGE), 1)
     b.append(ln(xr, round(A.py(PEAK / 1e12), 1) + 8, xr, A.Y0, "mark"))
-    b.append(halo(xr - 8, round(A.py(PEAK / 1e12)) + 26, "ridge, 295", anchor="end"))
-    for v, lab, cls, dx, dy, anc in [(pre, f"prefill, a {fc(LP)}-token prompt: {fc(pre)}", "m", 0, -14, "middle"),
-                                     (dec32, f"decode, {B} requests: {f(dec32, 1)}", "h", 10, 18, "start"),
-                                     (dec1, "decode, one request: 1", "h", 10, 18, "start")]:
+    b.append(halo(xr + 8, round(A.py(PEAK / 1e12)) + 26, "ridge, 295"))
+    for v, labs, cls, dx, dy, anc in [(pre, [f"prefill, a {fc(LP)}-token prompt: {fc(pre)}"], "m", 0, -14, "middle"),
+                                      (dec32, [f"decode, {B}", f"requests: {f(dec32, 1)}"], "h", 10, 18, "start"),
+                                      (dec1, ["decode, one request: 1"], "h", 10, 18, "start")]:
         x, y = round(A.px(v), 1), round(A.py(att(v)), 1)
         b.append(dot(x, y, cls))
-        b.append(halo(round(x + dx, 1), round(y + dy, 1), lab, anchor=anc))
+        for j, lab in enumerate(labs):
+            b.append(halo(round(x + dx, 1), round(y + dy + 14 * j, 1), lab, anchor=anc))
     gap = pre / dec32
     body, yb = prose(A.Y0 + 76, [
         f"Prefill processes thousands of prompt tokens at once and saturates the arithmetic units: a "
@@ -92,8 +93,8 @@ def o010():
     body, yb = prose(226, [
         "Prefill runs on one pool of GPUs and decode on another, each configured for its own bottleneck: "
         "the prefill pool for arithmetic, the decode pool for memory and batch size. The KV cache the "
-        "prefill pool builds is shipped across the interconnect to the decode pool, which carries on from "
-        "it.",
+        "prefill pool builds is shipped across the interconnect, the links between GPUs and between "
+        "machines ({{fig:v02-o093}}), to the decode pool, which carries on from it.",
         "That transfer is the price, and DistServe put a number on it: a single 512-token request on "
         "OPT-66B produces about 1.13 GB of KV cache, so at 10 requests a second the network must carry "
         "roughly 90 gigabits a second just to keep the transfer invisible. The next three figures check "
@@ -174,9 +175,11 @@ def a33():
     assert [round(s_ * 100, 1) for s_ in shares] == [96.6, 24.2, 1.3]
     body, yb = prose(156 + 3 * 36 + 34, [
         "Memory and file sizes are counted in bytes, network links in bits, and a byte is 8 bits "
-        "({{fig:v01-o073}}): a link sold as 400 gigabits a second carries 50 gigabytes a second.",
+        "({{fig:v01-o073}}): a link sold as 400 gigabits a second carries 50 gigabytes a second. NVLink "
+        "joins the GPUs inside one machine; network ports, InfiniBand or Ethernet, join machines "
+        "({{fig:v05-o008}}).",
         f"Ten {REQ}-token OPT-66B requests a second move {RATE} × 1.208 GB = {f(TRAFFIC / 1e9, 2)} GB/s, "
-        f"which is {f(gbps, 1)} Gb/s. DistServe wrote 11.3 GB/s and 90 Gbps by multiplying the binary 1.13 by "
+        f"which is {nb(f(gbps, 1) + ' Gb/s')}. DistServe wrote 11.3 GB/s and 90 Gbps by multiplying the binary 1.13 by "
         "10 and by 8; in the decimal units links are sold in, the figure is 7% higher. Said as 90 GB per "
         "second, the unit would be wrong by a factor of 8.",
         "On one 100 Gb/s Ethernet link, the kind Sarathi-Serve's machines used, that traffic alone takes "
@@ -231,7 +234,7 @@ def a35():
     both = [x and y for x, y in zip(ok1, ok2)]
     assert sum(ok1) == 9 and sum(ok2) == 9 and sum(both) == 8 and not ok1[3] and not ok2[5]
     b = [hd(40, 46, f"Ten requests, two targets: first token within {TTFT_T} ms, later ones within {TPOT_T} ms each")]
-    X = [70, 200, 270, 400, 470, 590]
+    X = [92, 210, 280, 410, 480, 590]
     for x, h_ in zip(X, ["request", "TTFT, ms", "", "TPOT, ms", "", "both"]):
         if h_:
             b.append(txt(x, 78, h_, "sub2", "end"))
@@ -340,8 +343,8 @@ def a36():
         "The reason is sparsity. In decode each request adds one token per step, and each expert sees the "
         f"combined batch × 8 ÷ 256 tokens. If each decode GPU runs {PER_GPU} requests (illustrative), one "
         f"GPU's batch gives each expert 2 tokens; the whole pool's {fc(144 * PER_GPU)} give 288, close to "
-        "the 295 at which an expert's arithmetic keeps pace with reading its weights, in FP8 as in 16 "
-        "bits ({{fig:v07-a01}}).",
+        "the 295 at which an expert's arithmetic keeps pace with reading its weights, in FP8, 8-bit "
+        "numbers of one byte each, as in 16 bits ({{fig:v07-a01}}).",
         "DeepSeek's 2025 overview of its production system puts 2 routed experts on each of the 144 decode "
         "GPUs, (256 + 32 redundant copies of busy experts) ÷ 144, and 9 on each of the 32 prefill GPUs. "
         "Its V3 technical report of December 2024 described a decode unit of 320 GPUs, one expert each: the "
@@ -399,11 +402,11 @@ def a38():
     body, yb = prose(66 + 3 * 50 + 30, [
         "By 2025 the pattern was standard. NVIDIA Dynamo and llm-d coordinate prefill and decode pools "
         "across machines; llm-d runs natively on Kubernetes, the common system for running programs across "
-        "a fleet of machines. SGLang's team reproduced DeepSeek's design on 96 H100s, 12 nodes of 8, and "
+        f"a fleet of machines. SGLang's team reproduced DeepSeek's design on {nb('96 H100s')}, 12 nodes of 8, and "
         "sustained 52,300 input and 22,300 output tokens a second per node on 2,000-token inputs.",
         "Its write-up puts the cost at about $0.20 per million output tokens without stating the hourly "
-        "price behind it. Working back from its own numbers gives about $2 per GPU-hour, counting the "
-        "decode GPUs alone.",
+        "price behind it. Working back from its own numbers gives about $2 per GPU-hour, the price of "
+        "renting one GPU for one hour, counting the decode GPUs alone.",
         "Turned around, the same division prices any deployment: dollars per GPU-hour ÷ millions of tokens "
         "per GPU-hour = dollars per million tokens.",
     ])

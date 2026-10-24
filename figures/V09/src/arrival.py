@@ -29,8 +29,9 @@ def o006():
         "A load balancer is a program that sits in front of many identical servers and hands each "
         "incoming request to one of them. The usual rules are simple: take turns, or pick the machine "
         "with the fewest requests in flight. Either spreads the work evenly.",
-        "Either would also waste this request. A machine picked by turns holds the shared system prompt, "
-        f"as every machine does, but is unlikely to hold this conversation, so it would compute the other "
+        "Either would also waste this request. Each machine keeps the key-value cache for the openings of "
+        "prompts it has already read, their prefixes. A machine picked by turns holds the shared system "
+        f"prompt, as every machine does, but is unlikely to hold this conversation, so it would compute the other "
         f"{n(TOTAL - PRE)} tokens of the prompt again. This gateway instead picks by what each machine "
         "already holds, and the next three figures show what that buys.",
     ])
@@ -170,8 +171,8 @@ def n10():
         "each weight against a single token, 4 operations, far below it ({{fig:v01-o129}}).",
         "One machine has to compromise between the two. Its hardware and its way of splitting the model "
         "suit one phase, and a long prefill mixed into a decode batch holds up everyone's next token "
-        "({{fig:v07-o008}}). So the work is split into separate pools ({{fig:v07-o010}}), and the price "
-        "is moving the cache from one pool to the other (Part 6).",
+        "({{fig:v07-o008}}). So the work is split into separate pools, which is called disaggregation "
+        "({{fig:v07-o010}}), and the price is moving the cache from one pool to the other (Part 6).",
         "With its prefix cached, this request brings only 100 new tokens: 400 operations per byte, below "
         "the ridge on its own. A prefill machine fills each pass with new tokens from several requests, "
         "so that together they clear it.",

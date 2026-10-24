@@ -131,8 +131,8 @@ def a23():
         f"attention reads: {B} requests holding {fc(CTXD)} tokens each, {gb(B * CTXD * KV8)} GB. "
         f"{nb(gb(W8 + B * CTXD * KV8) + ' GB')} at {nb('3.35 TB/s')} is {nb(fms(READ))}, whatever the step "
         "computes.",
-        f"Computing is 2 × {f(P8 / 1e9, 2)} billion operations per token, {f(TOK * 1e6, 1)} µs at the "
-        f"chip's peak. The {B} decode tokens need {fms(B * TOK)}, far inside the read, and a step can hold "
+        f"Computing is 2 × {f(P8 / 1e9, 2)} billion operations per token, {f(TOK * 1e6, 1)} µs "
+        f"(millionths of a second) at the chip's peak. The {B} decode tokens need {fms(B * TOK)}, far inside the read, and a step can hold "
         f"{round(KNEE)} tokens before the arithmetic takes longer. A {fc(LP)}-token prompt makes it "
         f"{fc(B + LP)} tokens: {fms(NAIVE, 1)}.",
         f"Assumed: the chip at its peak rates and {fc(CTXD)} tokens of context per running request "
@@ -482,7 +482,7 @@ def a29():
         "relaxed setting 25 times, the time of an undisturbed decode step.",
         "Against vLLM it reported 2.6 times the capacity for Mistral-7B on one A100, up to 3.7 times for "
         "Yi-34B on two, and up to 5.6 times for Falcon-180B split over two nodes of four A100s with "
-        "pipeline parallelism.",
+        "pipeline parallelism, which the next figure explains.",
     ])
     emit("a29", st("Under tail latency limits"), "Under a p99 limit, Sarathi-Serve served 2.6 to 5.6 times what vLLM could",
          yb + 32, b + [body],

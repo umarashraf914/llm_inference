@@ -13,7 +13,7 @@ from common import SRT, box, cell, hd, para, stamp, emit, width
 STOPS = [
     ("1 · gateway", "picks the machine", [
         ("prefix match", "v01-o044"), ("the shared preamble", "v01-o026"),
-        ("radix tree of prefixes", "v07-o013"), ("cache-aware routing", "v07-o014"),
+        ("radix tree of prefixes", "v07-o013"), ("cache-aware routing", "v07-b45"),
         ("the orchestrator", "v07-o015")]),
     ("2 · prefill pool", "reads the new tokens", [
         ("skip the cached prefix", "v07-o012"), ("4-bit blocks with scales", "v04-o076"),
