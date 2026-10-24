@@ -20,8 +20,9 @@ FPS_GRID = 30          # durations are rounded up to whole 1/30 s frames (also w
 LEAD, GAP, TAIL = 0.7, 0.45, 1.0      # seconds: before the first beat, between beats, after the last
 SENT_GAP = 0.22                       # between sentences inside a beat
 TITLE_DUR = 3.6                       # chapter title cards
-MODEL = "/opt/tts/kokoro-v1.0.onnx"
-VOICES = "/opt/tts/voices-v1.0.bin"
+KOKORO_DIR = os.environ.get("KOKORO_DIR", "/opt/tts")     # where the model files live (tools/setup.sh fetches them)
+MODEL = os.path.join(KOKORO_DIR, "kokoro-v1.0.onnx")
+VOICES = os.path.join(KOKORO_DIR, "voices-v1.0.bin")
 _k = None
 
 

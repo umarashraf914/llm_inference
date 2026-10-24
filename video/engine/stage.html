@@ -30,6 +30,10 @@
     });
   }
   const film = q.get('film'), scene = q.get('scene');
+  // text is measured as soon as a scene builds, so every bundled face must be loaded before then
+  const fonts = document.fonts.size ? Promise.all([...document.fonts].map(f => f.load()))
+    : Promise.reject(new Error('no bundled fonts: engine/fonts/fonts.css did not load'));
+  const fail = e => { window.__loadError = String((e && e.message) || e); window.__chapterLoaded = 'error'; };
   if (film && scene && !scene.endsWith('_title')) {
     const ch = scene.split('_')[0];
     fetch('../lib/manifest.json', { cache: 'no-store' })
@@ -37,9 +41,10 @@
       .then(files => files.reduce((p, f) => p.then(() => load(`../lib/${f}`)), Promise.resolve()))
       .then(() => load(`../${film}/scenes/${ch}_common.js`, true))
       .then(() => load(`../${film}/scenes/${scene}.js`))
-      .then(() => { window.__chapterLoaded = true; }, () => { window.__chapterLoaded = 'error'; });
+      .then(() => fonts)
+      .then(() => { window.__chapterLoaded = true; }, fail);
   } else {
-    window.__chapterLoaded = true;
+    fonts.then(() => { window.__chapterLoaded = true; }, fail);
   }
 </script>
 </body>

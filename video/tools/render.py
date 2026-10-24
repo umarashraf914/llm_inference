@@ -11,6 +11,10 @@
   # video segments (silent), one mp4 per scene, in parallel
   python3 video/tools/render.py video/v01 video all --fps 30 --workers 3
 
+  # 4K (3840x2160): the same 1920x1080 stage drawn at twice the pixel density, into its own folder;
+  # --skip-existing resumes an interrupted run (each segment is written to a .partial file, then renamed)
+  python3 video/tools/render.py video/v01 video all --scale 2 --out video/v01/build/segments_4k --skip-existing
+
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
 Needs build/timing.json from tools/tts.py and scenes/<scene>.js (plus optional scenes/<chapter>_common.js).
 """
@@ -19,8 +23,11 @@ from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
 
+from ffbin import ffmpeg
+
 VIDEO = Path(__file__).resolve().parents[1]
 CRF = os.environ.get("CRF", "18")
+PRESET = os.environ.get("PRESET", "slow")
 
 
 def serve():
@@ -60,16 +67,19 @@ def select(timing, sel):
 
 
 class Stage:
-    def __init__(self, film, port, debug=False):
+    def __init__(self, film, port, debug=False, scale=1):
         from playwright.sync_api import sync_playwright
         self.pw = sync_playwright().start()
         self.browser = self.pw.chromium.launch(args=["--disable-gpu", "--font-render-hinting=none", "--force-color-profile=srgb",
                                                       "--disable-lcd-text", "--hide-scrollbars"])
-        self.page = self.browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+        # the stage is always laid out at 1920x1080; scale only sets how many pixels draw it (2 -> 3840x2160)
+        self.page = self.browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
         self.errors = []
         self.page.on("pageerror", lambda e: self.errors.append(str(e)))
         self.page.on("console", lambda m: self.errors.append(m.text) if m.type == "error" else None)
         self.cdp = self.page.context.new_cdp_session(self.page)
+        # a bare CDP capture is 1920x1080 whatever the density; a clip with a scale renders it at that density
+        self.shot = {} if scale == 1 else {"clip": {"x": 0, "y": 0, "width": 1920, "height": 1080, "scale": scale}}
         self.film, self.port, self.debug = film, port, debug
         self.loaded_chapter = None
 
@@ -79,7 +89,7 @@ class Stage:
         self.page.goto(url)
         self.page.wait_for_function("window.__chapterLoaded !== undefined && window.V !== undefined", timeout=20000)
         if self.page.evaluate("window.__chapterLoaded") == "error":
-            raise RuntimeError(f"could not load scenes/{sid}.js")
+            raise RuntimeError(f"{sid}: could not load the stage: {self.page.evaluate('window.__loadError')}")
         self.errors.clear()
         res = self.page.evaluate("([id, t, dbg]) => V.load(id, t, {debug: dbg})", [sid, entry, self.debug])
         if self.errors:
@@ -90,12 +100,12 @@ class Stage:
         self.page.evaluate(f"V.seek({t})")
 
     def png(self):
-        d = self.cdp.send("Page.captureScreenshot", {"format": "png", "optimizeForSpeed": True})
+        d = self.cdp.send("Page.captureScreenshot", {"format": "png", "optimizeForSpeed": True, **self.shot})
         return base64.b64decode(d["data"])
 
     def jpeg(self, q=95):
         # PNG-compressing the textured background costs ~3x the paint; q95 JPEG is visually lossless before x264
-        d = self.cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": q, "optimizeForSpeed": True})
+        d = self.cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": q, "optimizeForSpeed": True, **self.shot})
         return base64.b64decode(d["data"])
 
     def close(self):
@@ -114,9 +124,9 @@ def stills_times(entry, at):
     return [round(min(t, entry["duration"] - 0.6), 2) for t in ts]
 
 
-def do_stills(film, timing, ids, at, debug):
+def do_stills(film, timing, ids, at, debug, scale=1):
     port = serve()
-    st = Stage(film, port, debug)
+    st = Stage(film, port, debug, scale)
     root = film / "build" / "stills"
     for sid in ids:
         entry = timing["scenes"][sid]
@@ -168,35 +178,49 @@ def do_audit(film, timing, ids, step):
 
 
 def render_one(args):
-    film, entry, fps, outdir = args
+    film, entry, fps, outdir, scale = args
     port = serve()
-    st = Stage(Path(film), port)
+    st = Stage(Path(film), port, scale=scale)
     st.load(entry)
     n = round(entry["duration"] * fps)
     out = Path(outdir) / f"{entry['id']}.mp4"
-    enc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(fps), "-i", "-",
-                            "-c:v", "libx264", "-preset", "slow", "-tune", "animation", "-crf", CRF, "-pix_fmt", "yuv420p",
-                            "-r", str(fps), "-g", str(fps * 4), "-video_track_timescale", str(fps * 1000), str(out)], stdin=subprocess.PIPE)
+    part = out.with_name(f"{entry['id']}.partial.mp4")       # renamed only once complete, so a resume never trusts half a file
+    # at 4K the capture (~5 fps) is the bottleneck, so two encoder threads keep up; a shorter look-ahead holds each
+    # encoder to ~1.8 GB instead of ~2.6 GB (SSIM 0.9971 vs 0.9977), so more scenes fit in memory at once
+    big = ["-threads", "2", "-rc-lookahead", "20"] if scale > 1 else []
+    enc = subprocess.Popen([ffmpeg(), "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(fps), "-i", "-",
+                            "-c:v", "libx264", "-preset", PRESET, "-tune", "animation", "-crf", CRF, "-pix_fmt", "yuv420p", *big,
+                            "-r", str(fps), "-g", str(fps * 4), "-video_track_timescale", str(fps * 1000), str(part)], stdin=subprocess.PIPE)
     t0 = time.time()
     for i in range(n):
         st.seek(i / fps)
         enc.stdin.write(st.jpeg())
-    enc.stdin.close(); enc.wait()
+    enc.stdin.close()
+    if enc.wait():
+        raise RuntimeError(f"{entry['id']}: ffmpeg failed")
     st.close()
+    os.replace(part, out)
     return entry["id"], n, time.time() - t0
 
 
-def do_video(film, timing, ids, fps, workers):
-    outdir = film / "build" / "segments"
+def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existing=False):
+    outdir = Path(outdir) if outdir else film / "build" / "segments"
     outdir.mkdir(parents=True, exist_ok=True)
-    jobs = sorted([(str(film), timing["scenes"][s], fps, str(outdir)) for s in ids], key=lambda j: -j[1]["duration"])
+    todo = [s for s in ids if not (skip_existing and (outdir / f"{s}.mp4").exists())]
+    if len(todo) < len(ids):
+        print(f"{len(ids) - len(todo)} of {len(ids)} scenes already rendered in {outdir}; rendering the other {len(todo)}", flush=True)
+    jobs = sorted([(str(film), timing["scenes"][s], fps, str(outdir), scale) for s in todo], key=lambda j: -j[1]["duration"])
+    total = sum(round(j[1]["duration"] * fps) for j in jobs)
     t0, frames = time.time(), 0
     with Pool(workers) as pool:
-        for sid, n, dt in pool.imap_unordered(render_one, jobs):
+        for k, (sid, n, dt) in enumerate(pool.imap_unordered(render_one, jobs), 1):
             frames += n
-            print(f"{sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps)", flush=True)
+            el = time.time() - t0
+            eta = el / frames * (total - frames)
+            print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps) | {100 * frames / total:.0f}% done, "
+                  f"about {eta / 3600:.1f} h left", flush=True)
     dt = time.time() - t0
-    print(f"rendered {len(jobs)} scenes, {frames} frames in {dt/60:.1f} min ({frames/dt:.1f} fps overall)")
+    print(f"rendered {len(jobs)} scenes, {frames} frames in {dt/60:.1f} min ({frames/max(dt, 1e-9):.1f} fps overall)")
 
 
 def main():
@@ -209,18 +233,23 @@ def main():
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--workers", type=int, default=3)
     ap.add_argument("--step", type=float, default=0.5, help="audit sampling step, seconds")
+    ap.add_argument("--scale", type=float, default=1, help="pixel density: 1 -> 1920x1080, 2 -> 3840x2160")
+    ap.add_argument("--out", help="folder for video segments (default build/segments)")
+    ap.add_argument("--skip-existing", action="store_true", help="leave segments already in the folder alone (resume)")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     # keep the icon bundle in step with the scene files (cheap, and self-heals concurrent edits)
-    subprocess.run([sys.executable, str(Path(__file__).with_name("build_icons.py"))], capture_output=True)
+    # (needs the icon packages in node_modules; without them the committed bundle is used as it is)
+    if (VIDEO / "node_modules").is_dir():
+        subprocess.run([sys.executable, str(Path(__file__).with_name("build_icons.py"))], capture_output=True)
     timing = json.loads((film / "build" / "timing.json").read_text())
     ids = select(timing, a.scenes)
     if a.mode == "stills":
-        do_stills(film, timing, ids, a.at, a.debug)
+        do_stills(film, timing, ids, a.at, a.debug, a.scale)
     elif a.mode == "audit":
         sys.exit(1 if do_audit(film, timing, ids, a.step) else 0)
     else:
-        do_video(film, timing, ids, a.fps, a.workers)
+        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing)
 
 
 if __name__ == "__main__":
