@@ -61,7 +61,8 @@ def n30():
     b.append(txt(40, 476, "serving", "cap"))
     b.append(txt(X0, 476, "0 bytes", "sub2"))
     body, yb = prose(522, [
-        "Training nudges every weight a little after each batch ({{fig:v01-o003}}). Two copies that "
+        "Training nudges every weight a little after each batch ({{fig:v01-o003}}), by an amount "
+        "set by its gradient: how fast the error changes as that weight moves. Two copies that "
         "see different batches compute different nudges, and if each applied its own, the copies "
         "would drift apart. So the nudges are averaged across every copy and the average applied "
         "everywhere: an all-reduce of one number per weight at every step, 140 GB for a "

@@ -335,7 +335,7 @@ def n14():
     ])
     emit("n14", stamp(SRT, "One all reduce sums the partials"),
          "The 70B's three-matrix block splits the same way", yb + 26, b + [body],
-         "V1's three feed-forward matrices and this video's A and B are the same block. The gate adds "
+         "V1's three feed-forward matrices and the A and B used here are the same block. The gate adds "
          "a matrix, not an exchange.")
 
 

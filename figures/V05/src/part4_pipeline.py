@@ -405,7 +405,7 @@ def n23():
     emit("n23", stamp(SRT, "Give each GPU several short"),
          "Two short chunks per GPU shrink the bubble from 43% to 27%", yb + 26, b + [body],
          "Both charts on one time scale; a prime marks a microbatch's second lap. The same trade as "
-         "everywhere in this video: a smaller bubble, paid for in messages.")
+         "everywhere in parallelism: a smaller bubble, paid for in messages.")
 
 
 # ---- Fig 14: the bubble depends on the phase -----------------------------------------------------
@@ -423,8 +423,8 @@ def o014():
     ])
     emit("o014", stamp(SRT, "The bubble is not the same size"),
          "The bubble depends on the phase", yb + 26, b + [body],
-         "The prefill and decode split from the first video, reappearing as a scheduling constraint. "
-         "It becomes the whole subject of the serving episode.")
+         "The prefill and decode split of V1, reappearing as a scheduling constraint. "
+         "It becomes the whole subject of V7, Serving in Production.")
 
 
 # ---- N24: decode in a pipeline -------------------------------------------------------------------

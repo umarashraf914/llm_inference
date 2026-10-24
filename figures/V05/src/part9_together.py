@@ -96,7 +96,7 @@ def n42():
             ("Data", "buys throughput only", [("unchanged", "u"), ("unchanged", "u"), ("nothing at all", "s")]),
             ("Sequence", "buys long context", [("unchanged", "u"), ("÷ GPUs, no limit", "s"),
                                               ("a ring of key-value blocks", "h")])]
-    b = [hd(40, 40, "Approximately, for the shapes in this video")]
+    b = [hd(40, 40, "Approximately, for the models used here")]
     for x, w, h_ in COLS:
         b.append(txt(x, 68, h_, "sub2"))
     for k, (name, buys, cells) in enumerate(rows):
@@ -153,11 +153,11 @@ def o025():
     assert f(100 * act, 1) == "3.1"
     b = [box(40, 55, 600, 66, "u", "384 experts per layer, six per token")]
     body, yb = prose(168, [
-        "Expert parallelism exists because the model is built out of separate experts, and this "
-        "video treated that as a given: 384 experts per layer, six per token, as if that were an "
+        "Expert parallelism exists because the model is built out of separate experts, and every "
+        "part so far treated that as a given: 384 experts per layer, six per token, as if that were an "
         "obvious way to build a machine. It is not obvious at all.",
         "Why a model that touches barely 3% of its weights on every token still works, 49 billion of "
-        "1.6 trillion, is the next episode.",
+        "1.6 trillion, is the subject of V6, Mixture of Experts.",
     ])
     emit("o025", stamp(SRT, "And one question is still open"), "The assumption left standing",
          yb + 26, b + [body],

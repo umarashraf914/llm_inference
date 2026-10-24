@@ -46,7 +46,7 @@ def o006():
         "answer have to trade and add their pieces before anyone can continue, and that exchange "
         "takes real time.",
         "Such all-at-once exchanges come in a handful of standard patterns called collectives, and "
-        "each strategy in this video has one as its signature.",
+        "each of the five strategies has one as its signature.",
     ])
     emit("o006", stamp(SRT, "Split the model and the GPUs must"),
          "Working in parallel means trading partial answers", yb + 26, b + [body],
@@ -78,7 +78,7 @@ def o007():
     ])
     emit("o007", stamp(SRT, "The workhorse is the all reduce"),
          "Five patterns, from the workhorse to the lightest", yb + 26, b + [body],
-         "Each strategy in this video has one of these as its signature. Which pattern it fires, and "
+         "Each of the five strategies has one of these as its signature. Which pattern it fires, and "
          "how often, decides where on the hardware it can afford to live.")
 
 
@@ -325,6 +325,7 @@ def n8():
     us = [(s / NVL_H100_EACH_WAY * 1e6, s / NET_EACH_WAY * 1e6) for s, _ in sizes]
     assert [round(a, 3) for a, _ in us][:1] == [0.036] and round(us[0][1], 2) == 0.33
     assert round(us[2][0]) == 149 and round(us[2][1]) == 1342
+    assert VEC == HIDDEN * BYTES == 8192 * 2 == 16_384
     b = [hd(40, 40, "time  =  a fixed toll  +  size ÷ bandwidth")]
     b.append(txt(290, 70, "size ÷ 450 GB/s, NVLink", "sub2"))
     b.append(txt(470, 70, "size ÷ 50 GB/s, network", "sub2"))
@@ -346,7 +347,8 @@ def n8():
         "Sending anything has a fixed cost before the first byte moves. The exchange runs as a GPU "
         "program that has to be launched, a few microseconds each ({{fig:v03-o096}}), and the GPUs "
         "must agree that the data is ready. After that, bytes flow at the link's bandwidth.",
-        "For a 16 KB message on NVLink the bandwidth part is 36 nanoseconds, shorter than a single "
+        "One token's vector is 8,192 numbers at 2 bytes each, 16 KB ({{fig:v01-o099}}). For a "
+        "message that size on NVLink the bandwidth part is 36 nanoseconds, shorter than a single "
         "read from the chip's own memory ({{fig:v02-o010}}). Whatever the toll comes to, a message "
         "that small is almost all toll; a 67 MB one is almost all bandwidth.",
         "So 'how often' matters as much as 'how much'. A strategy that sends little but often pays "

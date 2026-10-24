@@ -55,7 +55,7 @@ def o015():
             b.append(cell(x + 12 + (k % 8) * 15, y + 54 + (k // 8) * 12.4, 12, 9.4, "m", rx=1.5))
     body, yb = prose(384, [
         "In DeepSeek V4 Pro, a layer holds 384 routed experts, and every token runs through just six "
-        "of them. Why models built this way work so well is the next video's topic.",
+        "of them. Why models built this way work so well is the subject of V6, Mixture of Experts.",
         "What matters here is that the experts are separate networks, so they can live on separate "
         f"GPUs: that split is expert parallelism. Spread over eight GPUs, each holds 384 ÷ 8 = {per} "
         "experts whole. Where tensor parallelism slices every matrix into pieces, expert parallelism "
@@ -93,8 +93,8 @@ def n26():
         "A small router reads the token's vector and scores every expert: one small matrix multiply, "
         "one row per expert, gives 384 scores ({{fig:v06-p15}}). It keeps the six largest, and their "
         "scores later weight the six experts' outputs when they are combined ({{fig:v06-p17}}).",
-        f"Six of 384 routed experts is {f(100 * pct, 1)}% of them. With the one shared expert, "
-        "attention and the rest that every token uses, DeepSeek counts 49 billion of the model's 1.6 "
+        f"Six of 384 routed experts is {f(100 * pct, 1)}% of them. Add the one shared expert, "
+        "which every token passes through as well, plus attention and the rest, and DeepSeek counts 49 billion of the model's 1.6 "
         f"trillion parameters as active for each token: {f(100 * act, 1)}%.",
     ])
     emit("n26", stamp(SRT, "routed experts, and every token runs"),

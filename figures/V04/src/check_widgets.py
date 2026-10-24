@@ -87,7 +87,75 @@ def check_p14(page):
     return bad == 0
 
 
-CHECKS = {"p02w": check_p02w, "p14": check_p14}
+def check_p19(page):
+    """All 21 settings of 'how closely input 2 follows input 1' against seven nudges."""
+    from part7_parabola import frame
+    from common import f
+    rhos = [f"{k / 20:g}" for k in range(21)]
+    ds = ["-0.4", "-0.2", "0", "0.1", "0.32", "0.4", "0.8"]
+    got = page.evaluate("""([rhos, ds]) => {
+      const fig = document.getElementById('v04-p19'); const [sr, sd] = fig.querySelectorAll('input[type=range]');
+      const out = [];
+      for (const r of rhos) for (const d of ds) {
+        sr.value = r; sd.value = d; sr.dispatchEvent(new Event('input'));
+        const g = {}; fig.querySelectorAll('[data-k]').forEach(e => g[e.dataset.k] = e.textContent);
+        g.vals = [...fig.querySelectorAll('.val')].map(e => e.textContent); g.r = sr.value; g.d = sd.value;
+        out.push(g);
+      }
+      fig.querySelector('button').click();
+      return out;
+    }""", [rhos, ds])
+    bad = 0
+    for g in got:
+        fr = frame(float(g["r"]), float(g["d"]))
+        for k in ("A", "B", "C", "Ed", "ds", "Es", "E0", "ratio"):
+            if g[k] != fr[k]:
+                bad += 1
+                if bad < 8:
+                    print("  p19", g["r"], g["d"], k, g[k], "!=", fr[k])
+        if g["vals"] != [f(float(g["r"]), 2), f(float(g["d"]), 2)]:
+            bad += 1
+            print("  p19 slider readout", g["vals"], g["r"], g["d"])
+    print(f"p19: {len(got)} settings checked, {bad} mismatches")
+    return bad == 0 and len(got) == 147
+
+
+def check_p23(page):
+    """All 21 settings of alpha: the four readouts and every dot's position."""
+    from part7_smooth import p23_strings, lx, OUT_CH
+    from common import f
+    alphas = [f"{k / 20:g}" for k in range(21)]
+    got = page.evaluate("""(alphas) => {
+      const fig = document.getElementById('v04-p23'), sl = fig.querySelector('input[type=range]'); const out = [];
+      for (const a of alphas) {
+        sl.value = a; sl.dispatchEvent(new Event('input'));
+        const g = {a: sl.value, val: fig.querySelector('.val').textContent};
+        fig.querySelectorAll('[data-k]').forEach(e => g[e.dataset.k] = e.textContent);
+        g.am = [...fig.querySelectorAll('[data-am]')].map(e => e.getAttribute('cx'));
+        g.wm = [...fig.querySelectorAll('[data-wm]')].map(e => e.getAttribute('cx'));
+        g.kam = fig.querySelector('[data-k="am"]').textContent; g.kwm = fig.querySelector('[data-k="wm"]').textContent;
+        out.push(g);
+      }
+      fig.querySelector('button').click();
+      return out;
+    }""", alphas)
+    bad = 0
+    for g in got:
+        s = p23_strings(float(g["a"]))
+        r = s["r"]
+        want = {"val": s["a"], "s": s["s"], "kam": s["am"], "kwm": s["wm"], "err": s["err"]}
+        for k, v in want.items():
+            if g[k] != v:
+                bad += 1
+                print("  p23", g["a"], k, g[k], "!=", v)
+        if g["am"] != [f(lx(v), 1) for v in r["amax"]] or g["wm"] != [f(lx(v), 1) for v in r["wmax"]]:
+            bad += 1
+            print("  p23 dots", g["a"])
+    print(f"p23: {len(got)} settings checked, {bad} mismatches")
+    return bad == 0 and len(got) == 21
+
+
+CHECKS = {"p02w": check_p02w, "p14": check_p14, "p19": check_p19, "p23": check_p23}
 
 
 def main():

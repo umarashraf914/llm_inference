@@ -51,7 +51,7 @@ def o001():
     emit("o001", stamp(SRT, "The Frontier model DeepSeek V4 Pro"),
          "The weights alone are eight times one chip", yb + 26, b + [body],
          "Bars to scale; the lower pair is drawn larger. This is a capacity wall, not the speed wall "
-         "of the first video: no amount of bandwidth helps when the weights do not fit "
+         "of V1: no amount of bandwidth helps when the weights do not fit "
          "({{ref:v02-o091}}).")
 
 
@@ -75,7 +75,7 @@ def o002():
     ])
     emit("o002", stamp(SRT, "The model has to be split across many"),
          "A node is one box of GPUs; a cluster is many boxes", yb + 22, b + [body],
-         "The node, not the GPU, is the unit the network sees. Every strategy in this video is "
+         "The node, not the GPU, is the unit the network sees. Every strategy that follows is "
          "placed on one side of that boundary or the other.")
 
 
@@ -192,7 +192,9 @@ def o003():
     body, yb = prose(372, [
         "Splitting a model means giving each GPU a shard: its own piece of the weights, or of the "
         "input. There are four places to cut. By layers, inside every weight matrix, between "
-        "experts, or along the sequence of tokens. A fifth strategy makes no cut at all and copies "
+        "experts, or along the sequence of tokens. Experts are the many small networks a "
+        "mixture-of-experts model picks among for each token ({{fig:v05-n25}}). A fifth "
+        "strategy makes no cut at all and copies "
         "the whole model instead.",
         "Every cut line is a place where the GPUs on either side must exchange data, because nobody "
         "holds everything needed to finish a token. Where the line goes decides what has to cross "
@@ -200,7 +202,7 @@ def o003():
     ])
     emit("o003", stamp(SRT, "The model has to be split across many"),
          "Four ways to cut a model, and one way to copy it", yb + 26, b + [body],
-         "Five strategies, five places to put the line, and the rest of the video takes them one at "
+         "Five strategies, five places to put the line, and the parts that follow take them one at "
          "a time. The copy is the odd one out: it has nothing to say while serving.")
 
 

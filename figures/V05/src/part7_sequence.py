@@ -39,7 +39,7 @@ def o019():
     ])
     emit("o019", stamp(SRT, "Every strategy so far has split"),
          "Sequence parallelism splits the input, not the model", yb + 26, b + [body],
-         "Also called context parallelism. Of the splits in this video, it is the only one that keeps "
+         "Also called context parallelism. Of the five splits, it is the only one that keeps "
          "dividing the cache as the context grows.")
 
 
@@ -112,8 +112,9 @@ def n32():
     ])
     emit("n32", stamp(SRT, "Attention is what makes this hard"),
          "Three quarters of the score grid needs someone else's keys", yb + 26, b + [body],
-         "With N GPUs only N of the N × N blocks are local. Under the causal mask the six blocks above "
-         "the diagonal are empty, which also loads the GPUs unevenly.")
+         "With N GPUs only N of the N × N blocks are local. Under the causal mask, where a token may "
+         "look only at earlier tokens, the six blocks above the diagonal are empty, so the GPUs are "
+         "also loaded unevenly.")
 
 
 # ---- Fig 20: the ring ----------------------------------------------------------------------------

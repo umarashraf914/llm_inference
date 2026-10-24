@@ -104,7 +104,7 @@ def p20():
     entries = n * n
     mb = entries * 4 / 1e6
     assert entries == 16777216 and round(mb) == 67
-    b = [hd(40, 46, f"Two inputs, the averages of their products: the {len(x1)} inputs of the next panel's widget")]
+    b = [hd(40, 46, f"Two inputs: the averages of their products over the {len(x1)} inputs of the widget above")]
     gx, gy, cw, ch = 150, 74, 120, 44
     cells = [[A, C], [C, B]]
     names = [["average x₁ × x₁", "average x₁ × x₂"], ["average x₂ × x₁", "average x₂ × x₂"]]
@@ -119,7 +119,7 @@ def p20():
     b.append(text(gx + 2 * cw + 30, gy + 88, "move together, so whether one weight", "sub2"))
     b.append(text(gx + 2 * cw + 30, gy + 106, "can cover for the other", "sub2"))
     yq = gy + 2 * ch + 6 + 36
-    b.append(eq(60, yq, 560, f"best nudge to w₂  =  −e₁ × off-diagonal ÷ diagonal  =  0.4 × {f(C, 3)} ÷ {f(B, 3)}  =  {f(d_star, 3)}", "m"))
+    b.append(eq(60, yq, 560, f"best nudge to w₂  =  −e₁ × (x₁x₂ entry) ÷ (x₂x₂ entry)  =  0.4 × {f(C, 3)} ÷ {f(B, 3)}  =  {f(d_star, 3)}", "m"))
     # the full-size table, schematic
     yt = yq + 92
     b.append(text(40, yt - 12, f"A layer with {fi(n)} inputs: a table of {fi(n)} × {fi(n)}, schematic", "sub2"))
@@ -186,7 +186,8 @@ def p21():
     assert round(sizes[0][1]) == 326 and round(sizes[2][1], 1) == 81.5 and round(sizes[3][1], 1) == 61.1
     assert sizes[2][1] > card > sizes[3][1] + 9
     assert math.ceil(sizes[0][1] / card) == 5 and math.ceil(sizes[1][1] / card) == 3
-    PX = 1.4
+    assert math.ceil(sizes[2][1] / card) == 2
+    PX = 1.2
     X0 = 150
     b = [hd(40, 46, "OPT-175B's weights at four precisions, to scale, against one 80 GB GPU")]
     notes = {16: "5 GPUs", 8: "3 GPUs", 4: "does not fit", 3: "fits, with room for the cache"}
@@ -195,7 +196,10 @@ def p21():
         b.append(text(40, y + 18, f"{bits}-bit" if bits != 16 else "FP16", "cap"))
         c = "h" if size > card else "s"
         b.append(rect(X0, y, size * PX, 26, c, rx=2))
-        b.append(text(X0 + size * PX + 10, y + 18, f"{f(size, 1).rstrip('0').rstrip('.')} GB: {notes[bits]}", "sub2"))
+        lx = max(X0 + size * PX, X0 + card * PX) + 10        # labels start clear of the card's line
+        label = f"{f(size, 1).rstrip('0').rstrip('.')} GB: {notes[bits]}"
+        b.append(text(lx, y + 18, label, "sub2"))
+        assert lx + 6 * len(label) < 650
     xc = X0 + card * PX
     b.append(f'<line class="mark xok" x1="{xc:.1f}" y1="64" x2="{xc:.1f}" y2="{74 + 4 * 44}"/>')
     b.append(text(xc, 74 + 4 * 44 + 16, "one 80 GB A100", "sub2", "middle"))
@@ -209,8 +213,8 @@ def p21():
     ])
     b.append(body)
     emit("p21", st("it fit a 175"), "Three bits is what put 175 billion parameters on one GPU", y + 26, b,
-         "The headline is a three-bit result. Four bits divides the hardware by four, but only three bits "
-         "gets it down to one card.")
+         "The headline is a three-bit result. Four bits cuts the hardware from five cards to two; only "
+         "three bits gets it down to one.")
 
 
 # ---- the existing figures' prose ---------------------------------------------------------------------------------
@@ -221,7 +225,7 @@ def o059():
     reprose("o059", 164, [
         "Simply rounding each weight to the closest representable value is the null method. It holds at "
         "eight bits, degrades at four and collapses at three. Measured by Frantar and colleagues on "
-        "OPT-175B: perplexity 8.34 in FP16, 10.54 rounded to 4 bits, about 7,300 at 3.",
+        "OPT-175B: perplexity 8.34 in FP16, 10.54 rounded to 4 bits, about " + nb("7,300 at 3 bits") + ".",
         "Everything below exists because of that last step.",
     ])
 

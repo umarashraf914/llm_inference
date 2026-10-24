@@ -253,7 +253,7 @@ def labels(n, t):
     elif t <= n - 1:
         ph = f"reduce-scatter, step {t} of {n - 1}: every GPU adds one slice and passes it on"
     else:
-        ph = f"all-gather, step {t - n + 1} of {n - 1}: every GPU copies one finished slice on"
+        ph = f"all-gather, step {t - n + 1} of {n - 1}: every GPU passes a finished slice on; the receiver keeps it"
     tally = (f"each GPU has sent {t} of {total} slices of S/{n}: {t}/{n} of the message"
              + (f" = {f(total / n, 3).rstrip('0').rstrip('.')} S, the whole all-reduce" if t == total else ""))
     return ph, tally
@@ -317,7 +317,7 @@ WIDGET38 = r"""<script>(() => {
     }
     const ph = t === 0 ? 'start: each GPU holds only its own numbers' : t <= n - 1
       ? `reduce-scatter, step ${t} of ${n - 1}: every GPU adds one slice and passes it on`
-      : `all-gather, step ${t - n + 1} of ${n - 1}: every GPU copies one finished slice on`;
+      : `all-gather, step ${t - n + 1} of ${n - 1}: every GPU passes a finished slice on; the receiver keeps it`;
     let tally = `each GPU has sent ${t} of ${total} slices of S/${n}: ${t}/${n} of the message`;
     if (t === total) tally += ` = ${fmt(total / n, 3).replace(/0+$/, '').replace(/\.$/, '')} S, the whole all-reduce`;
     q('[data-ph]').textContent = ph; q('[data-tally]').textContent = tally;
@@ -365,7 +365,9 @@ def n38w():
          f'<text class="sub2" x="40" y="{H + 36}" data-tally="">{esc(tally)}</text>']
     body, yb = prose(H + 80, [
         "Step through the whole all-reduce, then change the number of GPUs. Highlighted cells have "
-        "just changed; teal cells hold a finished slice. Whatever the group, the reduce-scatter takes "
+        "just changed; teal cells hold a finished slice. During the all-gather, a cell still missing "
+        "dots is a partial sum left from the first lap, about to be overwritten. Whatever the group, "
+        "the reduce-scatter takes "
         "N − 1 steps, the all-gather N − 1 more, and each step costs every GPU one slice of S/N.",
         "So the tally always ends at 2(N − 1) slices of S/N: 1.5 S for four GPUs, 1.75 S for eight. "
         "The steps were checked against the same ring in Python for every group from two to eight.",
@@ -433,6 +435,11 @@ def n39():
     rows = [(8, "eight GPUs"), (16_000, "16,000 GPUs")]
     steps = [2 * (n_ - 1) for n_, _ in rows]
     assert steps == [14, 31_998]
+    # a complete binary tree of n nodes has floor(log2 n) + 1 levels; 2**13 <= 16,000 < 2**14
+    # (NCCL 2.4 blog, Jeaugey 2019: reduce up the tree, broadcast down; two complementary
+    # trees each take half the data; up to 180x lower latency than ring at 24,576 GPUs)
+    lv = (16_000).bit_length()
+    assert lv == 14 and 2 ** (lv - 1) <= 16_000 < 2 ** lv and 2 * (lv - 1) == 26
     X0, S = 200, 150
     b = [hd(40, 40, "Bytes per GPU: the same scale for both")]
     for k, ((n_, lab), st) in enumerate(zip(rows, steps)):
@@ -456,9 +463,12 @@ def n39():
         "{{fig:v05-n8}}. The steps grow with the group: 2 × 7 = 14 for eight GPUs, 2 × 15,999 = "
         "31,998 for 16,000. A ring's latency grows in proportion to its size.",
         "That is why very large groups do not use one flat ring. NCCL, Nvidia's communication "
-        "library, added double binary trees in 2019: the same full bandwidth, with a latency that "
-        "grows only with the logarithm of the group, measured up to 180 times lower than a ring at "
-        "24,576 GPUs.",
+        "library, added double binary trees in 2019. A tree adds partial sums on the way up to its "
+        f"root and copies the total back down, and a binary tree over 16,000 GPUs has only {lv} "
+        f"levels: a small message climbs {lv - 1} hops and comes back {lv - 1}, {2 * (lv - 1)} "
+        "steps against the ring's 31,998. Two complementary trees, each carrying half the data, "
+        "keep the ring's full bandwidth; measured, the latency was up to 180 times lower than a "
+        "ring's at 24,576 GPUs.",
     ])
     emit("n39", stamp(SRT, "A bigger ring means more steps"),
          "The bytes stay flat; the number of steps does not", yb + 26, b + [body],

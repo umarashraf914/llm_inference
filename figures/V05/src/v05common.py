@@ -45,7 +45,7 @@ assert NET_EACH_WAY == 50e9
 
 # ---- the frontier model of the opening ------------------------------------------------------------
 # DeepSeek-V4-Pro model card: 1.6T parameters, 49B activated, one-million-token context;
-# config.json: 384 routed experts, 6 per token, 1 shared; the FP8 base checkpoint is 1.606 TB.
+# config.json: hidden 7168, 384 routed experts, 6 per token, 1 shared; the FP8 base checkpoint is 1.606 TB.
 DS_PARAMS, DS_ACTIVE, DS_EXPERTS, DS_TOPK = 1.6e12, 49e9, 384, 6
 DS_FP4_RELEASE_BYTES = 864_721_029_744      # DeepSeek-V4-Pro safetensors, experts in FP4
 
