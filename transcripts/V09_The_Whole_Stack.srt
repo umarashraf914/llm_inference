@@ -1,0 +1,928 @@
+1
+00:00:00,000 --> 00:00:04,480
+A user asks a coding assistant to fix a
+
+2
+00:00:02,520 --> 00:00:06,040
+failing test.
+
+3
+00:00:04,480 --> 00:00:07,880
+Along with the question, the server
+
+4
+00:00:06,040 --> 00:00:10,160
+receives a system prompt listing the
+
+5
+00:00:07,880 --> 00:00:12,320
+tools the model may call. The server
+
+6
+00:00:10,160 --> 00:00:14,000
+also receives the file that failed, the
+
+7
+00:00:12,320 --> 00:00:15,720
+error the test printed, and the
+
+8
+00:00:14,000 --> 00:00:17,960
+conversation so far.
+
+9
+00:00:15,720 --> 00:00:20,400
+Joined into one block, the prompt runs
+
+10
+00:00:17,960 --> 00:00:22,840
+to a few thousand tokens.
+
+11
+00:00:20,400 --> 00:00:24,560
+The prompt arrives as a single request.
+
+12
+00:00:22,840 --> 00:00:26,800
+From arrival to the last token of the
+
+13
+00:00:24,560 --> 00:00:29,080
+answer, the request occupies a slot
+
+14
+00:00:26,800 --> 00:00:31,480
+somewhere in the rack.
+
+15
+00:00:29,080 --> 00:00:34,280
+The request is headed for a rack of 72
+
+16
+00:00:31,480 --> 00:00:36,640
+Blackwell GPUs. An NVLink fabric carries
+
+17
+00:00:34,280 --> 00:00:38,160
+130 terabytes per second between those
+
+18
+00:00:36,640 --> 00:00:41,120
+GPUs.
+
+19
+00:00:38,160 --> 00:00:43,520
+Because the fabric moves data that fast,
+
+20
+00:00:41,120 --> 00:00:46,240
+NVIDIA describes the whole rack as a
+
+21
+00:00:43,520 --> 00:00:50,160
+single massive GPU.
+
+22
+00:00:46,240 --> 00:00:52,120
+The rack holds 13.4 terabytes of memory.
+
+23
+00:00:50,160 --> 00:00:53,600
+The model being served holds a trillion
+
+24
+00:00:52,120 --> 00:00:56,240
+parameters.
+
+25
+00:00:53,600 --> 00:01:00,080
+Stored at 4 bits each, a trillion
+
+26
+00:00:56,240 --> 00:01:01,680
+parameters come to 500 GB, under 4% of
+
+27
+00:01:00,080 --> 00:01:04,440
+the rack's memory.
+
+28
+00:01:01,680 --> 00:01:06,520
+That leaves 12.9 terabytes for key value
+
+29
+00:01:04,440 --> 00:01:10,080
+cache, the attention state every
+
+30
+00:01:06,520 --> 00:01:12,440
+conversation reuses for each new token.
+
+31
+00:01:10,080 --> 00:01:14,680
+A gateway picks a machine that already
+
+32
+00:01:12,440 --> 00:01:17,120
+holds part of the prompt.
+
+33
+00:01:14,680 --> 00:01:19,800
+Prefill reads the remaining tokens in
+
+34
+00:01:17,120 --> 00:01:21,760
+one pass and builds the key value cache
+
+35
+00:01:19,800 --> 00:01:23,960
+for this request.
+
+36
+00:01:21,760 --> 00:01:26,640
+The key value cache crosses the network
+
+37
+00:01:23,960 --> 00:01:29,160
+to a separate pool of machines.
+
+38
+00:01:26,640 --> 00:01:32,320
+Those machines run decode, writing the
+
+39
+00:01:29,160 --> 00:01:35,280
+rest of the answer one token at a time.
+
+40
+00:01:32,320 --> 00:01:38,560
+At each step, decode chooses only from
+
+41
+00:01:35,280 --> 00:01:41,960
+tokens that keep the tool call valid.
+
+42
+00:01:38,560 --> 00:01:44,440
+A Blackwell GPU in this rack carries out
+
+43
+00:01:41,960 --> 00:01:48,000
+10 quadrillion 4-bit operations every
+
+44
+00:01:44,440 --> 00:01:50,680
+second. NVIDIA advertises twice that
+
+45
+00:01:48,000 --> 00:01:52,960
+rate, counting a sparsity mode that
+
+46
+00:01:50,680 --> 00:01:55,480
+skips zeroed weights, which this
+
+47
+00:01:52,960 --> 00:01:58,320
+workload does not use.
+
+48
+00:01:55,480 --> 00:02:00,840
+The same GPU pulls about 8 terabytes out
+
+49
+00:01:58,320 --> 00:02:02,920
+of its own memory every second.
+
+50
+00:02:00,840 --> 00:02:05,320
+Divide 10 quadrillion operations by 8
+
+51
+00:02:02,920 --> 00:02:08,320
+terabytes, and the arithmetic units need
+
+52
+00:02:05,320 --> 00:02:10,440
+1,250 operations from every byte fetched
+
+53
+00:02:08,320 --> 00:02:13,160
+to stay busy.
+
+54
+00:02:10,440 --> 00:02:15,040
+One byte holds two 4-bit weights.
+
+55
+00:02:13,160 --> 00:02:17,080
+Multiplying and accumulating each of
+
+56
+00:02:15,040 --> 00:02:18,560
+those two weights once is four
+
+57
+00:02:17,080 --> 00:02:21,280
+operations.
+
+58
+00:02:18,560 --> 00:02:23,760
+Getting to 1,250 means the same byte has
+
+59
+00:02:21,280 --> 00:02:25,840
+to serve roughly 300 tokens before the
+
+60
+00:02:23,760 --> 00:02:28,080
+chip lets it go.
+
+61
+00:02:25,840 --> 00:02:31,360
+That gap is the memory wall, which we
+
+62
+00:02:28,080 --> 00:02:33,480
+covered in detail in episode 1.
+
+63
+00:02:31,360 --> 00:02:35,440
+The request reaches the gateway,
+
+64
+00:02:33,480 --> 00:02:38,080
+an ordinary load balancer of the kind
+
+65
+00:02:35,440 --> 00:02:40,160
+that fronts any web service.
+
+66
+00:02:38,080 --> 00:02:42,680
+Load balancers normally pick a machine
+
+67
+00:02:40,160 --> 00:02:45,440
+by rotation or by whichever machine is
+
+68
+00:02:42,680 --> 00:02:48,760
+least busy. This gateway picks by what
+
+69
+00:02:45,440 --> 00:02:51,000
+each machine already holds in memory.
+
+70
+00:02:48,760 --> 00:02:53,240
+Most of this prompt is a prefix some
+
+71
+00:02:51,000 --> 00:02:54,880
+machine already holds.
+
+72
+00:02:53,240 --> 00:02:56,880
+The system prompt and the tool
+
+73
+00:02:54,880 --> 00:02:58,400
+definitions do not change between
+
+74
+00:02:56,880 --> 00:03:00,480
+sessions.
+
+75
+00:02:58,400 --> 00:03:02,360
+The earlier turns of this conversation
+
+76
+00:03:00,480 --> 00:03:04,840
+were pre-filled a minute ago when the
+
+77
+00:03:02,360 --> 00:03:06,640
+user asked the previous question.
+
+78
+00:03:04,840 --> 00:03:08,680
+Only the newest question has never been
+
+79
+00:03:06,640 --> 00:03:10,120
+through the model.
+
+80
+00:03:08,680 --> 00:03:12,519
+The gateway sends the request to the
+
+81
+00:03:10,120 --> 00:03:14,519
+machine holding that prefix. That
+
+82
+00:03:12,519 --> 00:03:17,000
+machine still has the prefix in its key
+
+83
+00:03:14,519 --> 00:03:19,239
+value cache because the engine keeps a
+
+84
+00:03:17,000 --> 00:03:21,160
+finished requests cache instead of
+
+85
+00:03:19,239 --> 00:03:23,280
+discarding it.
+
+86
+00:03:21,160 --> 00:03:25,200
+So, prefill starts partway through the
+
+87
+00:03:23,280 --> 00:03:27,800
+prompt at the first token that the
+
+88
+00:03:25,200 --> 00:03:29,640
+machine has not seen.
+
+89
+00:03:27,800 --> 00:03:31,680
+The machine that takes the request does
+
+90
+00:03:29,640 --> 00:03:35,360
+nothing but prefill.
+
+91
+00:03:31,680 --> 00:03:37,640
+Decode runs on a different set of GPUs.
+
+92
+00:03:35,360 --> 00:03:39,600
+Inside, the uncached tokens go through
+
+93
+00:03:37,640 --> 00:03:42,440
+the model once. The weights arrive
+
+94
+00:03:39,600 --> 00:03:44,320
+4-bits wide. Each block of 16 weights
+
+95
+00:03:42,440 --> 00:03:46,560
+carries its own scale.
+
+96
+00:03:44,320 --> 00:03:48,959
+The matrix multiply instruction applies
+
+97
+00:03:46,560 --> 00:03:51,360
+that scale as it runs, so the weights
+
+98
+00:03:48,959 --> 00:03:53,280
+stay 4-bits wide until the instant they
+
+99
+00:03:51,360 --> 00:03:55,840
+are multiplied.
+
+100
+00:03:53,280 --> 00:03:57,720
+Flash attention 4, the attention kernel
+
+101
+00:03:55,840 --> 00:03:58,960
+written for Blackwell, computes the
+
+102
+00:03:57,720 --> 00:04:01,200
+attention.
+
+103
+00:03:58,960 --> 00:04:02,352
+Each matrix multiply is split across
+
+104
+00:04:01,200 --> 00:04:02,560
+several GPUs,
+
+105
+00:04:02,352 --> 00:04:04,520
+>> [music]
+
+106
+00:04:02,560 --> 00:04:06,360
+>> which exchange partial results over
+
+107
+00:04:04,520 --> 00:04:08,520
+NVLink.
+
+108
+00:04:06,360 --> 00:04:11,120
+Each layer of the model holds hundreds
+
+109
+00:04:08,520 --> 00:04:13,080
+of separate expert networks. A router
+
+110
+00:04:11,120 --> 00:04:14,560
+sends every token to eight of those
+
+111
+00:04:13,080 --> 00:04:16,519
+experts.
+
+112
+00:04:14,560 --> 00:04:19,280
+The eight experts a token needs sit on
+
+113
+00:04:16,519 --> 00:04:21,760
+different GPUs, so the tokens cross in
+
+114
+00:04:19,280 --> 00:04:24,320
+an all-to-all exchange, every GPU
+
+115
+00:04:21,760 --> 00:04:26,480
+sending to every other.
+
+116
+00:04:24,320 --> 00:04:29,080
+Prefill [music] ends with a key value
+
+117
+00:04:26,480 --> 00:04:31,120
+cache covering the whole prompt.
+
+118
+00:04:29,080 --> 00:04:32,880
+Prefill also produces the first token of
+
+119
+00:04:31,120 --> 00:04:34,680
+the answer.
+
+120
+00:04:32,880 --> 00:04:37,080
+The rest of the answer is generated on
+
+121
+00:04:34,680 --> 00:04:39,480
+the decode machines, so a copy of that
+
+122
+00:04:37,080 --> 00:04:42,240
+cache has to cross to them.
+
+123
+00:04:39,480 --> 00:04:45,640
+The prefix stays behind here, ready for
+
+124
+00:04:42,240 --> 00:04:47,080
+the next request that shares it.
+
+125
+00:04:45,640 --> 00:04:50,000
+The cache has to reach the decode
+
+126
+00:04:47,080 --> 00:04:51,800
+machines before generation can continue.
+
+127
+00:04:50,000 --> 00:04:53,600
+Multi-head latent attention decides how
+
+128
+00:04:51,800 --> 00:04:55,919
+large that cache is.
+
+129
+00:04:53,600 --> 00:04:58,520
+Standard attention stores a full key and
+
+130
+00:04:55,919 --> 00:05:00,720
+value for every attention head of every
+
+131
+00:04:58,520 --> 00:05:03,160
+token in every layer.
+
+132
+00:05:00,720 --> 00:05:07,200
+Latent attention stores one short vector
+
+133
+00:05:03,160 --> 00:05:09,480
+per layer instead, about 1,100 bytes.
+
+134
+00:05:07,200 --> 00:05:12,240
+Across 61 layers, that comes to 70
+
+135
+00:05:09,480 --> 00:05:13,960
+kilobytes for each token in the prompt.
+
+136
+00:05:12,240 --> 00:05:15,880
+A prompt of a few thousand tokens
+
+137
+00:05:13,960 --> 00:05:17,960
+therefore makes a cache of a few hundred
+
+138
+00:05:15,880 --> 00:05:20,000
+megabytes.
+
+139
+00:05:17,960 --> 00:05:22,280
+Moving a few hundred megabytes between
+
+140
+00:05:20,000 --> 00:05:24,320
+machines is normally work for both
+
+141
+00:05:22,280 --> 00:05:27,520
+operating systems.
+
+142
+00:05:24,320 --> 00:05:29,680
+Remote direct memory access skips them.
+
+143
+00:05:27,520 --> 00:05:31,960
+The network card on the prefill machine
+
+144
+00:05:29,680 --> 00:05:33,640
+reads the cache straight out of memory
+
+145
+00:05:31,960 --> 00:05:35,720
+and writes it into the memory of the
+
+146
+00:05:33,640 --> 00:05:38,040
+decode machine.
+
+147
+00:05:35,720 --> 00:05:41,640
+Neither processor touches the data and
+
+148
+00:05:38,040 --> 00:05:44,000
+neither operating system is involved.
+
+149
+00:05:41,640 --> 00:05:46,400
+Storing the cache at eight or four bits
+
+150
+00:05:44,000 --> 00:05:48,400
+instead of 16 trims it further before it
+
+151
+00:05:46,400 --> 00:05:50,600
+crosses.
+
+152
+00:05:48,400 --> 00:05:52,600
+Decode writes the rest of the answer one
+
+153
+00:05:50,600 --> 00:05:54,560
+token at a time.
+
+154
+00:05:52,600 --> 00:05:56,960
+Every token begins with a read of the
+
+155
+00:05:54,560 --> 00:05:58,280
+active weights, about 30 billion
+
+156
+00:05:56,960 --> 00:06:01,160
+parameters.
+
+157
+00:05:58,280 --> 00:06:04,240
+At 4 bits each, 30 billion parameters
+
+158
+00:06:01,160 --> 00:06:06,640
+come to 15 GB pulled out of memory.
+
+159
+00:06:04,240 --> 00:06:08,400
+Those parameters do about 60 billion
+
+160
+00:06:06,640 --> 00:06:12,280
+operations of arithmetic on the way
+
+161
+00:06:08,400 --> 00:06:15,080
+past. 60 billion operations over 15 GB
+
+162
+00:06:12,280 --> 00:06:18,400
+is four operations per byte. The chip
+
+163
+00:06:15,080 --> 00:06:21,040
+can sustain 1,250.
+
+164
+00:06:18,400 --> 00:06:24,080
+Each token the model writes adds its own
+
+165
+00:06:21,040 --> 00:06:26,320
+70 KB to the cache. The next read is
+
+166
+00:06:24,080 --> 00:06:28,280
+therefore slightly larger than the read
+
+167
+00:06:26,320 --> 00:06:30,400
+before it.
+
+168
+00:06:28,280 --> 00:06:32,560
+Continuous batching puts this request
+
+169
+00:06:30,400 --> 00:06:34,960
+through the same forward pass as every
+
+170
+00:06:32,560 --> 00:06:37,760
+other request in flight. One read of the
+
+171
+00:06:34,960 --> 00:06:39,919
+weights then serves all of them.
+
+172
+00:06:37,760 --> 00:06:42,240
+Speculative decoding has a small draft
+
+173
+00:06:39,919 --> 00:06:44,280
+model proposed several tokens ahead,
+
+174
+00:06:42,240 --> 00:06:45,600
+which the large model checks in a single
+
+175
+00:06:44,280 --> 00:06:47,880
+pass.
+
+176
+00:06:45,600 --> 00:06:50,120
+The forward pass carrying this request
+
+177
+00:06:47,880 --> 00:06:53,520
+therefore holds many sequences, each
+
+178
+00:06:50,120 --> 00:06:55,960
+with several proposed tokens attached.
+
+179
+00:06:53,520 --> 00:06:58,600
+Every token that decode produces passes
+
+180
+00:06:55,960 --> 00:07:00,640
+one more step before it is chosen.
+
+181
+00:06:58,600 --> 00:07:03,280
+The answer to this request has to be a
+
+182
+00:07:00,640 --> 00:07:05,400
+tool call, so the engine removes every
+
+183
+00:07:03,280 --> 00:07:08,440
+token that does not fit the tool call
+
+184
+00:07:05,400 --> 00:07:10,600
+format. After an opening brace, only the
+
+185
+00:07:08,440 --> 00:07:11,760
+field names the format allows are still
+
+186
+00:07:10,600 --> 00:07:14,800
+available.
+
+187
+00:07:11,760 --> 00:07:17,600
+The model picks from what is left.
+
+188
+00:07:14,800 --> 00:07:19,840
+The tokens then reach the user.
+
+189
+00:07:17,600 --> 00:07:22,200
+The wait before the first token is time
+
+190
+00:07:19,840 --> 00:07:23,880
+to first token, and it covers everything
+
+191
+00:07:22,200 --> 00:07:26,000
+from the gateway through prefill
+
+192
+00:07:23,880 --> 00:07:28,280
+producing that token.
+
+193
+00:07:26,000 --> 00:07:30,600
+The gap between the tokens after that is
+
+194
+00:07:28,280 --> 00:07:32,800
+time per output token.
+
+195
+00:07:30,600 --> 00:07:34,840
+Everything decode does happens inside
+
+196
+00:07:32,800 --> 00:07:36,760
+that gap.
+
+197
+00:07:34,840 --> 00:07:39,815
+When the last token of the tool call is
+
+198
+00:07:36,760 --> 00:07:40,000
+sent, the request releases its slot,
+
+199
+00:07:39,815 --> 00:07:42,240
+>> [music]
+
+200
+00:07:40,000 --> 00:07:45,320
+>> and the decode machine gives that slot
+
+201
+00:07:42,240 --> 00:07:47,520
+to a request that was waiting.
+
+202
+00:07:45,320 --> 00:07:50,400
+This brings us to the end of this LLM
+
+203
+00:07:47,520 --> 00:07:52,360
+inference engineering series.
+
+204
+00:07:50,400 --> 00:07:54,520
+Most of the LLM inference stack this
+
+205
+00:07:52,360 --> 00:07:55,680
+series described did not exist 5 years
+
+206
+00:07:54,520 --> 00:07:58,480
+ago.
+
+207
+00:07:55,680 --> 00:08:01,440
+Paged caches, latent attention, the
+
+208
+00:07:58,480 --> 00:08:05,160
+prefill and decode split, and 4-bit
+
+209
+00:08:01,440 --> 00:08:07,320
+numerics were all published after 2022.
+
+210
+00:08:05,160 --> 00:08:10,640
+The memory wall they were built against
+
+211
+00:08:07,320 --> 00:08:13,640
+was named in 1995, more than 20 years
+
+212
+00:08:10,640 --> 00:08:16,400
+before the transformer existed.
+
+213
+00:08:13,640 --> 00:08:18,280
+Inference has grown to about 2/3 of all
+
+214
+00:08:16,400 --> 00:08:20,840
+AI compute.
+
+215
+00:08:18,280 --> 00:08:23,080
+At the same time, many totally different
+
+216
+00:08:20,840 --> 00:08:25,240
+approaches are being tried.
+
+217
+00:08:23,080 --> 00:08:27,680
+Every technique that fights decode
+
+218
+00:08:25,240 --> 00:08:29,120
+assumes the model writes one token at a
+
+219
+00:08:27,680 --> 00:08:32,000
+time.
+
+220
+00:08:29,120 --> 00:08:34,520
+Diffusion language models do not.
+
+221
+00:08:32,000 --> 00:08:37,000
+A diffusion model starts from a masked
+
+222
+00:08:34,520 --> 00:08:39,240
+sequence and fills it in over several
+
+223
+00:08:37,000 --> 00:08:40,479
+passes, predicting many positions at
+
+224
+00:08:39,240 --> 00:08:43,360
+once.
+
+225
+00:08:40,479 --> 00:08:45,880
+Mercury, a commercial diffusion model,
+
+226
+00:08:43,360 --> 00:08:49,960
+was independently measured at 1,100
+
+227
+00:08:45,880 --> 00:08:51,960
+tokens a second on H100s.
+
+228
+00:08:49,960 --> 00:08:54,640
+A model that fills in many positions at
+
+229
+00:08:51,960 --> 00:08:56,440
+once is a different problem. And the
+
+230
+00:08:54,640 --> 00:08:59,160
+stack that serves it will look
+
+231
+00:08:56,440 --> 00:09:02,000
+different, too.
+
+232
+00:08:59,160 --> 00:09:02,000
+Thanks for watching.
+

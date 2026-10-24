@@ -1,0 +1,5000 @@
+1
+00:00:00,000 --> 00:00:05,240
+The last video ended at the machine.
+
+2
+00:00:03,080 --> 00:00:07,520
+The streaming multiprocessors, the
+
+3
+00:00:05,240 --> 00:00:09,920
+tensor cores, and the four-level ladder
+
+4
+00:00:07,520 --> 00:00:12,120
+of memory that feeds them.
+
+5
+00:00:09,920 --> 00:00:13,720
+This video is about the code that runs
+
+6
+00:00:12,120 --> 00:00:16,880
+on that machine.
+
+7
+00:00:13,720 --> 00:00:19,520
+That code comes in units called kernels.
+
+8
+00:00:16,880 --> 00:00:21,840
+A kernel is one small program.
+
+9
+00:00:19,520 --> 00:00:23,960
+The CPU hands it to the GPU as a single
+
+10
+00:00:21,840 --> 00:00:26,440
+piece of work, say,
+
+11
+00:00:23,960 --> 00:00:28,960
+multiplying two matrices
+
+12
+00:00:26,440 --> 00:00:31,280
+or normalizing the rows of one.
+
+13
+00:00:28,960 --> 00:00:33,840
+The GPU then runs that one program
+
+14
+00:00:31,280 --> 00:00:36,000
+across thousands of threads at once.
+
+15
+00:00:33,840 --> 00:00:37,360
+Everything the chip ever does happens
+
+16
+00:00:36,000 --> 00:00:40,040
+this way.
+
+17
+00:00:37,360 --> 00:00:42,080
+When PyTorch multiplies two matrices,
+
+18
+00:00:40,040 --> 00:00:44,160
+what actually runs on the silicon is a
+
+19
+00:00:42,080 --> 00:00:45,840
+kernel.
+
+20
+00:00:44,160 --> 00:00:49,040
+Two kernels can compute the same
+
+21
+00:00:45,840 --> 00:00:51,560
+attention on the same GPU with identical
+
+22
+00:00:49,040 --> 00:00:54,280
+inputs and identical outputs.
+
+23
+00:00:51,560 --> 00:00:56,280
+One of them can finish up to 7.6 times
+
+24
+00:00:54,280 --> 00:00:58,400
+faster than the other.
+
+25
+00:00:56,280 --> 00:01:00,560
+The arithmetic cannot be the difference
+
+26
+00:00:58,400 --> 00:01:02,320
+because both kernels perform exactly the
+
+27
+00:01:00,560 --> 00:01:03,760
+same operations.
+
+28
+00:01:02,320 --> 00:01:06,720
+What separates [music] them is
+
+29
+00:01:03,760 --> 00:01:08,775
+everything the mathematics leaves open.
+
+30
+00:01:06,720 --> 00:01:08,880
+Which threads load which bytes
+
+31
+00:01:08,775 --> 00:01:10,840
+>> [music]
+
+32
+00:01:08,880 --> 00:01:13,440
+>> from which level of memory, in what
+
+33
+00:01:10,840 --> 00:01:15,920
+order, at what precision, and where each
+
+34
+00:01:13,440 --> 00:01:18,160
+result is written. Every one of those is
+
+35
+00:01:15,920 --> 00:01:20,680
+a choice about moving data.
+
+36
+00:01:18,160 --> 00:01:22,880
+The whole gap lives there in the data
+
+37
+00:01:20,680 --> 00:01:26,000
+movement.
+
+38
+00:01:22,880 --> 00:01:27,800
+We will follow one lineage of kernels,
+
+39
+00:01:26,000 --> 00:01:30,400
+FlashAttention,
+
+40
+00:01:27,800 --> 00:01:32,640
+through four generations. It computes
+
+41
+00:01:30,400 --> 00:01:34,480
+attention, the operation at the heart of
+
+42
+00:01:32,640 --> 00:01:37,280
+the transformer.
+
+43
+00:01:34,480 --> 00:01:39,600
+Once context grows long, attention's
+
+44
+00:01:37,280 --> 00:01:41,440
+memory cost grows with it, and it
+
+45
+00:01:39,600 --> 00:01:44,000
+becomes a dominant draw on memory
+
+46
+00:01:41,440 --> 00:01:45,680
+bandwidth in the forward pass.
+
+47
+00:01:44,000 --> 00:01:48,040
+That is what makes it one of the kernels
+
+48
+00:01:45,680 --> 00:01:50,080
+that matter most for inference.
+
+49
+00:01:48,040 --> 00:01:52,800
+Across all four generations, the
+
+50
+00:01:50,080 --> 00:01:55,080
+function never changes. Every generation
+
+51
+00:01:52,800 --> 00:01:57,880
+computes the same attention, the same
+
+52
+00:01:55,080 --> 00:01:59,760
+scores, the same softmax, the same
+
+53
+00:01:57,880 --> 00:02:01,760
+weighted sum.
+
+54
+00:01:59,760 --> 00:02:03,800
+What changes is the fraction of the
+
+55
+00:02:01,760 --> 00:02:05,760
+chip's peak arithmetic the kernel
+
+56
+00:02:03,800 --> 00:02:08,280
+actually delivers.
+
+57
+00:02:05,760 --> 00:02:10,520
+It starts low, the tensor cores mostly
+
+58
+00:02:08,280 --> 00:02:12,920
+waiting on memory, and climbs to roughly
+
+59
+00:02:10,520 --> 00:02:14,920
+3/4 of peak.
+
+60
+00:02:12,920 --> 00:02:17,120
+A gap that wide with identical
+
+61
+00:02:14,920 --> 00:02:20,920
+mathematics has to come from somewhere
+
+62
+00:02:17,120 --> 00:02:22,680
+physical, from where the bytes sit.
+
+63
+00:02:20,920 --> 00:02:25,040
+Flash attention is the one kernel this
+
+64
+00:02:22,680 --> 00:02:26,560
+video traces in full, four generations
+
+65
+00:02:25,040 --> 00:02:28,120
+of it.
+
+66
+00:02:26,560 --> 00:02:29,640
+After it come the other levers of
+
+67
+00:02:28,120 --> 00:02:33,160
+inference.
+
+68
+00:02:29,640 --> 00:02:35,000
+A model built to keep a smaller cache,
+
+69
+00:02:33,160 --> 00:02:36,400
+a cache backed into memory without
+
+70
+00:02:35,000 --> 00:02:39,080
+waste,
+
+71
+00:02:36,400 --> 00:02:41,240
+decode work split so the chip is not
+
+72
+00:02:39,080 --> 00:02:44,360
+idle on one token,
+
+73
+00:02:41,240 --> 00:02:47,920
+the launch of each kernel paid for once,
+
+74
+00:02:44,360 --> 00:02:49,480
+and every number carried in fewer bits.
+
+75
+00:02:47,920 --> 00:02:51,440
+Two tiers of the memory ladder we
+
+76
+00:02:49,480 --> 00:02:53,120
+climbed last time decide everything that
+
+77
+00:02:51,440 --> 00:02:54,886
+follows.
+
+78
+00:02:53,120 --> 00:02:55,120
+The first is HBM,
+
+79
+00:02:54,886 --> 00:02:57,080
+>> [music]
+
+80
+00:02:55,120 --> 00:02:58,920
+>> the high bandwidth memory stacked beside
+
+81
+00:02:57,080 --> 00:03:02,080
+the GPU die.
+
+82
+00:02:58,920 --> 00:03:06,120
+It is the large tier, and H100 holds 80
+
+83
+00:03:02,080 --> 00:03:07,680
+GB of it, and streams them at 3.35 TB
+
+84
+00:03:06,120 --> 00:03:09,959
+per second.
+
+85
+00:03:07,680 --> 00:03:12,239
+For an accelerator this hungry, even
+
+86
+00:03:09,959 --> 00:03:14,239
+that counts as slow.
+
+87
+00:03:12,239 --> 00:03:17,040
+The second tier is SRAM.
+
+88
+00:03:14,239 --> 00:03:19,320
+There is up to 228 KB of it per
+
+89
+00:03:17,040 --> 00:03:22,840
+streaming multiprocessor, and the chip
+
+90
+00:03:19,320 --> 00:03:25,200
+has 132 of those multiprocessors.
+
+91
+00:03:22,840 --> 00:03:27,959
+SRAM sits right beside the arithmetic
+
+92
+00:03:25,200 --> 00:03:30,440
+units, and it runs about 10 times faster
+
+93
+00:03:27,959 --> 00:03:32,640
+than HBM.
+
+94
+00:03:30,440 --> 00:03:35,000
+Compute throughput has outgrown memory
+
+95
+00:03:32,640 --> 00:03:37,720
+bandwidth for generations now.
+
+96
+00:03:35,000 --> 00:03:40,000
+So, moving a byte across that gap costs
+
+97
+00:03:37,720 --> 00:03:41,760
+more than doing arithmetic on it once it
+
+98
+00:03:40,000 --> 00:03:43,560
+arrives.
+
+99
+00:03:41,760 --> 00:03:46,280
+The whole craft of writing a kernel
+
+100
+00:03:43,560 --> 00:03:49,160
+reduces to one habit, keep the bytes out
+
+101
+00:03:46,280 --> 00:03:51,800
+of HBM and next to the math.
+
+102
+00:03:49,160 --> 00:03:54,640
+And which side a kernel lands on, memory
+
+103
+00:03:51,800 --> 00:03:56,880
+or compute, is decided by a single ratio
+
+104
+00:03:54,640 --> 00:04:00,120
+we already know.
+
+105
+00:03:56,880 --> 00:04:02,160
+That ratio is arithmetic intensity.
+
+106
+00:04:00,120 --> 00:04:03,800
+The operations a kernel performs per
+
+107
+00:04:02,160 --> 00:04:05,360
+byte it reads.
+
+108
+00:04:03,800 --> 00:04:07,080
+It lives on a diagram we have built
+
+109
+00:04:05,360 --> 00:04:09,200
+twice, [music] the roofline.
+
+110
+00:04:07,080 --> 00:04:11,920
+The roofline has a flat ceiling set by
+
+111
+00:04:09,200 --> 00:04:14,400
+the Tensor Cores, a slanted ceiling set
+
+112
+00:04:11,920 --> 00:04:16,000
+by memory bandwidth, and a ridge where
+
+113
+00:04:14,400 --> 00:04:19,000
+the two meet.
+
+114
+00:04:16,000 --> 00:04:23,320
+On the H100, that ridge sits at roughly
+
+115
+00:04:19,000 --> 00:04:26,000
+295 operations per byte.
+
+116
+00:04:23,320 --> 00:04:28,880
+A large dense matrix multiply does a lot
+
+117
+00:04:26,000 --> 00:04:30,640
+of arithmetic on every byte it loads, so
+
+118
+00:04:28,880 --> 00:04:32,919
+it sits well past the ridge,
+
+119
+00:04:30,640 --> 00:04:34,720
+compute-bound, with the Tensor Cores
+
+120
+00:04:32,919 --> 00:04:36,520
+setting the pace.
+
+121
+00:04:34,720 --> 00:04:38,919
+Attention over long sequences is the
+
+122
+00:04:36,520 --> 00:04:41,320
+opposite. It does very little arithmetic
+
+123
+00:04:38,919 --> 00:04:44,040
+per byte it touches, so it sits far down
+
+124
+00:04:41,320 --> 00:04:47,160
+the slanted ceiling, memory-bound.
+
+125
+00:04:44,040 --> 00:04:51,080
+Memory-bound means capped by bandwidth,
+
+126
+00:04:47,160 --> 00:04:53,400
+however fast the math units are.
+
+127
+00:04:51,080 --> 00:04:54,760
+For a kernel author, the roofline is a
+
+128
+00:04:53,400 --> 00:04:57,080
+lever.
+
+129
+00:04:54,760 --> 00:04:58,160
+The function fixes how many operations
+
+130
+00:04:57,080 --> 00:05:01,520
+there are.
+
+131
+00:04:58,160 --> 00:05:05,080
+Nothing fixes how many bytes move.
+
+132
+00:05:01,520 --> 00:05:07,760
+Cut the HBM traffic and intensity rises,
+
+133
+00:05:05,080 --> 00:05:10,880
+and the same computation slides right
+
+134
+00:05:07,760 --> 00:05:12,960
+out from under the bandwidth ceiling.
+
+135
+00:05:10,880 --> 00:05:15,080
+That is the craft, and its measure is
+
+136
+00:05:12,960 --> 00:05:17,400
+the fraction of peak arithmetic a kernel
+
+137
+00:05:15,080 --> 00:05:18,840
+sustains, the number we will track from
+
+138
+00:05:17,400 --> 00:05:20,520
+here on.
+
+139
+00:05:18,840 --> 00:05:24,600
+The workload that needed this most
+
+140
+00:05:20,520 --> 00:05:24,600
+urgently was attention itself.
+
+141
+00:05:26,919 --> 00:05:30,160
+The reason is visible in attention's
+
+142
+00:05:28,640 --> 00:05:31,919
+definition.
+
+143
+00:05:30,160 --> 00:05:34,560
+From the first video, each token builds
+
+144
+00:05:31,919 --> 00:05:37,360
+three [music] things: a query, what this
+
+145
+00:05:34,560 --> 00:05:40,280
+token is looking for, a key, what it
+
+146
+00:05:37,360 --> 00:05:42,960
+offers to other tokens, and a value,
+
+147
+00:05:40,280 --> 00:05:45,800
+what it actually contributes.
+
+148
+00:05:42,960 --> 00:05:49,280
+Stack those over a sequence of N tokens
+
+149
+00:05:45,800 --> 00:05:52,080
+and you get three matrices, Q, K, and V,
+
+150
+00:05:49,280 --> 00:05:55,840
+each with n rows, one per token, and d
+
+151
+00:05:52,080 --> 00:05:57,440
+columns, where d is typically 64 to 128
+
+152
+00:05:55,840 --> 00:05:59,600
+per head.
+
+153
+00:05:57,440 --> 00:06:02,160
+The kernel's first step compares every
+
+154
+00:05:59,600 --> 00:06:05,480
+query against every key, written as a
+
+155
+00:06:02,160 --> 00:06:06,920
+matrix product, that is S = Q * K
+
+156
+00:06:05,480 --> 00:06:09,200
+transpose.
+
+157
+00:06:06,920 --> 00:06:11,600
+One multiply does all the comparisons at
+
+158
+00:06:09,200 --> 00:06:15,160
+once, and the result is a score matrix
+
+159
+00:06:11,600 --> 00:06:17,400
+with one entry for every pair of tokens.
+
+160
+00:06:15,160 --> 00:06:19,720
+The second step turns each row of raw
+
+161
+00:06:17,400 --> 00:06:22,320
+scores into weights. The function that
+
+162
+00:06:19,720 --> 00:06:24,000
+does it is called softmax.
+
+163
+00:06:22,320 --> 00:06:26,680
+The raw scores come out of the
+
+164
+00:06:24,000 --> 00:06:29,160
+comparison at any size, positive or
+
+165
+00:06:26,680 --> 00:06:31,520
+negative. What we need instead are
+
+166
+00:06:29,160 --> 00:06:33,160
+blending weights, positive numbers that
+
+167
+00:06:31,520 --> 00:06:36,120
+sum to one.
+
+168
+00:06:33,160 --> 00:06:39,040
+Softmax does this in two moves.
+
+169
+00:06:36,120 --> 00:06:41,160
+First, raise e to each score. Every
+
+170
+00:06:39,040 --> 00:06:44,280
+number becomes positive, and strong
+
+171
+00:06:41,160 --> 00:06:46,160
+scores pull far ahead of weak ones.
+
+172
+00:06:44,280 --> 00:06:49,360
+Then divide each result by the row's
+
+173
+00:06:46,160 --> 00:06:50,689
+total, so the row sums to one.
+
+174
+00:06:49,360 --> 00:06:51,080
+That is the whole function.
+
+175
+00:06:50,689 --> 00:06:54,480
+>> [music]
+
+176
+00:06:51,080 --> 00:06:56,560
+>> Exponentiate, then normalize.
+
+177
+00:06:54,480 --> 00:06:58,760
+There is one practical wrinkle.
+
+178
+00:06:56,560 --> 00:07:01,080
+The exponential of a score overflows
+
+179
+00:06:58,760 --> 00:07:03,640
+finite precision floating-point well
+
+180
+00:07:01,080 --> 00:07:05,880
+before the score itself looks large.
+
+181
+00:07:03,640 --> 00:07:07,960
+So, every real implementation first
+
+182
+00:07:05,880 --> 00:07:09,029
+subtracts the row's largest score from
+
+183
+00:07:07,960 --> 00:07:09,200
+every entry.
+
+184
+00:07:09,029 --> 00:07:11,240
+>> [music]
+
+185
+00:07:09,200 --> 00:07:13,480
+>> The weights come out identical. The
+
+186
+00:07:11,240 --> 00:07:16,240
+largest exponent becomes zero, and
+
+187
+00:07:13,480 --> 00:07:18,640
+nothing overflows.
+
+188
+00:07:16,240 --> 00:07:21,360
+The third step multiplies the weights by
+
+189
+00:07:18,640 --> 00:07:22,960
+V, blending the values into one output
+
+190
+00:07:21,360 --> 00:07:25,880
+row per token.
+
+191
+00:07:22,960 --> 00:07:28,919
+So, attention is two matrix multiplies
+
+192
+00:07:25,880 --> 00:07:31,560
+with a normalization between them.
+
+193
+00:07:28,919 --> 00:07:33,800
+One more piece from the first video.
+
+194
+00:07:31,560 --> 00:07:35,760
+Attention runs not once per layer, but
+
+195
+00:07:33,800 --> 00:07:38,680
+as a few dozen independent copies side
+
+196
+00:07:35,760 --> 00:07:41,125
+by side, called heads. Each head has its
+
+197
+00:07:38,680 --> 00:07:41,480
+own smaller Q, K, and V.
+
+198
+00:07:41,125 --> 00:07:43,640
+>> [music]
+
+199
+00:07:41,480 --> 00:07:46,640
+>> Each head is free to track a different
+
+200
+00:07:43,640 --> 00:07:48,880
+kind of relationship between tokens.
+
+201
+00:07:46,640 --> 00:07:52,400
+Everything in this video happens inside
+
+202
+00:07:48,880 --> 00:07:54,680
+a single head, so we follow one.
+
+203
+00:07:52,400 --> 00:07:57,720
+The trouble is the object in the middle.
+
+204
+00:07:54,680 --> 00:08:01,080
+S holds one score per pair of tokens, so
+
+205
+00:07:57,720 --> 00:08:04,640
+it is n by n. Double the sequence length
+
+206
+00:08:01,080 --> 00:08:06,760
+and its size quadruples. At 1,024
+
+207
+00:08:04,640 --> 00:08:07,960
+tokens, it holds about a million
+
+208
+00:08:06,760 --> 00:08:10,640
+entries.
+
+209
+00:08:07,960 --> 00:08:16,200
+At 8,192 [music]
+
+210
+00:08:10,640 --> 00:08:19,200
+tokens, 67 million. At 32,768
+
+211
+00:08:16,200 --> 00:08:21,680
+tokens, about a billion.
+
+212
+00:08:19,200 --> 00:08:24,600
+A naive kernel builds every one of those
+
+213
+00:08:21,680 --> 00:08:26,480
+entries and makes three separate passes
+
+214
+00:08:24,600 --> 00:08:29,280
+through HBM.
+
+215
+00:08:26,480 --> 00:08:31,520
+The first pass computes S and writes it
+
+216
+00:08:29,280 --> 00:08:33,479
+out in full because the next kernel
+
+217
+00:08:31,520 --> 00:08:36,400
+needs it as input.
+
+218
+00:08:33,479 --> 00:08:38,719
+The second pass reads S back, applies
+
+219
+00:08:36,400 --> 00:08:40,719
+the softmax row by row, and writes the
+
+220
+00:08:38,719 --> 00:08:43,760
+result out again.
+
+221
+00:08:40,719 --> 00:08:47,440
+The third pass reads it one more time
+
+222
+00:08:43,760 --> 00:08:49,600
+and multiplies by V for the output.
+
+223
+00:08:47,440 --> 00:08:52,000
+The arithmetic here is mostly matrix
+
+224
+00:08:49,600 --> 00:08:54,000
+multiplication, exactly what the tensor
+
+225
+00:08:52,000 --> 00:08:56,480
+cores are built for.
+
+226
+00:08:54,000 --> 00:08:58,960
+The bottleneck is the traffic.
+
+227
+00:08:56,480 --> 00:09:02,120
+The bytes grow as n squared while the
+
+228
+00:08:58,960 --> 00:09:04,560
+work done per byte stays small. So on
+
+229
+00:09:02,120 --> 00:09:06,920
+long sequences, attention lands deep in
+
+230
+00:09:04,560 --> 00:09:09,440
+the memory-bound corner of the roofline,
+
+231
+00:09:06,920 --> 00:09:11,240
+the bus saturated and the tensor cores
+
+232
+00:09:09,440 --> 00:09:14,400
+waiting.
+
+233
+00:09:11,240 --> 00:09:17,400
+The same cost model points at the cure.
+
+234
+00:09:14,400 --> 00:09:20,720
+S is scratch, produced once, consumed
+
+235
+00:09:17,400 --> 00:09:23,240
+once, then discarded. Build it on chip
+
+236
+00:09:20,720 --> 00:09:25,880
+and never write it to HBM and the n
+
+237
+00:09:23,240 --> 00:09:29,360
+squared traffic vanishes.
+
+238
+00:09:25,880 --> 00:09:31,760
+That cure has a name, flash attention.
+
+239
+00:09:29,360 --> 00:09:34,640
+Flash attention was published in 2022 by
+
+240
+00:09:31,760 --> 00:09:36,920
+Tri Dao and his collaborators.
+
+241
+00:09:34,640 --> 00:09:39,040
+It begins with a change of accounting
+
+242
+00:09:36,920 --> 00:09:40,960
+rather than a new algorithm.
+
+243
+00:09:39,040 --> 00:09:42,240
+The starting point is the fact from a
+
+244
+00:09:40,960 --> 00:09:44,600
+moment ago.
+
+245
+00:09:42,240 --> 00:09:46,760
+Attention is memory bound.
+
+246
+00:09:44,600 --> 00:09:49,600
+It's wall clock time is set by the bytes
+
+247
+00:09:46,760 --> 00:09:52,200
+moved, not the operations performed. So,
+
+248
+00:09:49,600 --> 00:09:53,920
+the paper changes what it counts.
+
+249
+00:09:52,200 --> 00:09:56,920
+The cost model becomes the reads and
+
+250
+00:09:53,920 --> 00:09:59,480
+writes that cross between HBM and SRAM,
+
+251
+00:09:56,920 --> 00:10:03,320
+the two tiers we just compared.
+
+252
+00:09:59,480 --> 00:10:05,520
+The authors call this IO awareness.
+
+253
+00:10:03,320 --> 00:10:08,200
+Under that accounting, the three-pass
+
+254
+00:10:05,520 --> 00:10:09,280
+implementation is expensive for one
+
+255
+00:10:08,200 --> 00:10:12,480
+reason.
+
+256
+00:10:09,280 --> 00:10:15,600
+It parks two full n by n matrices in
+
+257
+00:10:12,480 --> 00:10:16,720
+HBM, the raw scores and the softmax
+
+258
+00:10:15,600 --> 00:10:18,920
+weights.
+
+259
+00:10:16,720 --> 00:10:20,360
+Then it pays the bus cost to read each
+
+260
+00:10:18,920 --> 00:10:22,560
+one back.
+
+261
+00:10:20,360 --> 00:10:24,960
+The cheap place to work is SRAM with
+
+262
+00:10:22,560 --> 00:10:26,920
+about 10 times the bandwidth, but SRAM
+
+263
+00:10:24,960 --> 00:10:28,760
+holds only a couple hundred kilobytes
+
+264
+00:10:26,920 --> 00:10:31,920
+per multiprocessor.
+
+265
+00:10:28,760 --> 00:10:34,560
+The n by n score matrix will never fit
+
+266
+00:10:31,920 --> 00:10:36,160
+their whole at any realistic sequence
+
+267
+00:10:34,560 --> 00:10:38,400
+length.
+
+268
+00:10:36,160 --> 00:10:40,400
+What rescues the plan is one property of
+
+269
+00:10:38,400 --> 00:10:43,839
+matrix multiplication.
+
+270
+00:10:40,400 --> 00:10:47,160
+It decomposes cleanly into blocks.
+
+271
+00:10:43,839 --> 00:10:50,040
+So, Flash Attention cuts Q, K, and V
+
+272
+00:10:47,160 --> 00:10:52,120
+into block size to fit in SRAM.
+
+273
+00:10:50,040 --> 00:10:54,520
+This is called tiling.
+
+274
+00:10:52,120 --> 00:10:56,400
+The kernel loads one block of K and one
+
+275
+00:10:54,520 --> 00:10:58,839
+block of V on chip.
+
+276
+00:10:56,400 --> 00:11:01,280
+For each block of Q, it computes that
+
+277
+00:10:58,839 --> 00:11:03,800
+tile of the attention right there, folds
+
+278
+00:11:01,280 --> 00:11:07,360
+the partial result into the output, then
+
+279
+00:11:03,800 --> 00:11:10,680
+lets the next blocks of K and V arrive.
+
+280
+00:11:07,360 --> 00:11:13,400
+Each tile of S lives briefly in SRAM,
+
+281
+00:11:10,680 --> 00:11:16,120
+gets used, and gets overwritten. The
+
+282
+00:11:13,400 --> 00:11:20,240
+full n by n matrix is built tile by tile
+
+283
+00:11:16,120 --> 00:11:22,520
+on chip and never reaches HBM at all.
+
+284
+00:11:20,240 --> 00:11:25,400
+This is still exact attention.
+
+285
+00:11:22,520 --> 00:11:27,160
+It does not skip token pairs or accept a
+
+286
+00:11:25,400 --> 00:11:29,000
+noisy answer.
+
+287
+00:11:27,160 --> 00:11:31,640
+The output matches the three-pass
+
+288
+00:11:29,000 --> 00:11:34,120
+version identical up to the reordering
+
+289
+00:11:31,640 --> 00:11:36,240
+of floating point sums. The function did
+
+290
+00:11:34,120 --> 00:11:37,720
+not change. The route the bytes take
+
+291
+00:11:36,240 --> 00:11:39,760
+did.
+
+292
+00:11:37,720 --> 00:11:41,320
+One obstacle remains, and it is the
+
+293
+00:11:39,760 --> 00:11:43,478
+central one.
+
+294
+00:11:41,320 --> 00:11:43,520
+Softmax still wants the whole row,
+
+295
+00:11:43,478 --> 00:11:45,200
+>> [music]
+
+296
+00:11:43,520 --> 00:11:46,960
+>> making it run without ever seeing the
+
+297
+00:11:45,200 --> 00:11:48,800
+whole row is the other half of the
+
+298
+00:11:46,960 --> 00:11:51,360
+paper.
+
+299
+00:11:48,800 --> 00:11:53,040
+Softmax needs two row wide numbers, the
+
+300
+00:11:51,360 --> 00:11:54,800
+rows maximum and its sum of
+
+301
+00:11:53,040 --> 00:11:56,720
+exponentials.
+
+302
+00:11:54,800 --> 00:11:59,640
+Those are exactly what tiling cannot
+
+303
+00:11:56,720 --> 00:12:00,760
+hand it. A tile only ever sees a slice
+
+304
+00:11:59,640 --> 00:12:02,480
+of a row.
+
+305
+00:12:00,760 --> 00:12:05,000
+And every weight has to divide by the
+
+306
+00:12:02,480 --> 00:12:07,720
+rows sum, while every exponential has to
+
+307
+00:12:05,000 --> 00:12:09,840
+subtract the rows maximum.
+
+308
+00:12:07,720 --> 00:12:11,680
+So, as Softmax is normally written,
+
+309
+00:12:09,840 --> 00:12:14,400
+nothing in the row can be finished until
+
+310
+00:12:11,680 --> 00:12:16,440
+the whole row exists.
+
+311
+00:12:14,400 --> 00:12:17,400
+The fix predates flash attention by 4
+
+312
+00:12:16,440 --> 00:12:20,120
+years.
+
+313
+00:12:17,400 --> 00:12:23,240
+It is called online Softmax published
+
+314
+00:12:20,120 --> 00:12:25,080
+out of Nvidia in 2018 by Milakov and
+
+315
+00:12:23,240 --> 00:12:27,120
+Gimel'shein.
+
+316
+00:12:25,080 --> 00:12:29,720
+It computes the same result in a single
+
+317
+00:12:27,120 --> 00:12:32,320
+streaming pass by carrying both row wide
+
+318
+00:12:29,720 --> 00:12:34,480
+numbers as running values.
+
+319
+00:12:32,320 --> 00:12:36,560
+One is a running maximum, the largest
+
+320
+00:12:34,480 --> 00:12:38,498
+score seen so far.
+
+321
+00:12:36,560 --> 00:12:38,520
+The other is a running denominator,
+
+322
+00:12:38,498 --> 00:12:41,160
+>> [music]
+
+323
+00:12:38,520 --> 00:12:42,720
+>> the sum of exponentials so far.
+
+324
+00:12:41,160 --> 00:12:45,000
+The subtlety is what happens when the
+
+325
+00:12:42,720 --> 00:12:47,600
+maximum changes partway through.
+
+326
+00:12:45,000 --> 00:12:49,800
+Watch it on one row.
+
+327
+00:12:47,600 --> 00:12:52,200
+The first tile of scores arrives, and
+
+328
+00:12:49,800 --> 00:12:54,480
+the largest score in it is three. So, we
+
+329
+00:12:52,200 --> 00:12:56,360
+compute each exponential as e to the
+
+330
+00:12:54,480 --> 00:13:00,120
+score minus three, and the running
+
+331
+00:12:56,360 --> 00:13:01,880
+denominator accumulates to 1.59.
+
+332
+00:13:00,120 --> 00:13:04,480
+Then the next tile arrives carrying a
+
+333
+00:13:01,880 --> 00:13:05,920
+five, and the running maximum updates to
+
+334
+00:13:04,480 --> 00:13:07,560
+five.
+
+335
+00:13:05,920 --> 00:13:09,800
+But every exponential already folded
+
+336
+00:13:07,560 --> 00:13:11,880
+into that 1.59 subtracted the old
+
+337
+00:13:09,800 --> 00:13:14,520
+maximum, three.
+
+338
+00:13:11,880 --> 00:13:17,080
+The true maximum is now five.
+
+339
+00:13:14,520 --> 00:13:19,080
+So, each of those terms is too large by
+
+340
+00:13:17,080 --> 00:13:21,120
+exactly [music] the same factor, e to
+
+341
+00:13:19,080 --> 00:13:22,800
+the five minus three.
+
+342
+00:13:21,120 --> 00:13:24,680
+They all subtracted the same wrong
+
+343
+00:13:22,800 --> 00:13:26,280
+number, so they are all wrong by the
+
+344
+00:13:24,680 --> 00:13:27,960
+same amount.
+
+345
+00:13:26,280 --> 00:13:29,760
+That shared error what saves the
+
+346
+00:13:27,960 --> 00:13:31,600
+algorithm.
+
+347
+00:13:29,760 --> 00:13:35,240
+One multiplication repairs the whole
+
+348
+00:13:31,600 --> 00:13:38,960
+denominator at once. We scale the 1.59
+
+349
+00:13:35,240 --> 00:13:41,440
+by E to the 3 - 5. That factor is about
+
+350
+00:13:38,960 --> 00:13:44,080
+0.135.
+
+351
+00:13:41,440 --> 00:13:45,080
+Every accumulated term lands on the new
+
+352
+00:13:44,080 --> 00:13:47,640
+scale,
+
+353
+00:13:45,080 --> 00:13:50,400
+ready for the new tiles exponentials to
+
+354
+00:13:47,640 --> 00:13:51,720
+add on cleanly.
+
+355
+00:13:50,400 --> 00:13:54,000
+Flash attention pushes the same
+
+356
+00:13:51,720 --> 00:13:55,800
+correction one step further.
+
+357
+00:13:54,000 --> 00:13:58,360
+The running output is built from those
+
+358
+00:13:55,800 --> 00:14:00,720
+same exponentials, so it drifts off
+
+359
+00:13:58,360 --> 00:14:03,240
+scale in exactly the same way.
+
+360
+00:14:00,720 --> 00:14:05,320
+The identical factor repairs it.
+
+361
+00:14:03,240 --> 00:14:07,360
+Whenever the denominator rescales, the
+
+362
+00:14:05,320 --> 00:14:09,520
+output rescales with it, and the two
+
+363
+00:14:07,360 --> 00:14:11,800
+stay in step.
+
+364
+00:14:09,520 --> 00:14:13,520
+By the last tile, the running maximum is
+
+365
+00:14:11,800 --> 00:14:16,640
+the true row maximum, [music] and the
+
+366
+00:14:13,520 --> 00:14:18,640
+running denominator is the true row sum.
+
+367
+00:14:16,640 --> 00:14:21,040
+The output matches a full row softmax
+
+368
+00:14:18,640 --> 00:14:23,800
+exactly because the correction was exact
+
+369
+00:14:21,040 --> 00:14:26,440
+at every step along the way.
+
+370
+00:14:23,800 --> 00:14:28,720
+This is what makes tiling legitimate.
+
+371
+00:14:26,440 --> 00:14:32,839
+Attention never needed the whole row at
+
+372
+00:14:28,720 --> 00:14:35,000
+once, only two running numbers per row.
+
+373
+00:14:32,839 --> 00:14:37,440
+That settles the forward pass, the only
+
+374
+00:14:35,000 --> 00:14:39,800
+pass inference ever runs. What comes
+
+375
+00:14:37,440 --> 00:14:41,920
+next belongs to training.
+
+376
+00:14:39,800 --> 00:14:44,260
+Since inference never runs the backward
+
+377
+00:14:41,920 --> 00:14:44,560
+pass, treat it as a brief detour,
+
+378
+00:14:44,260 --> 00:14:47,280
+>> [music]
+
+379
+00:14:44,560 --> 00:14:50,520
+>> but one worth taking because it finishes
+
+380
+00:14:47,280 --> 00:14:53,320
+how flash attention handles its memory.
+
+381
+00:14:50,520 --> 00:14:55,839
+Training runs every computation twice.
+
+382
+00:14:53,320 --> 00:14:57,920
+The forward pass makes a prediction. The
+
+383
+00:14:55,839 --> 00:15:00,040
+backward pass then runs through the same
+
+384
+00:14:57,920 --> 00:15:01,760
+steps to work out how each weight should
+
+385
+00:15:00,040 --> 00:15:03,880
+change.
+
+386
+00:15:01,760 --> 00:15:06,839
+And that backward sweep needs the
+
+387
+00:15:03,880 --> 00:15:09,680
+attention matrix a second time.
+
+388
+00:15:06,839 --> 00:15:11,920
+Flash attention never stored it.
+
+389
+00:15:09,680 --> 00:15:13,800
+Instead of storing the matrix, flash
+
+390
+00:15:11,920 --> 00:15:14,560
+attention kept just enough to rebuild
+
+391
+00:15:13,800 --> 00:15:16,160
+it.
+
+392
+00:15:14,560 --> 00:15:19,280
+That was the two running numbers per
+
+393
+00:15:16,160 --> 00:15:21,080
+row, the maximum and the denominator,
+
+394
+00:15:19,280 --> 00:15:22,640
+which online softmax was already
+
+395
+00:15:21,080 --> 00:15:24,720
+carrying.
+
+396
+00:15:22,640 --> 00:15:28,200
+During the backward pass, the kernel
+
+397
+00:15:24,720 --> 00:15:30,240
+reloads Q, K, and V tile by tile.
+
+398
+00:15:28,200 --> 00:15:33,040
+It recomputes each tile of the attention
+
+399
+00:15:30,240 --> 00:15:34,920
+matrix on chip at the exact moment that
+
+400
+00:15:33,040 --> 00:15:37,080
+tile is needed. The extra
+
+401
+00:15:34,920 --> 00:15:40,080
+multiplications are cheap since they run
+
+402
+00:15:37,080 --> 00:15:42,160
+on data already sitting in SRAM. The HBM
+
+403
+00:15:40,080 --> 00:15:44,000
+traffic they avoid is exactly the
+
+404
+00:15:42,160 --> 00:15:46,520
+expensive kind.
+
+405
+00:15:44,000 --> 00:15:48,520
+So, attention's memory footprint drops
+
+406
+00:15:46,520 --> 00:15:50,160
+from quadratic in the sequence length to
+
+407
+00:15:48,520 --> 00:15:52,840
+linear.
+
+408
+00:15:50,160 --> 00:15:55,320
+That is the principle kernel runs on.
+
+409
+00:15:52,840 --> 00:15:57,080
+Never spend HBM traffic on anything you
+
+410
+00:15:55,320 --> 00:15:58,680
+can rebuild from what is already on
+
+411
+00:15:57,080 --> 00:16:00,560
+chip.
+
+412
+00:15:58,680 --> 00:16:02,600
+Tiling, online SoftMax, and
+
+413
+00:16:00,560 --> 00:16:03,920
+recomputation together are the whole
+
+414
+00:16:02,600 --> 00:16:07,720
+kernel.
+
+415
+00:16:03,920 --> 00:16:10,440
+On GPT-2, it runs attention up to 7.6
+
+416
+00:16:07,720 --> 00:16:12,200
+times faster than the standard PyTorch
+
+417
+00:16:10,440 --> 00:16:15,080
+implementation.
+
+418
+00:16:12,200 --> 00:16:17,360
+That measured 7.6 is the figure this
+
+419
+00:16:15,080 --> 00:16:19,600
+video opened with.
+
+420
+00:16:17,360 --> 00:16:22,200
+Judged on the measure we set up though,
+
+421
+00:16:19,600 --> 00:16:25,240
+this kernel still sustains only 25 to
+
+422
+00:16:22,200 --> 00:16:27,120
+40% of peak arithmetic.
+
+423
+00:16:25,240 --> 00:16:29,760
+The memory wall is handled, and the
+
+424
+00:16:27,120 --> 00:16:32,600
+bytes now take the short route.
+
+425
+00:16:29,760 --> 00:16:34,960
+Yet, the Tensor Cores still sit idle
+
+426
+00:16:32,600 --> 00:16:37,680
+most of the time for reasons that have
+
+427
+00:16:34,960 --> 00:16:39,120
+nothing to do with HBM.
+
+428
+00:16:37,680 --> 00:16:42,160
+The next three generations of this
+
+429
+00:16:39,120 --> 00:16:45,040
+kernel exist because of that number.
+
+430
+00:16:42,160 --> 00:16:47,200
+Tri Dao's follow-up, Flash Attention 2,
+
+431
+00:16:45,040 --> 00:16:49,320
+came out in 2023.
+
+432
+00:16:47,200 --> 00:16:51,680
+It reads as an inventory of the places
+
+433
+00:16:49,320 --> 00:16:54,160
+where the chip was still waiting.
+
+434
+00:16:51,680 --> 00:16:56,480
+There turn out to be three.
+
+435
+00:16:54,160 --> 00:16:57,880
+The first wait sits between the matrix
+
+436
+00:16:56,480 --> 00:17:00,520
+multiplies.
+
+437
+00:16:57,880 --> 00:17:02,920
+The online SoftMax does its bookkeeping
+
+438
+00:17:00,520 --> 00:17:04,280
+between them, the rescales and the
+
+439
+00:17:02,920 --> 00:17:06,720
+divisions.
+
+440
+00:17:04,280 --> 00:17:08,680
+That bookkeeping runs on the CUDA Cores,
+
+441
+00:17:06,720 --> 00:17:10,319
+the general-purpose scalar units from
+
+442
+00:17:08,680 --> 00:17:13,120
+the last video.
+
+443
+00:17:10,319 --> 00:17:15,720
+While it runs, the Tensor Cores hold.
+
+444
+00:17:13,120 --> 00:17:20,360
+The cost of that holding is steep.
+
+445
+00:17:15,720 --> 00:17:22,560
+On an A100, the tensor cores deliver 312
+
+446
+00:17:20,360 --> 00:17:23,640
+trillion matrix multiply operations per
+
+447
+00:17:22,560 --> 00:17:26,199
+second.
+
+448
+00:17:23,640 --> 00:17:28,400
+The scalar floating point path delivers
+
+449
+00:17:26,199 --> 00:17:33,240
+19.5 trillion.
+
+450
+00:17:28,400 --> 00:17:35,720
+Divide. 312 over 19.5 is 16.
+
+451
+00:17:33,240 --> 00:17:38,320
+Every scalar operation the kernel cannot
+
+452
+00:17:35,720 --> 00:17:40,560
+avoid costs about 16 matrix operations
+
+453
+00:17:38,320 --> 00:17:42,600
+worth of machine time.
+
+454
+00:17:40,560 --> 00:17:45,080
+Flash attention two rearranges the
+
+455
+00:17:42,600 --> 00:17:47,000
+bookkeeping so that less of its time
+
+456
+00:17:45,080 --> 00:17:49,600
+spends between one matrix multiply and
+
+457
+00:17:47,000 --> 00:17:52,120
+the next. The output now writes through
+
+458
+00:17:49,600 --> 00:17:54,000
+the whole loop unnormalized.
+
+459
+00:17:52,120 --> 00:17:57,000
+The division by the denominator happens
+
+460
+00:17:54,000 --> 00:17:58,040
+once at the end instead of inside every
+
+461
+00:17:57,000 --> 00:18:00,240
+step. [music]
+
+462
+00:17:58,040 --> 00:18:02,200
+The result is unchanged and the waiting
+
+463
+00:18:00,240 --> 00:18:04,280
+shrinks.
+
+464
+00:18:02,200 --> 00:18:06,760
+The second wait is whole multiprocessors
+
+465
+00:18:04,280 --> 00:18:09,120
+sitting with no work at all. Seeing it
+
+466
+00:18:06,760 --> 00:18:10,400
+takes one fact about how GPUs hand out
+
+467
+00:18:09,120 --> 00:18:12,280
+work.
+
+468
+00:18:10,400 --> 00:18:14,480
+A kernel is distributed as thread
+
+469
+00:18:12,280 --> 00:18:17,040
+blocks, bundles of a few hundred
+
+470
+00:18:14,480 --> 00:18:19,200
+threads. Each block is placed on one
+
+471
+00:18:17,040 --> 00:18:20,680
+streaming multiprocessor and runs to
+
+472
+00:18:19,200 --> 00:18:22,880
+completion there.
+
+473
+00:18:20,680 --> 00:18:26,240
+So the number of blocks is the number of
+
+474
+00:18:22,880 --> 00:18:28,160
+multiprocessors you can keep busy.
+
+475
+00:18:26,240 --> 00:18:30,400
+The first flash attention created one
+
+476
+00:18:28,160 --> 00:18:32,800
+block per head per sequence in the
+
+477
+00:18:30,400 --> 00:18:34,560
+batch. The batch is however many
+
+478
+00:18:32,800 --> 00:18:36,280
+separate sequences the chip is
+
+479
+00:18:34,560 --> 00:18:38,560
+processing at once.
+
+480
+00:18:36,280 --> 00:18:40,640
+Serve a couple of long sequences and
+
+481
+00:18:38,560 --> 00:18:43,840
+that product is small.
+
+482
+00:18:40,640 --> 00:18:46,160
+A batch of two with 16 heads makes 32
+
+483
+00:18:43,840 --> 00:18:47,720
+blocks on a chip with over a hundred
+
+484
+00:18:46,160 --> 00:18:49,880
+multiprocessors.
+
+485
+00:18:47,720 --> 00:18:52,280
+The rest sit [music] idle.
+
+486
+00:18:49,880 --> 00:18:55,400
+Flash attention two adds a third source
+
+487
+00:18:52,280 --> 00:18:57,360
+of blocks. It splits the query rows of a
+
+488
+00:18:55,400 --> 00:19:00,840
+single long sequence across many of
+
+489
+00:18:57,360 --> 00:19:03,560
+them. So one sequence alone can fan out
+
+490
+00:19:00,840 --> 00:19:05,320
+and occupy the whole chip.
+
+491
+00:19:03,560 --> 00:19:07,720
+The third wait is inside the thread
+
+492
+00:19:05,320 --> 00:19:09,600
+block among the warps.
+
+493
+00:19:07,720 --> 00:19:12,040
+Warps are the 32 thread groups from the
+
+494
+00:19:09,600 --> 00:19:14,200
+last video that execute in lockstep.
+
+495
+00:19:12,040 --> 00:19:15,760
+Version one divided K and V across a
+
+496
+00:19:14,200 --> 00:19:17,680
+block swaps.
+
+497
+00:19:15,760 --> 00:19:19,680
+That left each warp holding partial
+
+498
+00:19:17,680 --> 00:19:21,960
+results it had to exchange with the
+
+499
+00:19:19,680 --> 00:19:24,640
+others through the small on-chip memory
+
+500
+00:19:21,960 --> 00:19:27,160
+they share before anything could finish.
+
+501
+00:19:24,640 --> 00:19:29,560
+Version 2 divides Q instead.
+
+502
+00:19:27,160 --> 00:19:31,800
+Now each warp carries its own rows all
+
+503
+00:19:29,560 --> 00:19:34,360
+the way to the output and the exchange
+
+504
+00:19:31,800 --> 00:19:37,120
+largely disappears.
+
+505
+00:19:34,360 --> 00:19:38,760
+Three weights, three rearrangements.
+
+506
+00:19:37,120 --> 00:19:43,040
+The number we are tracking roughly
+
+507
+00:19:38,760 --> 00:19:46,160
+doubles. 25 to 40% of peak becomes 50 to
+
+508
+00:19:43,040 --> 00:19:48,600
+73% on the A100.
+
+509
+00:19:46,160 --> 00:19:51,040
+The cleanest end-to-end test of a kernel
+
+510
+00:19:48,600 --> 00:19:53,320
+is a full training run. So the headline
+
+511
+00:19:51,040 --> 00:19:55,440
+figure here is a training number rather
+
+512
+00:19:53,320 --> 00:19:58,320
+than an inference one.
+
+513
+00:19:55,440 --> 00:20:01,760
+On that test, GPT-style models reached
+
+514
+00:19:58,320 --> 00:20:04,560
+up to 225 trillion operations per second
+
+515
+00:20:01,760 --> 00:20:07,720
+per A100. That works out to a model
+
+516
+00:20:04,560 --> 00:20:09,280
+flops utilization of 72%.
+
+517
+00:20:07,720 --> 00:20:11,240
+That figure is the fraction of the
+
+518
+00:20:09,280 --> 00:20:14,040
+hardware's theoretical arithmetic the
+
+519
+00:20:11,240 --> 00:20:17,120
+whole run actually used.
+
+520
+00:20:14,040 --> 00:20:19,840
+Those are A100 numbers measured on the
+
+521
+00:20:17,120 --> 00:20:21,800
+chip the kernel was written for.
+
+522
+00:20:19,840 --> 00:20:24,800
+Hopper, the architecture underneath the
+
+523
+00:20:21,800 --> 00:20:26,760
+H100, changed the machine.
+
+524
+00:20:24,800 --> 00:20:28,640
+The kernel's assumptions did not move
+
+525
+00:20:26,760 --> 00:20:31,560
+with it.
+
+526
+00:20:28,640 --> 00:20:35,280
+On the H100, this kernel reached only
+
+527
+00:20:31,560 --> 00:20:36,800
+about 35% of peak down from the 50 to
+
+528
+00:20:35,280 --> 00:20:39,440
+73%
+
+529
+00:20:36,800 --> 00:20:42,560
+it hit on the A100.
+
+530
+00:20:39,440 --> 00:20:44,880
+Hopper, the architecture under the H100,
+
+531
+00:20:42,560 --> 00:20:48,080
+had shipped two new features and flash
+
+532
+00:20:44,880 --> 00:20:50,760
+attention 2 used neither.
+
+533
+00:20:48,080 --> 00:20:54,720
+The first is a tensor core instruction
+
+534
+00:20:50,760 --> 00:20:58,240
+called WGMM A. It is issued by a warp
+
+535
+00:20:54,720 --> 00:21:00,080
+group, four warps acting as one.
+
+536
+00:20:58,240 --> 00:21:02,400
+What makes it new is that it runs
+
+537
+00:21:00,080 --> 00:21:05,000
+asynchronously. It starts a matrix
+
+538
+00:21:02,400 --> 00:21:08,120
+multiply, then lets the warps move on to
+
+539
+00:21:05,000 --> 00:21:10,320
+other work while the multiply runs.
+
+540
+00:21:08,120 --> 00:21:13,680
+The second feature we met last video,
+
+541
+00:21:10,320 --> 00:21:16,600
+the tensor memory accelerator or TMA.
+
+542
+00:21:13,680 --> 00:21:19,000
+The TMA is a dedicated copy engine.
+
+543
+00:21:16,600 --> 00:21:21,440
+It moves tiles between HBM and the
+
+544
+00:21:19,000 --> 00:21:24,640
+multiprocessors fast memory entirely on
+
+545
+00:21:21,440 --> 00:21:27,080
+its own with no threads required.
+
+546
+00:21:24,640 --> 00:21:29,840
+Put together, these two features let the
+
+547
+00:21:27,080 --> 00:21:33,400
+chip do its two jobs at the same time,
+
+548
+00:21:29,840 --> 00:21:35,560
+moving data and doing math.
+
+549
+00:21:33,400 --> 00:21:36,480
+FlashAttention 2 did them strictly in
+
+550
+00:21:35,560 --> 00:21:39,160
+turn.
+
+551
+00:21:36,480 --> 00:21:41,080
+It would load a tile, compute on it,
+
+552
+00:21:39,160 --> 00:21:43,600
+then load [music] the next.
+
+553
+00:21:41,080 --> 00:21:46,560
+So, the copy engine sat idle during the
+
+554
+00:21:43,600 --> 00:21:49,480
+math, and the math sat idle during the
+
+555
+00:21:46,560 --> 00:21:51,320
+copies on hardware built so neither has
+
+556
+00:21:49,480 --> 00:21:54,680
+to wait.
+
+557
+00:21:51,320 --> 00:21:57,080
+FlashAttention 3 published in 2024
+
+558
+00:21:54,680 --> 00:21:58,360
+reorganizes the kernel around that idle
+
+559
+00:21:57,080 --> 00:22:00,000
+time. [music]
+
+560
+00:21:58,360 --> 00:22:01,840
+The technique is called warp
+
+561
+00:22:00,000 --> 00:22:04,480
+specialization.
+
+562
+00:22:01,840 --> 00:22:07,440
+Instead of every warp doing every job,
+
+563
+00:22:04,480 --> 00:22:10,160
+the warps divide by occupation. Producer
+
+564
+00:22:07,440 --> 00:22:13,000
+warps do nothing but issue TMA loads,
+
+565
+00:22:10,160 --> 00:22:15,360
+pulling the next tiles out of HBM.
+
+566
+00:22:13,000 --> 00:22:17,320
+Consumer warps do nothing but compute,
+
+567
+00:22:15,360 --> 00:22:19,120
+running the matrix multiplies and the
+
+568
+00:22:17,320 --> 00:22:20,320
+softmax on tiles that have already
+
+569
+00:22:19,120 --> 00:22:22,160
+landed.
+
+570
+00:22:20,320 --> 00:22:24,440
+The producers run ahead while the
+
+571
+00:22:22,160 --> 00:22:26,840
+consumers work through what has arrived,
+
+572
+00:22:24,440 --> 00:22:29,840
+so data movement and computation finally
+
+573
+00:22:26,840 --> 00:22:31,880
+overlap, each hiding the other.
+
+574
+00:22:29,840 --> 00:22:34,040
+The same overlap continues one level
+
+575
+00:22:31,880 --> 00:22:35,360
+down between two separate pieces of
+
+576
+00:22:34,040 --> 00:22:38,000
+silicon.
+
+577
+00:22:35,360 --> 00:22:40,450
+The tensor cores run one tile's output
+
+578
+00:22:38,000 --> 00:22:41,600
+multiply, the attention weights times
+
+579
+00:22:40,450 --> 00:22:43,040
+[music] V.
+
+580
+00:22:41,600 --> 00:22:45,000
+At the same time, the next tile's
+
+581
+00:22:43,040 --> 00:22:47,480
+exponentials are computed elsewhere on
+
+582
+00:22:45,000 --> 00:22:50,120
+the die on a third unit that is neither
+
+583
+00:22:47,480 --> 00:22:52,680
+tensor core nor CUDA core.
+
+584
+00:22:50,120 --> 00:22:57,640
+Nvidia calls it the special function
+
+585
+00:22:52,680 --> 00:23:00,160
+unit or multi-function unit, MoFu.
+
+586
+00:22:57,640 --> 00:23:01,720
+FlashAttention 3's other contribution is
+
+587
+00:23:00,160 --> 00:23:03,840
+precision.
+
+588
+00:23:01,720 --> 00:23:07,080
+Hopper's tensor Cores can compute in
+
+589
+00:23:03,840 --> 00:23:09,400
+FP8, 8 bits per value. That runs at
+
+590
+00:23:07,080 --> 00:23:12,040
+roughly double the arithmetic rate of 16
+
+591
+00:23:09,400 --> 00:23:14,920
+bits, but 8 bits can only express a
+
+592
+00:23:12,040 --> 00:23:17,440
+couple hundred distinct values.
+
+593
+00:23:14,920 --> 00:23:19,240
+Using them means quantizing, rounding
+
+594
+00:23:17,440 --> 00:23:21,320
+every number to the nearest value the
+
+595
+00:23:19,240 --> 00:23:23,200
+format can express.
+
+596
+00:23:21,320 --> 00:23:24,600
+That goes wrong in a specific way for
+
+597
+00:23:23,200 --> 00:23:26,920
+transformers.
+
+598
+00:23:24,600 --> 00:23:29,640
+Their values mostly huddle near zero
+
+599
+00:23:26,920 --> 00:23:31,920
+with a handful of outliers far out. The
+
+600
+00:23:29,640 --> 00:23:34,520
+format has one scale, and it must
+
+601
+00:23:31,920 --> 00:23:37,160
+stretch to reach those outliers.
+
+602
+00:23:34,520 --> 00:23:39,520
+Once it does, the crowded majority near
+
+603
+00:23:37,160 --> 00:23:42,080
+zero lands on just a few of the
+
+604
+00:23:39,520 --> 00:23:44,640
+available levels. Most of the format's
+
+605
+00:23:42,080 --> 00:23:46,160
+resolution is spent on values that never
+
+606
+00:23:44,640 --> 00:23:48,840
+occur.
+
+607
+00:23:46,160 --> 00:23:51,920
+The kernel answers this twice.
+
+608
+00:23:48,840 --> 00:23:55,000
+First, each block of values gets its own
+
+609
+00:23:51,920 --> 00:23:57,086
+scale, so one region's outlier no longer
+
+610
+00:23:55,000 --> 00:23:57,240
+stretches everybody's.
+
+611
+00:23:57,086 --> 00:24:00,080
+>> [music]
+
+612
+00:23:57,240 --> 00:24:04,040
+>> Second, a trick the authors call
+
+613
+00:24:00,080 --> 00:24:06,560
+incoherent processing, multiply Q and K
+
+614
+00:24:04,040 --> 00:24:07,920
+by a fixed random rotation before
+
+615
+00:24:06,560 --> 00:24:10,560
+quantizing.
+
+616
+00:24:07,920 --> 00:24:13,280
+The rotation smears each loud coordinate
+
+617
+00:24:10,560 --> 00:24:15,800
+thinly across all the dimensions, so no
+
+618
+00:24:13,280 --> 00:24:18,680
+single coordinate stands out anymore,
+
+619
+00:24:15,800 --> 00:24:20,360
+and the attention scores do not change.
+
+620
+00:24:18,680 --> 00:24:22,720
+A rotation never changes the dot
+
+621
+00:24:20,360 --> 00:24:25,200
+products between vectors, and applied to
+
+622
+00:24:22,720 --> 00:24:27,560
+both Q and K, the rotations cancel
+
+623
+00:24:25,200 --> 00:24:29,600
+inside Q times K transpose. The
+
+624
+00:24:27,560 --> 00:24:32,080
+combination cuts the numerical error by
+
+625
+00:24:29,600 --> 00:24:35,120
+2.6 times.
+
+626
+00:24:32,080 --> 00:24:36,840
+The payoff is 1.5 to 2 times over Flash
+
+627
+00:24:35,120 --> 00:24:40,760
+Attention, too.
+
+628
+00:24:36,840 --> 00:24:43,160
+In FP16, the kernel reaches up to 740
+
+629
+00:24:40,760 --> 00:24:47,600
+trillion operations per second, about
+
+630
+00:24:43,160 --> 00:24:50,320
+3/4 of the H100's FP16 peak.
+
+631
+00:24:47,600 --> 00:24:52,000
+In FP8, it climbs close to 1.2
+
+632
+00:24:50,320 --> 00:24:54,280
+quadrillion.
+
+633
+00:24:52,000 --> 00:24:57,520
+And on Nvidia's next chip, the Tensor
+
+634
+00:24:54,280 --> 00:24:59,680
+Cores stop being the thing in the way.
+
+635
+00:24:57,520 --> 00:25:02,000
+Blackwell is that chip. It is where the
+
+636
+00:24:59,680 --> 00:25:05,400
+climb we have been tracking levels off,
+
+637
+00:25:02,000 --> 00:25:08,520
+and the reason is in the specifications.
+
+638
+00:25:05,400 --> 00:25:11,920
+From the H100 to the B200, Tensor Core
+
+639
+00:25:08,520 --> 00:25:14,240
+throughput in BF16, the 16-bit format,
+
+640
+00:25:11,920 --> 00:25:17,720
+rises from 1 quadrillion operations per
+
+641
+00:25:14,240 --> 00:25:20,680
+second to 2.25 quadrillion.
+
+642
+00:25:17,720 --> 00:25:22,680
+That is a factor of 2.25.
+
+643
+00:25:20,680 --> 00:25:24,960
+The special function units that compute
+
+644
+00:25:22,680 --> 00:25:26,560
+the exponential do not grow at all, and
+
+645
+00:25:24,960 --> 00:25:29,080
+neither does the bandwidth into the
+
+646
+00:25:26,560 --> 00:25:32,240
+multiprocessor's shared memory.
+
+647
+00:25:29,080 --> 00:25:34,080
+When one engine gets 2.25 times faster,
+
+648
+00:25:32,240 --> 00:25:37,280
+and its neighbors stay fixed, the
+
+649
+00:25:34,080 --> 00:25:39,760
+bottleneck does not disappear. It moves.
+
+650
+00:25:37,280 --> 00:25:42,520
+In the forward pass, the new bottleneck
+
+651
+00:25:39,760 --> 00:25:45,320
+is the exponential unit. In the backward
+
+652
+00:25:42,520 --> 00:25:47,600
+pass, it is shared memory.
+
+653
+00:25:45,320 --> 00:25:49,840
+TriDao's group calls this asymmetric
+
+654
+00:25:47,600 --> 00:25:53,000
+hardware scaling, and it changes the
+
+655
+00:25:49,840 --> 00:25:55,040
+job. Raising Tensor Core utilization is
+
+656
+00:25:53,000 --> 00:25:57,480
+no longer the lever.
+
+657
+00:25:55,040 --> 00:26:00,200
+FlashAttention-4, the Blackwell kernel
+
+658
+00:25:57,480 --> 00:26:02,320
+published in 2026, answers with three
+
+659
+00:26:00,200 --> 00:26:04,640
+changes to the algorithm and one change
+
+660
+00:26:02,320 --> 00:26:06,160
+of tools.
+
+661
+00:26:04,640 --> 00:26:08,200
+The first change goes after the
+
+662
+00:26:06,160 --> 00:26:10,800
+exponential itself.
+
+663
+00:26:08,200 --> 00:26:12,920
+Every entry of the softmax needs one,
+
+664
+00:26:10,800 --> 00:26:15,800
+and the hardware that provides it is the
+
+665
+00:26:12,920 --> 00:26:18,200
+multifunction unit we met earlier. On
+
+666
+00:26:15,800 --> 00:26:19,920
+Blackwell, it delivers about 16
+
+667
+00:26:18,200 --> 00:26:21,560
+exponentials per cycle per
+
+668
+00:26:19,920 --> 00:26:24,600
+multiprocessor.
+
+669
+00:26:21,560 --> 00:26:26,920
+The BF16 Tensor Cores beside it deliver
+
+670
+00:26:24,600 --> 00:26:29,000
+8,192
+
+671
+00:26:26,920 --> 00:26:32,040
+operations per cycle.
+
+672
+00:26:29,000 --> 00:26:34,760
+Divide. 8,192
+
+673
+00:26:32,040 --> 00:26:37,000
+over 16 is 512.
+
+674
+00:26:34,760 --> 00:26:39,880
+So, the Tensor Cores can consume softmax
+
+675
+00:26:37,000 --> 00:26:41,520
+results 500 times faster than the unit
+
+676
+00:26:39,880 --> 00:26:43,400
+producing them.
+
+677
+00:26:41,520 --> 00:26:46,080
+FlashAttention-4 therefore computes
+
+678
+00:26:43,400 --> 00:26:48,800
+exponentials down two paths at once. The
+
+679
+00:26:46,080 --> 00:26:50,640
+hardware unit keeps running. Beside it,
+
+680
+00:26:48,800 --> 00:26:52,920
+a short polynomial runs on the CUDA
+
+681
+00:26:50,640 --> 00:26:54,200
+Cores, which would otherwise sit idle in
+
+682
+00:26:52,920 --> 00:26:56,280
+this kernel.
+
+683
+00:26:54,200 --> 00:26:58,400
+That polynomial is just a few multiplies
+
+684
+00:26:56,280 --> 00:27:00,320
+and adds, approximating the same
+
+685
+00:26:58,400 --> 00:27:01,720
+exponential to the accuracy the kernel
+
+686
+00:27:00,320 --> 00:27:04,000
+needs.
+
+687
+00:27:01,720 --> 00:27:05,960
+Splitting the work across both parts
+
+688
+00:27:04,000 --> 00:27:07,960
+increases the effective exponential
+
+689
+00:27:05,960 --> 00:27:09,960
+throughput.
+
+690
+00:27:07,960 --> 00:27:11,520
+The second change is to the rescaling we
+
+691
+00:27:09,960 --> 00:27:13,520
+derived earlier.
+
+692
+00:27:11,520 --> 00:27:15,520
+Each rise in the running maximum
+
+693
+00:27:13,520 --> 00:27:18,160
+multiplies the denominator and the
+
+694
+00:27:15,520 --> 00:27:20,560
+output onto the new scale.
+
+695
+00:27:18,160 --> 00:27:23,640
+FlashAttention-4 makes that correction
+
+696
+00:27:20,560 --> 00:27:24,600
+conditional. It sets a threshold called
+
+697
+00:27:23,640 --> 00:27:26,760
+tau.
+
+698
+00:27:24,600 --> 00:27:30,320
+The running maximum may drift by up to
+
+699
+00:27:26,760 --> 00:27:32,640
+eight doublings, a factor of 256,
+
+700
+00:27:30,320 --> 00:27:35,000
+before a rescale fires.
+
+701
+00:27:32,640 --> 00:27:37,760
+Smaller jumps simply ride along as
+
+702
+00:27:35,000 --> 00:27:40,200
+bounded drift in the accumulated values.
+
+703
+00:27:37,760 --> 00:27:42,640
+At the end, everything is renormalized
+
+704
+00:27:40,200 --> 00:27:45,200
+once by the true final maximum and the
+
+705
+00:27:42,640 --> 00:27:46,880
+true final denominator, so the answer is
+
+706
+00:27:45,200 --> 00:27:49,280
+unchanged.
+
+707
+00:27:46,880 --> 00:27:51,040
+The paper describes the saved work as
+
+708
+00:27:49,280 --> 00:27:53,760
+significant.
+
+709
+00:27:51,040 --> 00:27:57,560
+In his Hot Chips talk, Tri Dao puts it
+
+710
+00:27:53,760 --> 00:27:59,720
+at around 10 times fewer rescales.
+
+711
+00:27:57,560 --> 00:28:02,280
+The third change is for the backward
+
+712
+00:27:59,720 --> 00:28:04,920
+pass [music] training side work again,
+
+713
+00:28:02,280 --> 00:28:06,640
+where shared memory is the new wall.
+
+714
+00:28:04,920 --> 00:28:11,160
+Blackwell adds a memory this kernel
+
+715
+00:28:06,640 --> 00:28:13,520
+leans on heavily, tensor memory or TMEM.
+
+716
+00:28:11,160 --> 00:28:15,880
+It is about 256 kilobytes per
+
+717
+00:28:13,520 --> 00:28:17,920
+multiprocessor, wired directly into the
+
+718
+00:28:15,880 --> 00:28:21,054
+tensor cores.
+
+719
+00:28:17,920 --> 00:28:21,120
+The TMA from Hopper is a copy engine.
+
+720
+00:28:21,054 --> 00:28:24,560
+>> [music]
+
+721
+00:28:21,120 --> 00:28:26,240
+>> TMEM is a place to keep data.
+
+722
+00:28:24,560 --> 00:28:28,560
+FlashAttention-4 pairs neighboring
+
+723
+00:28:26,240 --> 00:28:31,520
+multiprocessors in a mode NVIDIA calls
+
+724
+00:28:28,560 --> 00:28:34,000
+2CTA. Two cooperating thread blocks
+
+725
+00:28:31,520 --> 00:28:35,600
+drive one matrix multiply together, so a
+
+726
+00:28:34,000 --> 00:28:37,120
+single copy of the data they share
+
+727
+00:28:35,600 --> 00:28:38,960
+serves both.
+
+728
+00:28:37,120 --> 00:28:41,200
+The backward passes intermediate results
+
+729
+00:28:38,960 --> 00:28:42,840
+then park in TMEM instead of crowding
+
+730
+00:28:41,200 --> 00:28:44,800
+shared memory.
+
+731
+00:28:42,840 --> 00:28:47,320
+Together, those moves roughly halve its
+
+732
+00:28:44,800 --> 00:28:49,720
+shared memory traffic.
+
+733
+00:28:47,320 --> 00:28:52,360
+That leaves the change of tools.
+
+734
+00:28:49,720 --> 00:28:55,600
+Flash Attention 4 is written entirely in
+
+735
+00:28:52,360 --> 00:28:57,240
+QDSL, Nvidia's Python embedded language
+
+736
+00:28:55,600 --> 00:28:59,720
+for kernels.
+
+737
+00:28:57,240 --> 00:29:02,760
+It compiles 20 to 30 times faster than
+
+738
+00:28:59,720 --> 00:29:04,960
+the equivalent C++ templates. A kernel
+
+739
+00:29:02,760 --> 00:29:07,080
+at this level is tuned by rebuilding it
+
+740
+00:29:04,960 --> 00:29:08,360
+and measuring again hundreds of times
+
+741
+00:29:07,080 --> 00:29:10,160
+over.
+
+742
+00:29:08,360 --> 00:29:13,760
+So, the speed of the compiler becomes
+
+743
+00:29:10,160 --> 00:29:16,080
+the speed of every experiment.
+
+744
+00:29:13,760 --> 00:29:18,880
+The gains [music] are real, but regime
+
+745
+00:29:16,080 --> 00:29:23,000
+specific. The paper claims the win for
+
+746
+00:29:18,880 --> 00:29:27,000
+sequences of 4,000 tokens and longer.
+
+747
+00:29:23,000 --> 00:29:31,640
+There, the BF16 forward pass runs 1.1 to
+
+748
+00:29:27,000 --> 00:29:34,680
+1.3 times faster than cuDNN 9.13,
+
+749
+00:29:31,640 --> 00:29:38,240
+Nvidia's own attention library, and 2.1
+
+750
+00:29:34,680 --> 00:29:39,880
+to 2.7 times faster than Triton,
+
+751
+00:29:38,240 --> 00:29:41,960
+the open source language much of the
+
+752
+00:29:39,880 --> 00:29:44,520
+field writes kernels in.
+
+753
+00:29:41,960 --> 00:29:47,280
+Below 4,000 tokens, the paper does not
+
+754
+00:29:44,520 --> 00:29:49,720
+claim a consistent lead.
+
+755
+00:29:47,280 --> 00:29:53,200
+Measured the same way, Flash Attention 4
+
+756
+00:29:49,720 --> 00:29:55,680
+reaches up to about 1,605
+
+757
+00:29:53,200 --> 00:30:00,360
+trillion operations per second. That is
+
+758
+00:29:55,680 --> 00:30:03,320
+roughly 71% of the B200's BF16 peak.
+
+759
+00:30:00,360 --> 00:30:05,560
+Set it beside Flash Attention 3's 75% on
+
+760
+00:30:03,320 --> 00:30:07,680
+Hopper, and the fraction has plateaued
+
+761
+00:30:05,560 --> 00:30:10,600
+near three quarters. The ceiling
+
+762
+00:30:07,680 --> 00:30:12,400
+underneath it grew 2.25 times, yet the
+
+763
+00:30:10,600 --> 00:30:13,960
+fraction held.
+
+764
+00:30:12,400 --> 00:30:15,760
+The fraction holds because of the same
+
+765
+00:30:13,960 --> 00:30:18,240
+three costs.
+
+766
+00:30:15,760 --> 00:30:21,120
+The exponentials, the rescales, and the
+
+767
+00:30:18,240 --> 00:30:23,160
+backward passes bytes.
+
+768
+00:30:21,120 --> 00:30:25,120
+Every headline number here was measured
+
+769
+00:30:23,160 --> 00:30:27,280
+in BF16.
+
+770
+00:30:25,120 --> 00:30:30,000
+The width of the numbers is a lever we
+
+771
+00:30:27,280 --> 00:30:31,600
+will return to at the end.
+
+772
+00:30:30,000 --> 00:30:33,400
+Before that comes a different byte
+
+773
+00:30:31,600 --> 00:30:35,360
+problem, because the kernel's
+
+774
+00:30:33,400 --> 00:30:36,960
+intermediates were never the only thing
+
+775
+00:30:35,360 --> 00:30:39,320
+in HBM.
+
+776
+00:30:36,960 --> 00:30:41,640
+Every active request also keeps its keys
+
+777
+00:30:39,320 --> 00:30:43,480
+and values there, the KV cache from the
+
+778
+00:30:41,640 --> 00:30:45,880
+first video.
+
+779
+00:30:43,480 --> 00:30:48,200
+The way serving systems laid that cache
+
+780
+00:30:45,880 --> 00:30:50,080
+out turned out to waste more than half
+
+781
+00:30:48,200 --> 00:30:52,640
+of the most expensive memory in the
+
+782
+00:30:50,080 --> 00:30:52,640
+machine.
+
+783
+00:30:54,960 --> 00:30:58,840
+The cache problem starts with a
+
+784
+00:30:56,360 --> 00:31:00,880
+reasonable looking decision.
+
+785
+00:30:58,840 --> 00:31:03,280
+A serving system cannot know in advance
+
+786
+00:31:00,880 --> 00:31:05,960
+how long a response will run.
+
+787
+00:31:03,280 --> 00:31:07,320
+So, the systems before 2023 played it
+
+788
+00:31:05,960 --> 00:31:09,760
+safe.
+
+789
+00:31:07,320 --> 00:31:12,800
+For every request, they reserved one
+
+790
+00:31:09,760 --> 00:31:14,840
+contiguous stretch of HBM sized for the
+
+791
+00:31:12,800 --> 00:31:16,400
+longest sequence that request might
+
+792
+00:31:14,840 --> 00:31:19,160
+reach.
+
+793
+00:31:16,400 --> 00:31:22,320
+Suppose the limit is 4,096
+
+794
+00:31:19,160 --> 00:31:24,800
+tokens and the response stops at 200.
+
+795
+00:31:22,320 --> 00:31:27,200
+The other 3,896
+
+796
+00:31:24,800 --> 00:31:28,960
+slots sit reserved and empty until the
+
+797
+00:31:27,200 --> 00:31:31,080
+request finishes.
+
+798
+00:31:28,960 --> 00:31:33,680
+That waste inside a reservation is
+
+799
+00:31:31,080 --> 00:31:35,640
+internal fragmentation.
+
+800
+00:31:33,680 --> 00:31:38,200
+There is a second kind.
+
+801
+00:31:35,640 --> 00:31:40,560
+As requests of different lengths start
+
+802
+00:31:38,200 --> 00:31:43,040
+and finish, the free memory between the
+
+803
+00:31:40,560 --> 00:31:45,320
+reservations turns ragged.
+
+804
+00:31:43,040 --> 00:31:47,840
+A new request can fit comfortably in the
+
+805
+00:31:45,320 --> 00:31:50,080
+total free space and still find no
+
+806
+00:31:47,840 --> 00:31:52,280
+single contiguous stretch large enough
+
+807
+00:31:50,080 --> 00:31:54,240
+to hold it. That is external
+
+808
+00:31:52,280 --> 00:31:56,280
+fragmentation.
+
+809
+00:31:54,240 --> 00:31:59,920
+Operating systems textbooks have
+
+810
+00:31:56,280 --> 00:32:02,800
+described both since the 1960s.
+
+811
+00:31:59,920 --> 00:32:04,120
+The VLLM team measured what the two cost
+
+812
+00:32:02,800 --> 00:32:06,680
+together.
+
+813
+00:32:04,120 --> 00:32:10,120
+In the serving systems of the time, only
+
+814
+00:32:06,680 --> 00:32:13,240
+20.4% to 38.2%
+
+815
+00:32:10,120 --> 00:32:14,400
+of the KV cache memory held actual token
+
+816
+00:32:13,240 --> 00:32:16,280
+states.
+
+817
+00:32:14,400 --> 00:32:18,800
+More than half of the most expensive
+
+818
+00:32:16,280 --> 00:32:20,600
+memory in the machine was storing
+
+819
+00:32:18,800 --> 00:32:22,320
+nothing.
+
+820
+00:32:20,600 --> 00:32:24,600
+Operating systems also solved this
+
+821
+00:32:22,320 --> 00:32:27,760
+problem decades ago.
+
+822
+00:32:24,600 --> 00:32:29,960
+Paged attention, published in 2023,
+
+823
+00:32:27,760 --> 00:32:31,320
+carries that solution over almost
+
+824
+00:32:29,960 --> 00:32:33,800
+unchanged.
+
+825
+00:32:31,320 --> 00:32:36,680
+Break the cache into fixed-size blocks,
+
+826
+00:32:33,800 --> 00:32:39,280
+16 or 32 tokens each.
+
+827
+00:32:36,680 --> 00:32:41,320
+Give every request a block table. The
+
+828
+00:32:39,280 --> 00:32:44,000
+table maps its logical blocks to
+
+829
+00:32:41,320 --> 00:32:46,880
+physical block identifiers.
+
+830
+00:32:44,000 --> 00:32:49,000
+Physically, a request's blocks can sit
+
+831
+00:32:46,880 --> 00:32:51,360
+anywhere in HBM.
+
+832
+00:32:49,000 --> 00:32:53,560
+Logically, the attention kernel follows
+
+833
+00:32:51,360 --> 00:32:56,400
+the table and sees one contiguous
+
+834
+00:32:53,560 --> 00:32:58,920
+sequence. Now, internal fragmentation
+
+835
+00:32:56,400 --> 00:33:00,120
+shrinks to at most one partial block per
+
+836
+00:32:58,920 --> 00:33:02,480
+request.
+
+837
+00:33:00,120 --> 00:33:03,362
+And external fragmentation disappears
+
+838
+00:33:02,480 --> 00:33:03,480
+entirely
+
+839
+00:33:03,362 --> 00:33:05,560
+>> [music]
+
+840
+00:33:03,480 --> 00:33:08,840
+>> because every free block is the same
+
+841
+00:33:05,560 --> 00:33:10,600
+size and any of them will do.
+
+842
+00:33:08,840 --> 00:33:11,960
+The attention kernel still computes the
+
+843
+00:33:10,600 --> 00:33:14,200
+same function.
+
+844
+00:33:11,960 --> 00:33:15,560
+It just gathers each block by following
+
+845
+00:33:14,200 --> 00:33:17,960
+the table.
+
+846
+00:33:15,560 --> 00:33:19,760
+What is new is where the bytes live,
+
+847
+00:33:17,960 --> 00:33:21,440
+plus the block table indirection needed
+
+848
+00:33:19,760 --> 00:33:24,040
+to find them. [music] The reclaimed
+
+849
+00:33:21,440 --> 00:33:26,560
+memory turns directly into throughput.
+
+850
+00:33:24,040 --> 00:33:29,840
+More concurrent requests now fit in the
+
+851
+00:33:26,560 --> 00:33:31,400
+same HBM. So, vLLM serves two to four
+
+852
+00:33:29,840 --> 00:33:33,680
+times the throughput of the serving
+
+853
+00:33:31,400 --> 00:33:35,680
+systems that came before it at the same
+
+854
+00:33:33,680 --> 00:33:38,880
+latency.
+
+855
+00:33:35,680 --> 00:33:40,680
+The block table buys one more thing.
+
+856
+00:33:38,880 --> 00:33:43,160
+Sometimes many sequences begin
+
+857
+00:33:40,680 --> 00:33:45,320
+identically, sharing a system prompt or
+
+858
+00:33:43,160 --> 00:33:47,360
+a long instruction preamble.
+
+859
+00:33:45,320 --> 00:33:49,720
+Sometimes the server deliberately
+
+860
+00:33:47,360 --> 00:33:52,520
+explores several candidate continuations
+
+861
+00:33:49,720 --> 00:33:54,160
+of one prompt at once, a strategy called
+
+862
+00:33:52,520 --> 00:33:56,480
+beam search.
+
+863
+00:33:54,160 --> 00:33:58,440
+In both cases, their tables can point at
+
+864
+00:33:56,480 --> 00:34:00,320
+the same physical blocks.
+
+865
+00:33:58,440 --> 00:34:02,840
+A block is copied only when a sequence
+
+866
+00:34:00,320 --> 00:34:04,800
+diverges and writes into it. On beam
+
+867
+00:34:02,840 --> 00:34:07,640
+search, the shared portions reach up to
+
+868
+00:34:04,800 --> 00:34:10,120
+55% of the cache.
+
+869
+00:34:07,640 --> 00:34:11,960
+That saved memory feeds straight back
+
+870
+00:34:10,120 --> 00:34:15,639
+into batch size.
+
+871
+00:34:11,960 --> 00:34:17,600
+In all, vLLM's throughput runs from 1.3
+
+872
+00:34:15,639 --> 00:34:20,600
+times the previous best system on plain
+
+873
+00:34:17,600 --> 00:34:22,840
+sampling to 2.3 times on beam search six
+
+874
+00:34:20,600 --> 00:34:24,840
+candidates wide.
+
+875
+00:34:22,840 --> 00:34:26,399
+Paging controls where the cached bytes
+
+876
+00:34:24,840 --> 00:34:28,120
+are placed.
+
+877
+00:34:26,399 --> 00:34:30,360
+How many of them there need to be is a
+
+878
+00:34:28,120 --> 00:34:32,639
+separate lever, and that one is
+
+879
+00:34:30,360 --> 00:34:35,080
+architectural.
+
+880
+00:34:32,639 --> 00:34:37,720
+In standard multi-head attention, every
+
+881
+00:34:35,080 --> 00:34:39,679
+head carries its own keys and values.
+
+882
+00:34:37,720 --> 00:34:42,960
+So, the cache stores two vectors per
+
+883
+00:34:39,679 --> 00:34:45,040
+head per layer for every token. Write
+
+884
+00:34:42,960 --> 00:34:47,600
+that out as a formula.
+
+885
+00:34:45,040 --> 00:34:50,520
+Two times the head count times the head
+
+886
+00:34:47,600 --> 00:34:52,639
+dimension times the number of layers.
+
+887
+00:34:50,520 --> 00:34:54,840
+The first video priced that formula out
+
+888
+00:34:52,639 --> 00:34:57,320
+for Llama 370B.
+
+889
+00:34:54,840 --> 00:34:59,920
+It came to 320 kilobytes for every
+
+890
+00:34:57,320 --> 00:35:02,120
+token. Hundreds of megabytes for one
+
+891
+00:34:59,920 --> 00:35:04,120
+long conversation. And that figure
+
+892
+00:35:02,120 --> 00:35:06,720
+already includes the optimization we are
+
+893
+00:35:04,120 --> 00:35:08,680
+coming to. Without it, the bill is eight
+
+894
+00:35:06,720 --> 00:35:11,800
+times larger.
+
+895
+00:35:08,680 --> 00:35:15,040
+In 2019, Noam Shazeer noticed where the
+
+896
+00:35:11,800 --> 00:35:17,480
+bill lands. Generating each token means
+
+897
+00:35:15,040 --> 00:35:19,440
+reloading all of those cached keys and
+
+898
+00:35:17,480 --> 00:35:21,920
+values from HBM.
+
+899
+00:35:19,440 --> 00:35:24,320
+That reloading is bandwidth bound, the
+
+900
+00:35:21,920 --> 00:35:27,080
+same constraint behind every technique
+
+901
+00:35:24,320 --> 00:35:29,160
+so far. And most of those bytes exist
+
+902
+00:35:27,080 --> 00:35:31,160
+only because every head insists on a
+
+903
+00:35:29,160 --> 00:35:32,920
+private copy.
+
+904
+00:35:31,160 --> 00:35:34,320
+His proposal is called multi-query
+
+905
+00:35:32,920 --> 00:35:36,120
+attention.
+
+906
+00:35:34,320 --> 00:35:38,520
+Keep all the query heads, but let them
+
+907
+00:35:36,120 --> 00:35:40,120
+share one single key head and one single
+
+908
+00:35:38,520 --> 00:35:41,520
+value head.
+
+909
+00:35:40,120 --> 00:35:43,840
+Now, the head count term in the cache
+
+910
+00:35:41,520 --> 00:35:45,400
+formula drops to one. The cache shrinks
+
+911
+00:35:43,840 --> 00:35:47,640
+by the full head count, and the
+
+912
+00:35:45,400 --> 00:35:49,840
+bandwidth bill shrinks with it. Models
+
+913
+00:35:47,640 --> 00:35:51,080
+like Falcon and Palm shipped exactly
+
+914
+00:35:49,840 --> 00:35:53,200
+this.
+
+915
+00:35:51,080 --> 00:35:57,360
+The price is quality.
+
+916
+00:35:53,200 --> 00:35:59,640
+64 query heads were trained to ask 64
+
+917
+00:35:57,360 --> 00:36:02,200
+different kinds of questions.
+
+918
+00:35:59,640 --> 00:36:04,520
+Under multi-query, every one of them now
+
+919
+00:36:02,200 --> 00:36:06,120
+consults the same single description of
+
+920
+00:36:04,520 --> 00:36:09,280
+each token.
+
+921
+00:36:06,120 --> 00:36:12,600
+Accuracy measurably drops.
+
+922
+00:36:09,280 --> 00:36:15,280
+Grouped query attention from 2023 turns
+
+923
+00:36:12,600 --> 00:36:17,560
+that all-or-nothing choice into a dial.
+
+924
+00:36:15,280 --> 00:36:19,880
+Split the query heads into groups and
+
+925
+00:36:17,560 --> 00:36:21,200
+give each group its own key and value
+
+926
+00:36:19,880 --> 00:36:23,240
+head.
+
+927
+00:36:21,200 --> 00:36:25,320
+One group is multi-query, and one group
+
+928
+00:36:23,240 --> 00:36:27,720
+per head is full multi-head. So, the
+
+929
+00:36:25,320 --> 00:36:29,640
+useful settings sit in between. Eight
+
+930
+00:36:27,720 --> 00:36:31,920
+groups turns out to hold quality close
+
+931
+00:36:29,640 --> 00:36:33,160
+to multi-head at close to multi-query
+
+932
+00:36:31,920 --> 00:36:35,560
+speed.
+
+933
+00:36:33,160 --> 00:36:38,640
+An existing multi-head model can even be
+
+934
+00:36:35,560 --> 00:36:40,825
+converted to this layout for about 5% of
+
+935
+00:36:38,640 --> 00:36:40,960
+its original pre-training compute.
+
+936
+00:36:40,825 --> 00:36:43,480
+>> [music]
+
+937
+00:36:40,960 --> 00:36:46,080
+>> The paper calls that up-training.
+
+938
+00:36:43,480 --> 00:36:48,800
+That combination is why Llama 2, Llama
+
+939
+00:36:46,080 --> 00:36:50,760
+3, and Mistral adopted it almost
+
+940
+00:36:48,800 --> 00:36:54,120
+immediately.
+
+941
+00:36:50,760 --> 00:36:56,000
+Sharing heads is one way to store less.
+
+942
+00:36:54,120 --> 00:36:59,240
+DeepSeek took a different route,
+
+943
+00:36:56,000 --> 00:37:02,840
+compressing what each token stores.
+
+944
+00:36:59,240 --> 00:37:05,760
+DeepSeek V2, from May 2024, cuts the
+
+945
+00:37:02,840 --> 00:37:07,640
+cache far deeper than grouping can.
+
+946
+00:37:05,760 --> 00:37:09,200
+It does this by changing what gets
+
+947
+00:37:07,640 --> 00:37:11,240
+stored.
+
+948
+00:37:09,200 --> 00:37:14,080
+Multi-head latent attention does not
+
+949
+00:37:11,240 --> 00:37:16,560
+keep keys and values at all. For each
+
+950
+00:37:14,080 --> 00:37:18,080
+token, it stores one short vector called
+
+951
+00:37:16,560 --> 00:37:20,480
+a latent.
+
+952
+00:37:18,080 --> 00:37:22,840
+The latent is a compressed summary that
+
+953
+00:37:20,480 --> 00:37:25,680
+the model itself learns to write during
+
+954
+00:37:22,840 --> 00:37:27,760
+training. From that summary, the keys
+
+955
+00:37:25,680 --> 00:37:29,600
+and values can be rebuilt at the moment
+
+956
+00:37:27,760 --> 00:37:32,240
+attention needs them.
+
+957
+00:37:29,600 --> 00:37:34,240
+The paper calls this low-rank joint
+
+958
+00:37:32,240 --> 00:37:37,800
+compression.
+
+959
+00:37:34,240 --> 00:37:40,640
+In DeepSeek V2, there are 128 heads,
+
+960
+00:37:37,800 --> 00:37:42,440
+each of dimension 128.
+
+961
+00:37:40,640 --> 00:37:45,080
+That makes the full keys and values
+
+962
+00:37:42,440 --> 00:37:48,080
+32,768
+
+963
+00:37:45,080 --> 00:37:51,840
+elements per layer for every token.
+
+964
+00:37:48,080 --> 00:37:54,800
+The latent stores 512 elements.
+
+965
+00:37:51,840 --> 00:37:57,560
+A small 64-element companion rides
+
+966
+00:37:54,800 --> 00:38:01,080
+beside it to carry position, and we will
+
+967
+00:37:57,560 --> 00:38:06,160
+come to that in a moment. So, 576
+
+968
+00:38:01,080 --> 00:38:06,160
+elements are stored in place of 32,768.
+
+969
+00:38:06,760 --> 00:38:10,920
+Divide.
+
+970
+00:38:08,040 --> 00:38:12,920
+32,768
+
+971
+00:38:10,920 --> 00:38:14,920
+over 576
+
+972
+00:38:12,920 --> 00:38:17,320
+is about 57.
+
+973
+00:38:14,920 --> 00:38:19,040
+The cache is 57 times smaller. The
+
+974
+00:38:17,320 --> 00:38:21,760
+footprint of a grouped query model with
+
+975
+00:38:19,040 --> 00:38:24,320
+just 2.25 groups, and nothing is being
+
+976
+00:38:21,760 --> 00:38:26,800
+discarded. The full keys and values are
+
+977
+00:38:24,320 --> 00:38:29,280
+rebuilt from the summary on the fly by
+
+978
+00:38:26,800 --> 00:38:32,120
+two learned decompression matrices only
+
+979
+00:38:29,280 --> 00:38:34,200
+for the tokens being attended to.
+
+980
+00:38:32,120 --> 00:38:36,400
+Rebuilding them costs extra matrix
+
+981
+00:38:34,200 --> 00:38:39,080
+multiplies on every step.
+
+982
+00:38:36,400 --> 00:38:41,600
+Arithmetic is cheap. HBM bytes are
+
+983
+00:38:39,080 --> 00:38:44,120
+expensive, and decode leaves the tensor
+
+984
+00:38:41,600 --> 00:38:46,400
+cores mostly idle anyway.
+
+985
+00:38:44,120 --> 00:38:48,760
+MLA spends that idle arithmetic to buy
+
+986
+00:38:46,400 --> 00:38:50,640
+back cache space and the bandwidth to
+
+987
+00:38:48,760 --> 00:38:53,080
+read it.
+
+988
+00:38:50,640 --> 00:38:54,480
+In practice, even the extra is largely
+
+989
+00:38:53,080 --> 00:38:56,840
+vanish.
+
+990
+00:38:54,480 --> 00:38:59,600
+Two matrix multiplies in a row are the
+
+991
+00:38:56,840 --> 00:39:02,200
+same as one multiplied by their product.
+
+992
+00:38:59,600 --> 00:39:05,800
+A query only ever meets a reconstructed
+
+993
+00:39:02,200 --> 00:39:08,560
+key inside a chain of matrix multiplies.
+
+994
+00:39:05,800 --> 00:39:11,040
+So, the decompression matrix for keys
+
+995
+00:39:08,560 --> 00:39:13,360
+can fold into the matrix that produces
+
+996
+00:39:11,040 --> 00:39:16,200
+queries, and the decompression matrix
+
+997
+00:39:13,360 --> 00:39:18,960
+for values into the matrix that produces
+
+998
+00:39:16,200 --> 00:39:20,600
+the output. The kernel simply reorders
+
+999
+00:39:18,960 --> 00:39:23,440
+its multiplies.
+
+1000
+00:39:20,600 --> 00:39:26,520
+No step ever rebuilds the full keys and
+
+1001
+00:39:23,440 --> 00:39:28,200
+values from the cached latents at all.
+
+1002
+00:39:26,520 --> 00:39:32,120
+The decompression dissolves into
+
+1003
+00:39:28,200 --> 00:39:34,720
+multiplies the model was already doing.
+
+1004
+00:39:32,120 --> 00:39:37,080
+One thing nearly breaks this.
+
+1005
+00:39:34,720 --> 00:39:39,800
+Transformers encode each token's
+
+1006
+00:39:37,080 --> 00:39:42,680
+position by rotating its query and key
+
+1007
+00:39:39,800 --> 00:39:45,920
+vectors by a position dependent angle, a
+
+1008
+00:39:42,680 --> 00:39:47,920
+scheme called rotary position embedding.
+
+1009
+00:39:45,920 --> 00:39:50,440
+That rotation changes from token to
+
+1010
+00:39:47,920 --> 00:39:52,360
+token, so it cannot be merged into any
+
+1011
+00:39:50,440 --> 00:39:54,480
+fixed matrix.
+
+1012
+00:39:52,360 --> 00:39:56,720
+Applied to a reconstructed key, [music]
+
+1013
+00:39:54,480 --> 00:39:58,360
+and it wedges an unmergeable step into
+
+1014
+00:39:56,720 --> 00:40:00,960
+the middle of the chain.
+
+1015
+00:39:58,360 --> 00:40:02,800
+DeepSeek's answer is to route position
+
+1016
+00:40:00,960 --> 00:40:06,160
+around the compression.
+
+1017
+00:40:02,800 --> 00:40:08,960
+A small 64-element channel rides beside
+
+1018
+00:40:06,160 --> 00:40:10,600
+the latent and carries the rotated part.
+
+1019
+00:40:08,960 --> 00:40:13,120
+The 512-element
+
+1020
+00:40:10,600 --> 00:40:15,000
+summary stays position free, so the
+
+1021
+00:40:13,120 --> 00:40:17,280
+merge stays legal.
+
+1022
+00:40:15,000 --> 00:40:20,360
+That channel is the companion we counted
+
+1023
+00:40:17,280 --> 00:40:22,080
+into the 576.
+
+1024
+00:40:20,360 --> 00:40:25,240
+Measured against Deep Seek's own
+
+1025
+00:40:22,080 --> 00:40:28,480
+previous 67 billion parameter model, the
+
+1026
+00:40:25,240 --> 00:40:30,800
+KV cache shrinks by 93.3%
+
+1027
+00:40:28,480 --> 00:40:33,440
+and maximum generation throughput rises
+
+1028
+00:40:30,800 --> 00:40:36,200
+to 5.76 times.
+
+1029
+00:40:33,440 --> 00:40:38,480
+They also report quality at or above
+
+1030
+00:40:36,200 --> 00:40:41,160
+full multi-head attention.
+
+1031
+00:40:38,480 --> 00:40:42,480
+That last claim is one to read carefully
+
+1032
+00:40:41,160 --> 00:40:44,480
+since it comes from their own
+
+1033
+00:40:42,480 --> 00:40:46,360
+comparisons inside their own training
+
+1034
+00:40:44,480 --> 00:40:49,120
+recipe.
+
+1035
+00:40:46,360 --> 00:40:51,160
+Paged, grouped, and compressed, the
+
+1036
+00:40:49,120 --> 00:40:52,800
+cache is now a fraction of its former
+
+1037
+00:40:51,160 --> 00:40:54,560
+size.
+
+1038
+00:40:52,800 --> 00:40:56,480
+Shrinking the cache does not change how
+
+1039
+00:40:54,560 --> 00:40:58,680
+the cache is read though.
+
+1040
+00:40:56,480 --> 00:41:00,720
+And at decode, the reading has a problem
+
+1041
+00:40:58,680 --> 00:41:03,200
+of its own. The way Flash Attention
+
+1042
+00:41:00,720 --> 00:41:06,040
+divides its work collapses when the
+
+1043
+00:41:03,200 --> 00:41:08,080
+query is a single token.
+
+1044
+00:41:06,040 --> 00:41:09,800
+Flash Attention 2 fills a chip by
+
+1045
+00:41:08,080 --> 00:41:12,000
+handing out many independent blocks of
+
+1046
+00:41:09,800 --> 00:41:14,680
+work, and each block is one bundle of
+
+1047
+00:41:12,000 --> 00:41:16,120
+query rows for one head for one sequence
+
+1048
+00:41:14,680 --> 00:41:20,200
+in the batch.
+
+1049
+00:41:16,120 --> 00:41:21,880
+The H100 has 132 multiprocessors, and
+
+1050
+00:41:20,200 --> 00:41:23,600
+the number of blocks is the number it
+
+1051
+00:41:21,880 --> 00:41:26,280
+can keep busy.
+
+1052
+00:41:23,600 --> 00:41:28,640
+Prefill produces thousands of blocks,
+
+1053
+00:41:26,280 --> 00:41:31,560
+more than enough to go around.
+
+1054
+00:41:28,640 --> 00:41:34,320
+Decode produces almost none.
+
+1055
+00:41:31,560 --> 00:41:36,520
+The query at decode is one new token, a
+
+1056
+00:41:34,320 --> 00:41:39,360
+single row. So, the query dimension
+
+1057
+00:41:36,520 --> 00:41:41,440
+contributes exactly one block. The block
+
+1058
+00:41:39,360 --> 00:41:42,760
+count collapses to the batch size times
+
+1059
+00:41:41,440 --> 00:41:45,320
+the head count.
+
+1060
+00:41:42,760 --> 00:41:48,120
+Serve one request on a model with 32
+
+1061
+00:41:45,320 --> 00:41:49,520
+heads, and the chip receives 32 pieces
+
+1062
+00:41:48,120 --> 00:41:53,080
+of work.
+
+1063
+00:41:49,520 --> 00:41:55,400
+100 multiprocessors stand idle.
+
+1064
+00:41:53,080 --> 00:41:57,920
+Each busy one walks the entire cached
+
+1065
+00:41:55,400 --> 00:41:59,800
+sequence alone, tile after tile, and the
+
+1066
+00:41:57,920 --> 00:42:02,120
+longer the context, the longer that
+
+1067
+00:41:59,800 --> 00:42:04,160
+serial walk.
+
+1068
+00:42:02,120 --> 00:42:07,720
+The work is all in one dimension that
+
+1069
+00:42:04,160 --> 00:42:09,760
+nobody had split, the cache itself.
+
+1070
+00:42:07,720 --> 00:42:12,760
+Flash Decoding, published in October
+
+1071
+00:42:09,760 --> 00:42:15,080
+2023 by Tri Dao and collaborators,
+
+1072
+00:42:12,760 --> 00:42:16,280
+splits the cached keys and values into
+
+1073
+00:42:15,080 --> 00:42:19,280
+chunks.
+
+1074
+00:42:16,280 --> 00:42:22,040
+Every chunk gets its own block of work,
+
+1075
+00:42:19,280 --> 00:42:23,960
+which means its own multi-processor.
+
+1076
+00:42:22,040 --> 00:42:26,680
+Each one computes the new tokens
+
+1077
+00:42:23,960 --> 00:42:29,840
+attention against its own chunk as if
+
+1078
+00:42:26,680 --> 00:42:32,480
+that chunk were the whole sequence.
+
+1079
+00:42:29,840 --> 00:42:34,880
+SoftMax should forbid that.
+
+1080
+00:42:32,480 --> 00:42:37,560
+Its normalization couples every position
+
+1081
+00:42:34,880 --> 00:42:40,360
+in a row to every other, so the partial
+
+1082
+00:42:37,560 --> 00:42:42,400
+results cannot simply be added. What
+
+1083
+00:42:40,360 --> 00:42:45,600
+makes the split is the bookkeeping
+
+1084
+00:42:42,400 --> 00:42:48,680
+online SoftMax already keeps per row.
+
+1085
+00:42:45,600 --> 00:42:51,720
+Each chunk keeps its own running maximum
+
+1086
+00:42:48,680 --> 00:42:54,560
+and its own running sum of exponentials.
+
+1087
+00:42:51,720 --> 00:42:56,680
+A small second kernel merges the partial
+
+1088
+00:42:54,560 --> 00:42:59,400
+outputs at the end.
+
+1089
+00:42:56,680 --> 00:43:02,240
+It rescales each one by how far its
+
+1090
+00:42:59,400 --> 00:43:04,800
+local maximum sits below the global one.
+
+1091
+00:43:02,240 --> 00:43:07,520
+The same correction online SoftMax
+
+1092
+00:43:04,800 --> 00:43:10,480
+applies down a single row.
+
+1093
+00:43:07,520 --> 00:43:12,440
+The merged answer is exact attention.
+
+1094
+00:43:10,480 --> 00:43:15,080
+Online SoftMax ran that bookkeeping
+
+1095
+00:43:12,440 --> 00:43:17,320
+serially down one row. Flash decoding
+
+1096
+00:43:15,080 --> 00:43:19,280
+runs it in parallel across the chunks of
+
+1097
+00:43:17,320 --> 00:43:21,560
+the cache.
+
+1098
+00:43:19,280 --> 00:43:25,960
+The published benchmark runs CodeLlama
+
+1099
+00:43:21,560 --> 00:43:27,920
+34B on prompts from 512 tokens out to
+
+1100
+00:43:25,960 --> 00:43:29,840
+64,000.
+
+1101
+00:43:27,920 --> 00:43:33,160
+Every attention implementation in the
+
+1102
+00:43:29,840 --> 00:43:35,120
+comparison slows as the context grows.
+
+1103
+00:43:33,160 --> 00:43:37,720
+This one does not.
+
+1104
+00:43:35,120 --> 00:43:40,400
+With flash decoding, sequence length has
+
+1105
+00:43:37,720 --> 00:43:42,680
+little impact on generation speed.
+
+1106
+00:43:40,400 --> 00:43:44,840
+At the long end, decoding runs up to
+
+1107
+00:43:42,680 --> 00:43:46,880
+eight times faster on the back of an
+
+1108
+00:43:44,840 --> 00:43:50,240
+attention operation up to 50 times
+
+1109
+00:43:46,880 --> 00:43:52,120
+faster than unsplit flash attention.
+
+1110
+00:43:50,240 --> 00:43:54,840
+The gain concentrates exactly where
+
+1111
+00:43:52,120 --> 00:43:57,280
+decode hurt most, at long context and
+
+1112
+00:43:54,840 --> 00:43:59,240
+small batch. A large batch already fills
+
+1113
+00:43:57,280 --> 00:44:01,080
+the chip through the batch dimension by
+
+1114
+00:43:59,240 --> 00:44:03,760
+the same block counting argument from
+
+1115
+00:44:01,080 --> 00:44:06,400
+flash attention, too.
+
+1116
+00:44:03,760 --> 00:44:09,040
+The cache is paged, shrunk, and now read
+
+1117
+00:44:06,400 --> 00:44:11,960
+by the whole chip at once.
+
+1118
+00:44:09,040 --> 00:44:14,560
+One cost at decode is still untouched.
+
+1119
+00:44:11,960 --> 00:44:18,240
+The number of separate kernels the CPU
+
+1120
+00:44:14,560 --> 00:44:20,920
+must launch to produce one token.
+
+1121
+00:44:18,240 --> 00:44:24,840
+Producing a single token at batch size
+
+1122
+00:44:20,920 --> 00:44:28,360
+one runs a long chain of small kernels.
+
+1123
+00:44:24,840 --> 00:44:31,160
+Each layer launches a handful of them.
+
+1124
+00:44:28,360 --> 00:44:33,720
+One makes the queries, keys, and values.
+
+1125
+00:44:31,160 --> 00:44:36,480
+One applies the position rotation. One
+
+1126
+00:44:33,720 --> 00:44:38,320
+runs the attention itself. One combines
+
+1127
+00:44:36,480 --> 00:44:40,320
+the heads outputs.
+
+1128
+00:44:38,320 --> 00:44:42,720
+And two handle the feed forward networks
+
+1129
+00:44:40,320 --> 00:44:44,680
+big matrix multiplies.
+
+1130
+00:44:42,720 --> 00:44:47,240
+A few more do the small add and
+
+1131
+00:44:44,680 --> 00:44:50,040
+re-normalize steps between them. Across
+
+1132
+00:44:47,240 --> 00:44:52,240
+a 32-layer model, that is hundreds of
+
+1133
+00:44:50,040 --> 00:44:54,040
+kernel launches for every generated
+
+1134
+00:44:52,240 --> 00:44:56,480
+token.
+
+1135
+00:44:54,040 --> 00:44:59,160
+Each launch costs the CPU a few
+
+1136
+00:44:56,480 --> 00:45:01,560
+microseconds of bookkeeping. Validating
+
+1137
+00:44:59,160 --> 00:45:03,120
+arguments, queuing the work, talking to
+
+1138
+00:45:01,560 --> 00:45:05,040
+the driver.
+
+1139
+00:45:03,120 --> 00:45:07,120
+A few microseconds would not normally
+
+1140
+00:45:05,040 --> 00:45:09,240
+matter. But at batch size one, the
+
+1141
+00:45:07,120 --> 00:45:11,240
+kernels themselves often run for only a
+
+1142
+00:45:09,240 --> 00:45:13,696
+few microseconds, too.
+
+1143
+00:45:11,240 --> 00:45:16,280
+So, the GPU finishes each piece of work,
+
+1144
+00:45:13,696 --> 00:45:18,920
+[music] and then idles, waiting for the
+
+1145
+00:45:16,280 --> 00:45:21,400
+CPU to hand it the next one.
+
+1146
+00:45:18,920 --> 00:45:25,240
+At small batch, that dispatch overhead
+
+1147
+00:45:21,400 --> 00:45:27,520
+can reach 20 to 30% of the whole step.
+
+1148
+00:45:25,240 --> 00:45:30,040
+CUDA graphs amortize that overhead
+
+1149
+00:45:27,520 --> 00:45:32,000
+instead of paying it per kernel.
+
+1150
+00:45:30,040 --> 00:45:34,480
+During a warm-up step, the runtime
+
+1151
+00:45:32,000 --> 00:45:37,440
+records the entire launch sequence into
+
+1152
+00:45:34,480 --> 00:45:39,960
+a graph object. From then on, a single
+
+1153
+00:45:37,440 --> 00:45:41,840
+call replays the whole graph. Hundreds
+
+1154
+00:45:39,960 --> 00:45:43,480
+of kernels are dispatched for the price
+
+1155
+00:45:41,840 --> 00:45:45,360
+of one.
+
+1156
+00:45:43,480 --> 00:45:47,480
+The one constraint is that a replayed
+
+1157
+00:45:45,360 --> 00:45:50,000
+graph must touch the same memory
+
+1158
+00:45:47,480 --> 00:45:52,440
+addresses every time, which is awkward
+
+1159
+00:45:50,000 --> 00:45:54,520
+for a paged cache. So, serving systems
+
+1160
+00:45:52,440 --> 00:45:57,200
+lay out fixed buffers to keep their
+
+1161
+00:45:54,520 --> 00:45:59,760
+decode graphs replayable.
+
+1162
+00:45:57,200 --> 00:46:01,360
+Prefill runs a few large kernels and
+
+1163
+00:45:59,760 --> 00:46:04,600
+gains little.
+
+1164
+00:46:01,360 --> 00:46:06,880
+Decode at small batch gains the most,
+
+1165
+00:46:04,600 --> 00:46:10,840
+which is why the major serving systems
+
+1166
+00:46:06,880 --> 00:46:12,920
+all replay their decode steps this way.
+
+1167
+00:46:10,840 --> 00:46:16,120
+Let's recap the levers: kernel
+
+1168
+00:46:12,920 --> 00:46:18,280
+intermediates, cache layout, cache size,
+
+1169
+00:46:16,120 --> 00:46:19,640
+parallel cache reads, and now launch
+
+1170
+00:46:18,280 --> 00:46:22,360
+overhead.
+
+1171
+00:46:19,640 --> 00:46:24,600
+Each one made the bytes cheaper to move
+
+1172
+00:46:22,360 --> 00:46:26,360
+or rarer to need.
+
+1173
+00:46:24,600 --> 00:46:29,120
+One lever remains, the one
+
+1174
+00:46:26,360 --> 00:46:30,640
+FlashAttention-4's BF16 headline already
+
+1175
+00:46:29,120 --> 00:46:33,880
+hinted at.
+
+1176
+00:46:30,640 --> 00:46:35,960
+The width of each number itself.
+
+1177
+00:46:33,880 --> 00:46:37,840
+This last lever follows the same logic
+
+1178
+00:46:35,960 --> 00:46:40,880
+as the rest.
+
+1179
+00:46:37,840 --> 00:46:43,400
+Wall clock time tracks bytes moved. So,
+
+1180
+00:46:40,880 --> 00:46:45,080
+cutting each number from 16 bits to
+
+1181
+00:46:43,400 --> 00:46:46,280
+eight halves the memory traffic
+
+1182
+00:46:45,080 --> 00:46:48,560
+outright. [music]
+
+1183
+00:46:46,280 --> 00:46:51,160
+The compute gets cheaper, too, because
+
+1184
+00:46:48,560 --> 00:46:53,480
+fewer bits per operand means more Tensor
+
+1185
+00:46:51,160 --> 00:46:56,040
+Core operations fit in each cycle, and
+
+1186
+00:46:53,480 --> 00:46:58,840
+the hardware keeps lowering the floor.
+
+1187
+00:46:56,040 --> 00:47:01,600
+Hopper's Tensor Cores run FP8, the 8-bit
+
+1188
+00:46:58,840 --> 00:47:03,360
+format FlashAttention-3 exploited.
+
+1189
+00:47:01,600 --> 00:47:06,640
+Blackwell's Tensor Cores reach further
+
+1190
+00:47:03,360 --> 00:47:08,760
+down to 4-bit FP4.
+
+1191
+00:47:06,640 --> 00:47:12,680
+Yet, FlashAttention-4's headline numbers
+
+1192
+00:47:08,760 --> 00:47:14,520
+still run in 16-bit BF16.
+
+1193
+00:47:12,680 --> 00:47:16,960
+The reason is that accuracy gives out
+
+1194
+00:47:14,520 --> 00:47:19,520
+before the hardware floor is reached.
+
+1195
+00:47:16,960 --> 00:47:20,960
+Even at 8 bits, holding the error down
+
+1196
+00:47:19,520 --> 00:47:22,680
+took everything we saw in
+
+1197
+00:47:20,960 --> 00:47:25,200
+FlashAttention-3.
+
+1198
+00:47:22,680 --> 00:47:27,040
+A separate scale for every block, and
+
+1199
+00:47:25,200 --> 00:47:29,120
+outliers scattered through random
+
+1200
+00:47:27,040 --> 00:47:31,600
+rotations.
+
+1201
+00:47:29,120 --> 00:47:34,200
+So, lower precision is faster, but
+
+1202
+00:47:31,600 --> 00:47:36,240
+accuracy fails first.
+
+1203
+00:47:34,200 --> 00:47:38,120
+Navigating between those two facts is a
+
+1204
+00:47:36,240 --> 00:47:39,840
+discipline of its own called
+
+1205
+00:47:38,120 --> 00:47:41,640
+quantization.
+
+1206
+00:47:39,840 --> 00:47:43,480
+That is exactly where this series goes
+
+1207
+00:47:41,640 --> 00:47:47,120
+next.
+
+1208
+00:47:43,480 --> 00:47:49,320
+Before that, look at what stayed fixed.
+
+1209
+00:47:47,120 --> 00:47:51,840
+Four generations of FlashAttention, each
+
+1210
+00:47:49,320 --> 00:47:53,040
+in its headline precision, compute exact
+
+1211
+00:47:51,840 --> 00:47:56,400
+attention.
+
+1212
+00:47:53,040 --> 00:47:58,960
+The same S equals Q times K transpose,
+
+1213
+00:47:56,400 --> 00:48:01,440
+the same row-wise softmax, the same
+
+1214
+00:47:58,960 --> 00:48:04,200
+multiply by V, identical up to the
+
+1215
+00:48:01,440 --> 00:48:06,640
+reordering of floating point sums.
+
+1216
+00:48:04,200 --> 00:48:08,680
+Across four generations, the function
+
+1217
+00:48:06,640 --> 00:48:11,440
+never moved.
+
+1218
+00:48:08,680 --> 00:48:13,760
+What moved was the route the bytes took
+
+1219
+00:48:11,440 --> 00:48:16,040
+through the memory hierarchy and which
+
+1220
+00:48:13,760 --> 00:48:18,000
+pieces of hardware carried them.
+
+1221
+00:48:16,040 --> 00:48:20,760
+Tiling [music] kept the N by N score
+
+1222
+00:48:18,000 --> 00:48:23,280
+matrix out of HBM entirely.
+
+1223
+00:48:20,760 --> 00:48:25,200
+Online softmax made that legal, carrying
+
+1224
+00:48:23,280 --> 00:48:27,440
+two running numbers per row in place of
+
+1225
+00:48:25,200 --> 00:48:29,520
+waiting on the full one. Asynchrony let
+
+1226
+00:48:27,440 --> 00:48:30,853
+the copies and the math overlap instead
+
+1227
+00:48:29,520 --> 00:48:31,160
+of taking turns.
+
+1228
+00:48:30,853 --> 00:48:33,920
+>> [music]
+
+1229
+00:48:31,160 --> 00:48:36,680
+>> And when the exponential unit saturated,
+
+1230
+00:48:33,920 --> 00:48:40,040
+a polynomial on the idle multiply-add
+
+1231
+00:48:36,680 --> 00:48:41,520
+units routed the work around it.
+
+1232
+00:48:40,040 --> 00:48:43,800
+The same pattern holds beyond the
+
+1233
+00:48:41,520 --> 00:48:45,440
+kernel. Paging moved the cache without
+
+1234
+00:48:43,800 --> 00:48:47,680
+touching the math.
+
+1235
+00:48:45,440 --> 00:48:50,520
+Splitting it across the chip let one
+
+1236
+00:48:47,680 --> 00:48:53,640
+token read it in parallel. Graph replay
+
+1237
+00:48:50,520 --> 00:48:55,200
+cut the bookkeeping between kernels.
+
+1238
+00:48:53,640 --> 00:48:56,600
+None of those changed the model's
+
+1239
+00:48:55,200 --> 00:48:58,840
+output.
+
+1240
+00:48:56,600 --> 00:49:00,000
+Grouping and latent compression were the
+
+1241
+00:48:58,840 --> 00:49:01,720
+exception.
+
+1242
+00:49:00,000 --> 00:49:04,120
+They shrank the cache by changing the
+
+1243
+00:49:01,720 --> 00:49:06,600
+model itself, what attention stores in
+
+1244
+00:49:04,120 --> 00:49:08,560
+the first place.
+
+1245
+00:49:06,600 --> 00:49:11,560
+We started with the tensor cores mostly
+
+1246
+00:49:08,560 --> 00:49:13,600
+idle, [music] stalled waiting on memory.
+
+1247
+00:49:11,560 --> 00:49:15,440
+By the end, they run at nearly three
+
+1248
+00:49:13,600 --> 00:49:17,360
+quarters of peak.
+
+1249
+00:49:15,440 --> 00:49:21,280
+Every point of that climb came from
+
+1250
+00:49:17,360 --> 00:49:21,280
+changing the route the bytes take.
+
