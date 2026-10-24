@@ -137,8 +137,9 @@ function ch16Block(S, o, parent) {
  */
 function ch16Plate(S, o, parent) {
   const size = o.size ?? 30;
-  const a = `hit ${o.hit}`, b = ` · `, c = `prefill ${o.pre}`;
-  const wa = S.measure(a, { size, weight: 800 }), wb = S.measure(b, { size, weight: 800 }), wc = S.measure(c, { size, weight: 800 });
+  const a = `hit ${o.hit}`, b = '·', c = `prefill ${o.pre}`;
+  const gap = size * 0.45;  // SVG drops leading spaces, so the dot's spacing is measured in
+  const wa = S.measure(a, { size, weight: 800 }) + gap, wb = S.measure(b, { size, weight: 800 }) + gap, wc = S.measure(c, { size, weight: 800 });
   const tw = wa + wb + wc, W = tw + 64, H = size * 2.2;
   const g = S.g(null, parent);
   S.rect({ x: o.x - W / 2, y: o.y - H / 2, w: W, h: H, r: 16, fill: CH16.BASE, stroke: '#ffffff', strokeOpacity: 0.35, sw: 2 }, g);
