@@ -93,8 +93,8 @@ def n26():
         "A small router reads the token's vector and scores every expert: one small matrix multiply, "
         "one row per expert, gives 384 scores ({{fig:v06-p15}}). It keeps the six largest, and their "
         "scores later weight the six experts' outputs when they are combined ({{fig:v06-p17}}).",
-        f"Six of 384 routed experts is {f(100 * pct, 1)}% of them. Add the one shared expert, "
-        "which every token passes through as well, plus attention and the rest, and DeepSeek counts 49 billion of the model's 1.6 "
+        f"Six of 384 routed experts is {f(100 * pct, 1)}% of them. Add the one shared expert "
+        "({{fig:v06-o015}}), which every token passes through as well, plus attention and the rest, and DeepSeek counts 49 billion of the model's 1.6 "
         f"trillion parameters as active for each token: {f(100 * act, 1)}%.",
     ])
     emit("n26", stamp(SRT, "routed experts, and every token runs"),

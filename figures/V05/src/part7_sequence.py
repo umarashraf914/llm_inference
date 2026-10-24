@@ -113,7 +113,7 @@ def n32():
     emit("n32", stamp(SRT, "Attention is what makes this hard"),
          "Three quarters of the score grid needs someone else's keys", yb + 26, b + [body],
          "With N GPUs only N of the N × N blocks are local. Under the causal mask, where a token may "
-         "look only at earlier tokens, the six blocks above the diagonal are empty, so the GPUs are "
+         "look only at earlier tokens ({{ref:v03-o020}}), the six blocks above the diagonal are empty, so the GPUs are "
          "also loaded unevenly.")
 
 
