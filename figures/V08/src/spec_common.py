@@ -29,15 +29,41 @@ DRAFT_BYTES = BYTES / 100            # a drafter 100 times smaller: 1.4 GB a pas
 
 
 def glue(s):
-    """Keep a short formula on one line: no line break either side of ÷, × or a spaced minus."""
-    for op in ("÷", "×", "−"):
+    """Keep a short formula on one line: no line break either side of ÷, ×, =, + or a spaced minus."""
+    for op in ("÷", "×", "−", "=", "+"):
         s = s.replace(f" {op} ", f"\u00a0{op}\u00a0")
     return s
 
 
-def prose(y, paras, **kw):
-    """atlas.prose, with formulas glued so a wrap never strands an operator."""
-    return _prose(y, [glue(t) for t in paras], **kw)
+def _greek(ch):
+    return ch.isalpha() and not ch.isascii()
+
+
+def prose(y, paras, x=40, width=88, cls="cap"):
+    """atlas.prose with two changes: formulas are glued so a wrap never strands an operator, and no
+    line starts or ends with a Greek letter beside a word on the next line. (check_atlas.py's
+    split-word check assumes ASCII letters and stops with an IndexError at such a join.)"""
+    import textwrap
+    o = []
+    for k, para in enumerate(paras):
+        if k:
+            y += 40
+        lines = textwrap.wrap(glue(para), width)
+        changed = True
+        while changed:
+            changed = False
+            for i in range(1, len(lines)):
+                a_, b_ = lines[i - 1], lines[i]
+                if (_greek(b_[0]) or _greek(a_[-1])) and " " in a_:
+                    head, last = a_.rsplit(" ", 1)
+                    lines[i - 1], lines[i] = head, last + " " + b_
+                    changed = True
+                    break
+        for j, line in enumerate(lines):
+            if j:
+                y += 20
+            o.append(txt(x, y, line, cls))
+    return "".join(o), y
 
 
 def f(v, d=2):

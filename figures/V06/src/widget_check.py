@@ -77,6 +77,68 @@ def p31(page):
     return n, bad
 
 
+@check
+def p39(page):
+    import serving as S
+    from common import n as nfmt
+    fig = page.query_selector("#v06-p39")
+    bad, count = [], 0
+    for i, B in enumerate(S.BS):
+        set_range(fig, str(i))
+        s = S.state(B)
+        want = {f"[data-r='{k}']": v for k, v in S.readout_texts(s, B).items()}
+        want[".val"] = nfmt(B)
+        for sel, w in want.items():
+            count += 1
+            got = text(fig, sel)
+            if got != w:
+                bad.append((B, sel, got, w))
+        cls = fig.eval_on_selector_all("[data-c]", "els => els.map(e => e.getAttribute('class'))")
+        count += len(cls)
+        if cls != s["cls"]:
+            bad.append((B, "cells", sum(a != b for a, b in zip(cls, s["cls"])), "differ"))
+    fig.eval_on_selector("button", "b => b.click()")
+    if text(fig, ".val") != "1":
+        bad.append(("reset", ".val", text(fig, ".val"), "1"))
+    return count, bad
+
+
+@check
+def p46(page):
+    import derive as D
+    from common import n as nfmt
+    fig = page.query_selector("#v06-p46")
+    bad, count = [], 0
+    SET = """(el, a) => { const r = el.querySelectorAll('input[type=radio]'); r[a[0]].checked = true;
+        r[a[0]].dispatchEvent(new Event('change'));
+        const s = el.querySelectorAll('input[type=range]'); [a[1], a[2], a[3], a[4]].forEach((v, i) => s[i].value = v);
+        s[0].dispatchEvent(new Event('input'));
+        const out = {}; el.querySelectorAll('[data-r]').forEach(e => out[e.dataset.r] = e.textContent);
+        out.vals = [...el.querySelectorAll('.val')].map(e => e.textContent); return out; }"""
+    for pi, key in enumerate(["deepseek", "mixtral"]):
+        a = D.ARCH[key]
+        for ni, N in enumerate(D.NS):
+            for K in (1, 2, 8, 16):
+                for S in (0, 1):
+                    for wi, w in enumerate(D.WS):
+                        got = fig.evaluate(SET, [pi, ni, K, S, wi])
+                        k = min(K, N)
+                        want = D.outs(D.calc(a, N, k, S, w))
+                        want["name"] = a["name"]
+                        for kk, vv in want.items():
+                            count += 1
+                            if got[kk] != vv:
+                                bad.append((key, N, k, S, w, kk, got[kk], vv))
+                        vals = [str(N), str(k), str(S), nfmt(w)]
+                        count += 4
+                        if got["vals"] != vals:
+                            bad.append((key, N, k, S, w, "vals", got["vals"], vals))
+    fig.eval_on_selector("button", "b => b.click()")
+    if text(fig, "[data-r=held]") != D.outs(D.calc(D.ARCH["deepseek"], 256, 8, 1, 2048))["held"]:
+        bad.append(("reset", "held", text(fig, "[data-r=held]"), ""))
+    return count, bad
+
+
 def main():
     atlas = sys.argv[1]
     only = sys.argv[2:]

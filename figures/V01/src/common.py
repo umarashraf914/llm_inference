@@ -88,6 +88,12 @@ def g(v, d=0):
     return (MINUS if v < 0 and float(q) != 0 else "") + s
 
 
+def rnd(v, d=1):
+    """Round like JavaScript's toFixed: exact halves away from zero. For drawing coordinates that a
+    widget's script recomputes, so the static frame and the live one agree to the last digit."""
+    return float(Decimal(v).quantize(Decimal(1).scaleb(-d), rounding=ROUND_HALF_UP))
+
+
 def sig(v, n=3):
     """`n` significant figures, plain notation: 41.8, 0.142, 1,416."""
     if v == 0:

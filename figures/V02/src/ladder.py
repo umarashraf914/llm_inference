@@ -64,21 +64,22 @@ def o051():
 
 
 def p16():
-    side = 600
-    small = side * math.sqrt(FAST / MODEL)
+    W, H = 600, 300
+    small = math.sqrt(W * H * FAST / MODEL)            # equal ratio of areas
     l2_frac = MODEL / CAP["L2"]
-    assert 17 < small < 18.5 and 2600 < l2_frac < 2700
+    assert 12 < small < 13 and 2600 < l2_frac < 2700
     b = [hd(40, 46, "Areas to scale: a 70B model's weights, and all the fast memory on the chip")]
-    b.append(rect(40, 62, side, 300, "h", rx=4))
-    b.append(txt(52, 84, f"140 GB of weights (shown at half height: the full square is {side} × {side})", "sub"))
-    b.append(rect(40 + side / 2 - small / 2, 62 + 150 - small / 2, small, small, "s", rx=1))
-    b.append(txt(40 + side / 2 + small / 2 + 10, 62 + 150 + 4, f"{FAST / 1e6:.1f} MB: registers, L1, shared and L2", "sub2 halo"))
+    b.append(f'<g class="h"><rect x="40" y="62" width="{W}" height="{H}" rx="4"/>'
+             f'<text class="sub" x="56" y="86">140 GB of weights</text>'
+             f'<text class="sub" x="{86 + small:.1f}" y="{132 + small / 2 + 4:.1f}">{FAST / 1e6:.1f} MB: every register, '
+             f'L1, shared memory and L2</text></g>')
+    b.append(rect(70, 132, small, small, "s", rx=1))
     body, yb = prose(400, [
         "Memory sizes count in powers of two: a kilobyte of memory is 1,024 bytes and a megabyte "
         f"1,048,576. So the chip's registers are 33,792 KB = {CAP['registers']:,} bytes, the L1 and shared "
         f"memory the same again, and the 50 MB L2 is {CAP['L2']:,} bytes: {FAST / 1e6:.1f} million bytes "
         f"in all, {100 * FAST / MODEL:.3f}% of the 140 billion bytes of a 70B model.",
-        f"The L2 alone holds one {round(l2_frac, -1):,.0f}th of the weights. Generating a token reads every "
+        f"The L2 alone holds one part in {round(l2_frac, -1):,.0f} of the weights. Generating a token reads every "
         "weight exactly once, so by the time a weight could be reused, thousands of others have passed "
         "through: during decode the caches have almost nothing worth keeping.",
     ])
@@ -100,7 +101,13 @@ def p15():
         b.append(txt(40, y + 16, lab, "cap"))
         b.append(rect(X0, y, w, 22, c))
         b.append(txt(X0 + w + 8, y + 16, note or f"{v:g}", "sub2"))
-    y2 = 62 + 5 * 30 + 36
+    ax1 = 62 + 5 * 30 + 2
+    b.append(ln(X0, ax1, X1, ax1, "axis"))
+    for v in (1, 10, 100, 1000):
+        x = logx(v, 0.5, 1000, X0, X1)
+        b.append(vline(x, ax1, ax1 + 5))
+        b.append(txt(round(x, 1), ax1 + 19, f"{v:,}", "sub2", "middle"))
+    y2 = ax1 + 58
     b.append(hd(40, y2, "Bytes each multiprocessor can take in per tick (log axis)"))
     rows2 = [("registers", "registers", "s", f"{BW_TICK['registers']:,}, one FFMA per lane"),
              ("shared memory", "shared", "s", f"{BW_TICK['shared']}, 32 banks × 4 bytes"),
@@ -113,7 +120,13 @@ def p15():
         b.append(txt(40, y + 16, lab, "cap"))
         b.append(rect(X0, y, w, 22, c))
         b.append(txt(X0 + w + 8, y + 16, note, "sub2"))
-    body, yb = prose(y2 + 16 + 4 * 30 + 38, [
+    ax2 = y2 + 16 + 4 * 30 + 2
+    b.append(ln(X0, ax2, X1, ax2, "axis"))
+    for v in (1, 10, 100, 1000, 10000):
+        x = logx(v, 1, 10000, X0, X1)
+        b.append(vline(x, ax2, ax2 + 5))
+        b.append(txt(round(x, 1), ax2 + 19, f"{v:,}", "sub2", "middle"))
+    body, yb = prose(ax2 + 56, [
         f"Latencies were measured on a Hopper GPU, the H800, with the chip otherwise idle: {LAT['shared']:g} "
         f"ticks for shared memory, {LAT['l1']:g} for L1, {LAT['l2']:g} for L2 and {LAT['hbm']:g} for HBM.",
         f"Bandwidth falls the other way. An FFMA on every lane reads three 4-byte registers, "
@@ -128,35 +141,34 @@ def p15():
 
 
 def o054():
-    b = [hd(40, 46, "Top rung against bottom rung, on log axes")]
-    X0, X1 = 200, 600
-    pairs = [("bandwidth", [("registers", BW_TICK["registers"], "s"), ("HBM", BW_TICK["HBM"], "h")], 1, 10000,
-              f"{bw_ratio:.0f}× less", "bytes a tick, per SM"),
-             ("latency", [("registers", LAT_TICK["registers"], "s"), ("HBM", LAT_TICK["HBM"], "h")], 0.5, 1000,
-              f"{lat_ratio:.0f}× longer", "ticks")]
-    y = 66
-    for name, rows, v0, v1, verdict, unit in pairs:
-        b.append(txt(40, y + 16, name, "cap"))
-        b.append(txt(40, y + 34, unit, "sub2"))
-        for k, (lab, v, c) in enumerate(rows):
-            yy = y + k * 30
-            w = max(logx(v, v0, v1, X0, X1) - X0, 3)
-            b.append(rect(X0, yy, w, 22, c))
-            b.append(txt(X0 + w + 8, yy + 16, f"{lab}: {v:,.1f}".replace(".0", "") if v < 100 else f"{lab}: {v:,.0f}", "sub2"))
-        b.append(txt(X0, y + 76, verdict, "sub2"))
-        y += 114
-    body, yb = prose(y + 10, [
-        "Round figures of a hundredfold less bandwidth and a thousandfold more latency, top to bottom, "
-        f"are the usual summary. Worked out, bandwidth falls about {bw_ratio:.0f}× and latency grows about "
-        f"{lat_ratio:.0f}× on an idle chip, more when the memory is busy and requests queue.",
-        "Reaching down to HBM for a byte costs vastly more than doing arithmetic on a byte already at the "
-        "top. GPU programming is largely the craft of staging data upward and keeping the maths units fed "
-        "from the fast end.",
+    b = [hd(40, 46, "How much worse the bottom rung is than the top, on one log axis")]
+    X0, X1 = 230, 600
+    rows = [("bandwidth, round figure", 100, "u"), ("bandwidth, worked out", bw_ratio, "h"),
+            ("latency, round figure", 1000, "u"), ("latency, measured idle", lat_ratio, "h")]
+    for k, (lab, v, c) in enumerate(rows):
+        y = 64 + k * 40 + (12 if k >= 2 else 0)
+        w = logx(v, 1, 1000, X0, X1) - X0
+        b.append(txt(40, y + 18, lab, "cap"))
+        note = f"{v:,.0f}×"
+        b.append(cell(X0, y, w, 26, c, label=note))
+    ax = 64 + 4 * 40 + 12 + 4
+    b.append(ln(X0, ax, X1, ax, "axis"))
+    for v in (1, 10, 100, 1000):
+        x = logx(v, 1, 1000, X0, X1)
+        b.append(vline(x, ax, ax + 5))
+        b.append(txt(round(x, 1), ax + 19, f"{v:,}×", "sub2", "middle"))
+    body, yb = prose(ax + 58, [
+        "Top to bottom, bandwidth is usually said to fall a hundredfold and latency to grow a thousandfold. "
+        f"Worked out from the previous figure, bandwidth falls about {bw_ratio:.0f}× and latency grows about "
+        f"{lat_ratio:.0f}× on an idle chip, and more when the memory is busy and requests queue.",
+        "Either way, reaching down to HBM for a byte costs vastly more than doing arithmetic on a byte "
+        "already at the top. GPU programming is largely the craft of staging data upward and keeping the "
+        "maths units fed from the fast end.",
     ])
     emit("o054", stamp(SRT, "hundredfold drop in bandwidth"), "The asymmetry that defines the craft", yb + 24,
          b + [body],
-         "Log axes: each ratio is past what straight bars can show honestly. The two gaps call for different "
-         "remedies: bandwidth by moving fewer bytes, latency by having more work in flight.")
+         "Log axis: the gaps span two and three decades, past what straight bars can show honestly. They call "
+         "for different remedies: bandwidth by moving fewer bytes, latency by having more work in flight.")
 
 
 def fixes():

@@ -70,7 +70,8 @@ def p06():
         b.append(txt(xx, bot2 + 18, lab, "sub2"))
     b.append(txt(410, wy[0] + 17, "3  narrow: multiply by the second matrix", "sub2"))
     body, yy = prose(bot2 + 64, [
-        "The feed-forward block does three things to one token's vector. It multiplies by a first matrix "
+        "The feed-forward block, or feed-forward network (FFN), does three things to one token's vector. "
+        "It multiplies by a first matrix "
         "that makes the vector wider, four times wider in the classic design; here 2 numbers become 4. "
         "Then it replaces every negative number with zero: ReLU, max(0, x). Then a second matrix narrows "
         "the result back to the token's width.",
@@ -209,8 +210,9 @@ def p09():
     assert ffn / (att + ffn) == 2 / 3 and 3 * d * (8 * d / 3) == ffn
     body, yy = prose(yE + 140, [
         "A matrix that turns a vector of d numbers into another of d numbers is d × d, so d² weights "
-        "({{fig:v01-o084}}). Attention makes queries, keys and values and combines the result: four of "
-        "them, 4d². The feed-forward block widens to 4d and narrows back: d × 4d and 4d × d, 8d².",
+        "({{fig:v01-o084}}). Attention makes queries, keys and values ({{fig:v01-o092}}) and combines the "
+        "result: four of them, 4d². The feed-forward block widens to 4d and narrows back: d × 4d and "
+        "4d × d, 8d².",
         f"So the block holds 8 parts in 12, two thirds, whatever d is. At d = {n(d)}, d² is "
         f"{n(d * d)}: {att / 1e6:.1f} million weights of attention against {ffn / 1e6:.1f} million of "
         "feed-forward in every layer.",
@@ -244,8 +246,9 @@ def p10():
         b.append(rect(X0 + sh * W, yy, (1 - sh) * W, 28, "u"))
     b.append(txt(X0 + W, 72 + 3 * 46 + 4, "the grey end is attention", "sub2", "end"))
     body, yy = prose(72 + 3 * 46 + 52, [
-        f"The 70-billion-parameter model of {{{{fig:v01-o101}}}} has 64 query heads sharing 8 key-value "
-        "heads, grouped-query attention ({{fig:v03-o089}}), so its K and V matrices are "
+        f"The 70-billion-parameter model of {{{{fig:v01-o101}}}} has 64 query heads, independent copies "
+        "of attention ({{fig:v03-o013}}), sharing 8 key-value heads: grouped-query attention "
+        "({{fig:v03-o089}}). So its K and V matrices are "
         f"{n(d70)} × {n(kvw)} rather than {n(d70)} × {n(d70)}. Attention falls to {att70 / 1e6:.1f} million "
         f"weights a layer, while the gated feed-forward block, 3.5 times wide, holds {ffn70 / 1e6:.1f} "
         f"million: {pct(rows[1][1])}.",

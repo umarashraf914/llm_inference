@@ -82,7 +82,8 @@ def p02():
     b.append(txt(X0 + w + 10, 262, f"{ops_run / 1e9:.0f} billion", "sub2"))
     body, y = prose(318, [
         "Memory is set by what is held: parameters × bytes per parameter ({{fig:v01-o105}}). At FP8, "
-        f"one byte each, {HELD / 1e9:.0f} billion parameters fill {mem_held / 1e9:.0f} GB, whichever "
+        f"an 8-bit format ({{{{fig:v04-o032}}}}), one byte each, {HELD / 1e9:.0f} billion parameters fill "
+        f"{mem_held / 1e9:.0f} GB, whichever "
         "experts a token happens to pick.",
         f"Arithmetic is set by what runs: two operations per parameter used ({{{{fig:v01-o114}}}}). "
         f"A token runs {RUN / 1e9:.0f} billion, so 2 × {RUN / 1e9:.0f} billion = {ops_run / 1e9:.0f} billion "
@@ -124,8 +125,8 @@ def o003():
         "runs. A dense layer has one feed-forward network and runs it for every token, so the two "
         "numbers are the same and can only grow together.",
         "A mixture of experts holds N networks in each layer and runs K of them for each token. N "
-        "sets the memory, K sets the work, and the two can now be turned separately: Mixtral holds "
-        "eight and runs two, DeepSeek V3 holds 256 and runs eight.",
+        "sets the memory, K sets the work, and the two can now be turned separately: Mixtral, Mistral's "
+        "open model, holds eight and runs two; DeepSeek V3 holds 256 and runs eight.",
     ])
     emit("o003", at("A dense model multiplies every token"), "Two things a dense model welds together",
          yy + 32, b + [body],

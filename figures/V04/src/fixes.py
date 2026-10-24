@@ -47,7 +47,35 @@ FIXES = [
      cap(346, "In numbers: with an INT8 scale sized to a 100x outlier, every ordinary value lands on code")
      + cap(366, f"{MINUS}1, 0 or 1. That is three of the 255 codes, about 1.6 of the eight bits you paid for.")),
     ("o035", "six of eight bits spent representing", "six and a half of eight bits spent representing"),
+    # the bending is now shown: p07 works E4M3's 448 against the 240 the rules would give
+    ("o015", cap(442, "FP8 variants bend these rules slightly, reserving fewer patterns to buy a little more range."),
+     cap(442, "E4M3 bends these rules, reserving fewer patterns to buy more range ({{fig:v04-p07}}).")),
+    # stamps: perplexity is introduced at 7:17
+    ("o049", "Fig 49 &nbsp;&middot;&nbsp; 6:47</div>", "Fig 49 &nbsp;&middot;&nbsp; 7:17</div>"),
+    # §5 (checker): "how many share a scale" had 4px of room in its 138px box
+    ("o050", '>how many share a scale</text>', '>who shares a scale</text>'),
 ]
+
+
+def reprose(name, y_first, paras, caption=None, pad=22):
+    """Rewrite an original item's body prose: everything from its prose line at y_first to the end of
+    the drawing is replaced by prose(y_first, paras), and the canvas is resized to fit. Rerunning gives
+    the same result, because the new prose starts at the same line."""
+    import re
+    from common import prose, esc
+    p = OUT / f"{name}.html"
+    t = p.read_text(encoding="utf-8")
+    i = t.index(f'<text class="cap" x="40" y="{y_first}"')
+    j = t.index("</svg>")
+    body, y = prose(y_first, paras)
+    t = t[:i] + body + t[j:]
+    t, n = re.subn(r"""viewBox=(['"])0 0 680 \d+\1""", f'viewBox="0 0 680 {y + pad}"', t, count=1)
+    assert n == 1
+    if caption is not None:
+        a, b = t.index("<figcaption>") + len("<figcaption>"), t.index("</figcaption>")
+        t = t[:a] + esc(caption) + t[b:]
+    p.write_text(t, encoding="utf-8")
+    print(f"{name}: prose rewritten from y={y_first}")
 
 
 def apply(fixes):

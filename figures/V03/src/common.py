@@ -54,6 +54,11 @@ def f(v, d=2):
     return ("−" if v < 0 and float(q) != 0 else "") + s
 
 
+def fn(v, d=2):
+    """f() without thousands separators, for widgets whose JavaScript prints toFixed() as it is."""
+    return f(v, d).replace(",", "")
+
+
 def pct(v, d=0):
     return f(100 * v, d) + "%"
 
@@ -109,6 +114,13 @@ def patch(name, pairs, stamp_to=None):
     print(f"{name:6s} patched" + (f", stamped {stamp_to}" if stamp_to else ""))
 
 
+def hbar(x, y, w, h, cls, label, inside_from=150):
+    """A bar drawn to scale with its value: inside when the bar is wide enough, after it otherwise."""
+    if w >= inside_from:
+        return cell(x, y, w, h, cls, label=label)
+    return cell(x, y, max(w, 2), h, cls) + txt(x + max(w, 2) + 8, y + h / 2 + 4, label, "sub2")
+
+
 def lg(v, lo, hi, x0, x1):
     """Position of v on a logarithmic axis running from lo (at x0) to hi (at x1)."""
     return x0 + (math.log10(v) - math.log10(lo)) / (math.log10(hi) - math.log10(lo)) * (x1 - x0)
@@ -137,3 +149,37 @@ def dot(x, y, r=4, var="--h", fill="--paper"):
 def text(x, y, s, cls="sub2", anchor="start", extra=""):
     """txt() with an optional attribute string (data-* hooks for widgets)."""
     return f'<text class="{cls}" x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}"{extra}>{esc(s)}</text>'
+
+
+# ---- the worked row: one row of six scores in two tiles, carried from Part 7 to Parts 9, 12 and 15 ----
+ROW_X = [[3, 2, 1.5], [5, 4, 1]]          # tile 1's largest score is 3 and its terms sum to 1.59; tile 2 holds a 5
+ROW_V = [[10, 20, 30], [40, 50, 60]]      # one value per score (a value is a vector; one coordinate is enough)
+TAU = 8 * math.log(2)                      # FA4's threshold: 8 doublings, a factor of 256, in natural-log units
+
+
+def online(tiles_x, tiles_v, tau=None):
+    """Online softmax over tiles, the unnormalised form: returns the ledger and the answer O / l.
+    With tau, the running maximum is only moved when a tile's maximum exceeds it by more than tau
+    (FlashAttention 4's conditional rescale); terms are then taken against the stale maximum."""
+    m, l, O, steps = -math.inf, 0.0, 0.0, []
+    for xs, vs in zip(tiles_x, tiles_v):
+        tmax = max(xs)
+        if m == -math.inf or tau is None or tmax - m > tau:
+            m_new = max(m, tmax)
+            c = 0.0 if m == -math.inf else math.exp(m - m_new)
+            fired = m != -math.inf and m_new > m
+        else:
+            m_new, c, fired = m, 1.0, False
+        terms = [math.exp(x - m_new) for x in xs]
+        l = l * c + sum(terms)
+        O = O * c + sum(t * v for t, v in zip(terms, vs))
+        steps.append(dict(m_old=m, tmax=tmax, m=m_new, c=c, terms=terms, l=l, O=O, fired=fired))
+        m = m_new
+    return steps, O / l
+
+
+def direct(xs, vs):
+    """The same answer computed all at once: subtract the maximum, exponentiate, weight, divide."""
+    mx = max(xs)
+    e = [math.exp(x - mx) for x in xs]
+    return sum(a * b for a, b in zip(e, vs)) / sum(e)

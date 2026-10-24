@@ -40,8 +40,12 @@ def o048():
         y = 94 + k * 40
         b.append(txt(40, y + 19, str(s), "cap"))
         cls = "h" if ws(s) > H100_SMEM else ("s" if s == pick else "u")
-        b.append(cell(xb, y + 2, ws(s) * SC, 24, cls))
-        b.append(txt(xb + ws(s) * SC + 8, y + 19, f"{f(kib[s], 1 if kib[s] % 1 else 0)} KB", "sub2"))
+        lab = f"{f(kib[s], 1 if kib[s] % 1 else 0)} KB"
+        if 70 < ws(s) * SC and ws(s) <= H100_SMEM:
+            b.append(cell(xb, y + 2, ws(s) * SC, 24, cls, label=lab))
+        else:
+            b.append(cell(xb, y + 2, ws(s) * SC, 24, cls))
+            b.append(txt(xb + ws(s) * SC + 8, y + 19, lab, "sub2"))
         b.append(txt(640, y + 19, f"{tiles[s]} × {tiles[s]}", "sub2", "end"))
     b.append(dashed(budget_x, 88, budget_x, 94 + 4 * 40, "--s"))
     b.append(txt(budget_x + 6, 94 + 4 * 40 + 14, "228 KB budget", "sub2"))
@@ -78,7 +82,7 @@ def o049():
         for j, (ka, kz) in enumerate(blocks):
             x, y, w, h = X0 + px(ka), Y0 + px(qa), px(kz - ka) - 3, px(qz - qa) - 3
             if (i, j) in skipped:
-                b.append(ghost(x, y, w, h, label="skipped: all masked"))
+                b.append(ghost(x, y, w, h, label="skipped"))
                 continue
             b.append(cell(x, y, w, h, "m"))
             if i == j:                                 # the mask hides the triangle above the diagonal

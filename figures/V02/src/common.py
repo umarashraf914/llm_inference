@@ -192,4 +192,14 @@ DROPPED = {
     "o047": "merged into o048 (one stream cannot serve two destinations; nesting 2, 4, 8)",
     "o015": "merged into o016 (the capacitor and its leak) and o017 (refresh)",
     "o050": "merged into o018 (no technology is fast and large; geometry)",
+    "o058": "merged into o059 (registers stay put, so switching is free)",
+    "o061": "replaced by p19 (32-byte sectors, four to a 128-byte line)",
+    "o062": "replaced by p19 (the hardware cannot fetch a single value)",
+    "o075": "merged into o074 (the roofline recap and the 295 decomposed)",
 }
+
+
+def fixed(v, d=1):
+    """JavaScript's Number.prototype.toFixed: the exact binary value, halves rounded away from zero."""
+    q = Decimal(abs(v)).quantize(Decimal(1).scaleb(-d), rounding=ROUND_HALF_UP)
+    return ("-" if v < 0 and q != 0 else "") + f"{q:.{d}f}"

@@ -51,8 +51,8 @@ def b05():
     ])
     emit("b05", stamp("Most of the attention weight lands"),
          "One query's attention: four tokens take 82.5% of the weight", yb + 30, b + [body],
-         "Scores illustrative, shape measured. Most of what a query reads contributes almost nothing "
-         "to its answer, and every method in this part is a rule for not reading it.")
+         "Scores illustrative, shape measured. A query's answer is decided by a handful of tokens; the "
+         "rest are read for almost nothing.")
 
 
 # ---- b06: every pair -----------------------------------------------------------------------------------
@@ -92,7 +92,8 @@ def b06():
     body, yb = prose(Y0 + n * P + 56, [
         f"Exact attention scores every query against every earlier key, a triangle of n(n + 1) ÷ 2 "
         f"cells. At {n} tokens that is {n * (n + 1) // 2}. At {n0(CTX)} tokens it is 8.6 billion, for each "
-        f"of the 70B model's {heads} heads in each of its {layers} layers: {f(total / 1e13, 1)} × 10¹³ "
+        f"of the 70B model's {heads} heads ({{{{fig:v03-o013}}}}) in each of its {layers} layers: "
+        f"{f(total / 1e13, 1)} × 10¹³ "
         f"scores for one 128k prompt. In decode each step adds one row, the newest query against all "
         f"{n0(CTX)} keys, which is the cache read of {{{{fig:v08-b02}}}}.",
         "If each row looks like the previous figure, a handful of cells take most of the weight and "

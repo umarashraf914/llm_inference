@@ -1,0 +1,51 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 25:00</div><h3>Turn the sampler's knobs on two lists of scores</h3><div class='wg'><div class='ctl'><label class='opt'><input type='radio' name='v07-b71-list' value='0' checked> confident list</label><label class='opt'><input type='radio' name='v07-b71-list' value='1'> unsure list</label><label>temperature <input type='range' min='0.1' max='3' step='0.1' value='1.0'><span class='val'>1.0</span></label></div><div class='ctl'><label class='opt'><input type='radio' name='v07-b71-cut' value='none'> no cut</label><label class='opt'><input type='radio' name='v07-b71-cut' value='top-k'> top-k</label><label class='opt'><input type='radio' name='v07-b71-cut' value='top-p' checked> top-p</label><label class='opt'><input type='radio' name='v07-b71-cut' value='min-p'> min-p</label><button type='button'>Reset</button></div><div class='ctl'><label>k <input type='range' min='1' max='6' step='1' value='2'><span class='val'>2</span></label><label>P <input type='range' min='0.05' max='1' step='0.05' value='0.9'><span class='val'>0.90</span></label><label>min-p fraction <input type='range' min='0' max='0.5' step='0.01' value='0.1'><span class='val'>0.10</span></label></div><svg viewBox='0 0 680 446' role='img'><title>Turn the sampler's knobs on two lists of scores</title><text class="hd" x="40" y="34">One list of scores, through temperature, a cut and a rescale</text><text class="sub2" x="40" y="62" text-anchor="start">token</text><text class="sub2" x="92" y="62" text-anchor="start">score ÷ T</text><text class="sub2" x="160" y="62" text-anchor="start">after softmax</text><text class="sub2" x="440" y="62" text-anchor="start">after the cut, rescaled</text><g data-row="0"><text class="cap" x="40" y="87" data-nm="0">cat</text><text class="sub2" x="92" y="87" data-lt="0">8.20</text><g class="s"><rect x="160" y="73" width="148.99" height="18" rx="2" data-sh="0"/></g><text class="sub2" x="314.99" y="87" data-sv="0">74.5%</text><g class="m"><rect x="440" y="73" width="105.04" height="18" rx="2" data-fb="0"/></g><text class="sub2" x="551.04" y="87" data-fv="0">75.0%</text></g><g data-row="1"><text class="cap" x="40" y="115" data-nm="1">dog</text><text class="sub2" x="92" y="115" data-lt="1">7.10</text><g class="s"><rect x="160" y="101" width="49.59" height="18" rx="2" data-sh="1"/></g><text class="sub2" x="215.59" y="115" data-sv="1">24.8%</text><g class="m"><rect x="440" y="101" width="34.96" height="18" rx="2" data-fb="1"/></g><text class="sub2" x="480.96" y="115" data-fv="1">25.0%</text></g><g data-row="2"><text class="cap" x="40" y="143" data-nm="2">the</text><text class="sub2" x="92" y="143" data-lt="2">3.50</text><g class="u"><rect x="160" y="129" width="1.50" height="18" rx="2" data-sh="2" style="fill:none;stroke:var(--rule);stroke-dasharray:3 3"/></g><text class="sub2" x="167.50" y="143" data-sv="2">0.68%</text><g class="m"><rect x="440" y="129" width="0.00" height="18" rx="2" data-fb="2"/></g><text class="sub2" x="447.50" y="143" data-fv="2">dropped</text></g><g data-row="3"><text class="cap" x="40" y="171" data-nm="3">banana</text><text class="sub2" x="92" y="171" data-lt="3">0.40</text><g class="u"><rect x="160" y="157" width="1.50" height="18" rx="2" data-sh="3" style="fill:none;stroke:var(--rule);stroke-dasharray:3 3"/></g><text class="sub2" x="167.50" y="171" data-sv="3">0.03%</text><g class="m"><rect x="440" y="157" width="0.00" height="18" rx="2" data-fb="3"/></g><text class="sub2" x="447.50" y="171" data-fv="3">dropped</text></g><g data-row="4" style="display:none"><text class="cap" x="40" y="199" data-nm="4"></text><text class="sub2" x="92" y="199" data-lt="4">0.00</text><g class="s"><rect x="160" y="185" width="1.50" height="18" rx="2" data-sh="4"/></g><text class="sub2" x="167.50" y="199" data-sv="4"></text><g class="m"><rect x="440" y="185" width="1.50" height="18" rx="2" data-fb="4"/></g><text class="sub2" x="447.50" y="199" data-fv="4"></text></g><g data-row="5" style="display:none"><text class="cap" x="40" y="227" data-nm="5"></text><text class="sub2" x="92" y="227" data-lt="5">0.00</text><g class="s"><rect x="160" y="213" width="1.50" height="18" rx="2" data-sh="5"/></g><text class="sub2" x="167.50" y="227" data-sv="5"></text><g class="m"><rect x="440" y="213" width="1.50" height="18" rx="2" data-fb="5"/></g><text class="sub2" x="447.50" y="227" data-fv="5"></text></g><text class="sub2" x="40" y="258" data-sum="">keeps 2 of 4 tokens; the most likely draw is cat, at 75.0%</text><text class="cap" x="40" y="300" text-anchor="start">Every control acts on the same few numbers: divide by T, softmax, cut, renormalise. Try</text><text class="cap" x="40" y="320" text-anchor="start">the unsure list with top-k at 2, then top-p at 0.9, to watch a fixed list fail where an</text><text class="cap" x="40" y="340" text-anchor="start">adaptive one does not; then raise T and see the cut let more of the tail through.</text><text class="cap" x="40" y="380" text-anchor="start">Not one weight has changed in any of this. The sampler only reshapes what the model</text><text class="cap" x="40" y="400" text-anchor="start">already produced, which is why all of it is a setting on the request rather than a</text><text class="cap" x="40" y="420" text-anchor="start">property of the model. The arithmetic was checked against Python over many settings.</text></svg></div><figcaption>Temperature reshapes and truncation cuts: one knob for how adventurous the text is, one for how much of the tail to trust.</figcaption><script>(() => {
+  const fig = document.currentScript.closest('figure');
+  const L = [[["cat", 8.2], ["dog", 7.1], ["the", 3.5], ["banana", 0.4]], [["red", 3.0], ["blue", 2.9], ["green", 2.8], ["gold", 2.7], ["grey", 2.6], ["the", 0.0]]], D = {"lst": 0, "T": 1.0, "method": "top-p", "k": 2, "p": 0.9, "mp": 0.1};
+  const fx = (v, d = 2) => { const s = Math.abs(v).toFixed(d); return (v < 0 && +s !== 0 ? '\u2212' : '') + s; };const gx = (v, d = 0) => { const s = Math.abs(v).toFixed(d), [a, b] = s.split('.'); const t = a.replace(/\B(?=(\d{3})+(?!\d))/g, ','); return (v < 0 && +s !== 0 ? '\u2212' : '') + t + (b ? '.' + b : ''); };const pcx = (v, d = 1) => fx(100 * v, d) + '%';
+  const q = s => fig.querySelector(s);
+  const sl = [...fig.querySelectorAll('input[type=range]')], val = [...fig.querySelectorAll('.val')];
+  const rl = [...fig.querySelectorAll('input[name="v07-b71-list"]')], rm = [...fig.querySelectorAll('input[name="v07-b71-cut"]')];
+  function softmax(z) { const m = Math.max(...z), e = z.map(v => Math.exp(v - m)), s = e.reduce((a, b) => a + b, 0); return e.map(v => v / s); }
+  function sampleSet(logits, T, method, k, p, mp) {
+    const sh = softmax(logits.map(v => v / T));
+    const order = sh.map((v, i) => i).sort((a, b) => sh[b] - sh[a]);
+    let keep = sh.map(() => true);
+    if (method === 'top-k') keep = sh.map((v, i) => order.slice(0, k).includes(i));
+    else if (method === 'top-p') { let tot = 0; const kept = new Set();
+      for (const i of order) { kept.add(i); tot += sh[i]; if (tot >= p) break; }
+      keep = sh.map((v, i) => kept.has(i)); }
+    else if (method === 'min-p') { const cut = mp * Math.max(...sh); keep = sh.map(v => v >= cut); }
+    const s = sh.reduce((a, v, i) => a + (keep[i] ? v : 0), 0);
+    return [sh, keep, sh.map((v, i) => keep[i] ? v / s : 0)];
+  }
+  function draw() {
+    const li = rl[1].checked ? 1 : 0, lst = L[li], T = +sl[0].value, k = +sl[1].value, p = +sl[2].value, mp = +sl[3].value;
+    const method = rm.find(r => r.checked).value;
+    val[0].textContent = fx(T, 1); val[1].textContent = k; val[2].textContent = fx(p, 2); val[3].textContent = fx(mp, 2);
+    const [sh, keep, fin] = sampleSet(lst.map(t => t[1]), T, method, k, p, mp);
+    for (let i = 0; i < 6; i++) {
+      const row = q(`[data-row="${i}"]`);
+      if (i >= lst.length) { row.style.display = 'none'; continue; }
+      row.style.display = '';
+      q(`[data-nm="${i}"]`).textContent = lst[i][0];
+      q(`[data-lt="${i}"]`).textContent = fx(lst[i][1] / T, 2);
+      const w = Math.max(sh[i] * 200, 1.5), bar = q(`[data-sh="${i}"]`);
+      bar.setAttribute('width', w.toFixed(2));
+      bar.parentNode.setAttribute('class', keep[i] ? 's' : 'u');
+      bar.style.cssText = keep[i] ? '' : 'fill:none;stroke:var(--rule);stroke-dasharray:3 3';
+      const tv = q(`[data-sv="${i}"]`); tv.textContent = pcx(sh[i], sh[i] < 0.01 ? 2 : 1); tv.setAttribute('x', (160 + w + 6).toFixed(2));
+      const wf = fin[i] * 140, fb = q(`[data-fb="${i}"]`);
+      fb.setAttribute('width', Math.max(wf, keep[i] ? 1.5 : 0).toFixed(2));
+      const fv = q(`[data-fv="${i}"]`); fv.textContent = keep[i] ? pcx(fin[i], fin[i] < 0.01 ? 2 : 1) : 'dropped';
+      fv.setAttribute('x', (440 + Math.max(wf, 1.5) + 6).toFixed(2));
+    }
+    const nk = keep.filter(Boolean).length;
+    q('[data-sum]').textContent = `keeps ${nk} of ${lst.length} tokens; the most likely draw is ${lst[fin.indexOf(Math.max(...fin))][0]}, at ${pcx(Math.max(...fin))}`;
+  }
+  [...sl, ...rl, ...rm].forEach(e => e.addEventListener('input', draw));
+  [...rl, ...rm].forEach(e => e.addEventListener('change', draw));
+  q('button').addEventListener('click', () => {
+    rl[D.lst].checked = true; rm.find(r => r.value === D.method).checked = true;
+    sl[0].value = D.T; sl[1].value = D.k; sl[2].value = D.p; sl[3].value = D.mp; draw(); });
+  draw();
+})();</script></figure>

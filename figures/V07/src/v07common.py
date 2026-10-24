@@ -190,3 +190,8 @@ def in_order(item_id):
 def fwd(item_id, with_ref, without):
     """with_ref (containing a pointer to item_id) once item_id is in the order, else the plain text."""
     return with_ref if in_order(item_id) else without
+
+
+def nb(s):
+    """Bind an expression so body prose never wraps inside it: spaces become non-breaking."""
+    return s.replace(" ", " ")

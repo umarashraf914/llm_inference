@@ -83,12 +83,11 @@ def o001():
 
 def n01():
     b = [hd(40, 46, "One turn of the loop: text in, text out, and software in between")]
-    L = (40, 70, 258, 132)
-    R = (382, 70, 258, 132)
-    tools = ["run_tests(path): runs a test", "read_file(path): returns a file",
-             "edit_file(path, patch): edits it"]
-    call = ['{"name": "edit_file",', ' "arguments": {', '   "path": "tests/test_parser.py",',
-            '   "patch": "…" }}']
+    L = (40, 70, 258, 152)
+    R = (382, 70, 258, 152)
+    tools = ["run_tests(path)", "read_file(path)", "edit_file(path, find, replace)"]
+    call = ['{"name": "edit_file",', ' "arguments": {', '   "path": "parser.py",', '   "find": "a - b",',
+            '   "replace": "a + b"}}']
     b.append(cont(*L, "u", "In the prompt: the tools"))
     for k, s in enumerate(tools):
         assert width(s, "sub") < L[2] - 44
@@ -98,19 +97,19 @@ def n01():
         assert width(s, "sub") < R[2] - 44
         b.append(f'<g class="u"><text class="sub" x="{R[0] + 22}" y="{R[1] + 56 + k * 20}" '
                  f'style="white-space:pre">{s}</text></g>')
-    b.append(f'<line class="conn" x1="{L[0] + L[2] + 6}" y1="136" x2="{R[0] - 6}" y2="136" marker-end="url(#arw)"/>')
-    b.append(txt((L[0] + L[2] + R[0]) / 2, 126, "the model", "sub2", "middle"))
-    B = (205, 262, 270, 52)
+    b.append(f'<line class="conn" x1="{L[0] + L[2] + 6}" y1="146" x2="{R[0] - 6}" y2="146" marker-end="url(#arw)"/>')
+    b.append(txt((L[0] + L[2] + R[0]) / 2, 136, "the model", "sub2", "middle"))
+    B = (205, 282, 270, 52)
     b.append(box(*B, "u", "the serving software", "parses the call and runs the code", rx=6))
     b.append(f'<line class="conn" x1="540" y1="{R[1] + R[3] + 4}" x2="{B[0] + B[2] + 4}" y2="{B[1] + 26}" marker-end="url(#arw)"/>')
-    b.append(txt(552, 246, "if it parses", "sub2"))
+    b.append(txt(552, 266, "if it parses", "sub2"))
     b.append(f'<line class="conn" x1="{B[0] - 4}" y1="{B[1] + 26}" x2="140" y2="{L[1] + L[3] + 4}" marker-end="url(#arw)"/>')
-    b.append(txt(40, 252, "its output joins", "sub2"))
-    b.append(txt(40, 268, "the next prompt", "sub2"))
+    b.append(txt(40, 272, "its output joins", "sub2"))
+    b.append(txt(40, 288, "the next prompt", "sub2"))
     body, yb = para(B[1] + B[3] + 46, [
-        "A tool is described to the model in plain words: a name, its arguments and what it does. The "
-        "descriptions sit in the system prompt like any other text and cost tokens on every turn. The "
-        "code behind them never enters the model ({{fig:v01-o024}}). The three names here are "
+        "A tool is described to the model in plain words: a name, its arguments and a sentence on what it "
+        "does. The descriptions sit in the system prompt like any other text and cost tokens on every "
+        "turn. The code behind them never enters the model ({{fig:v01-o024}}). The three tools here are "
         "illustrative.",
         "The model cannot run anything. It writes text in a shape the serving software recognises as a "
         "call: a small object in JSON, a format for structured data, naming the tool and its arguments. "

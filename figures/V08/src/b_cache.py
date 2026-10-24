@@ -147,7 +147,7 @@ def b02():
         f"A step reads every weight and every stored key and value, so its time is bytes ÷ bandwidth: "
         f"(140 GB + requests × tokens × {n0(KV_PER_TOKEN)} bytes) ÷ 3.35 TB/s. The weights fix the "
         f"starting height, {f(t_w * 1e3, 1)} ms. The cache adds {f(slope * 1e6, 4)} microseconds per token "
-        f"of context, {f(slope * 1e6, 4)} ms per thousand, for every request in the batch.",
+        f"of context, {f(slope * 1e6, 4)} ms per thousand, for every request in the batch ({{{{fig:v07-o002}}}}).",
         f"That is a straight line. One request at 128k takes {f(step(1, CTX) * 1e3, 1)} ms a step; four take "
         f"{f(step(4, CTX) * 1e3, 1)} ms, more than twice the weights alone, and still produce only one "
         f"token each. For one request the cache matches the weights at {n0(cross[1])} tokens; for four, "

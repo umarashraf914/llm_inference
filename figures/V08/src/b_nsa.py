@@ -45,9 +45,10 @@ def o018():
     b.append(arr(340, 250, 340, 270))
     b.append(txt(340, 288, "one output for the query", "sub2", "middle"))
     body, yb = prose(330, [
-        "DeepSeek's native sparse attention makes the sparsity something the model learns rather than "
-        "something bolted on afterwards. Every query runs three branches at once, and each branch has its "
-        "own keys and values, computed from the same tokens, so each can specialise.",
+        "DeepSeek's native sparse attention makes the sparsity something the model learns in pretraining, "
+        "the long first training run on a huge body of text ({{fig:v01-o002}}), rather than something "
+        "bolted on afterwards. Every query runs three branches at once, and each branch has its own keys "
+        "and values, computed from the same tokens, so each can specialise.",
         "A compression branch cuts the older tokens into blocks and squashes each block into one coarse "
         "summary. A selection branch picks out a few important blocks and keeps them at full detail. A "
         "sliding branch handles whatever is nearby. The next four figures take them in turn: what each "
@@ -268,7 +269,8 @@ def b13():
         "context, but it has few heads and works in 8-bit numbers, far cheaper per pair than the "
         f"attention it saves. Single tokens can follow the weight wherever it lands: with the same "
         f"budget here, they catch {pct(got_t, 0)} of it and two whole blocks {pct(got_b, 0)}.",
-        "DeepSeek cut its API prices by more than half on the same day.",
+        "DeepSeek cut the prices of its API, what developers pay per token, by more than half on the "
+        "same day.",
     ])
     emit("b13", stamp("picks single tokens rather"),
          "DeepSeek Sparse Attention reads single tokens: 2,048 of 131,072 per query", yb + 30, b + [body],

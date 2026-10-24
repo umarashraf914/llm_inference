@@ -44,7 +44,60 @@ def test_n07(pg, static):
     return checked
 
 
-TESTS = {"v09-n07": (test_n07, "[data-r]")}
+def test_n24w(pg, static):
+    import decode as d
+    fid = "v09-n24w"
+    B0, D0, A0 = d.BS2[d.INIT[0]], d.INIT[1], d.AS[d.INIT[2]]
+    want0 = d.lines24(B0, D0, A0)
+    assert static[fid] == want0, (static[fid], want0)
+    checked = 0
+    for i, B in enumerate(d.BS2):
+        set_range(pg, fid, 0, i)
+        for dr in range(d.DMAX + 1):
+            set_range(pg, fid, 1, dr)
+            for j, a in enumerate(d.AS):
+                set_range(pg, fid, 2, j)
+                got = texts(pg, fid, "[data-l]")
+                want = d.lines24(B, dr, a)
+                assert got == want, (B, dr, a, got, want)
+                assert texts(pg, fid, ".val") == [f"{B:,}", str(dr), f"{a:.1f}"]
+                checked += len(want)
+    click(pg, fid, "Reset")
+    assert texts(pg, fid, "[data-l]") == want0
+    return checked
+
+
+READ27 = """fid => { const f = document.getElementById(fid), q = s => f.querySelector(s), out = [];
+  for (const s of ['[data-k]', '[data-pre]', '[data-next]', '[data-state]']) out.push(q(s).textContent);
+  for (let i = 0; i < 5; i++) { const g = q(`[data-row="${i}"]`);
+    if (g.getAttribute('visibility') === 'hidden') continue;
+    for (const s of ['[data-c]', '[data-pv]', '[data-av]']) out.push(g.querySelector(s).textContent); }
+  out.push(q('[data-tot]').textContent); return out; }"""
+
+
+def test_n27w(pg, static):
+    import pick
+    fid = "v09-n27w"
+    want0 = pick.lines27(0)
+    assert static[fid] == want0, (static[fid], want0)
+    checked = 0
+    for k in range(len(pick.STEPS)):
+        if k:
+            click(pg, fid, "Next")
+        got = pg.evaluate(READ27, fid)
+        want = pick.lines27(k)
+        assert got == want, (k, got, want)
+        checked += len(want)
+    for k in range(len(pick.STEPS) - 2, -1, -1):      # and back again
+        click(pg, fid, "Back")
+        assert pg.evaluate(READ27, fid) == pick.lines27(k), k
+    click(pg, fid, "Next")
+    click(pg, fid, "Reset")
+    assert pg.evaluate(READ27, fid) == want0
+    return checked
+
+
+TESTS = {"v09-n07": (test_n07, "[data-r]"), "v09-n24w": (test_n24w, "[data-l]"), "v09-n27w": (test_n27w, None)}
 
 
 def main():
@@ -57,7 +110,8 @@ def main():
         ctx = b.new_context(java_script_enabled=False)
         st = ctx.new_page()
         st.goto(page.as_uri())
-        static = {fid: texts(st, fid, sel) for fid, (_, sel) in TESTS.items() if f"id='{fid}'" in html}
+        static = {fid: (texts(st, fid, sel) if sel else st.evaluate(READ27, fid))
+                  for fid, (_, sel) in TESTS.items() if f"id='{fid}'" in html}
         ctx.close()
         pg.goto(page.as_uri())
         pg.wait_for_timeout(300)
@@ -66,7 +120,7 @@ def main():
             if f"id='{fid}'" not in html:
                 print(f"{fid}: not in this build")
                 continue
-            got = texts(pg, fid, sel)
+            got = texts(pg, fid, sel) if sel else pg.evaluate(READ27, fid)
             assert got == static[fid], f"{fid}: the script's first draw differs from Python's static state"
             k = fn(pg, static)
             total += k

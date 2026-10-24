@@ -230,7 +230,7 @@ def b23():
             b.append(txt(X0 + L + 8, yy + 16, f"request {k + 1}", "sub2"))
         b.append(txt(X0, y + 2 * 32 + 14, f"shared prefix: {pct(share)}", "sub2"))
         y += 2 * 32 + 44
-    b.append(txt(X0, y - 4, f"system {SYS} + document or chunks {n0(MID)} + question {QN} tokens; teal reused, red computed afresh", "sub2"))
+    b.append(txt(X0, y - 4, f"{SYS} system + {n0(MID)} document or chunks + {QN} question; teal reused, red recomputed", "sub2"))
     body, yb = prose(y + 40, [
         "Prefix caching, which episode 7 built ({{fig:v07-o012}}), works because an identical run of "
         "tokens produces identical keys and values, so the shared front of a prompt can be computed once "

@@ -228,7 +228,8 @@ def p05():
         "({{fig:v01-o114}}) and about twice that again for the backward pass that finds the gradient "
         "({{fig:v03-o060}}). So a run's compute is about 6 × N × D, for N parameters and D tokens.",
         "In 2022 DeepMind's Chinchilla paper held that budget fixed and asked how to split it. Its answer "
-        "was to grow the model and its data together. Chinchilla has a quarter of Gopher's parameters, "
+        "was to grow the model and its data together. Chinchilla has a quarter of the parameters of "
+        "Gopher, DeepMind's earlier model, "
         f"trained on {CHIN['D'] / GOPHER['D']:.1f} times the tokens, and beat it: {tpp_c:.0f} tokens per "
         f"parameter, against Gopher's {tpp_g:.1f}.",
         "6 × N × D puts the two runs within a sixth of each other; the paper's fuller count gives Gopher "
@@ -264,8 +265,9 @@ def o006():
     b.append(txt(X0 + 12, 352, f"{work * 1e3:.2f} ms, {100 * work / read:.2f}% of the time", "sub2"))
     assert round(read * 1e3) == 200 and round(work * 1e3, 2) == 0.68 and work / read < 0.01
     body, y = prose(408, [
-        "At decode, producing each new token means reading every weight out of HBM and across the memory "
-        f"bus ({{{{fig:v01-o105}}}}). For 671 billion weights at one byte each, an H100's {nb('3.35 TB/s')} needs "
+        "At decode, the phase that writes the answer one token at a time ({{fig:v01-o109}}), producing each "
+        f"new token means reading every weight out of HBM and across the memory bus ({{{{fig:v01-o105}}}}). "
+        f"For 671 billion weights at one byte each, an H100 GPU's {nb('3.35 TB/s')} needs "
         f"{read * 1e3:.0f} ms. The arithmetic is two operations per weight, which the same chip does at "
         f"1,979 trillion a second in FP8: {work * 1e3:.2f} ms. Arithmetic is under 1% of each token's "
         "time, as {{fig:v01-o129}} found; the pace is set by the reading.",

@@ -1,0 +1,42 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 21:24</div><h3>The MoE calculator</h3><div class='wg'><div class='ctl'><label class='opt'><input type='radio' name='v06-p46-model' value='deepseek' checked> DeepSeek V3</label><label class='opt'><input type='radio' name='v06-p46-model' value='mixtral'> Mixtral</label><button type='button'>Reset</button></div><div class='ctl'><label>routed experts N <input type='range' min='0' max='7' step='1' value='5'><span class='val'>256</span></label><label>experts per token K <input type='range' min='1' max='16' step='1' value='8'><span class='val'>8</span></label><label>shared experts <input type='range' min='0' max='2' step='1' value='1'><span class='val'>1</span></label><label>expert width <input type='range' min='0' max='6' step='1' value='3'><span class='val'>2,048</span></label></div><svg viewBox='0 0 680 632' role='img'><title>The MoE calculator</title><text class="hd" x="40" y="34">The calculator, set to <tspan data-r="name">DeepSeek V3</tspan></text><text class="sub2" x="40" y="66">held, every weight: <tspan data-r="held">671.0 B</tspan></text><text class="sub2" x="40" y="90">memory at one byte a weight: <tspan data-r="mem">671.0 GB</tspan></text><text class="sub2" x="40" y="114">run per token: <tspan data-r="run">36.6 B</tspan></text><text class="sub2" x="40" y="138">run as a share of held: <tspan data-r="share">5.5%</tspan></text><text class="sub2" x="40" y="162">operations per token: <tspan data-r="ops">73.3 billion</tspan></text><text class="sub2" x="40" y="186">possible teams of experts: <tspan data-r="teams">4.1 × 10¹⁴</tspan></text><text class="cap" x="40" y="239" text-anchor="start">held</text><g class="h"><rect x="200.0" y="220.0" width="420.0" height="26.0" rx="3"/></g><text class="cap" x="40" y="275" text-anchor="start">run per token</text><g class="m"><rect x="200" y="256" width="22.9" height="26" rx="3" data-bar="run"/></g><text class="sub2" x="200" y="302" text-anchor="start">to scale, against the model as held</text><text class="cap" x="40" y="346" text-anchor="start">Pick a model, then turn its MoE dials. The routed experts N and the expert width set</text><text class="cap" x="40" y="366" text-anchor="start">what is held; the experts per token K and the shared experts set what runs. Attention,</text><text class="cap" x="40" y="386" text-anchor="start">the dense layers and the embeddings stay as published.</text><text class="cap" x="40" y="426" text-anchor="start">Held is every weight. Run counts the weights a token is multiplied by, so it leaves out</text><text class="cap" x="40" y="446" text-anchor="start">the embedding table, which is only looked up. The presets give DeepSeek V3's 671.0 and</text><text class="cap" x="40" y="466" text-anchor="start">36.6 billion and Mixtral's 46.7 and 12.7 billion; the published 37 and 12.9 differ only</text><text class="cap" x="40" y="486" text-anchor="start">in how they count the embedding table ({{fig:v06-p45}}, {{fig:v06-p11}}).</text><text class="cap" x="40" y="526" text-anchor="start">A cluster holds the full set, every expert resident on some GPU, and ships each token to</text><text class="cap" x="40" y="546" text-anchor="start">the experts it picked: per-token compute tracks what runs while memory tracks what is</text><text class="cap" x="40" y="566" text-anchor="start">held. That decoupling is what lets totals keep climbing. The early DeepSeek V4 Pro</text><text class="cap" x="40" y="586" text-anchor="start">figures reach 1.6 trillion total parameters, with the active count still in the tens of</text><text class="cap" x="40" y="606" text-anchor="start">billions. The calculator's arithmetic was checked against Python.</text></svg></div><figcaption>The two dials of the mechanism, with the rest of a real model attached. Double N and the memory nearly doubles while the work stays put; double K and only the work moves.</figcaption><script>(() => {
+  const fig = document.currentScript.closest('figure');
+  const ARCH = {"deepseek": {"name": "DeepSeek V3", "d": 7168, "layers": 61, "dense": 3, "ffn_dense": 18432, "attn": 187107328, "vocab": 129280, "N": 256, "K": 8, "S": 1, "w": 2048}, "mixtral": {"name": "Mixtral", "d": 4096, "layers": 32, "dense": 0, "ffn_dense": 0, "attn": 41943040, "vocab": 32000, "N": 8, "K": 2, "S": 0, "w": 14336}}, NS = [8, 16, 32, 64, 128, 256, 384, 512], WS = [512, 1024, 1536, 2048, 3584, 7168, 14336], CX = 200, CW = 420;
+  const sl = [...fig.querySelectorAll('input[type=range]')], val = [...fig.querySelectorAll('.val')];
+  const rad = [...fig.querySelectorAll('input[type=radio]')], q = s => fig.querySelector(s);
+  const fmt = (v, d = 2) => (v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+  const group = s => s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const one = v => group((v / 1e9).toFixed(1));
+  const sup = s => s.replace(/[0-9]/g, c => '⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]);
+  function teams(c) {
+    if (c < 1e6) return group(String(Math.round(c)));
+    let m = c, e = 0; while (m >= 10) { m /= 10; e++; }
+    return `${fmt(m, 1)} × 10${sup(String(e))}`;
+  }
+  function calc(a, N, K, S, w) {
+    const d = a.d, moe = a.layers - a.dense, expert = 3 * d * w;
+    const held = a.layers * (a.attn + 2 * d) + a.dense * 3 * d * a.ffn_dense + moe * ((N + S) * expert + N * d) + 2 * a.vocab * d + d;
+    const run = held - a.vocab * d - moe * (N - K) * expert;
+    let t = 1; for (let i = 0; i < K; i++) t = t * (N - i) / (i + 1);
+    return {held, run, ops: 2 * run, teams: t};
+  }
+  const arch = () => ARCH[rad[0].checked ? 'deepseek' : 'mixtral'];
+  function setTo(a) {
+    sl[0].value = NS.indexOf(a.N); sl[1].value = a.K; sl[2].value = a.S; sl[3].value = WS.indexOf(a.w);
+  }
+  function draw() {
+    const a = arch(), N = NS[+sl[0].value];
+    if (+sl[1].value > N) sl[1].value = N;
+    const K = +sl[1].value, S = +sl[2].value, w = WS[+sl[3].value];
+    [String(N), String(K), String(S), group(String(w))].forEach((s, i) => val[i].textContent = s);
+    const r = calc(a, N, K, S, w), set = (k, v) => q(`[data-r="${k}"]`).textContent = v;
+    set('held', one(r.held) + ' B'); set('run', one(r.run) + ' B'); set('mem', one(r.held) + ' GB');
+    set('ops', one(r.ops) + ' billion'); set('share', fmt(100 * r.run / r.held, 1) + '%'); set('teams', teams(r.teams));
+    set('name', a.name);
+    const big = Math.max(r.held, 1);
+    q('[data-bar="run"]').setAttribute('width', Math.max(r.run / big * CW, 2).toFixed(1));
+  }
+  sl.forEach(s => s.addEventListener('input', draw));
+  rad.forEach(r => r.addEventListener('change', () => { setTo(arch()); draw(); }));
+  q('button').addEventListener('click', () => { rad[0].checked = true; setTo(ARCH.deepseek); draw(); });
+  draw();
+})();</script></figure>

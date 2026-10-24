@@ -260,8 +260,8 @@ def o031():
             b.append(txt(200 + w + 10, y + 20, note, "sub2"))
     body, yb = prose(232, [
         "A byte is the space one character of plain text takes in a computer ({{fig:v01-o073}} builds it "
-        "from bits), and a kilobyte, KB, is a thousand bytes. A whole turn crosses the network in a few tens "
-        "of kilobytes.",
+        "from bits), and a kilobyte, KB, is a thousand bytes ({{fig:v01-p05}} lists the prefixes). A whole "
+        "turn crosses the network in a few tens of kilobytes.",
         f"Inside the machine the same answer reads the model's weights once per token. The weights take 140 "
         f"billion bytes, so 500 tokens read 70 million million bytes, 70 terabytes: about "
         f"{f(ratio / 1e9, 1)} billion times the 26 KB that crossed the network.",

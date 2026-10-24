@@ -69,17 +69,19 @@ def p06():
     b.append(text(X(-3), Y - 14, "the same, mirrored", "sub2", "middle"))
     # FP6 beside FP4
     ty = Y + 62
-    cols = [40, 170, 300, 410, 530]
-    for c, s in zip(cols, ["format", "sign, exp, mant", "largest", "finest step", "values ≥ 0"]):
+    cols = [40, 150, 250, 340, 445, 570]
+    heads = ["format", "s + e + m", "largest", "smallest > 0", "steps per doubling", "values ≥ 0"]
+    for c, s in zip(cols, heads):
         b.append(text(c, ty, s, "sub2"))
-    for r, (name, lay, Lm) in enumerate([("FP4  E2M1", "1 + 2 + 1", L4), ("FP6  E2M3", "1 + 2 + 3", L23),
-                                         ("FP6  E3M2", "1 + 3 + 2", L32)]):
+    for r, (name, lay, Lm, mb) in enumerate([("FP4  E2M1", "1 + 2 + 1", L4, 1), ("FP6  E2M3", "1 + 2 + 3", L23, 3),
+                                             ("FP6  E3M2", "1 + 3 + 2", L32, 2)]):
         y = ty + 24 + r * 22
         b.append(text(cols[0], y, name, "cap"))
         b.append(text(cols[1], y, lay, "sub2"))
         b.append(text(cols[2], y, f"{float(Lm['max']):g}", "sub2"))
         b.append(text(cols[3], y, f"{float(Lm['min_sub']):g}", "sub2"))
-        b.append(text(cols[4], y, str(Lm["codes"]), "sub2"))
+        b.append(text(cols[4], y, str(2 ** mb), "sub2"))
+        b.append(text(cols[5], y, str(Lm["codes"]), "sub2"))
     body, y = prose(ty + 24 + 3 * 22 + 28, [
         "Below the eight-bit floats sit six and four bits. Four bits make only sixteen patterns, so FP4 "
         "can be listed in full. The two exponent bits pick a power of two after subtracting the bias of "
@@ -88,7 +90,7 @@ def p06():
         "The steps grow 0.5, 0.5, 0.5, 0.5, 1, 1, 2: the float staircase of {{fig:v04-o022}} in "
         "miniature. Nothing is reserved: these small formats have no infinity and no not-a-number, so "
         "every code is a number. FP6 splits its six bits two ways, as FP8 does: more exponent reaches "
-        "28, more mantissa steps eight times finer.",
+        "28, more mantissa cuts each power of two into eight steps instead of four.",
         "Alone, FP4 covers only 0.5 to 6. It becomes useful with a scale shared by a small block of "
         "values, which is how MXFP4 and NVFP4 use it ({{fig:v04-o076}}).",
     ])
@@ -137,7 +139,7 @@ def p07():
     b.append(body)
     emit("p07", st("for the wider range that"), "How far each eight-bit float reaches", y + 26, b,
          "Same eight bits, two answers. E5M2 buys fourteen more powers of two of reach with one mantissa "
-         "bit, so its steps are twice as wide as E4M3's everywhere.")
+         "bit: wherever both formats hold normal numbers, its steps are twice as wide.")
 
 
 # ---- o031: FP16's window, moved to where the video returns to it ----------------------------------------
@@ -146,8 +148,8 @@ def o031():
     mn, mx = Lm["min_normal"], Lm["max"]
     assert mn == Fr(1, 2 ** 14) and mx == (2 - Fr(1, 1024)) * 2 ** 15 == 65504
     b = [hd(40, 46, "FP16 has five exponent bits, so its bias is 15")]
-    b.append(box(60, 70, 260, 42, "s", "smallest normal = 2^(1 − 15) = 2^−14"))
-    b.append(box(360, 70, 260, 42, "s", "largest = (2 − 2^−10) × 2^15"))
+    b.append(box(60, 70, 260, 42, "s", "smallest normal = 2¹⁻¹⁵ = 2⁻¹⁴"))
+    b.append(box(360, 70, 260, 42, "s", "largest = (2 − 2⁻¹⁰) × 2¹⁵"))
     b.append(box(60, 128, 260, 42, "m", f"= {float(mn):.6f}…, or {fs(float(mn), 2)}"))
     b.append(box(360, 128, 260, 42, "m", f"= {fi(mx)}"))
     body, y = prose(214, [
@@ -272,8 +274,8 @@ def p09():
     b.append(eq(60, 278, 270, f"q  =  round(x ÷ s)  +  z", "m"))
     b.append(eq(350, 278, 270, f"read back  =  s  ×  (q  −  z)", "u"))
     body, y = prose(370, [
-        f"A symmetric grid is centred on zero, so data that leans to one side wastes half of it: here "
-        f"only {len(used)} of the 15 codes are ever used. A zero-point, an integer z stored with the "
+        f"A symmetric grid is centred on zero, so data that leans to one side leaves part of it empty: "
+        f"here only {len(used)} of the 15 codes are ever used. A zero-point, an integer z stored with the "
         "scale, slides the grid so its 16 codes span exactly the data: real 0 lands on code 2, −1 on "
         f"code 0, 6.5 on code 15, and the step is {f(ratio, 2)} times finer.",
         "Values outside the span are clamped: 7.2 gives round(14.4) + 2 = 16, past the last code, so it "
@@ -327,7 +329,7 @@ def p10():
     b.append(body)
     emit("p10", st("One outlier stretches the"), "The outlier's price is paid by every ordinary value",
          y + 26, b,
-         "Same value, same eight bits, a hundredfold difference in error, decided entirely by a "
+         "Same value, same eight bits, a hundred times the worst-case error, decided entirely by a "
          "neighbour. Every outlier method later in this atlas is an attempt to stop this.")
 
 
@@ -412,7 +414,7 @@ def o036():
     b.append(rect(xs0, Y - 46, xs1 - xs0, 16, "m", rx=2))
     b.append(rect(xs1, Y - 46, xs2 - xs1, 16, "s", rx=2))
     b.append(decades(X, lo, hi, Y, every=2))
-    b.append(text(xs0, Y + 40, "3 × 10⁻⁸: below, exactly 0", "sub2", "end"))
+    b.append(text(xs0, Y + 40, "3 × 10⁻⁸", "sub2", "middle"))
     b.append(text(xs1, Y + 40, "6 × 10⁻⁵", "sub2", "middle"))
     b.append(text(xs2, Y + 40, "65,504", "sub2", "middle"))
     body, y = prose(Y + 82, [
@@ -448,8 +450,8 @@ def o037():
         b.append(f'<line class="tick" x1="{WX(t0):.1f}" y1="{LY(sc * LOSS(w0) + sc * g * (t0 - w0)):.1f}" '
                  f'x2="{WX(t1):.1f}" y2="{LY(sc * LOSS(w0) + sc * g * (t1 - w0)):.1f}" stroke-dasharray="4 3"/>')
         b.append(dot(WX(w0), LY(sc * LOSS(w0)), 4, "m" if sc == 1 else "h"))
-    b.append(text(WX(w0) + 10, LY(LOSS(w0)) + 16, f"loss: slope {g}", "sub2 halo"))
-    b.append(text(WX(w0) - 10, LY(S * LOSS(w0)) - 8, f"{S} × loss: slope {S * g}", "sub2 halo", "end"))
+    b.append(text(WX(w0) + 10, LY(LOSS(w0)) + 16, f"loss: slope {g:g}", "sub2 halo"))
+    b.append(text(WX(w0) - 10, LY(S * LOSS(w0)) - 8, f"{S} × loss: slope {S * g:g}", "sub2 halo", "end"))
     b.append(text((L + R) / 2, B + 22, "the weight's value", "sub2", "middle"))
     xr = 420
     b.append(text(xr, 92, "the three steps", "hd"))
@@ -459,7 +461,7 @@ def o037():
         b.append(text(xr, 120 + k * 22, s, "sub2"))
     body, y = prose(B + 60, [
         "Stretching a curve upwards by a factor S stretches its slope at every point by the same factor: "
-        "if the loss rose 0.003 for a 0.001 step in a weight, S times the loss rises S × 0.003. So "
+        "if the loss rose 0.003 for a 0.001 step in a weight, S times the loss rises " + nb("S × 0.003") + ". So "
         "scaling the loss scales every gradient in the network at once, lifting the tiny ones above the "
         "floor of {{fig:v04-o036}}. Dividing by S again before the update leaves each step exactly as "
         "it would have been.",
@@ -502,7 +504,6 @@ def p12():
     b.append(dot(X(h), Y, 5, "s"))
     b.append(arr(X(g) + 8, Y - 34, X(h) - 8, Y - 34))
     b.append(text((X(g) + X(h)) / 2, Y - 44, "× 65,536 = 2¹⁶, before the backward pass", "sub2", "middle"))
-    b.append(text(X(g), Y - 14, "10⁻⁸", "sub2", "middle"))
     b.append(text(X(h), Y - 14, "6.55 × 10⁻⁴", "sub2", "middle"))
     ty = Y + 100
     rows = [("the gradient", fs(g, 2), "FP16 stores 0"),

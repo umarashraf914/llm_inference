@@ -121,7 +121,7 @@ def a14():
 def a15():
     b = [hd(40, 46, "Expected tokens from one pass, each term to scale")]
     X0, S = 150, 150
-    b.append(txt(40, 89, "α = 0.7", "cap"))
+    b.append(txt(40, 89, "at α = 0.7", "cap"))
     xx = X0
     shown = ["1", "0.7", "0.49", "0.34", "0.24", "0.17"]
     for k, v in enumerate(TERMS):
@@ -133,7 +133,7 @@ def a15():
         ["1", "0.7", "0.49", "0.34", "0.24", "0.17"]
     b.append(txt(xx + 10, 89, f"= {E5:.2f}", "sub2"))
     b.append(txt(X0 + S + 4, 140, "guess 1 to guess 5: each one's chance of being kept", "sub2"))
-    b.append(txt(40, 189, "α = 0.709", "cap"))
+    b.append(txt(40, 189, "at α = 0.709", "cap"))
     b.append(ghost(X0, 170, 3 * S - 2, 30, label=f"{tokens(A3, GAMMA):.2f} tokens: the three of {{{{fig:v08-o008}}}}"))
     y3 = 246
     b.append(txt(40, y3, f"speed-up at α = 0.7: {E5:.2f} tokens ÷ 1.05 passes' worth of bytes = "
@@ -193,9 +193,9 @@ def a16():
         "first: every term that appears in both cancels, leaving 1 − α⁶.",
         "So S × (1 − α) = 1 − α⁶, and dividing gives S = (1 − α⁶) ÷ (1 − α). With α = 0.7 that is "
         f"0.882351 ÷ 0.3 = {(1 - a6) / 0.3:.3f}, the same as adding the six terms one by one.",
-        "With γ guesses instead of five the same subtraction leaves α to the power γ + 1 at the end, "
-        "and S = (1 − α to the γ + 1) ÷ (1 − α): the formula the 2022 paper gives for the expected "
-        "tokens per pass.",
+        "With γ guesses instead of five, the term left at the end is α multiplied by itself γ + 1 "
+        "times, and S is 1 minus that term, divided by 1 − α: the formula the 2022 paper gives for "
+        "the expected tokens per pass.",
     ])
     emit("a16", at("The real speed up always lands a little under"),
          "Summing the series without adding it up: multiply by α and subtract", yb + 30, b + [body],
@@ -210,7 +210,6 @@ def a17():
     panels = [(0.6, 60, 196), (0.7, 380, 196), (0.8, 60, 400), (0.9, 380, 400)]
     for a, x0, yb0 in panels:
         ceil_ = 1 / (1 - a)
-        b.append(txt(x0, yb0 - 128, f"α = {a:g}", "hd"))
         for g in range(1, 11):
             e = tokens(a, g)
             assert e < ceil_
@@ -224,6 +223,7 @@ def a17():
         b.append(ln(x0, yb0, x0 + PW - 8, yb0, "axis"))
         b.append(txt(x0, yb0 + 16, "γ = 1", "sub2"))
         b.append(txt(x0 + PW - 8, yb0 + 16, "10", "sub2", "end"))
+        b.append(txt(x0, yb0 - 128, f"α = {a:g}", "hd"))
     gains = {a: tokens(a, 10) - tokens(a, 5) for a, _, _ in panels}
     assert round(gains[0.6], 2) == 0.11 and round(gains[0.9], 2) == 2.18
     body, yb = prose(452, [
@@ -255,7 +255,7 @@ def wstate(a, g, c):
 
 def wtext(a, g, c):
     E, S, best, ceil_ = wstate(a, g, c)
-    l1 = (f"γ = {g}: {f(E[g - 1])} tokens a pass, for {f(1 + g * c)} passes' worth of time: "
+    l1 = (f"with γ = {g}: {f(E[g - 1])} tokens a pass, for {f(1 + g * c)} passes' worth of time: "
           f"{f(S[g - 1])}× faster")
     l2 = f"ceiling 1 ÷ (1 − α) = {f(ceil_)} tokens; best draft length {best}, at {f(S[best - 1])}×"
     return l1, l2
@@ -286,7 +286,7 @@ W_JS = r"""<script>(() => {
     lab.setAttribute('y', (yc - 6).toFixed(2)); lab.textContent = 'ceiling ' + fmt(ceil);
     const bx = X + (best - 1) * PITCH + BW / 2, bl = q$('[data-best]');
     bl.setAttribute('x', bx.toFixed(2));
-    q$('[data-l1]').textContent = 'γ = ' + g + ': ' + fmt(E[g - 1]) + ' tokens a pass, for ' + fmt(1 + g * c) +
+    q$('[data-l1]').textContent = 'with γ = ' + g + ': ' + fmt(E[g - 1]) + ' tokens a pass, for ' + fmt(1 + g * c) +
       " passes' worth of time: " + fmt(S[g - 1]) + '× faster';
     q$('[data-l2]').textContent = 'ceiling 1 ÷ (1 − α) = ' + fmt(ceil) + ' tokens; best draft length ' + best +
       ', at ' + fmt(S[best - 1]) + '×';

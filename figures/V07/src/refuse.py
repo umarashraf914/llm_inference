@@ -204,7 +204,8 @@ def b52():
         "total for each tenant of the input and output tokens it has been served, and always serves "
         f"whoever has received least. Here a request is charged its input tokens plus twice its "
         f"output tokens, the weighting the paper's experiments used: A's {A_IN} in and {A_OUT} out "
-        f"count {ua}, and B's, five times larger, {ub}.",
+        f"count {ua}, and B's, five times larger, {ub}. The paper adds output tokens as they are "
+        "generated; serving one request at a time, as here, that comes to the same total.",
         f"Step through it: B is served once and its counter jumps to {ub}, so A is served until it "
         f"catches up, then B again. After twelve choices A has had {na} requests and B {STEPS - na}, "
         f"and each has received {g(ca)} units. Switch to taking turns and B takes "
@@ -247,7 +248,7 @@ def b53():
     assert round(t47 * 1e3, 2) == 19.86 and round(t55 * 1e3, 2) == 22.42
     assert round(thr47) == 2367 and round(thr55) == 2453
     b = [hd(40, 46, "One decode step, to scale: the weights read once, then every request's cache")]
-    X0, SC = 150, 20000                        # px per second: 20 ms = 400 px
+    X0, SC = 150, 18000                        # px per second: 20 ms = 360 px
     wt = W8 / BW
     for k, (n, t) in enumerate([(47, t47), (55, t55)]):
         y = 74 + k * 50
@@ -310,15 +311,16 @@ def b54():
     b = [hd(40, 46, f"GPUs needed at {RATE} requests a second, drawn to scale")]
     X0, SC = 220, 50
     for k, (lab, i, o, pg, dg) in enumerate(res):
-        y = 76 + k * 64
+        y = 76 + k * 74
         b.append(txt(40, y + 14, lab, "cap"))
         b.append(txt(40, y + 30, f"{g(i)} in, {g(o)} out", "sub2"))
         b.append(cell(X0, y, pg * SC, 30, "m", label="prefill" if pg * SC > 70 else None))
         b.append(cell(X0 + pg * SC, y, dg * SC, 30, "s", label="decode" if dg * SC > 70 else None))
-        b.append(txt(X0 + (pg + dg) * SC + 10, y + 19, f"{f(pg)} + {f(dg)}: {pc(pg / (pg + dg), 0)} prefill", "sub2"))
-    b.append(cell(X0, 210, 12, 12, "m")); b.append(txt(X0 + 18, 220, "prefill GPUs", "sub2"))
-    b.append(cell(X0 + 120, 210, 12, 12, "s")); b.append(txt(X0 + 138, 220, "decode GPUs", "sub2"))
-    body, yb = prose(262, [
+        b.append(txt(X0, y + 46, f"{f(pg)} prefill + {f(dg)} decode GPUs: {pc(pg / (pg + dg), 0)} prefill", "sub2"))
+        assert X0 + (pg + dg) * SC < 640
+    b.append(cell(X0, 232, 12, 12, "m")); b.append(txt(X0 + 18, 242, "prefill GPUs", "sub2"))
+    b.append(cell(X0 + 120, 232, 12, 12, "s")); b.append(txt(X0 + 138, 242, "decode GPUs", "sub2"))
+    body, yb = prose(284, [
         "Prefill GPUs are needed in proportion to prompt tokens, decode GPUs in proportion to output "
         f"tokens. Take the per-GPU rates of the 96-GPU SGLang run: 52,300 ÷ 8 = {g(IN_GPU, 1)} prompt "
         f"tokens a second on a prefill GPU, and 22,300 ÷ 8 = {g(OUT_GPU, 1)} output tokens on a decode "

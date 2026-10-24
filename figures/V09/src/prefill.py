@@ -204,7 +204,7 @@ def n13():
     steps = [("the score matrix goes out to memory", "and back, at every layer", "v1: build it tile by tile",
               "on chip, never store it", "v03-o037"),
              ("scalar work sits between the", "matrix multiplies", "v2: do less of it, and split",
-              "the work across more blocks", "v03-o066"),
+              "the work across more blocks", "v03-o065"),
              ("copying and multiplying", "take turns", "v3: asynchronous units", "run them at the same time",
               "v03-o072"),
              ("Blackwell's tensor cores: 2.25×", "faster; its exponential unit: not", "v4: some exponentials by",

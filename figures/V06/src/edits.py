@@ -64,6 +64,14 @@ def reprose(i, y0, paras):
 # ---- Part 1 ---------------------------------------------------------------------------------------
 replace("o001", "The distinction the whole video turns on", "The distinction the whole subject turns on")
 restamp("o002", "The other 634 billion sit in memory")
+reprose("o002", 200, [
+    "DeepSeek V3, the open model this atlas keeps returning to, holds 671 billion parameters, and a token is "
+    "multiplied against only 37 billion of them. The other 634 billion sit in memory untouched by this "
+    "token, waiting for the other tokens that will need them.",
+    "That gap is the whole of mixture of experts, MoE for short. By the end of this document we can derive "
+    "the split, say which parts of the model a token gets to skip, and account for what the skipping costs "
+    "everywhere else in the system.",
+])
 
 # ---- Part 3 and 4 ---------------------------------------------------------------------------------
 restamp("o007", "A transformer layer does two different jobs")
@@ -101,6 +109,19 @@ reprose("o015", 474, [
 # ---- Part 9: routing collapse ------------------------------------------------------------------------
 restamp("o017", "Token choice has a failure mode")
 restamp("o018", "The classic fix introduced by Shazeer")       # o018 is redrawn whole in balance.py
+
+
+# ---- Part 11: the memory bill gets its "1 byte each" (o020 and o021 are redrawn in serving.py) --------
+restamp("o019", "Start with the memory")
+replace("o019", ">671B parameters at FP8</text>", ">671 billion at FP8, 1 byte each</text>")
+
+
+# ---- Part 13: how to read a headline; its closing paragraphs move to the series recap (P48) ------------
+restamp("o023", "Just do not read those headline totals")
+reprose("o023", 238, [
+    "Neither number measures how capable a model is. A total says how much is stored and must be held; an "
+    "active count says how much work each token costs. The next figure reads five of them side by side.",
+])
 
 
 # ---- part labels, renumbered for the three parts the pass adds (s11 Part 8, s12 Part 10, s13 Part 13) ----

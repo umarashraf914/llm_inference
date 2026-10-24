@@ -1,0 +1,37 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 11:38</div><h3>Chunk size, priced both ways</h3><div class='wg'><div class='ctl'><label>budget <input type='range' min='0' max='8' step='1' value='4'><span class='val'>512</span></label><label>prompt <input type='range' min='0' max='4' step='1' value='2'><span class='val'>2,000</span></label><button type='button'>Reset</button></div><svg viewBox='0 0 680 494' role='img'><title>Chunk size, priced both ways</title><text class="hd" x="40" y="34">From the prompt's arrival to its first token, each step drawn to scale in time</text><text class="cap" x="40" y="83" text-anchor="start">steps</text><text class="cap" x="40" y="115" text-anchor="start">a user's tokens</text><g data-lane=""><g class="h"><rect x="150.00" y="66" width="100.35" height="24" rx="1"/></g><g class="s"><rect x="249.85" y="102" width="2" height="16" rx="0.5"/></g><g class="h"><rect x="251.35" y="66" width="100.35" height="24" rx="1"/></g><g class="s"><rect x="351.19" y="102" width="2" height="16" rx="0.5"/></g><g class="h"><rect x="352.69" y="66" width="100.35" height="24" rx="1"/></g><g class="s"><rect x="452.54" y="102" width="2" height="16" rx="0.5"/></g><g class="h"><rect x="454.04" y="66" width="100.35" height="24" rx="1"/></g><g class="s"><rect x="553.88" y="102" width="2" height="16" rx="0.5"/></g><g class="h"><rect x="555.38" y="66" width="73.62" height="24" rx="1"/></g><g class="s"><rect x="628.50" y="102" width="2" height="16" rx="0.5"/></g></g><line class="axis" x1="150" y1="132" x2="630" y2="132"/><line class="tick" x1="150" y1="132" x2="150" y2="137"/><line class="tick" x1="630" y1="132" x2="630" y2="137"/><text class="sub2" x="150" y="151" text-anchor="start">the prompt arrives</text><text class="sub2" x="630" y="151" text-anchor="end" data-end="">39.4 ms</text><text class="sub2" x="560" y="151" text-anchor="end">first token at</text><text class="sub2" x="40" y="190" data-r1="">chunks of 480: the 2,000-token prompt goes in over 5 iterations</text><text class="sub2" x="40" y="210" data-r2="">running requests wait up to 8.31 ms for a token, against 6.04 ms with no prompt arriving</text><text class="sub2" x="40" y="230" data-r3="">the prompt's first token after 39.4 ms; cache re-read by its later chunks: 629 MB</text><text class="cap" x="40" y="268" text-anchor="start">Chunk size is a real trade. Small chunks keep each step short and the token stream</text><text class="cap" x="40" y="288" text-anchor="start">smooth, but the prompt needs more steps, so its own first token comes later, and every</text><text class="cap" x="40" y="308" text-anchor="start">chunk re-reads the cache its earlier chunks wrote. Large chunks reverse both.</text><text class="cap" x="40" y="348" text-anchor="start">At a 512-token budget the running requests never wait more than 8.31 ms, and the</text><text class="cap" x="40" y="368" text-anchor="start">prompt's first token comes after 39.4 ms, with 629 MB re-read. At 2,048 the prompt goes</text><text class="cap" x="40" y="388" text-anchor="start">in whole: one 33.0 ms stall, a first token at 33.0 ms, nothing re-read. Try a 64-token</text><text class="cap" x="40" y="408" text-anchor="start">budget on an 8,000-token prompt.</text><text class="cap" x="40" y="448" text-anchor="start">Sarathi-Serve measured the cost of small chunks at up to about 25% more prefill time at</text><text class="cap" x="40" y="468" text-anchor="start">512 on Yi-34B. This widget's arithmetic was checked against Python at every setting.</text></svg></div><figcaption>Small chunks protect the people already being served; large ones protect the newcomer. The budget is the dial between them.</figcaption><script>(() => {
+  const fig = document.currentScript.closest('figure');
+  const BUD = [64, 128, 256, 384, 512, 768, 1024, 1536, 2048], PR = [500, 1000, 2000, 4000, 8000], DB = 4, DP = 2, B = 32, CTXD = 1000;
+  const W8 = 16056328192, KV8 = 131072, P8 = 8028164096, BW = 3.35e12, PEAK = 989e12, X0 = 150, X1 = 630;
+  
+  const fx = (v, d = 2) => { const s = Math.abs(v).toFixed(d); return (v < 0 && +s !== 0 ? '−' : '') + s; };
+  const fcx = (v, d = 0) => { const s = fx(v, d), n = s.startsWith('−'), t = n ? s.slice(1) : s;
+    const [w, fr] = t.split('.'); return (n ? '−' : '') + (+w).toLocaleString('en-US') + (fr ? '.' + fr : ''); };
+
+  const fms = (s, d = 2) => fcx(s * 1e3, d) + ' ms';
+  const fsz = b => b === 0 ? 'nothing' : (b >= 1e9 ? fx(b / 1e9, 2) + ' GB' : fx(b / 1e6, 0) + ' MB');
+  const stepT = (d, k, p) => Math.max((W8 + d * CTXD * KV8 + p * KV8) / BW, 2 * P8 * (d + k) / PEAK);
+  function schedule(bud, lp) { const ch = bud - B, out = []; let p = 0;
+    while (p < lp) { const k = Math.min(ch, lp - p); out.push([k, p, stepT(B, k, p)]); p += k; } return out; }
+  const sl = [...fig.querySelectorAll('input[type=range]')], val = [...fig.querySelectorAll('.val')];
+  const q = s => fig.querySelector(s), NS = 'http://www.w3.org/2000/svg';
+  function rect(cls, x, y, w, h, rx) { const g = document.createElementNS(NS, 'g'); g.setAttribute('class', cls);
+    const r = document.createElementNS(NS, 'rect'); r.setAttribute('x', x.toFixed(2)); r.setAttribute('y', y);
+    r.setAttribute('width', w.toFixed(2)); r.setAttribute('height', h); r.setAttribute('rx', rx); g.appendChild(r); return g; }
+  function draw() {
+    const bud = BUD[+sl[0].value], lp = PR[+sl[1].value], s = schedule(bud, lp);
+    const n = s.length, mx = Math.max(...s.map(x => x[2])), tt = s.reduce((a, x) => a + x[2], 0);
+    const rr = s.reduce((a, x) => a + x[1], 0) * KV8;
+    val[0].textContent = fcx(bud); val[1].textContent = fcx(lp);
+    q('[data-r1]').textContent = `chunks of ${fcx(bud - B)}: the ${fcx(lp)}-token prompt goes in over ${fcx(n)} iteration${n > 1 ? 's' : ''}`;
+    q('[data-r2]').textContent = `running requests wait up to ${fms(mx)} for a token, against ${fms(stepT(B, 0, 0))} with no prompt arriving`;
+    q('[data-r3]').textContent = `the prompt's first token after ${fms(tt, 1)}; cache re-read by its later chunks: ${fsz(rr)}`;
+    q('[data-end]').textContent = fms(tt, 1);
+    const g = q('[data-lane]'); g.replaceChildren();
+    const sc = (X1 - X0) / tt; let t = 0;
+    for (const [k, p, dt] of s) { g.appendChild(rect('h', X0 + t * sc, 66, Math.max(dt * sc - 1, 0.6), 24, 1));
+      t += dt; g.appendChild(rect('s', X0 + t * sc - 1.5, 102, 2, 16, 0.5)); }
+  }
+  sl.forEach(x => x.addEventListener('input', draw));
+  q('button').addEventListener('click', () => { sl[0].value = DB; sl[1].value = DP; draw(); });
+  draw();
+})();</script></figure>

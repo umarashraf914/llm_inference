@@ -124,6 +124,10 @@ def bits_row(x, y, bits, w=22, h=28, gap=3, cls_of=None, label=True):
     return "".join(out)
 
 
-def poly(points, cls="pl-m"):
+def poly(points, cls="pl-m", width=2, dash=None):
+    """A plot curve. V4's stylesheet defines pl-h but not pl-m, so the stroke is set here explicitly."""
     pts = " ".join(f"{a:.1f},{b:.1f}" for a, b in points)
-    return f'<polyline class="{cls}" points="{pts}"/>'
+    colour = {"pl-m": "var(--m)", "pl-h": "var(--h)", "pl-s": "var(--s)", "pl-u": "var(--u)"}[cls]
+    d = f' stroke-dasharray="{dash}"' if dash else ""
+    return (f'<polyline class="{cls}" fill="none" stroke="{colour}" stroke-width="{width}"{d} '
+            f'points="{pts}"/>')
