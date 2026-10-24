@@ -26,7 +26,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | V3 | Kernels and Memory (+ FlashAttention animation, 42 steps) | 100 | 49:21 |
 | V4 | Quantization | 83 | 20:47 |
 | V5 | Parallelism | 25 | 16:45 |
-| V6 | Mixture of Experts | 23 | 22:38 |
+| V6 | Mixture of Experts | 70 | 22:38 |
 | V7 | Serving in Production | 26 | 29:59 |
 | V8 | Speculative Decoding and Long Context | 32 | 29:58 |
 | V9 | The Whole Stack | 15 | 9:02 |
