@@ -26,7 +26,8 @@ def o123():
         b.append(f'<circle cx="{x}" cy="{y}" r="4" fill="var(--paper)" stroke="var(--h)" stroke-width="1.5"/>')
         b.append(txt(x + 8, y + 16, lab, "sub2 halo"))
     assert round(BW * 1 / 1e12, 2) == 3.35 and round(BW * 10 / 1e12, 1) == 33.5
-    b.append(txt(xs(0.3), ys(BW * 0.3) - 14, "slanted ceiling: bandwidth × intensity", "sub2 halo"))
+    b.append(txt(130, 352, "slanted ceiling: bandwidth × intensity", "sub2 halo"))   # in the empty corner under the line
+    assert ys(BW * 0.237) < 352 - 12
     b.append(eq(140, roof.B + 58, 400, "attainable  =  the lower of:  peak,  bandwidth × intensity", "m"))
     body, yb = prose(roof.B + 58 + 42 + 36, [
         "Both axes are logarithmic ({{fig:v01-o121}}): each labelled step is ten times the one before. The "

@@ -94,7 +94,7 @@ def row_note(k, sets, used):
     extra = sets[k] - sets[k - 1]
     note = f"{sets[k]} settled"
     if used[k]:
-        note += f", +{extra} from the pool"
+        note += f", {extra} by the pool"
     return note
 
 
@@ -107,20 +107,17 @@ def mode_summary(sets, pool_on):
 # ---- o014: the claim, and the guessers side by side ---------------------------------------------------
 def o014():
     b = [hd(40, 46, "What makes the guesses, method by method, for a 70B target")]
-    cols = [(40, "method"), (150, "the guesser"), (420, "extra weights"), (540, "output")]
-    for x, h in cols:
+    cols = [(40, 96, "method"), (142, 240, "the guesser"), (388, 112, "extra weights"), (506, 140, "output")]
+    for x, w, h in cols:
         b.append(txt(x, 78, h, "sub2"))
     rows = [("2022 paper", "a second model, 100 times smaller", "0.7 billion", "exact", "u"),
             ("Medusa", "extra heads on the target", "1.1 billion a head", "exact only with p ÷ q", "u"),
-            ("EAGLE", "one small layer on the target's vectors", "1 billion", "exact", "u"),
-            ("lookahead", "the target itself, from its own spare guesses", "none", "exact", "m")]
-    for k, (m, g, w, o, c) in enumerate(rows):
+            ("EAGLE", "a small layer on the target's vectors", "1 billion", "exact", "u"),
+            ("lookahead", "the target, from its spare guesses", "none", "exact", "m")]
+    for k, vals in enumerate(rows):
         y = 90 + k * 40
-        b.append(cell(40, y, 600, 30, c))
-        b.append(txt(52, y + 20, m, "sub"))
-        b.append(txt(150, y + 20, g, "sub"))
-        b.append(txt(420, y + 20, w, "sub"))
-        b.append(txt(540, y + 20, o, "sub"))
+        for (x, w, _), v in zip(cols, vals[:4]):
+            b.append(cell(x, y, w, 30, vals[4], label=v))
     body, yb = prose(90 + 4 * 40 + 40, [
         "Lookahead decoding gets several tokens out of a single pass with no drafter at all. It runs "
         "the model on several future positions at once, taking a rough guess at all of them, then "
@@ -139,7 +136,7 @@ def o014():
 
 
 # ---- a31 · G1: the widget ---------------------------------------------------------------------------------
-GX, GW, GP, GY, GH, GR = 110, 64, 72, 74, 24, 30      # grid: x, cell width, pitch, top, cell height, row pitch
+GX, GW, GP, GY, GH, GR = 100, 60, 68, 74, 24, 30      # grid: x, cell width, pitch, top, cell height, row pitch
 
 
 def cell_view(rows, sets, k, i):
@@ -195,7 +192,7 @@ WIDGET_JS = r"""<script>(() => {
     for (let k = 0; k <= N; k++) {
       const vis = k <= Math.min(shown, R);
       q$(`[data-note="${k}"]`).textContent = !vis ? '' : k === 0 ? 'the starting guess' :
-        r.sets[k] + ' settled' + (r.used[k] ? ', +' + (r.sets[k] - r.sets[k - 1]) + ' from the pool' : '');
+        r.sets[k] + ' settled' + (r.used[k] ? ', ' + (r.sets[k] - r.sets[k - 1]) + ' by the pool' : '');
       for (let i = 0; i < N; i++) {
         const t = q$(`[data-w="${k}-${i}"]`), g = t.parentNode;
         g.setAttribute('visibility', vis ? 'visible' : 'hidden');
@@ -323,8 +320,8 @@ def a33():
     b.append(txt(xr, 160, "look up ‘cat’: check ‘sat on’ in the same pass", "sub2"))
     for j, w in enumerate(["the", "cat", "sat", "on", "the"]):
         b.append(cell(xr + j * 52, 172, 46, 26, "m", label=w))
-    b.append(txt(xr, 222, "‘sat’ and ‘on’ check out, and the pass also gives the", "sub2"))
-    b.append(txt(xr, 240, "word after them: three settled in one round", "sub2"))
+    b.append(txt(xr, 222, "‘sat’ and ‘on’ check out, plus the next", "sub2"))
+    b.append(txt(xr, 240, "word: three settled in one round", "sub2"))
     body, yb = prose(270, [
         "Lookahead keeps every fragment the rounds produce in a pool, filed under its first word. Each "
         "time the model emits a real token, the pass also pulls out the fragments that begin with "
@@ -357,12 +354,12 @@ def a34():
         for j in range(10):
             b.append(cell(150 + j * 20, y, 16, 16, "u", rx=2))
     b.append(txt(150, 64 + 8 * 22 + 16, "each question has a follow-up turn", "sub2"))
-    xr, S = 400, 34
-    b.append(txt(xr, 60, "EAGLE-3's speed-up, one 13B model, five benchmarks", "sub2"))
+    xr, S = 400, 20
+    b.append(txt(xr, 60, "EAGLE-3, one 13B model, five benchmarks", "sub2"))
     for k, (lab, v) in enumerate(EAGLE3_V13B):
-        y = 72 + k * 34
-        b.append(cell(xr, y, v * S, 24, "m" if v == max(x for _, x in EAGLE3_V13B) else "u", label=f"{v:.2f}×"))
-        b.append(txt(xr, y + 36 - 2, lab, "sub2"))
+        y = 72 + k * 30
+        b.append(txt(xr, y + 15, lab, "sub2"))
+        b.append(cell(xr + 124, y, v * S, 22, "m" if v == max(x for _, x in EAGLE3_V13B) else "u", label=f"{v:.2f}×"))
     assert max(v for _, v in EAGLE3_V13B) == 6.47 and min(v for _, v in EAGLE3_V13B) == 5.01
     body, yb = prose(64 + 8 * 22 + 62, [
         "A benchmark is a fixed set of questions with a fixed way of scoring the answers, so that "

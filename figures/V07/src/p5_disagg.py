@@ -88,7 +88,7 @@ def o010():
     b.append(txt(384, 100, "KV cache", "sub2", "middle"))
     b.append(txt(384, 136, "over the", "sub2", "middle"))
     b.append(txt(384, 150, "interconnect", "sub2", "middle"))
-    b.append(txt(430, 180, "then one token per step, until the end-of-sequence token", "sub2"))
+    b.append(txt(430, 180, "then a token per step until the end", "sub2"))
     body, yb = prose(226, [
         "Prefill runs on one pool of GPUs and decode on another, each configured for its own bottleneck: "
         "the prefill pool for arithmetic, the decode pool for memory and batch size. The KV cache the "
@@ -192,13 +192,13 @@ def a33():
 # ---- a34 · P31 ------------------------------------------------------------------------------------
 def a34():
     T_STEP70 = t_read(W70)
-    rows = [("one decode step, 70B", T_STEP70, "u", "for comparison"),
+    rows = [("a 70B decode step, for scale", T_STEP70, "u", ""),
             ("OPT-66B, 400 Gb/s port", OPT_REQ / (400e9 / 8), "h", ""),
             ("Llama 3 70B, 400 Gb/s port", L70_REQ / (400e9 / 8), "s", ""),
             ("OPT-66B, NVLink", OPT_REQ / 900e9, "s", "")]
     assert [round(t * 1e3, 2) for _, t, _, _ in rows] == [41.79, 24.16, 3.36, 1.34]
     b = [hd(40, 46, f"Time to move one {REQ}-token request's cache, to scale")]
-    X0, SC = 250, 370 / T_STEP70
+    X0, SC = 250, 340 / T_STEP70
     for i, (lab, t, cls, note) in enumerate(rows):
         y = 70 + i * 34
         b.append(txt(40, y + 17, lab, "cap"))
@@ -230,7 +230,7 @@ def a35():
     ok2 = [p <= TPOT_T for _, p in REQS]
     both = [x and y for x, y in zip(ok1, ok2)]
     assert sum(ok1) == 9 and sum(ok2) == 9 and sum(both) == 8 and not ok1[3] and not ok2[5]
-    b = [hd(40, 46, f"Ten requests against two targets: first token within {TTFT_T} ms, each later one within {TPOT_T} ms")]
+    b = [hd(40, 46, f"Ten requests, two targets: first token within {TTFT_T} ms, later ones within {TPOT_T} ms each")]
     X = [70, 200, 270, 400, 470, 590]
     for x, h_ in zip(X, ["request", "TTFT, ms", "", "TPOT, ms", "", "both"]):
         if h_:
@@ -245,7 +245,7 @@ def a35():
         b.append(cell(X[5] - 22, y + 2, 22, 16, "s" if ob else "h", rx=2, label="✓" if ob else "✗"))
     yt = 86 + 10 * 22 + 8
     b.append(ln(40, yt, 600, yt, "axis"))
-    b.append(txt(X[0], yt + 18, "met", "cap", "end"))
+    b.append(txt(X[0], yt + 18, "met", "sub2", "end"))
     b.append(txt(X[2], yt + 18, f"{sum(ok1)} of 10", "sub2", "end"))
     b.append(txt(X[4], yt + 18, f"{sum(ok2)} of 10", "sub2", "end"))
     b.append(txt(X[5], yt + 18, f"{sum(both)} of 10", "sub2", "end"))
@@ -273,10 +273,16 @@ def o011():
     for i, (lab, base, v, val, sc) in enumerate(rows):
         y = 88 + i * 58
         b.append(txt(40, y + 14, lab, "cap"))
-        b.append(ghost(X0, y, sc * base, 18) if i else cell(X0, y, sc * base, 18, "u", rx=2))
-        b.append(txt(round(X0 + sc * base + 8, 1), y + 14, "before", "sub2"))
-        b.append(cell(X0, y + 24, max(sc * v, 2), 18, "s", rx=2))
-        b.append(txt(round(X0 + sc * v + 8, 1), y + 38, val, "sub2"))
+        if sc * base > 100:
+            b.append(ghost(X0, y, sc * base, 18, label="before"))
+        else:
+            b.append(cell(X0, y, sc * base, 18, "u", rx=2))
+            b.append(txt(round(X0 + sc * base + 8, 1), y + 14, "before", "sub2"))
+        if sc * v > 160:
+            b.append(cell(X0, y + 24, sc * v, 18, "s", rx=2, label=val))
+        else:
+            b.append(cell(X0, y + 24, max(sc * v, 2), 18, "s", rx=2))
+            b.append(txt(round(X0 + sc * v + 8, 1), y + 38, val, "sub2"))
     assert round(50 * 7.4) == 370 and round(370 / 12.6, 1) == 29.4
     ys = 88 + 2 * 58 + 18
     b.append(txt(40, ys, "Splitwise, throughput per dollar against an ordinary cluster", "sub2"))
@@ -286,8 +292,7 @@ def o011():
                                         ("same cost and power", 2.35, "2.35× per dollar")]):
         y = ys + 12 + i * 30
         b.append(txt(40, y + 14, lab, "cap"))
-        b.append(cell(X0, y, v * 140, 18, "s", rx=2))
-        b.append(txt(round(X0 + v * 140 + 8, 1), y + 14, val, "sub2"))
+        b.append(cell(X0, y, v * 140, 18, "s", rx=2, label=val))
     body, yb = prose(ys + 12 + 2 * 30 + 34, [
         "DistServe (Peking University and UC San Diego) and Splitwise (University of Washington and "
         "Microsoft) were concurrent, independent work that reached the same conclusion.",
