@@ -39,10 +39,11 @@ def o003():
     b = [hd(40, 46, "The weights belong to nobody")]
     b.append(box(40, 84, 190, 56, "h", "one weight matrix", "read once from memory", rx=4))
     ys = [66, 90, 114, 138, 162]
-    for i, y in enumerate(ys):
+    for i, (y, lab) in enumerate(zip(ys, ["request 1", "request 2", "request 3", "…", "request N"])):
         b.append(arr(236, 112, 280, y + 8))
-        b.append(cell(286, y, 96, 16, "s", rx=2))
-        b.append(txt(394, y + 12, f"request {i + 1}'s token vector" if i < 4 else "… request N's", "sub2"))
+        b.append(cell(286, y, 96, 16, "s", rx=2, label=lab))
+    b.append(txt(396, 116, "one token vector from each request,", "sub2"))
+    b.append(txt(396, 132, "all multiplied by the same weights", "sub2"))
     body, yb = prose(222, [
         "When the GPU pulls a weight matrix out of high-bandwidth memory, nothing about that matrix "
         "belongs to any particular user. So instead of reading the weights, computing one token and "
@@ -133,8 +134,8 @@ def a04():
 # ---- a05 · P5 -------------------------------------------------------------------------------------
 def a05():
     b = [hd(40, 46, "The same count for a model of P weights and a batch of N requests")]
-    steps = [("operations per step  =  2 × P × N", "each weight does one multiply-add, 2 operations, for each of N tokens"),
-             ("bytes per step  =  2 × P", "each weight is read once, 2 bytes, however many tokens use it"),
+    steps = [("operations per step  =  2 × P × N", "2 operations per weight, for each of N tokens"),
+             ("bytes per step  =  2 × P", "each weight read once, 2 bytes, whoever uses it"),
              ("intensity  =  2PN ÷ 2P  =  N", "the 2 and the P cancel: only the batch is left")]
     for i, (e, note) in enumerate(steps):
         y = 66 + i * 58
@@ -260,10 +261,13 @@ def a06():
     b.append(cell(BX0, YB, round(T_READ70 * BSC, 1), 22, "h", rx=2))
     b.append(txt(40, YB + 45, "arithmetic", "cap"))
     b.append(f'<g class="m"><rect x="{BX0}" y="{YB + 30}" width="{max(s0["_tm"] * BSC, 2):.1f}" height="22" rx="2" data-bm=""/></g>')
-    b.append(tick(BX0 + 480, YB - 4, BX0 + 480, YB + 56))
-    b.append(txt(BX0 + 476, YB + 70, "150 ms", "sub2", "end"))
-    b.append(txt(BX0, YB + 70, "0", "sub2"))
-    RY = YB + 100
+    b.append(txt(round(BX0 + T_READ70 * BSC + 8, 1), YB + 15, f"{ft(T_READ70)} ms, whatever the batch", "sub2"))
+    b.append(ln(BX0, YB + 60, BX0 + 480, YB + 60, "axis"))
+    for v in (0, 50, 100, 150):
+        x = BX0 + v / 1e3 * BSC
+        b.append(tick(x, YB + 60, x, YB + 65))
+        b.append(txt(round(x, 1), YB + 82, f"{v} ms" if v == 150 else str(v), "sub2", "middle" if v < 150 else "end"))
+    RY = YB + 108
     for k in (1, 2, 3):
         b.append(f'<text class="sub2" x="40" y="{RY + (k - 1) * 20}" data-r{k}="">{esc(s0[f"r{k}"])}</text>')
     body, yb = prose(RY + 2 * 20 + 38, [
@@ -273,9 +277,13 @@ def a06():
         f"Past {round(RIDGE)} the arithmetic is the longer of the two. Each further request lengthens "
         f"the step by {ft(T_TOK70)} ms for every user, and the total stops rising at 989 trillion ÷ 140 "
         f"billion = {fc(PEAK / (2 * P70))} tokens a second.",
-        "This counts the weights alone. The next figures add what every request brings with it, and the "
-        "curve bends long before 295 ({{fig:v07-a09}}). The widget's arithmetic was checked against "
-        "Python at every setting.",
+        fwd("a09",
+            "This counts the weights alone. The next figures add what every request brings with it, and "
+            "the curve bends long before 295 ({{fig:v07-a09}}). The widget's arithmetic was checked "
+            "against Python at every setting.",
+            "This counts the weights alone. The next figures add what every request brings with it, and "
+            "the curve bends long before 295. The widget's arithmetic was checked against Python at "
+            "every setting."),
     ])
     ctl = (f"<div class='ctl'><label>batch size <input type='range' min='0' max='{len(NS) - 1}' step='1' "
            f"value='0'><span class='val'>{s0['val']}</span></label>"
@@ -311,7 +319,7 @@ def o004():
     assert round(used / cap * 100, 1) == 29.5 and round((1 - used / cap) * 100, 1) == 70.5
     assert round(used / T, 2) == 1.18 and T - NEED[0] == 504 and T - NEED[2] == 452
     b = [hd(40, 46, "Four requests that need 8, 24, 60 and 512 decode steps, locked together")]
-    X0, X1 = 170, 630
+    X0, X1 = 182, 630
     sc = (X1 - X0) / T
     for i, n in enumerate(NEED):
         y = 68 + i * 38
@@ -326,19 +334,19 @@ def o004():
         b.append(tick(x, ya, x, ya + 5))
         b.append(txt(round(x, 1), ya + 19, str(v) + (" steps" if v == 512 else ""), "sub2", "middle" if v < 512 else "end"))
     # tokens per read of the weights, step by step
-    ys = ya + 66
+    ys = ya + 78
     b.append(txt(40, ys - 4, "tokens per read", "cap"))
     segs = [(0, 8, 4), (8, 24, 3), (24, 60, 2), (60, 512, 1)]
     for a_, e_, k in segs:
         assert all(occ[t] == k for t in range(a_, e_))
         b.append(cell(X0 + a_ * sc, ys - k * 9, (e_ - a_) * sc, k * 9, "s", rx=1))
-    b.append(txt(X0 + 70, ys - 26, "4, then 3, then 2, then 1 for the last 452 steps", "sub2"))
+    b.append(txt(X0, ys + 18, f"4, then 3, then 2, then 1 for the last {T - NEED[2]} steps", "sub2"))
     # work delivered against room
-    yw = ys + 40
+    yw = ys + 46
     b.append(txt(40, yw + 18, "seats used", "cap"))
-    b.append(track(X0, yw, 300, 26))
-    b.append(cell(X0, yw, used / cap * 300, 26, "s", rx=2))
-    b.append(txt(X0 + 312, yw + 18, f"{used} of {fc(cap)} seat-steps, {f(used / cap * 100, 1)}%", "sub2"))
+    b.append(track(X0, yw, 240, 26))
+    b.append(cell(X0, yw, used / cap * 240, 26, "s", rx=2))
+    b.append(txt(X0 + 252, yw + 18, f"{used} of {fc(cap)} seat-steps, {f(used / cap * 100, 1)}%", "sub2"))
     body, yb = prose(yw + 70, [
         "That N is not a number anyone sets: it is however many requests are generating at that step. "
         "The first serving systems fixed it when the batch formed. They scheduled whole requests: "

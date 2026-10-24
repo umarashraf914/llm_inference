@@ -152,6 +152,8 @@ def edit_item(name, from_y=None, paras=None, caption=None, title=None, ts=None, 
     p = OUT / f"{name}.html"
     s = p.read_text(encoding="utf-8")
     for old, new in replace:
+        if old not in s and new in s:            # already applied: rerunning a script is safe
+            continue
         assert s.count(old) == 1, (name, old, s.count(old))
         s = s.replace(old, new)
     if paras is not None:
@@ -176,3 +178,18 @@ def edit_item(name, from_y=None, paras=None, caption=None, title=None, ts=None, 
         s = _re.sub(r"^<figure[^>]*>", f"<figure class='{cls}'>" if cls else "<figure>", s, count=1)
     p.write_text(s, encoding="utf-8")
     print(f"{name:6s} edited")
+
+
+# ---- items taken out of order.txt on purpose -----------------------------------------------------
+# Their files stay in items/ (atlas_build's drop keeps them); the content lives on in the item named.
+# A resumer should not re-insert these.
+DROPPED = {
+    "o008": "merged into o007 (the bus drawing, wires times rate)",
+    "o009": "merged into o005 (latency against bandwidth, recap of V1 Fig 76)",
+    "o036": "replaced by p09 (one multiprocessor is four identical quarters)",
+    "o041": "absorbed into p09 (128 lanes / 4 schedulers = 32; the A100's 16 lanes a quarter)",
+    "o040": "absorbed into p12 (fetch and decode paid once per warp, not per operation)",
+    "o047": "merged into o048 (one stream cannot serve two destinations; nesting 2, 4, 8)",
+    "o015": "merged into o016 (the capacitor and its leak) and o017 (refresh)",
+    "o050": "merged into o018 (no technology is fast and large; geometry)",
+}

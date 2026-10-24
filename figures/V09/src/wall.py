@@ -65,7 +65,7 @@ def o005():
         "followed by sixteen zeros ({{fig:v01-o062}}). The rate is for 4-bit numbers. Narrower numbers "
         "run faster, so the same chip does fewer operations a second at 16 bits ({{fig:v02-o084}}).",
         "It pulls about 8 terabytes a second out of its own memory. Dividing one rate by the other "
-        "cancels the seconds and leaves operations per byte ({{fig:v01-o066}}): 1,250. That is this "
+        "cancels the seconds and leaves operations per byte ({{fig:v01-o065}}): 1,250. That is this "
         "chip's ridge ({{fig:v01-o126}}). A workload that does fewer operations per byte leaves the "
         "arithmetic waiting on memory.",
         "A byte holds two 4-bit weights, and each is multiplied and added once per token, which counts "

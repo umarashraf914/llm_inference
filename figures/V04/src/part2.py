@@ -13,7 +13,7 @@ import math, struct
 from fractions import Fraction as Fr
 import numpy as np
 from common import (emit, txt, hd, cell, box, ln, arr, prose, text, tick, hline, dot, rect, f, fi, fs, sup,
-                    MINUS, st)
+                    MINUS, st, nb)
 from numfmt import values, limits, round_to, bias
 
 # ---- shared drawing: a row of bits under their place values ----------------------------------------
@@ -95,7 +95,7 @@ def p02():
     heads = ["4", "2", "1", "½", "¼", "⅛"]
     rows = [("110100", 2, "4 + 2 + ½  =  6.5"), ("001101", 2, "1 + ½ + ⅛  =  1.625")]
     assert 4 + 2 + Fr(1, 2) == Fr(13, 2) and 1 + Fr(1, 2) + Fr(1, 8) == Fr(13, 8)
-    b = [hd(40, 46, "Places after the point are halves, quarters and eighths")]
+    b = [hd(40, 46, "6.5 and its significand 1.625, written in base two place by place")]
     X0 = 150
     b.append(text(40, 84, "place value", "cap"))
     b.append(places(X0, 84, heads, point_after=2))
@@ -128,8 +128,9 @@ def p02():
     f32, f16 = float(np.float32(0.1)), float(np.float16(0.1))
     assert repr(f32) == "0.10000000149011612" and f16 == 0.0999755859375
     body, y = prose(Y + 64, [
-        "To the right of the point the places keep halving: ½, ¼, ⅛ and so on. So 110.1 is 4 + 2 + ½ "
-        "= 6.5, and 1.101 is 1 + ½ + ⅛ = 1.625. Both reappear when {{fig:v04-o017}} encodes 6.5. "
+        "To the right of the point the places keep halving: ½, ¼, ⅛ and so on. So 110.1 is "
+        + nb("4 + 2 + ½ = 6.5") + ", and 1.101 is " + nb("1 + ½ + ⅛ = 1.625") + ". Both reappear when "
+        "{{fig:v04-o017}} encodes 6.5. "
         "Each extra bit halves the step, which is why every mantissa bit is worth exactly one halving "
         "of the gap ({{fig:v04-o020}}).",
         f"Some short decimals never end in binary. One tenth is 0.{digs}… with 0011 repeating for "
@@ -167,16 +168,16 @@ def p03():
     b.append(hline(L, R, Y))
     for v in range(-16, 16):
         b.append(tick(X(v), Y - (7 if v in (-16, -1, 0, 15) else 4), Y + (7 if v in (-16, -1, 0, 15) else 4)))
-    for v, anc, dx in ((-16, "middle", 0), (-1, "end", 6), (0, "start", -6), (15, "middle", 0)):
-        b.append(text(X(v) + dx, Y - 30, format(v & 31, "05b"), "sub2", anc))
-        b.append(text(X(v), Y - 14, str(v).replace("-", MINUS), "sub2", "middle"))
+    for v, anc, dx in ((-16, "start", -4), (-1, "end", 4), (0, "start", -4), (15, "end", 4)):
+        b.append(text(X(v) + dx, Y - 16, format(v & 31, "05b") + " = " + str(v).replace("-", MINUS), "sub2", anc))
     b.append(text(X(-8.5), Y + 24, "top bit 1: negative", "sub2", "middle"))
     b.append(text(X(7.5), Y + 24, "top bit 0: zero and positive", "sub2", "middle"))
     body, y = prose(Y + 70, [
         "Give the top place a negative value and the same five bits count from −16 to 15. This is two's "
-        "complement, the way chips store signed integers. With n bits the range is −2ⁿ⁻¹ to 2ⁿ⁻¹ − 1: "
+        "complement, the way chips store signed integers. With n bits the range is −2ⁿ⁻¹ to "
+        + nb("2ⁿ⁻¹ − 1") + ": "
         "INT8 runs from −128 to 127, and INT4 from −8 to 7.",
-        "It won because ordinary binary addition still works. 11111 + 00001 is 100000; drop the carry "
+        "It won because ordinary binary addition still works. " + nb("11111 + 00001") + " is 100000; drop the carry "
         "out of the fifth place and 00000 is left, so −1 + 1 = 0 with no special rules.",
         "The cost shows when the bits are read as a plain count: every negative number starts with a 1, "
         "so −1 looks like 31, the largest pattern of all. {{fig:v04-o013}} shows what that does to a "
@@ -256,7 +257,7 @@ def p05():
     assert [float(g) for g in got] == [4, 6, 6, 8]
     errs = [g - t for g, t in zip(got, ties)]
     assert sum(errs) == 0 and [float(e) for e in errs] == [-0.5, 0.5, -0.5, 0.5]
-    b = [hd(40, 46, "E5M2 between 4 and 8: four values, and four exact ties between them")]
+    b = [hd(40, 46, "E5M2 from 4 to 8: five values, and the four exact ties between them")]
     L, R, Y = 110, 590, 128
     X = lambda v: L + (float(v) - 4) / 4 * (R - L)
     b.append(hline(L, R, Y))
@@ -275,7 +276,8 @@ def p05():
     b.append(text(40, Y + 56, "ties", "cap"))
     body, y = prose(Y + 120, [
         "Round to nearest leaves one case open: a value exactly halfway between two neighbours. The rule "
-        "every IEEE format uses is to pick the neighbour whose last mantissa bit is 0, the even one. So "
+        "floating-point hardware follows by default is to pick the neighbour whose last mantissa bit is "
+        "0, the even one. So "
         "6.5 goes down to 6 (mantissa 10) rather than up to 7 (mantissa 11), while 5.5 goes up to 6.",
         "Across the four ties the errors are −½, +½, −½ and +½, which average to zero. Always rounding "
         "halves up would add +½ every time, and over millions of roundings that lean would build into a "
@@ -320,7 +322,7 @@ def o018():
         if k < 3:
             b.append(arr(480, y + 42, 480, y + 48))
     body, y = prose(244 + 4 * 52 + 26, [
-        "Every floating-point number in every model you run is decoded by exactly these four steps.",
+        "Every floating-point number in every model you run is decoded by these four steps.",
     ])
     b.append(body)
     emit("o018", "1:12", "A complete decode, start to finish", y + 22, b,
@@ -345,7 +347,7 @@ def o024():
     b = [hd(40, 46, "Bars: how many weights have each value.  Ticks: every value FP8 E4M3 can hold")]
     for a, c, hgt in zip(edges, edges[1:], hts):
         hh = 92 * hgt
-        if hh >= 1:
+        if hh >= 3:                                   # thinner bars read as stray dashes
             b.append(rect(X(a) + 1, Y - 18 - hh, X(c) - X(a) - 2, hh, "m", rx=1))
     b.append(hline(L, R, Y))
     for v in ticks:
@@ -353,8 +355,8 @@ def o024():
     near = sum(1 for v in pos if 0 < v <= sigma)
     far = sum(1 for v in pos if 3 * sigma < v <= MAXV)
     assert near > 10 * far
-    for v, lab in [(-MAXV, "largest negative"), (0, "0"), (MAXV, "largest")]:
-        b.append(text(X(v), Y + 26, lab, "sub2", "middle"))
+    for v, lab, anc in [(-MAXV, "most negative", "start"), (0, "0", "middle"), (MAXV, "largest", "end")]:
+        b.append(text(X(v), Y + 26, lab, "sub2", anc))
     body, y = prose(Y + 64, [
         "A trained network's weights crowd around zero, and so do a float's ticks: within one typical "
         f"weight of zero there are {near} of FP8 E4M3's positive values, and in the outer stretch, beyond "
@@ -375,7 +377,8 @@ def o026():
     mx, mn = float(L["max"]), float(L["min_normal"])
     d23, d24 = 23 * math.log10(2), 24 * math.log10(2)
     d11, d8 = 11 * math.log10(2), 8 * math.log10(2)
-    assert f"{d23:.2f}" == "6.92" and f"{d24:.2f}" == "7.22" and round(math.log10(mx)) == 38
+    assert f"{d23:.2f}" == "6.92" and f"{d24:.2f}" == "7.22" and math.floor(math.log10(mx)) == 38
+    assert math.floor(math.log10(mn)) == -38
     PX = 15.5
     b = []
     x = 60
@@ -391,7 +394,8 @@ def o026():
     body, y = prose(232, [
         f"Range near ten to the plus or minus thirty-eight: the largest FP32 number is {fs(mx, 3)} and the "
         f"smallest normal one {fs(mn, 3)}. Precision of about seven decimal digits.",
-        "Seven digits is worth checking. A binary digit is worth log₁₀ 2 ≈ 0.301 of a decimal digit, so "
+        "Seven digits is worth checking. Each bit doubles the number of values a format can tell "
+        "apart, and doubling is multiplying by 10⁰·³⁰¹, so a bit is worth 0.301 of a decimal digit: "
         f"23 bits would give {d23:.2f} digits and 24 give {d24:.2f}. FP32 is usually quoted at about seven "
         "digits, and that only comes out right because the implied 1 makes the precision 24 bits, not 23.",
         f"Same everywhere: FP16 stores 10 and behaves like 11, about {d11:.1f} digits; BF16 stores 7 and "

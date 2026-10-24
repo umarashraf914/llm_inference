@@ -50,6 +50,40 @@ DS_PARAMS, DS_ACTIVE, DS_EXPERTS, DS_TOPK = 1.6e12, 49e9, 384, 6
 DS_FP4_RELEASE_BYTES = 864_721_029_744      # DeepSeek-V4-Pro safetensors, experts in FP4
 
 
+import re as _re
+import textwrap as _tw
+
+_UNIT = _re.compile(r"(\d) (GB/s|TB/s|Gb/s|GB|TB|MB|KB|ms|µs|ns|bytes|tokens|GPUs|layers|times|S)\b")
+_OP = _re.compile(r"(?<=[\d)]) ([+×÷=−]) (?=[\d(−])")
+
+
+def prose(y, paras, x=40, width=88, cls="cap"):
+    """atlas.prose with two changes: a line never breaks inside a hyphenated word, and a number
+    never wraps away from its unit or from the sum it is part of."""
+    o = []
+    for k, p in enumerate(paras):
+        p = _OP.sub("\u00a0\\1\u00a0", _UNIT.sub("\\1\u00a0\\2", p))
+        refs = _re.findall(r"\{\{(?:fig|ref):[^}]+\}\}", p)
+        for i, r in enumerate(refs):              # wrap as if each pointer were already "V5 Fig 99"
+            p = p.replace(r, f"\u0001{i:07d}\u0001", 1)
+        if k:
+            y += 40
+        for j, line in enumerate(_tw.wrap(p, width, break_on_hyphens=False)):
+            for i, r in enumerate(refs):
+                line = line.replace(f"\u0001{i:07d}\u0001", r)
+            if j:
+                y += 20
+            o.append(txt(x, y, line, cls))
+    return "".join(o), y
+
+
+def fwd(i, words, kind="fig"):
+    """A pointer to V5 item i once it is in order.txt; until then, `words` (the atlas must build
+    after every step, so forward pointers wait for their target). Rerun the script to fill them in."""
+    order = (ROOT / "figures/V05/order.txt").read_text(encoding="utf-8").split()
+    return f"{{{{{kind}:v05-{i}}}}}" if i in order else words
+
+
 def f(v, d=2):
     """A number as printed: fixed decimals and a real minus sign. Exact halves round away from
     zero, as JavaScript's toFixed does, so widgets and static figures print the same digits."""

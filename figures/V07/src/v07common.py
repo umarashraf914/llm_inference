@@ -117,9 +117,12 @@ def tick(x1, y1, x2, y2):
     return ln(x1, y1, x2, y2, "tick")
 
 
-def emit(name, ts, title, h, body, caption, cls=None):
-    """Write items/<name>.html. h is the SVG height."""
-    (OUT / f"{name}.html").write_text(item(ts, title, h, body, caption, cls), encoding="utf-8")
+def emit(name, ts, title, h, body, caption, cls=None, note=None):
+    """Write items/<name>.html. h is the SVG height. note leaves a <!-- link: … --> for the final pass."""
+    html_ = item(ts, title, h, body, caption, cls)
+    if note:
+        html_ = html_[: -len("</figure>")] + f"<!-- link: {note} --></figure>"
+    (OUT / f"{name}.html").write_text(html_, encoding="utf-8")
     print(f"{name:5s} {ts:>6}  {title}")
 
 
@@ -175,3 +178,15 @@ class LogAxes:
         o.append(txt((self.X0 + self.X1) / 2, self.Y0 + 38, xlabel, "sub2", "middle"))
         o.append(txt(self.X0 - 9, self.Y1 - 14, ylabel, "sub2", "start"))
         return o
+
+
+def in_order(item_id):
+    """True when item_id is listed in order.txt, so a {{fig:v07-…}} pointer to it will resolve.
+    Lets a figure point forward to one a later build-up adds, without breaking the build before."""
+    p = ROOT / "figures/V07/order.txt"
+    return item_id in [ln_.split("#", 1)[0].strip() for ln_ in p.read_text(encoding="utf-8").splitlines()]
+
+
+def fwd(item_id, with_ref, without):
+    """with_ref (containing a pointer to item_id) once item_id is in the order, else the plain text."""
+    return with_ref if in_order(item_id) else without

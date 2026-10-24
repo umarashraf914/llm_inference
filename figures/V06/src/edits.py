@@ -98,5 +98,16 @@ reprose("o015", 474, [
 ])
 
 
+# ---- Part 9: routing collapse ------------------------------------------------------------------------
+restamp("o017", "Token choice has a failure mode")
+restamp("o018", "The classic fix introduced by Shazeer")       # o018 is redrawn whole in balance.py
+
+
+# ---- part labels, renumbered for the three parts the pass adds (s11 Part 8, s12 Part 10, s13 Part 13) ----
+replace("s08", "<div class='l'>Part 8</div>", "<div class='l'>Part 9</div>")
+replace("s09", "<div class='l'>Part 9</div>", "<div class='l'>Part 11</div>")
+replace("s10", "<div class='l'>Part 10</div>", "<div class='l'>Part 12</div>")
+
+
 if __name__ == "__main__":
     print("edits applied")

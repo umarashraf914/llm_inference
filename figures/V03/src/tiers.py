@@ -39,7 +39,7 @@ def o008():
     body, yb = prose(70 + BIG + 46, [
         f"The square is the 80 GB of high-bandwidth memory stacked beside the GPU die. The dot beside "
         f"it is every byte of on-chip SRAM on all {H100_SMS} multiprocessors added together, {sram / 1e6:.1f} MB "
-        f"({{{{fig:v02-o031}}}}). The slow tier holds about {ratio:,.0f} times as much.",
+        f"({{{{fig:v02-o031}}}}). The slow tier holds about {round(ratio, -2):,.0f} times as much.",
         f"The fast tier wins on speed: it sits beside the arithmetic units, and the chip reads it at "
         f"about {smem_bw / 1e12:.0f} TB/s against HBM's 3.35, roughly {speed:.0f} times faster.",
         "So the fast tier can never hold the data. It holds only the piece being worked on at this "
@@ -176,8 +176,8 @@ def p05():
     # the claim in the prose: the naive kernel tends to d/2, every-byte-once to n/2
     for dd in DS:
         assert abs(points(10 ** 7, dd)[2][2] - dd / 2) < 0.01 and points(4096, dd)[3][2] == 2048
-    s = [hd(40, 34, "One head of naive attention on an H100, FP16, sequence of "),
-         f'<text class="hd" x="{40 + 7 * 59:.0f}" y="34" data-n="">{n:,}</text>']
+    s = [f'<text class="hd" x="40" y="34">One head of naive attention on an H100, FP16, sequence of '
+         f'<tspan data-n="">{n:,}</tspan> tokens</text>']
     # axes and grid
     for v in (0.1, 1, 10, 100, 1000, 10000, 100000):
         x = IX(v)
@@ -206,14 +206,14 @@ def p05():
     # the table
     ty = Y0 + 74
     s.append(txt(40, ty, "point", "sub2"))
-    s.append(txt(104, ty, "what is measured", "sub2"))
-    s.append(txt(520, ty, "operations per byte", "sub2", "end"))
-    s.append(txt(640, ty, "share of peak, at most", "sub2", "end"))
+    s.append(txt(104, ty, "what", "sub2"))
+    s.append(txt(500, ty, "per byte", "sub2", "end"))
+    s.append(txt(640, ty, "most of peak", "sub2", "end"))
     for k, (o, by, i) in enumerate(P):
         y = ty + 26 + k * 24
         s.append(txt(40, y, LETTERS[k], "cap"))
         s.append(txt(104, y, WHAT[k], "cap"))
-        s.append(f'<text class="sub2" x="520" y="{y}" text-anchor="end" data-i="{k}">{fmt_i(i)}</text>')
+        s.append(f'<text class="sub2" x="500" y="{y}" text-anchor="end" data-i="{k}">{fmt_i(i)}</text>')
         s.append(f'<text class="sub2" x="640" y="{y}" text-anchor="end" data-s="{k}">{fmt_share(i)}</text>')
     yo = ty + 26 + 4 * 24 + 6
     s.append(f'<text class="sub2" x="104" y="{yo}">C: <tspan data-ops="">{f(P[2][0] / 1e9, 1)}</tspan> billion '

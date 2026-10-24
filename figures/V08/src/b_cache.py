@@ -34,8 +34,8 @@ def o015():
         new = i == 4
         b.append(cell(x, 70, CW, 28, "u", label=t if not new else "the  (newest)"))
         if new:
-            b.append(ghost(x, 110, CW, 26, label="its k, appended"))
-            b.append(ghost(x, 146, CW, 26, label="its v, appended"))
+            b.append(ghost(x, 110, CW, 26, label="k5, new"))
+            b.append(ghost(x, 146, CW, 26, label="v5, new"))
         else:
             b.append(cell(x, 110, CW, 26, "h", label=f"k{i + 1}"))
             b.append(cell(x, 146, CW, 26, "h", label=f"v{i + 1}"))
@@ -113,7 +113,7 @@ def b02():
     slope = KV_PER_TOKEN / H100_BW                         # seconds per token of context, per request
     step = lambda B, L: (WEIGHT_BYTES + B * L * KV_PER_TOKEN) / H100_BW
     cross = {B: WEIGHT_BYTES / (B * KV_PER_TOKEN) for B in (1, 4)}
-    assert round(t_w * 1e3, 1) == 41.8 and round(slope * 1e6 * 1e3, 4) == 97.8149 / 1e0 * 1 or True
+    assert round(t_w * 1e3, 1) == 41.8 and round(slope * 1e6, 4) == 0.0978   # µs per token = ms per 1,000
     assert round(step(1, CTX) * 1e3, 1) == 54.6 and round(step(4, CTX) * 1e3, 1) == 93.1
     assert round(cross[1]) == 427_246 and round(cross[4]) == 106_812
     assert abs(step(4, cross[4]) - 2 * t_w) < 1e-12                      # where cache = weights, time doubles
@@ -206,8 +206,8 @@ def b03():
          "FlashAttention stopped the scores reaching memory; the cache stayed the same size",
          yb + 30, b + [body],
          "Two memory problems with different shapes. FlashAttention solved the one that grows with the "
-         "square of the context; the one that grows in a straight line is what the rest of this video "
-         "is about.")
+         "square of the context; the one that grows in a straight line is what every method from here "
+         "on attacks.")
 
 
 # ---- b04: ring attention ---------------------------------------------------------------------------------------
@@ -235,7 +235,7 @@ def b04():
         b.append(txt(40, y + 18, f"GPU {g + 1}, queries {names[g]}", "cap"))
         for s in range(G):
             x = X0 + s * (CW + GX)
-            b.append(cell(x, y, CW, 26, "s" if holds[g][s] == names[g] else "u", label=f"keys {holds[g][s]}"))
+            b.append(cell(x, y, CW, 26, "u", label=f"keys {holds[g][s]}"))
             if s < G - 1:
                 b.append(arr(x + CW + 4, y + 13, x + CW + GX - 4, y + 13))
     yy = Y0 + G * RH + 8

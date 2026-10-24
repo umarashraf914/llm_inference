@@ -10,7 +10,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / ".claude/skills/srt-figure-atlas/scripts"))
-from atlas import box, cell, ghost, txt, hd, ln, arr, eq, prose, item, stamp, esc  # noqa: E402,F401
+from atlas import box, cell, ghost, txt, hd, ln, arr, eq, item, stamp, esc  # noqa: E402,F401
+from atlas import prose as _prose  # noqa: E402
 
 SRT = ROOT / "transcripts/V08_Speculative_Decoding_and_Long_Context.srt"
 OUT = ROOT / "figures/V08/items"
@@ -25,6 +26,18 @@ T_READ = BYTES / BW                  # 41.8 ms to read the weights once
 T_POS = OPS_TOKEN / PEAK             # 0.142 ms of arithmetic per position in a pass
 RIDGE = PEAK / BW                    # 295 operations per byte
 DRAFT_BYTES = BYTES / 100            # a drafter 100 times smaller: 1.4 GB a pass
+
+
+def glue(s):
+    """Keep a short formula on one line: no line break either side of ÷, × or a spaced minus."""
+    for op in ("÷", "×", "−"):
+        s = s.replace(f" {op} ", f"\u00a0{op}\u00a0")
+    return s
+
+
+def prose(y, paras, **kw):
+    """atlas.prose, with formulas glued so a wrap never strands an operator."""
+    return _prose(y, [glue(t) for t in paras], **kw)
 
 
 def f(v, d=2):

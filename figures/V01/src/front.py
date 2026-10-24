@@ -303,6 +303,37 @@ def o060():
          "stages.")
 
 
+# ---- o027: what the preamble costs, bars to one scale ------------------------------------------
+def o027():
+    rows = [("the provider's system prompt", 2000, "m"), ("the user's custom instructions", 300, "s"),
+            ("tool descriptions", 450, "s"), ("one loaded skill", 2000, "s")]
+    total = sum(n for _, n, _ in rows)
+    assert total == 4750
+    sc = 380 / total                            # the total bar ends at the right margin
+    b = [hd(40, 46, "What sits in front of the user's first word, and who put it there")]
+    for k, (lab, n, c) in enumerate(rows):
+        y = 70 + k * 46
+        b.append(txt(40, y + 20, lab, "cap"))
+        w = round(n * sc, 1)
+        b.append(cell(260, y, w, 30, c, rx=3))
+        b.append(txt(260 + w + 10, y + 20, f"{g(n)} tokens", "sub2"))
+    yt = 70 + 4 * 46 + 8
+    b.append(ln(40, yt - 4, 640, yt - 4, "axis"))
+    b.append(txt(40, yt + 28, "together", "cap"))
+    b.append(cell(260, yt + 8, round(total * sc, 1), 30, "h", rx=3, label=f"{g(total)} tokens"))
+    body, yb = prose(yt + 84, [
+        "None of it was written by the user, and all of it counts against the context window and the bill "
+        "on every single turn.",
+        "Where it was stored changes who transmits it. It does not change that the model has to read every "
+        "one of these tokens before it writes the first word of an answer, on every turn.",
+        "Figures are illustrative; the bars are drawn to one scale. The shape is not illustrative: the "
+        "preamble is usually far larger than anything the user types.",
+    ])
+    emit("o027", "0:21", "What a request carries before the user types a word", yb + 26, b + [body],
+         "Where the text is stored is invisible to the user. Its token count is not, and the preamble is "
+         "almost always the largest thing in the request.")
+
+
 if __name__ == "__main__":
-    for fn in (o018, p02, p03, p04, p01, o020, o031, o060):
+    for fn in (o018, p02, p03, p04, p01, o020, o027, o031, o060):
         fn()

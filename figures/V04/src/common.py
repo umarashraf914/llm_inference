@@ -63,6 +63,11 @@ def sup(n):
     return str(n).translate(SUP)
 
 
+def nb(s):
+    """Bind a short equation together so prose() never wraps it across lines (no-break spaces)."""
+    return s.replace(" ", "\u00a0")
+
+
 def pct(v, d=1):
     return f(100 * v, d) + "%"
 

@@ -1,0 +1,29 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 5:51</div><h3>Across the network, the exchanges would outlast the arithmetic five times over</h3><div class='wg'><div class='ctl'><label>prompt tokens <input type='range' min='0' max='14' step='1' value='12'><span class='val'>4,096</span></label><label>network GB/s each way <input type='range' min='0' max='5' step='1' value='2'><span class='val'>50</span></label></div><div class='ctl'><button type='button'>Reset</button></div><svg viewBox='0 0 680 494' role='img'><title>Across the network, the exchanges would outlast the arithmetic five times over</title><text class="hd" x="40" y="34">One prompt through the 70B on eight H100s, at ideal rates</text><text class="cap" x="40" y="64" text-anchor="start">the GPU's own work</text><text class="sub2" x="40" y="80" data-work="">the arithmetic</text><g class="m"><rect x="230" y="52" width="63.6" height="26" rx="3" data-bar="0"/></g><text class="sub2" x="303.6" y="70" data-t="0">72.5 ms</text><text class="cap" x="40" y="114" text-anchor="start">160 all-reduces</text><text class="sub2" x="40" y="130">NVLink, 450 GB/s each way</text><g class="h"><rect x="230" y="102" width="36.7" height="26" rx="3" data-bar="1"/></g><text class="sub2" x="276.7" y="120" data-t="1">41.8 ms</text><text class="cap" x="40" y="164" text-anchor="start">160 all-reduces</text><text class="sub2" x="40" y="180" data-net="">network, 50 GB/s each way</text><g class="h"><rect x="230" y="152" width="330.0" height="26" rx="3" data-bar="2"/></g><text class="sub2" x="570.0" y="170" data-t="2">375.8 ms</text><text class="sub2" x="230" y="206" data-r="">exchanges ÷ work: 0.58× on NVLink, 5.2× on the network</text><text class="cap" x="40" y="270" text-anchor="start">One 4,096-token prompt through the 70B on eight H100s. The arithmetic is 2 operations</text><text class="cap" x="40" y="290" text-anchor="start">per weight per token ({{fig:v01-o111}}): 2 × 70 billion × 4,096 ÷ (8 × 989 trillion a</text><text class="cap" x="40" y="310" text-anchor="start">second) = 72.5 ms, with every GPU at full speed.</text><text class="cap" x="40" y="350" text-anchor="start">Each of the 160 all-reduces moves 1.75 × 67 MB from every GPU: 0.26 ms over NVLink's</text><text class="cap" x="40" y="370" text-anchor="start">450 GB/s, 41.8 ms in all; over the network's 50 GB/s, 2.35 ms each, 375.8 ms in all. The</text><text class="cap" x="40" y="390" text-anchor="start">exchanges sit on the critical path, so their time adds to the work.</text><text class="cap" x="40" y="430" text-anchor="start">Slide the prompt down to one token and the work becomes reading the weights, 5.2 ms,</text><text class="cap" x="40" y="450" text-anchor="start">while the bandwidth part of the exchanges almost vanishes; what is left is 160 tolls,</text><text class="cap" x="40" y="470" text-anchor="start">not drawn. The widget's arithmetic was checked against Python at every setting.</text></svg></div><figcaption>Bars share one scale, which resets as you move the sliders; ideal rates, so every bar is a floor. It takes about 260 GB/s each way, more than five 400 Gb/s ports per GPU, before the network's exchanges fall below the arithmetic.</figcaption><script>(() => {
+  const fig = document.currentScript.closest('figure');
+  const TOK = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384], NETS = [12.5, 25, 50, 100, 200, 400], NL = ["12.5", "25", "50", "100", "200", "400"], C = {"params": 70000000000.0, "flops": 989000000000000.0, "wbytes": 140000000000.0, "hbm": 3350000000000.0, "vec": 16384, "nv": 450000000000.0, "W": 330, "X0": 230, "t0": 12, "n0": 2};
+  const sl = [...fig.querySelectorAll('input[type=range]')], val = [...fig.querySelectorAll('.val')];
+  const q = s => fig.querySelector(s);
+  const fmt = (v, d) => { const s = Math.abs(v).toFixed(d), [i, p] = s.split('.');
+    return (v < 0 && +s !== 0 ? '−' : '') + i.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (p ? '.' + p : ''); };
+  const ms = v => v < 1 ? fmt(v, 3) : v < 10 ? fmt(v, 2) : fmt(v, 1);
+  const rat = r => r < 0.1 ? fmt(r, 3) : r < 1 ? fmt(r, 2) : fmt(r, 1);
+  function draw() {
+    const T = TOK[+sl[0].value], net = NETS[+sl[1].value];
+    val[0].textContent = fmt(T, 0); val[1].textContent = NL[+sl[1].value];
+    const comp = 2 * C.params * T / (8 * C.flops), read = C.wbytes / 8 / C.hbm, work = Math.max(comp, read);
+    const per = 2 * 7 / 8 * T * C.vec, nv = 160 * per / C.nv, nt = 160 * per / (net * 1e9);
+    const v = [work * 1e3, nv * 1e3, nt * 1e3], mx = Math.max(...v);
+    v.forEach((t, k) => {
+      const w = Math.max(t / mx * C.W, 2);
+      q(`[data-bar="${k}"]`).setAttribute('width', w.toFixed(1));
+      const lab = q(`[data-t="${k}"]`);
+      lab.textContent = ms(t) + ' ms'; lab.setAttribute('x', (C.X0 + w + 10).toFixed(1));
+    });
+    q('[data-work]').textContent = comp >= read ? 'the arithmetic' : 'reading the weights';
+    q('[data-net]').textContent = `network, ${NL[+sl[1].value]} GB/s each way`;
+    q('[data-r]').textContent = `exchanges ÷ work: ${rat(v[1] / v[0])}× on NVLink, ${rat(v[2] / v[0])}× on the network`;
+  }
+  sl.forEach(s => s.addEventListener('input', draw));
+  q('button').addEventListener('click', () => { sl[0].value = C.t0; sl[1].value = C.n0; draw(); });
+  draw();
+})();</script></figure>

@@ -159,8 +159,8 @@ def b39():
         "A tree is nodes joined by edges. Each edge runs from a parent to a child. The root is the "
         "one node with no parent, and a leaf is a node with no children. Every other node has exactly "
         "one parent, so from the root to any node there is exactly one path.",
-        "A file path is such a path: /home/alice/notes.txt names the four nodes passed through, drawn "
-        "here in teal. Two files in one folder share the beginning of their paths, and the tree holds "
+        "A file path is such a path: /home/alice/notes.txt names the four nodes passed through, "
+        "highlighted here. Two files in one folder share the beginning of their paths, and the tree holds "
         "that shared part once: home and alice exist once, for both notes.txt and todo.txt.",
     ])
     emit("b39", stamp(SRT, "S G Lang's radix attention keeps them in"),
@@ -238,7 +238,7 @@ def b41():
     b.append(txt(40, y2 - 12, "radix tree", "sub2"))
     rn, re_ = layout(RADIX, 62, y2, 38, gap=14)
     b.append(draw(rn, re_, cls=lambda nd: "s", gap=14, root=(40, y2)))
-    body, yb = prose(y2 + 2 * 38 + 48, [
+    body, yb = prose(max(nd["y"] for nd in rn) + 26 + 40, [
         "A chain is a run of nodes that each have exactly one child. Nothing can branch inside it, so "
         f"it can be stored as one node holding the whole run. The {NODES} nodes fall into "
         f"{count(RADIX)} chains.",
@@ -408,13 +408,16 @@ WIDGET_JS = r"""<script>(() => {
     const v = victim();
     let freed = 0, kept = 0;
     N.forEach(n => {
-      const g = q(`[data-n="${n[0]}"]`), r = g.querySelector('rect'), ghost = q(`[data-x="${n[0]}"]`);
+      const g = q(`[data-n="${n[0]}"]`), r = g.querySelector('rect'), t = g.querySelector('text');
       const out = gone.includes(n[0]);
       if (out) freed += n[2]; else kept += n[2];
-      g.style.display = out ? 'none' : ''; ghost.style.display = out ? '' : 'none';
       const ref = (box.checked && RUN.includes(n[0])) ? 1 : 0;
-      g.setAttribute('class', v && v[0] === n[0] ? 'h' : (ref ? 's' : 'u'));
-      q(`[data-r="${n[0]}"]`).textContent = `used ${LU[n[0]]} · count ${ref}`;
+      g.setAttribute('class', out ? '' : (v && v[0] === n[0] ? 'h' : (ref ? 's' : 'u')));
+      r.style.cssText = out ? 'fill:none;stroke:var(--rule);stroke-dasharray:3 3' : '';
+      t.style.cssText = out ? 'fill:var(--muted)' : '';
+      t.textContent = out ? 'evicted' : n[1];
+      q(`[data-u="${n[0]}"]`).textContent = out ? '' : `used ${LU[n[0]]}`;
+      q(`[data-c="${n[0]}"]`).textContent = out ? '' : `count ${ref}`;
     });
     q('[data-next]').textContent = v ? `next to go: ${v[1]}, the stalest leaf with count 0` : 'nothing left that can be evicted';
     q('[data-freed]').textContent = `freed ${gx(freed)} tokens; ${gx(kept)} still cached`;
@@ -442,9 +445,9 @@ def b43():
         acc += tok[order[k]]; k += 1
     assert (k, acc) == (4, 960)
     s = [hd(40, 34, "Each node: when a request last used it, and how many running requests hold it")]
-    nodes, edges = chat_layout(62, 76, 58)
+    nodes, edges = chat_layout(62, 76, 70)
     byid = {nd["key"]: nd for nd in nodes}
-    # edges (drawn once), then each node as a group the script can recolour, hide or replace
+    # edges (drawn once), then each node as a group the script can recolour or mark evicted
     o = []
     for p, c in edges:
         x1, y1, xm = p["x"] + p["w"], p["y"] + 13, p["x"] + p["w"] + 8
@@ -463,11 +466,12 @@ def b43():
         o.append(f'<g class="{cls}" data-n="{nid}"><rect x="{nd["x"]}" y="{nd["y"]}" width="{nd["w"]}" '
                  f'height="26" rx="3"/><text class="sub" x="{nd["x"] + nd["w"] / 2}" y="{nd["y"] + 13}" '
                  f'text-anchor="middle" dominant-baseline="central">{nd["s"]}</text></g>')
-        o.append(f'<g data-x="{nid}" style="display:none">{ghost(nd["x"], nd["y"], nd["w"], 26, label="evicted")}</g>')
         o.append(f'<text class="sub2" x="{nd["x"] + nd["w"] / 2}" y="{nd["y"] + 40}" text-anchor="middle" '
-                 f'data-r="{nid}">used {lu[nid]} · count {ref}</text>')
+                 f'data-u="{nid}">used {lu[nid]}</text>')
+        o.append(f'<text class="sub2" x="{nd["x"] + nd["w"] / 2}" y="{nd["y"] + 54}" text-anchor="middle" '
+                 f'data-c="{nid}">count {ref}</text>')
     s.append("".join(o))
-    ybot = max(nd["y"] for nd in nodes) + 26 + 40
+    ybot = max(nd["y"] for nd in nodes) + 58 + 30
     s.append(f'<text class="sub2" x="40" y="{ybot}" data-next="">next to go: '
              f'{next(n[1] for n in CHAT if n[0] == first)}, the stalest leaf with count 0</text>')
     s.append(f'<text class="sub2" x="40" y="{ybot + 18}" data-freed="">freed 0 tokens; '
@@ -477,8 +481,9 @@ def b43():
         "go, because removing a node from the middle would cut off everything below it; once a leaf "
         "is gone its parent may become a leaf, so eviction works inward toward the shared trunk.",
         "A count on each node says how many running requests are using it. B's second turn is running "
-        "now, so B and the system prompt carry a count of 1 and cannot go. Answer 3 is older than "
-        "turn 4, but it must wait: while turn 4 is cached it is not a leaf.",
+        "now, so B and the system prompt carry a count of 1 and cannot go. Turn 4's request walked "
+        "all of A's path at time 71, so every node on it reads 71; they still leave one at a time "
+        "from the end, because only a leaf can go.",
         f"Step it through: the retried answer goes first, then turn 4, then the rest of A, freeing "
         f"{g(freed)} tokens in all; freeing {g(need)} takes {k} steps. Untick the box and B's request "
         "ends: B and then the system prompt become evictable too. The order was checked against the "

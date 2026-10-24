@@ -61,12 +61,23 @@ def pct(v, d=0):
 def figure(name, ts, title, h, body, caption, cls=None):
     """Write a figure item. `caption` is HTML: pass text through esc() yourself, so a link can sit in
     it. {{ref:…}} and {{fig:…}} are resolved at build time."""
+    guard_split_word(name, "".join(body))
     c = f" class='{cls}'" if cls else ""
     out = (f"<figure{c}><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; {ts}</div><h3>{esc(title)}</h3>"
            f"<svg viewBox='0 0 680 {int(math.ceil(h))}' role='img'><title>{esc(title)}</title>"
            f"{''.join(body)}</svg><figcaption>{caption}</figcaption></figure>")
     (ITEMS / f"{name}.html").write_text(out, encoding="utf-8")
     print(f"{name:6s} {ts:>6}  {title}")
+
+
+def guard_split_word(name, svg):
+    """check_atlas.py's split-word check crashes when a label ends in a non-ASCII letter (Kᵀ, Oᵢ, µ) and
+    the next label starts in lower case: str.isalpha() accepts the letter, its ASCII regex finds no word.
+    Refuse to write such a figure, so the checker can run."""
+    texts = [_html.unescape(re.sub(r"<[^>]+>", "", x)) for x in re.findall(r"<text[^>]*>(.*?)</text>", svg, re.S)]
+    for a, b in zip(texts, texts[1:]):
+        if a and b and a[-1].isalpha() and b[0].isalpha() and b[0].islower() and not re.search(r"[A-Za-z'-]+$", a):
+            raise SystemExit(f"{name}: label {a!r} ends in {a[-1]!r} before {b!r}; reword it (checker bug)")
 
 
 def anim_link(words):

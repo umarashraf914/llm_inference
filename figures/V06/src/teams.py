@@ -136,10 +136,11 @@ def p23():
         b.append(rect(X0, y, W - ws, 28, cl))
         b.append(rect(X0 + W - ws, y, max(ws, 2), 28, "s"))
         b.append(txt(X0 + W - ws - 8, y + 44, f"shared: {pct(shared / tot, 2 if k == 0 else 1)}", "sub2", "end"))
+    prod = nb(f"{v['moe_layers']} × {v['expert'] / 1e6:.2f} million")
     body, y = prose(182 + 2 * 50 + 50, [
         "A shared expert is an ordinary expert, three matrices of 7,168 × 2,048, that skips the router "
         f"and runs for every token. DeepSeek V3 has one in each of its {v['moe_layers']} MoE layers: "
-        f"{v['moe_layers']} × {v['expert'] / 1e6:.2f} million = {shared / 1e9:.2f} billion weights.",
+        f"{prod} = {shared / 1e9:.2f} billion weights.",
         f"Against everything held, that is {pct(shared / held, 2)}, the price of one expert in 257. Against "
         f"what a token runs it is {pct(shared / run)}, and one expert in nine in every MoE layer: the "
         "always-on part of each token's bill.",
