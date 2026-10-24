@@ -267,6 +267,9 @@ def p24():
     assert [round(r[4], 3) for r in rows] == [0.3, -0.2, 0.05]
     rms = [step / (s * math.sqrt(12)) for s in (1, 2, 4)]
     assert [round(v, 4) for v in rms] == [0.0289, 0.0144, 0.0072]
+    ten = [(k + 0.5) / 10 - 0.5 for k in range(10)]            # ten errors spread evenly across a step
+    msq = sum(e * e for e in ten) / 10
+    assert f(ten[0], 2) == "−0.45" and f(msq, 4) == "0.0825" and f(1 / 12, 4) == "0.0833"
     b = [hd(40, 46, "A weight of 0.37 with input 10, on a grid of step 0.1, scaled by s before rounding")]
     L, R = 180, 620
     for k, (s, ws, stored, used, err) in enumerate(rows):
@@ -292,7 +295,10 @@ def p24():
         "into the layer before, and the product is unchanged; but the rounding error, still at most half a "
         "step, is now divided by s on the way out.",
         "One weight's error wanders, 0.3, 0.2, 0.05 here; across many weights the typical error falls as "
-        f"step ÷ (s × √12): {f(rms[0], 4)}, {f(rms[1], 4)}, {f(rms[2], 4)}. AWQ, from Ji Lin and "
+        f"step ÷ (s × √12): {f(rms[0], 4)}, {f(rms[1], 4)}, {f(rms[2], 4)}. The √12 is the rms of errors "
+        "spread evenly across one step: ten of them, −0.45, −0.35 and so on to 0.45 steps, have an average "
+        f"square of {f(msq, 4)}, and spread ever more finely the average reaches 1/12 = {f(1 / 12, 4)}, so "
+        f"the rms is step ÷ √12, {f(1 / math.sqrt(12), 2)} of a step. AWQ, from Ji Lin and "
         "colleagues in the same MIT group, scales the weights whose inputs run largest, because their "
         "errors are multiplied by the most ({{fig:v04-p13}}).",
         "The limit: scale too far and the weight becomes the group's largest, widening the step for every "

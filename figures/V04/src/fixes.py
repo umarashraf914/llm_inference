@@ -98,5 +98,24 @@ def apply(fixes):
             raise SystemExit(f"{name}: neither the old nor the new text is there; look at the item")
 
 
+def final_read():
+    """Found reading the finished atlas from the top: pointers that inserted figures made stale, and the
+    sign factor that Fig 11's formula never explained."""
+    reprose("o009", 128, [
+        "Three stored fields, one formula. (−1)^sign is +1 when the sign bit is 0 and −1 when it is 1, so "
+        "the sign bit only chooses a side of zero. The 1 in front of the mantissa is the implied bit being "
+        "put back.",
+        "The bias exists because the exponent field is an unsigned integer but exponents need to go "
+        "negative. Subtracting a fixed bias shifts the range down. For an exponent field of E bits the "
+        "bias is 2^(E-1) - 1: 127 for FP32's eight bits, 15 for FP16's five.",
+    ])
+    apply([("o014", ">arithmetic on the next page.</text>", ">arithmetic of {{fig:v04-o015}}.</text>")])
+    reprose("o079", 186, [
+        "Both of these sit underneath the headline result of {{fig:v04-o077}}, and neither is settled.",
+        "Treat published near-lossless figures as upper bounds, not guarantees.",
+    ])
+
+
 if __name__ == "__main__":
     apply(FIXES)
+    final_read()

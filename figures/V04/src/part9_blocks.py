@@ -86,9 +86,14 @@ def o074():
         g = []
         for i in range(rows):
             for j in range(cols):
-                c = cls_of(i, j)
-                lab = "!" if (i, j) == out_at else None
-                g.append(cell(x0 + j * pitch, y0 + i * rh, cw, ch_, c, rx=2, label=lab))
+                x, y = x0 + j * pitch, y0 + i * rh
+                if (i, j) == out_at:                     # the outlier itself, solid
+                    g.append(f'<rect x="{x}" y="{y}" width="{cw}" height="{ch_}" rx="2" fill="var(--h)" '
+                             f'stroke="var(--h)"/><text class="sub" x="{x + cw / 2}" y="{y + ch_ / 2}" '
+                             f'text-anchor="middle" dominant-baseline="central" fill="var(--paper)" '
+                             f'style="fill:var(--paper)">!</text>')
+                else:
+                    g.append(cell(x, y, cw, ch_, cls_of(i, j), rx=2))
         return g
     b += grid(60, lambda i, j: "h")
     b.append(ghost(x0 - 4, 56, cols * pitch + 6, rows * rh + 2, rx=4))
@@ -139,7 +144,7 @@ def fix_75_76():
 
 
 # ---- p32: a power-of-two scale moves in factors of two (widget) ------------------------------------------------
-_rng = np.random.default_rng(11)
+_rng = np.random.default_rng(1)
 P = [round(float(v), 3) for v in np.abs(_rng.standard_normal(16))]
 _m = max(P)
 P = [round(v / _m, 3) for v in P]
@@ -227,6 +232,25 @@ for a in SETTINGS:
         assert fp4(v / X) == float(round_to(Fr(v) / Fr(X), "E2M1")) and fp4(v / S) == float(round_to(Fr(v) / Fr(S), "E2M1"))
     assert max(S * g for g in FP4) < VMAX
 fr11, fr7 = p32_frame(11.0), p32_frame(7.0)
+assert float(fr11["nv"]["rms"]) < float(fr11["mx"]["rms"]) and float(fr7["nv"]["rms"]) < float(fr7["mx"]["rms"])
+assert any(float(p32_frame(a)["nv"]["rms"]) > float(p32_frame(a)["mx"]["rms"]) for a in SETTINGS)
+
+
+def many_blocks(n=20000, seed=0):
+    """Mean square error of the two scale rules on random bell-shaped blocks of 16, signs included."""
+    rng = np.random.default_rng(seed)
+    m2 = n2 = wins = 0.0
+    for _ in range(n):
+        v = rng.standard_normal(16)
+        a = float(np.abs(v).max())
+        sc = (2.0 ** (exp2floor(a) - 2), e4m3(a / 6))
+        e = [sum((s * fp4(abs(x) / s) * (1 if x > 0 else -1) - x) ** 2 for x in v) / 16 for s in sc]
+        m2, n2, wins = m2 + e[0], n2 + e[1], wins + (e[1] < e[0])
+    return 1 - n2 / m2, wins / n
+
+
+CUT, WINS = many_blocks()
+assert f(100 * CUT, 0) == "35" and f(10 * WINS, 0) == "7"
 assert (fr11["mx"]["scale"], fr11["mx"]["stored"], fr11["mx"]["off"]) == ("2", "12", "1.00")
 assert (fr11["nv"]["scale"], fr11["nv"]["stored"], fr11["nv"]["off"]) == ("1.875", "11.25", "0.25")
 assert (fr7["mx"]["scale"], fr7["mx"]["stored"], fr7["mx"]["off"]) == ("1", "6", "1.00")
@@ -308,15 +332,20 @@ def p32():
         "Both formats store each value as one of FP4's levels, 0, 0.5, 1, 1.5, 2, 3, 4 and 6, times the "
         "block's scale ({{fig:v04-p06}}), and both aim to put the block's largest value at the top level, "
         "6. The ideal scale is therefore the largest value ÷ 6.",
-        "MXFP4's scale must be a power of two. For a largest value of 11 the OCP rule gives 8 ÷ 4 = 2, so "
-        "the top level is 12 and 11 is stored as 12. For 7 it gives 4 ÷ 4 = 1, the top level is 6, and 7 "
+        "MXFP4's scale must be a power of two. For a largest value of 11 the OCP rule gives "
+        + nb("8 ÷ 4 = 2") + ", so the top level is 12 and 11 is stored as 12. For 7 it gives "
+        + nb("4 ÷ 4 = 1") + ", the top level is 6, and 7 "
         "is clipped to 6. The rule lands between 0.75 and 1.5 times the ideal scale and clips whenever it "
         "lands low. cuBLAS rounds the power of two up instead, which never clips but can make the steps up "
         "to twice too coarse: a full factor of two.",
         "NVFP4's scale is an FP8 number, with 8 steps between one power of two and the next, so it lands "
         "within 6.25% of the ideal: 11 ÷ 6 = 1.833 becomes 1.875, and 11 is stored as 11.25. Drag the "
         "largest value. MXFP4's levels jump only when it crosses a power of two; NVFP4's follow it in "
-        "small steps. The widget's numbers were checked against Python at every setting.",
+        "small steps.",
+        "On one block either can come out ahead: at some settings MXFP4's rms error is the lower. Over "
+        "20,000 random bell-shaped blocks of 16, simulated in Python, NVFP4's scale won about "
+        f"{f(10 * WINS, 0)} times in 10 and cut the mean square error by {f(100 * CUT, 0)}%. The widget's "
+        "numbers were checked against Python at every setting.",
     ])
     b.append(body)
     presets = "".join(f"<button type='button' data-a='{a:g}'>{a:g}</button>" for a in (11, 7))

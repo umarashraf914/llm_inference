@@ -195,8 +195,50 @@ def check_p25(page):
     return bad == 0 and len(got) == 362
 
 
+def check_p32(page):
+    """Every setting of the block's largest value: both scales, levels, readouts and every dot and tick."""
+    from part9_blocks import p32_frame, SETTINGS
+    vals = [f"{a:g}" for a in SETTINGS]
+    got = page.evaluate("""(vals) => {
+      const fig = document.getElementById('v04-p32'), sl = fig.querySelector('input[type=range]'); const out = [];
+      const read = () => {
+        const r = {a: sl.value, val: fig.querySelector('.val').textContent};
+        fig.querySelectorAll('[data-k]').forEach(e => r[e.dataset.k] = e.textContent);
+        r.vx = [...fig.querySelectorAll('[data-v]')].map(e => e.getAttribute('cx'));
+        for (const k of ['mx', 'nv']) {
+          r[k + 'sx'] = [...fig.querySelectorAll(`[data-s="${k}"]`)].map(e => e.getAttribute('cx'));
+          r[k + 'gx'] = [...fig.querySelectorAll(`[data-g="${k}"]`)].map(e => [e.getAttribute('x1'), e.getAttribute('x2')]);
+        }
+        return r; };
+      for (const v of vals) { sl.value = v; sl.dispatchEvent(new Event('input')); out.push(read()); }
+      for (const b of fig.querySelectorAll('button[data-a]')) { b.click(); out.push(read()); }
+      fig.querySelector('button[data-reset]').click(); out.push(read());
+      return out;
+    }""", vals)
+    bad = 0
+    for r in got:
+        fr = p32_frame(float(r["a"]))
+        want = {"val": fr["val"], "ideal": fr["ideal"], "vx": fr["vx"] * 2}
+        for k in ("mx", "nv"):
+            for key in ("scale", "levels", "big", "stored", "off", "rms"):
+                want[f"{k}-{key}"] = fr[k][key]
+            want[k + "sx"] = fr[k]["sx"]
+            want[k + "gx"] = [[x, x] for x in fr[k]["gx"]]
+        for k, v in want.items():
+            if r[k] != v:
+                bad += 1
+                if bad < 8:
+                    print("  p32", r["a"], k, r[k], "!=", v)
+    tail = [r["a"] for r in got[-3:]]
+    if tail != ["11", "7", "11"]:
+        bad += 1
+        print("  p32 presets and reset gave", tail)
+    print(f"p32: {len(got)} settings checked, {bad} mismatches")
+    return bad == 0 and len(got) == len(vals) + 3
+
+
 CHECKS = {"p02w": check_p02w, "p14": check_p14, "p19": check_p19, "p23": check_p23,
-          "p25": check_p25}
+          "p25": check_p25, "p32": check_p32}
 
 
 def main():
