@@ -176,9 +176,10 @@ Every figure gets a permanent id (`v06-p15`) that survives renumbering. Point to
 with `{{fig:v01-o085}}` (becomes "V1 Fig 85", for SVG text) or `{{ref:v01-o085}}` (the same as a
 link, for captions). Only point at a figure after reading it.
 
-In `scripts/atlas.py`, `item()` writes a figure, `prose()` wraps body text at the standard measure,
-and `stamp(srt, phrase)` finds where a phrase is spoken, so stamps come from the transcript rather
-than memory. Label classes follow the series: `cap` for free-standing row labels, `sub2` for values
+In `scripts/atlas.py`, `item()` writes a figure, `prose()` wraps body text at the standard measure
+(never inside a hyphenated word, between a number and its unit, or inside a short sum, and with
+each pointer measured at its printed length), and `stamp(srt, phrase)` finds where a phrase is
+spoken, so stamps come from the transcript rather than memory. Label classes follow the series: `cap` for free-standing row labels, `sub2` for values
 and annotations, `sub`/`lbl` only inside a coloured box. `figures/V06/src/router.py` is a worked
 example of a build-up and an inline widget: numbers computed in code, every claim asserted, the
 widget's initial state drawn in Python and its JavaScript checked against Python in a browser.

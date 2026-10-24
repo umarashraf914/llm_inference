@@ -69,13 +69,25 @@ def eq(x, y, w, s, cls="u", h=42):
 
 def prose(y, paras, x=40, width=88, cls="cap"):
     """Body prose: wrap each paragraph to `width` characters, 20px lines, a blank line between.
+    A line never breaks inside a hyphenated word, between a number and its unit ("2.68 ms"), or
+    inside a sum between numbers ("3 × 4 = 12"); those spaces become no-break spaces. A {{fig:…}}
+    pointer is measured at its printed length, "V1 Fig 179", not its raw one.
     Returns (svg, y of the last baseline)."""
-    import textwrap
+    import re, textwrap
+    unit = re.compile(r"(\d) (GB/s|TB/s|Gb/s|Tb/s|MB/s|KB/s|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|"
+                      r"ms|µs|ns|s|GHz|MHz|W|kW|bits|bytes|tokens|GPUs|layers)(?![\w/])")
+    op = re.compile(r"(?<=[\d)]) ([+×÷=−]) (?=[\d(−])")
     o = []
     for k, p in enumerate(paras):
+        p = op.sub("\u00a0\\1\u00a0", unit.sub("\\1\u00a0\\2", p))
+        refs = re.findall(r"\{\{(?:fig|ref):[^}]+\}\}", p)
+        for i, r in enumerate(refs):
+            p = p.replace(r, f"\u0001{i:08d}\u0001", 1)          # ten characters, like "V1 Fig 179"
         if k:
             y += 40
         for j, line in enumerate(textwrap.wrap(p, width, break_on_hyphens=False, break_long_words=False)):
+            for i, r in enumerate(refs):
+                line = line.replace(f"\u0001{i:08d}\u0001", r)
             if j:
                 y += 20
             o.append(txt(x, y, line, cls))
