@@ -53,3 +53,41 @@ function ch11Kit(S) {
   return { T, cl, lerp, E, EIO, drive, clock, whole, setO, hide, fade, ignore, pulse, stateAt, track, K: (t, st) => [t, st], draw };
 }
 
+
+/**
+ * The roofline's log-log frame: equal px per factor of ten on both axes, so a bandwidth line is at 45 degrees.
+ * o: {x0 320, y0 900 (intensity 1, 1 trillion ops/s), ppd 250, xDec 4 (ticks 1 … 10,000), yDec 2 (labels 1 … 100),
+ *     yTop 150 (top of the vertical axis), peak 989, bw 3.35, tickSize 24, titleSize 26, titles true}
+ * Returns <g> with .axes, .xTicks, .yTicks (groups, one child per tick), .xTitle, .yTitle (rotated), and geometry:
+ *   .X(intensity) .Y(trillion ops/s) .ridgeI (= peak / bw) .ridge [x, y] .flatD .slantD (path data for the two ceilings)
+ */
+function ch11Roof(S, o = {}, parent) {
+  const x0 = o.x0 ?? 320, y0 = o.y0 ?? 900, ppd = o.ppd ?? 250, xDec = o.xDec ?? 4, yDec = o.yDec ?? 2;
+  const xEnd = x0 + xDec * ppd, yTop = o.yTop ?? 150, ts = o.tickSize ?? 24, tt = o.titleSize ?? 26;
+  const X = v => x0 + Math.log10(v) * ppd, Y = v => y0 - Math.log10(v) * ppd;
+  const g = S.g(null, parent);
+  g.axes = S.path({ d: `M${x0},${yTop} V${y0} H${xEnd}`, stroke: 'white', strokeOpacity: 0.55, sw: 2.5 }, g);
+  g.xTicks = S.g(null, g);
+  g.yTicks = S.g(null, g);
+  for (let k = 0; k <= xDec; k++) {
+    const t = S.g(null, g.xTicks), v = 10 ** k;
+    S.path({ d: `M${X(v)},${y0} V${y0 + 10}`, stroke: 'white', strokeOpacity: 0.55, sw: 2 }, t);
+    if (ts) S.text(v.toLocaleString('en-US'), { x: X(v), y: y0 + 32, size: ts, weight: 600, family: 'mono', anchor: 'middle', color: 'muted' }, t);
+  }
+  for (let k = 0; k <= yDec; k++) {
+    const t = S.g(null, g.yTicks), v = 10 ** k;
+    S.path({ d: `M${x0 - 10},${Y(v)} H${x0}`, stroke: 'white', strokeOpacity: 0.55, sw: 2 }, t);
+    if (ts) S.text(v.toLocaleString('en-US'), { x: x0 - 18, y: Y(v), size: ts, weight: 600, family: 'mono', anchor: 'end', color: 'muted' }, t);
+  }
+  if (o.titles !== false) {
+    g.xTitle = S.text([{ t: 'operations', c: 'compute' }, { t: ' per ', c: 'ink' }, { t: 'byte', c: 'bytes' }, { t: ' (log)', c: 'muted' }], { x: (x0 + xEnd) / 2, y: y0 + 74, size: tt, weight: 700, anchor: 'middle' }, g);
+    const ym = (y0 + yTop) / 2, yx = x0 - 96;
+    g.yTitle = S.text('trillion operations per second (log)', { x: yx, y: ym, size: tt, weight: 700, anchor: 'middle', color: 'compute' }, g);
+    g.yTitle.setAttribute('transform', `rotate(-90 ${yx} ${ym})`);
+  }
+  const peak = o.peak ?? 989, bw = o.bw ?? 3.35, ridgeI = peak / bw;
+  Object.assign(g, { X, Y, x0, y0, ppd, xEnd, yTop, peak, bw, ridgeI, ridge: [X(ridgeI), Y(peak)] });
+  g.flatD = `M${x0},${Y(peak).toFixed(1)} H${xEnd}`;
+  g.slantD = `M${x0},${Y(bw).toFixed(1)} L${X(ridgeI).toFixed(1)},${Y(peak).toFixed(1)}`;
+  return g;
+}
