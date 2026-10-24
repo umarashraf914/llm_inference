@@ -232,7 +232,7 @@ V.scene('ch12_s01', S => {
   ] });
 
   // attention: a lighter segment of 34 px clicks onto the end (its true share is 2–4%, so it is schematic)
-  const attn = S.rect({ x: LX + W280 + 2, y: P.opsY, w: FULL - W280 - 2, h: BH, r: 5, fill: 'compute', fillOpacity: 0.42, stroke: 'compute', strokeOpacity: 0.9, sw: 1.5 }, barsG);
+  const attn = S.rect({ x: LX + W280 + 2, y: P.opsY, w: FULL - W280 - 2, h: BH, r: 5, fill: '#ffd99a', fillOpacity: 0.9, stroke: 'compute', strokeOpacity: 0.9, sw: 1.5 }, barsG);
   S.add(gsap.fromTo(attn, { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.35, ease: 'back.out(2.5)' }), 'b1~adds-0.15');
   const attnTag = label('attention: a few %, schematic', { x: LEND, y: P.opsY + BH + 24, anchor: 'end' });
   S.add(fx.in(attnTag, { from: 'up', d: 0.45, dist: 12 }), 'b1~few-0.1');
