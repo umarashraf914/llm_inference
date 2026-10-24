@@ -1,0 +1,1984 @@
+1
+00:00:00,000 --> 00:00:04,360
+In the last video, we found we could
+
+2
+00:00:01,960 --> 00:00:06,240
+predict how fast a chip turns out tokens
+
+3
+00:00:04,360 --> 00:00:08,760
+from just two numbers.
+
+4
+00:00:06,240 --> 00:00:10,880
+How fast it does arithmetic in
+
+5
+00:00:08,760 --> 00:00:13,320
+operations per second,
+
+6
+00:00:10,880 --> 00:00:16,080
+and how fast it moves bytes between
+
+7
+00:00:13,320 --> 00:00:17,760
+memory and the compute units in bytes
+
+8
+00:00:16,080 --> 00:00:20,080
+per second.
+
+9
+00:00:17,760 --> 00:00:23,000
+From those two alone, we landed on the
+
+10
+00:00:20,080 --> 00:00:25,200
+central puzzle of LLM inference.
+
+11
+00:00:23,000 --> 00:00:27,840
+Generating a single token barely uses
+
+12
+00:00:25,200 --> 00:00:31,160
+the arithmetic at all. Less than 1% of
+
+13
+00:00:27,840 --> 00:00:33,240
+the time goes to math. The other 99% is
+
+14
+00:00:31,160 --> 00:00:36,200
+the chip sitting idle waiting for the
+
+15
+00:00:33,240 --> 00:00:39,280
+model's weights to arrive from memory.
+
+16
+00:00:36,200 --> 00:00:43,800
+Decode wasn't compute bound. It was
+
+17
+00:00:39,280 --> 00:00:45,200
+memory bound by a factor of almost 300.
+
+18
+00:00:43,800 --> 00:00:47,280
+Last video was about what that
+
+19
+00:00:45,200 --> 00:00:49,520
+bottleneck is. This one is about the
+
+20
+00:00:47,280 --> 00:00:52,080
+machine that creates it.
+
+21
+00:00:49,520 --> 00:00:53,840
+We're going to open the GPU up and ask
+
+22
+00:00:52,080 --> 00:00:56,160
+three questions.
+
+23
+00:00:53,840 --> 00:00:58,480
+Why is it built so differently from the
+
+24
+00:00:56,160 --> 00:01:00,960
+processor in your laptop?
+
+25
+00:00:58,480 --> 00:01:03,840
+Why does moving a byte across it cost so
+
+26
+00:01:00,960 --> 00:01:06,400
+much more than doing arithmetic on one?
+
+27
+00:01:03,840 --> 00:01:10,080
+And once we understand that, what can
+
+28
+00:01:06,400 --> 00:01:12,160
+the hardware actually do to fight back?
+
+29
+00:01:10,080 --> 00:01:14,320
+It starts with a single bet about the
+
+30
+00:01:12,160 --> 00:01:16,240
+kind of work this chip would spend its
+
+31
+00:01:14,320 --> 00:01:18,000
+life doing. [music]
+
+32
+00:01:16,240 --> 00:01:20,640
+The bet is this.
+
+33
+00:01:18,000 --> 00:01:23,200
+The work this chip will do all day is
+
+34
+00:01:20,640 --> 00:01:25,400
+the same few arithmetic operations
+
+35
+00:01:23,200 --> 00:01:26,880
+repeated across billions of numbers at
+
+36
+00:01:25,400 --> 00:01:29,600
+once.
+
+37
+00:01:26,880 --> 00:01:32,120
+That is the shape of a matrix multiply,
+
+38
+00:01:29,600 --> 00:01:34,680
+and a transformer is mostly matrix
+
+39
+00:01:32,120 --> 00:01:36,880
+multiplies. Design a chip around that
+
+40
+00:01:34,680 --> 00:01:38,400
+one assumption, and it ends up looking
+
+41
+00:01:36,880 --> 00:01:39,960
+nothing like the processor in your
+
+42
+00:01:38,400 --> 00:01:42,840
+laptop.
+
+43
+00:01:39,960 --> 00:01:45,400
+A CPU is built to rush a single thread
+
+44
+00:01:42,840 --> 00:01:47,520
+through as fast as it can, even when
+
+45
+00:01:45,400 --> 00:01:48,880
+that thread keeps making unpredictable
+
+46
+00:01:47,520 --> 00:01:50,960
+turns.
+
+47
+00:01:48,880 --> 00:01:53,800
+So, most of its silicon goes not into
+
+48
+00:01:50,960 --> 00:01:55,720
+doing arithmetic, but into anticipation,
+
+49
+00:01:53,800 --> 00:01:57,560
+guessing what the thread will do next,
+
+50
+00:01:55,720 --> 00:01:59,880
+and lining up the data before the thread
+
+51
+00:01:57,560 --> 00:02:01,360
+asks for it, so it almost never has to
+
+52
+00:01:59,880 --> 00:02:03,760
+stop and wait.
+
+53
+00:02:01,360 --> 00:02:07,040
+A chip built that way runs maybe a few
+
+54
+00:02:03,760 --> 00:02:10,200
+tens of those fast threads at once.
+
+55
+00:02:07,040 --> 00:02:12,760
+A GPU makes the opposite trade.
+
+56
+00:02:10,200 --> 00:02:14,520
+Nvidia's H100, the data center chip
+
+57
+00:02:12,760 --> 00:02:17,600
+we'll use throughout, is built on
+
+58
+00:02:14,520 --> 00:02:20,880
+Hopper, its 2022 architecture.
+
+59
+00:02:17,600 --> 00:02:24,600
+It spends its silicon on 132 identical
+
+60
+00:02:20,880 --> 00:02:27,760
+compute units, each holding up to 2048
+
+61
+00:02:24,600 --> 00:02:30,040
+threads at once, over 270,000
+
+62
+00:02:27,760 --> 00:02:32,440
+in flight across the chip.
+
+63
+00:02:30,040 --> 00:02:34,880
+Not one of them is fast on its own,
+
+64
+00:02:32,440 --> 00:02:38,240
+and none gets the anticipation machinery
+
+65
+00:02:34,880 --> 00:02:40,520
+a CPU lavishes on a single thread.
+
+66
+00:02:38,240 --> 00:02:43,120
+For this workload, that is exactly the
+
+67
+00:02:40,520 --> 00:02:45,520
+right call, even if my first reaction
+
+68
+00:02:43,120 --> 00:02:48,080
+was that a chip full of slow threads
+
+69
+00:02:45,520 --> 00:02:49,800
+just throws performance away.
+
+70
+00:02:48,080 --> 00:02:52,680
+When the job is the same operation over
+
+71
+00:02:49,800 --> 00:02:54,640
+a billion elements, 100,000 slow threads
+
+72
+00:02:52,680 --> 00:02:58,040
+in parallel beat a handful of fast ones
+
+73
+00:02:54,640 --> 00:02:58,040
+by orders of magnitude.
+
+74
+00:03:00,320 --> 00:03:05,000
+Zoom into one of those 132 compute
+
+75
+00:03:02,880 --> 00:03:07,519
+units, and you're looking at a streaming
+
+76
+00:03:05,000 --> 00:03:10,519
+multiprocessor, the SM.
+
+77
+00:03:07,519 --> 00:03:14,400
+The whole chip is one SM design stamped
+
+78
+00:03:10,519 --> 00:03:17,239
+out 132 times, so understand one and you
+
+79
+00:03:14,400 --> 00:03:19,680
+understand the GPU.
+
+80
+00:03:17,239 --> 00:03:23,880
+The heart of an SM is its arithmetic
+
+81
+00:03:19,680 --> 00:03:26,519
+units, 128 CUDA cores, the general
+
+82
+00:03:23,880 --> 00:03:28,720
+purpose scalar units that each do one
+
+83
+00:03:26,519 --> 00:03:30,880
+multiply add per cycle,
+
+84
+00:03:28,720 --> 00:03:32,880
+plus four tensor cores that operate on
+
+85
+00:03:30,880 --> 00:03:34,400
+whole matrix tiles instead of single
+
+86
+00:03:32,880 --> 00:03:37,000
+values.
+
+87
+00:03:34,400 --> 00:03:39,320
+The H100's headline throughput, close to
+
+88
+00:03:37,000 --> 00:03:41,320
+a thousand trillion operations a second,
+
+89
+00:03:39,320 --> 00:03:44,519
+comes almost entirely from those four
+
+90
+00:03:41,320 --> 00:03:46,040
+tensor cores, not the 128 CUDA cores
+
+91
+00:03:44,519 --> 00:03:48,760
+beside them.
+
+92
+00:03:46,040 --> 00:03:51,440
+We'll come back to how they do it later.
+
+93
+00:03:48,760 --> 00:03:54,000
+Everything else on the SM exists to keep
+
+94
+00:03:51,440 --> 00:03:56,360
+those units fed, because a math unit
+
+95
+00:03:54,000 --> 00:03:58,440
+waiting on data is doing nothing.
+
+96
+00:03:56,360 --> 00:03:59,960
+Right against the core sits the fastest
+
+97
+00:03:58,440 --> 00:04:03,000
+memory on the chip.
+
+98
+00:03:59,960 --> 00:04:05,080
+A 256 kilobyte register file with single
+
+99
+00:04:03,000 --> 00:04:07,720
+cycle [music] access partitioned across
+
+100
+00:04:05,080 --> 00:04:10,680
+every thread the SM is running.
+
+101
+00:04:07,720 --> 00:04:12,640
+One level out is another 256 kilobytes
+
+102
+00:04:10,680 --> 00:04:15,840
+of on-chip SRAM.
+
+103
+00:04:12,640 --> 00:04:18,320
+Up to 228 of those kilobytes can be
+
+104
+00:04:15,840 --> 00:04:20,440
+claimed as shared memory, a scratchpad
+
+105
+00:04:18,320 --> 00:04:22,919
+the program manages by hand. So,
+
+106
+00:04:20,440 --> 00:04:27,120
+cooperating threads stage the data they
+
+107
+00:04:22,919 --> 00:04:29,560
+share while the rest serves as L1 cache.
+
+108
+00:04:27,120 --> 00:04:31,840
+Four schedulers keep it all moving, each
+
+109
+00:04:29,560 --> 00:04:35,200
+choosing a group of threads every cycle
+
+110
+00:04:31,840 --> 00:04:37,560
+and issuing their next instruction.
+
+111
+00:04:35,200 --> 00:04:40,000
+One more piece is worth calling out new
+
+112
+00:04:37,560 --> 00:04:42,200
+with Hopper, a dedicated unit called the
+
+113
+00:04:40,000 --> 00:04:44,640
+Tensor Memory Accelerator.
+
+114
+00:04:42,200 --> 00:04:48,000
+It's only job is to stream blocks of
+
+115
+00:04:44,640 --> 00:04:51,080
+data from main memory into that SRAM in
+
+116
+00:04:48,000 --> 00:04:54,520
+the background. So, threads never spend
+
+117
+00:04:51,080 --> 00:04:58,720
+their own instructions on the transfer.
+
+118
+00:04:54,520 --> 00:05:00,640
+One SM holds up to 2048 threads. Across
+
+119
+00:04:58,720 --> 00:05:03,400
+all 132,
+
+120
+00:05:00,640 --> 00:05:05,040
+that is where the chip's 270,000 come
+
+121
+00:05:03,400 --> 00:05:07,760
+from.
+
+122
+00:05:05,040 --> 00:05:09,600
+Those groups of threads have a name.
+
+123
+00:05:07,760 --> 00:05:12,600
+Warps.
+
+124
+00:05:09,600 --> 00:05:15,960
+A warp is 32 threads and it's the real
+
+125
+00:05:12,600 --> 00:05:18,760
+unit the hardware schedules. The 2048
+
+126
+00:05:15,960 --> 00:05:22,200
+threads on an SM always move in warps of
+
+127
+00:05:18,760 --> 00:05:24,880
+32, never one at a time.
+
+128
+00:05:22,200 --> 00:05:27,160
+What defines a warp is that all 32
+
+129
+00:05:24,880 --> 00:05:30,720
+threads execute the same instruction at
+
+130
+00:05:27,160 --> 00:05:32,440
+the same moment, each on its own data.
+
+131
+00:05:30,720 --> 00:05:35,360
+The hardware fetches that instruction
+
+132
+00:05:32,440 --> 00:05:38,960
+once, decodes it once, and fires it
+
+133
+00:05:35,360 --> 00:05:41,280
+across all 32 lanes in lockstep. Nvidia
+
+134
+00:05:38,960 --> 00:05:45,080
+calls this SIMT,
+
+135
+00:05:41,280 --> 00:05:47,000
+single instruction multiple threads.
+
+136
+00:05:45,080 --> 00:05:49,040
+That single fact is where the GPUs
+
+137
+00:05:47,000 --> 00:05:51,240
+compute density comes from.
+
+138
+00:05:49,040 --> 00:05:54,440
+Fetching and decoding an instruction
+
+139
+00:05:51,240 --> 00:05:56,960
+costs real silicon and energy. And a
+
+140
+00:05:54,440 --> 00:05:59,440
+scalar processor pays that cost for
+
+141
+00:05:56,960 --> 00:06:02,520
+every operation it runs.
+
+142
+00:05:59,440 --> 00:06:05,080
+A GPU pays it once per warp and spreads
+
+143
+00:06:02,520 --> 00:06:07,400
+it across 32. The control overhead
+
+144
+00:06:05,080 --> 00:06:10,560
+nearly disappears, which frees the chip
+
+145
+00:06:07,400 --> 00:06:12,720
+to put its silicon into arithmetic.
+
+146
+00:06:10,560 --> 00:06:15,360
+The SM's four schedulers work at this
+
+147
+00:06:12,720 --> 00:06:18,440
+same granularity, each issuing one ready
+
+148
+00:06:15,360 --> 00:06:20,880
+warp per cycle. And with up to 64 warps
+
+149
+00:06:18,440 --> 00:06:23,360
+resident at once, they almost always
+
+150
+00:06:20,880 --> 00:06:27,280
+have one ready to fire.
+
+151
+00:06:23,360 --> 00:06:29,360
+That lockstep is also SIMT's weakness.
+
+152
+00:06:27,280 --> 00:06:31,840
+A warp shares one instruction stream
+
+153
+00:06:29,360 --> 00:06:34,280
+across all 32 threads, [music] so it can
+
+154
+00:06:31,840 --> 00:06:36,080
+only do one thing at a time.
+
+155
+00:06:34,280 --> 00:06:38,000
+What happens when the threads need to do
+
+156
+00:06:36,080 --> 00:06:41,080
+different things?
+
+157
+00:06:38,000 --> 00:06:43,640
+Say the code hits an if else, and inside
+
+158
+00:06:41,080 --> 00:06:45,919
+one warp some threads take the if while
+
+159
+00:06:43,640 --> 00:06:47,880
+the rest take the else. There's only one
+
+160
+00:06:45,919 --> 00:06:50,600
+instruction stream, so the hardware
+
+161
+00:06:47,880 --> 00:06:53,080
+can't run both branches at once.
+
+162
+00:06:50,600 --> 00:06:55,760
+It runs them back-to-back. The if path
+
+163
+00:06:53,080 --> 00:06:57,840
+first with the else threads masked off,
+
+164
+00:06:55,760 --> 00:06:59,160
+then the else path with the if threads
+
+165
+00:06:57,840 --> 00:07:01,520
+masked.
+
+166
+00:06:59,160 --> 00:07:03,160
+Each thread sits idle through the half
+
+167
+00:07:01,520 --> 00:07:06,240
+it skipped.
+
+168
+00:07:03,160 --> 00:07:09,360
+So a balanced if else costs you both
+
+169
+00:07:06,240 --> 00:07:11,760
+paths in sequence and cuts throughput in
+
+170
+00:07:09,360 --> 00:07:13,440
+half, and nesting branches only
+
+171
+00:07:11,760 --> 00:07:15,800
+compounds it.
+
+172
+00:07:13,440 --> 00:07:18,680
+This is warp divergence, one of the two
+
+173
+00:07:15,800 --> 00:07:21,360
+cardinal sins of GPU programming.
+
+174
+00:07:18,680 --> 00:07:22,400
+The other is about memory, not control
+
+175
+00:07:21,360 --> 00:07:25,080
+flow.
+
+176
+00:07:22,400 --> 00:07:26,960
+When the 32 threads in a warp reach for
+
+177
+00:07:25,080 --> 00:07:29,120
+scattered addresses instead of
+
+178
+00:07:26,960 --> 00:07:32,040
+neighboring ones, most of what the
+
+179
+00:07:29,120 --> 00:07:34,440
+hardware fetches gets thrown away.
+
+180
+00:07:32,040 --> 00:07:37,440
+That one is uncoalesced access, and
+
+181
+00:07:34,440 --> 00:07:37,440
+we'll come back to it.
+
+182
+00:07:39,680 --> 00:07:44,040
+We keep saying the math is fast and the
+
+183
+00:07:42,200 --> 00:07:46,200
+data is slow.
+
+184
+00:07:44,040 --> 00:07:48,600
+The reason is physical.
+
+185
+00:07:46,200 --> 00:07:50,920
+The GPU's memory is a ladder of four
+
+186
+00:07:48,600 --> 00:07:54,800
+levels and each step away from the
+
+187
+00:07:50,920 --> 00:07:57,760
+compute units trade speed for capacity.
+
+188
+00:07:54,800 --> 00:08:01,400
+At the top, right inside each SM, are
+
+189
+00:07:57,760 --> 00:08:04,080
+the registers, 256 kilobytes of them,
+
+190
+00:08:01,400 --> 00:08:06,400
+reachable in a single cycle. A thread's
+
+191
+00:08:04,080 --> 00:08:08,840
+working values live here and getting at
+
+192
+00:08:06,400 --> 00:08:11,560
+them is as good as free.
+
+193
+00:08:08,840 --> 00:08:15,520
+One step down is the on-chip SRAM we met
+
+194
+00:08:11,560 --> 00:08:18,520
+earlier. Up to 228 kilobytes per SM as
+
+195
+00:08:15,520 --> 00:08:21,160
+shared memory plus L1, still on the SM
+
+196
+00:08:18,520 --> 00:08:24,280
+and still measured in nanoseconds.
+
+197
+00:08:21,160 --> 00:08:28,080
+Below that, the L2 cache, 50 megabytes
+
+198
+00:08:24,280 --> 00:08:31,320
+shared across all 132 SMs, and the last
+
+199
+00:08:28,080 --> 00:08:34,640
+level that still lives on the GPU die.
+
+200
+00:08:31,320 --> 00:08:36,840
+Then comes HBM, high bandwidth memory,
+
+201
+00:08:34,640 --> 00:08:40,039
+80 gigabytes of DRAM stacked beside the
+
+202
+00:08:36,840 --> 00:08:43,200
+GPU but off the compute die itself.
+
+203
+00:08:40,039 --> 00:08:45,440
+It delivers 3.35 terabytes per second,
+
+204
+00:08:43,200 --> 00:08:47,480
+which sounds enormous, yet a single
+
+205
+00:08:45,440 --> 00:08:49,160
+access still takes hundreds of cycles to
+
+206
+00:08:47,480 --> 00:08:51,000
+come back.
+
+207
+00:08:49,160 --> 00:08:53,176
+Top to bottom, that's roughly a
+
+208
+00:08:51,000 --> 00:08:56,000
+hundredfold drop in bandwidth and a
+
+209
+00:08:53,176 --> 00:08:58,760
+[music] thousandfold jump in latency.
+
+210
+00:08:56,000 --> 00:09:00,760
+Reaching down to HBM for a byte costs
+
+211
+00:08:58,760 --> 00:09:03,200
+vastly more than doing arithmetic on a
+
+212
+00:09:00,760 --> 00:09:05,360
+byte you already have up top and that
+
+213
+00:09:03,200 --> 00:09:07,760
+asymmetry is the whole game.
+
+214
+00:09:05,360 --> 00:09:10,040
+GPU programming is mostly about staging
+
+215
+00:09:07,760 --> 00:09:13,160
+data up this ladder, keeping the tensor
+
+216
+00:09:10,040 --> 00:09:15,680
+cores fed from the fast end.
+
+217
+00:09:13,160 --> 00:09:17,240
+So, a trip to HBM costs hundreds of
+
+218
+00:09:15,680 --> 00:09:20,120
+cycles.
+
+219
+00:09:17,240 --> 00:09:22,360
+A CPU would dodge a wait like that by
+
+220
+00:09:20,120 --> 00:09:25,240
+guessing what comes next and fetching
+
+221
+00:09:22,360 --> 00:09:27,839
+the data before it's asked for.
+
+222
+00:09:25,240 --> 00:09:30,720
+The GPU does none of that. How does it
+
+223
+00:09:27,839 --> 00:09:34,440
+survive a stall this long?
+
+224
+00:09:30,720 --> 00:09:37,520
+It doesn't avoid the stall, it hides it.
+
+225
+00:09:34,440 --> 00:09:40,120
+An SM keeps up to 64 warps resident at
+
+226
+00:09:37,520 --> 00:09:43,040
+once, and when one warp fires off a load
+
+227
+00:09:40,120 --> 00:09:44,960
+to HBM and stalls, a scheduler just runs
+
+228
+00:09:43,040 --> 00:09:47,040
+another warp that's ready.
+
+229
+00:09:44,960 --> 00:09:49,600
+By the time the first warp's data comes
+
+230
+00:09:47,040 --> 00:09:51,200
+back, dozens of others have taken their
+
+231
+00:09:49,600 --> 00:09:53,000
+turn.
+
+232
+00:09:51,200 --> 00:09:54,040
+This works because switching warps is
+
+233
+00:09:53,000 --> 00:09:56,080
+free.
+
+234
+00:09:54,040 --> 00:09:58,080
+Every resident warp's registers stay in
+
+235
+00:09:56,080 --> 00:10:00,360
+the register file the whole time, so
+
+236
+00:09:58,080 --> 00:10:02,160
+there's nothing to save or restore. The
+
+237
+00:10:00,360 --> 00:10:04,160
+scheduler just points at a different
+
+238
+00:10:02,160 --> 00:10:07,560
+warp next cycle.
+
+239
+00:10:04,160 --> 00:10:10,240
+A CPU burns real cycles to swap threads,
+
+240
+00:10:07,560 --> 00:10:12,840
+and SM pays nothing.
+
+241
+00:10:10,240 --> 00:10:15,160
+That's latency hiding, the GPU's whole
+
+242
+00:10:12,840 --> 00:10:17,040
+answer to slow memory.
+
+243
+00:10:15,160 --> 00:10:19,520
+Each warp still waits hundreds of cycles
+
+244
+00:10:17,040 --> 00:10:22,040
+for HBM. The SM with enough warps in
+
+245
+00:10:19,520 --> 00:10:23,760
+flight never does.
+
+246
+00:10:22,040 --> 00:10:25,800
+Here's that second sin.
+
+247
+00:10:23,760 --> 00:10:28,600
+And this one wastes the HBM bandwidth
+
+248
+00:10:25,800 --> 00:10:31,200
+the whole chip is starved for.
+
+249
+00:10:28,600 --> 00:10:33,080
+It starts with one limitation.
+
+250
+00:10:31,200 --> 00:10:35,640
+The hardware can't fetch a single value
+
+251
+00:10:33,080 --> 00:10:38,040
+from HBM. It moves a whole block at a
+
+252
+00:10:35,640 --> 00:10:40,880
+time, a cache line.
+
+253
+00:10:38,040 --> 00:10:43,440
+So, when the 32 threads in a warp want
+
+254
+00:10:40,880 --> 00:10:46,040
+values that sit next to each other, they
+
+255
+00:10:43,440 --> 00:10:49,160
+fall inside the same block, and one
+
+256
+00:10:46,040 --> 00:10:51,520
+transaction serves the entire warp.
+
+257
+00:10:49,160 --> 00:10:54,680
+That's coalesced access, the efficient
+
+258
+00:10:51,520 --> 00:10:56,680
+case. Every byte moved is a byte some
+
+259
+00:10:54,680 --> 00:10:59,080
+thread wanted.
+
+260
+00:10:56,680 --> 00:11:00,120
+Now, scatter those 32 addresses across
+
+261
+00:10:59,080 --> 00:11:01,960
+memory.
+
+262
+00:11:00,120 --> 00:11:04,240
+Each thread's value lands in a different
+
+263
+00:11:01,960 --> 00:11:07,160
+block, so the hardware runs a separate
+
+264
+00:11:04,240 --> 00:11:09,560
+fetch for each, up to 32 transactions
+
+265
+00:11:07,160 --> 00:11:11,839
+where the coalesced version needed one.
+
+266
+00:11:09,560 --> 00:11:14,080
+And every block it drags in is mostly
+
+267
+00:11:11,839 --> 00:11:16,640
+bytes nobody asked for, hauled across
+
+268
+00:11:14,080 --> 00:11:19,839
+the bus, and thrown away.
+
+269
+00:11:16,640 --> 00:11:21,960
+The arithmetic is identical either way.
+
+270
+00:11:19,839 --> 00:11:24,520
+The only thing that changed is where the
+
+271
+00:11:21,960 --> 00:11:27,200
+data sits in memory, and it can cost
+
+272
+00:11:24,520 --> 00:11:30,360
+many times the bandwidth. On a chip this
+
+273
+00:11:27,200 --> 00:11:32,440
+memory bound, data layout is as decisive
+
+274
+00:11:30,360 --> 00:11:34,400
+as the math.
+
+275
+00:11:32,440 --> 00:11:36,000
+Latency hiding, coalescing, the whole
+
+276
+00:11:34,400 --> 00:11:39,080
+obsession with feeding the compute
+
+277
+00:11:36,000 --> 00:11:41,480
+units, it all traces back to one trend,
+
+278
+00:11:39,080 --> 00:11:43,440
+and that trend has a name.
+
+279
+00:11:41,480 --> 00:11:45,840
+The memory wall.
+
+280
+00:11:43,440 --> 00:11:48,560
+Across GPU generations, the compute side
+
+281
+00:11:45,840 --> 00:11:51,080
+keeps pulling away from the memory side.
+
+282
+00:11:48,560 --> 00:11:54,600
+Bandwidth has grown steadily from about
+
+283
+00:11:51,080 --> 00:11:58,040
+2 TB per second on the 2020 A100 to
+
+284
+00:11:54,600 --> 00:12:00,800
+roughly 8 on the 2024 Blackwell B200, a
+
+285
+00:11:58,040 --> 00:12:03,080
+fourfold gain in 4 years.
+
+286
+00:12:00,800 --> 00:12:05,480
+But peak compute climbed faster still,
+
+287
+00:12:03,080 --> 00:12:07,360
+largely because each generation added a
+
+288
+00:12:05,480 --> 00:12:09,720
+lower precision math format that
+
+289
+00:12:07,360 --> 00:12:12,160
+multiplies throughput. The two curves
+
+290
+00:12:09,720 --> 00:12:13,840
+keep diverging, and that widening gap is
+
+291
+00:12:12,160 --> 00:12:15,680
+the wall.
+
+292
+00:12:13,840 --> 00:12:18,200
+How much does the memory side matter on
+
+293
+00:12:15,680 --> 00:12:20,280
+its own? Nvidia effectively ran the
+
+294
+00:12:18,200 --> 00:12:23,000
+experiment for us.
+
+295
+00:12:20,280 --> 00:12:25,520
+The H200 uses the exact same compute die
+
+296
+00:12:23,000 --> 00:12:27,680
+as the H100, the same tensor cores, the
+
+297
+00:12:25,520 --> 00:12:31,480
+same peak flops. The only thing they
+
+298
+00:12:27,680 --> 00:12:36,200
+changed is the memory. 141 GB of faster
+
+299
+00:12:31,480 --> 00:12:37,120
+HBM3e at 4.8 TB per second, up from the
+
+300
+00:12:36,200 --> 00:12:40,440
+H100's [music]
+
+301
+00:12:37,120 --> 00:12:42,960
+80 GB at 3.35.
+
+302
+00:12:40,440 --> 00:12:45,040
+For memory-bound work, which is most LLM
+
+303
+00:12:42,960 --> 00:12:47,480
+inference at the batch a single request
+
+304
+00:12:45,040 --> 00:12:50,400
+sees, that upgrade alone is a genuine
+
+305
+00:12:47,480 --> 00:12:52,560
+speedup. Direct evidence that inference
+
+306
+00:12:50,400 --> 00:12:54,400
+is limited by bandwidth,
+
+307
+00:12:52,560 --> 00:12:56,280
+not by how fast the tensor cores can
+
+308
+00:12:54,400 --> 00:12:58,480
+multiply.
+
+309
+00:12:56,280 --> 00:13:00,520
+Every new generation, Nvidia attacks
+
+310
+00:12:58,480 --> 00:13:02,640
+this wall the same few ways. Lower
+
+311
+00:13:00,520 --> 00:13:05,400
+precision, so each weight moves fewer
+
+312
+00:13:02,640 --> 00:13:07,080
+bytes, faster HBM, and wider links
+
+313
+00:13:05,400 --> 00:13:08,480
+between chips.
+
+314
+00:13:07,080 --> 00:13:10,320
+But whether a given operation is
+
+315
+00:13:08,480 --> 00:13:12,520
+actually stuck against the wall or
+
+316
+00:13:10,320 --> 00:13:14,480
+limited instead by raw compute, comes
+
+317
+00:13:12,520 --> 00:13:16,560
+down to a single number, arithmetic
+
+318
+00:13:14,480 --> 00:13:19,280
+intensity, and the roofline we built
+
+319
+00:13:16,560 --> 00:13:21,120
+around it in the last video.
+
+320
+00:13:19,280 --> 00:13:23,280
+Before we leave the hardware, it all
+
+321
+00:13:21,120 --> 00:13:26,520
+comes down to one number.
+
+322
+00:13:23,280 --> 00:13:28,680
+That rich point, the 295 operations per
+
+323
+00:13:26,520 --> 00:13:31,880
+byte that separates memory bound from
+
+324
+00:13:28,680 --> 00:13:33,360
+compute bound on the H100 isn't a free
+
+325
+00:13:31,880 --> 00:13:36,120
+standing number.
+
+326
+00:13:33,360 --> 00:13:38,920
+It's these two hardware peaks divided.
+
+327
+00:13:36,120 --> 00:13:42,680
+The tensor core's 989 trillion
+
+328
+00:13:38,920 --> 00:13:44,920
+operations a second over HBM's 3.35
+
+329
+00:13:42,680 --> 00:13:46,320
+terabytes a second.
+
+330
+00:13:44,920 --> 00:13:48,640
+Everything we worked out about the
+
+331
+00:13:46,320 --> 00:13:50,480
+roofline last time, why decode lands
+
+332
+00:13:48,640 --> 00:13:52,840
+deep on the memory bound side, and
+
+333
+00:13:50,480 --> 00:13:55,080
+prefill lands on the compute side, comes
+
+334
+00:13:52,840 --> 00:13:56,840
+back to those two ceilings.
+
+335
+00:13:55,080 --> 00:13:58,200
+The tensor cores are the compute
+
+336
+00:13:56,840 --> 00:14:02,600
+ceiling.
+
+337
+00:13:58,200 --> 00:14:02,600
+HBM is the bandwidth ceiling.
+
+338
+00:14:04,840 --> 00:14:09,840
+Earlier, inside the SM, we said we'd
+
+339
+00:14:07,440 --> 00:14:12,880
+come back to the tensor cores.
+
+340
+00:14:09,840 --> 00:14:14,760
+This is how four small units per SM
+
+341
+00:14:12,880 --> 00:14:16,480
+deliver almost all of the chip's
+
+342
+00:14:14,760 --> 00:14:19,720
+throughput.
+
+343
+00:14:16,480 --> 00:14:22,560
+A CUDA core is scalar. It multiplies two
+
+344
+00:14:19,720 --> 00:14:24,240
+numbers and adds a third, one result per
+
+345
+00:14:22,560 --> 00:14:26,560
+cycle.
+
+346
+00:14:24,240 --> 00:14:28,080
+A tensor core doesn't deal in single
+
+347
+00:14:26,560 --> 00:14:30,200
+numbers.
+
+348
+00:14:28,080 --> 00:14:32,880
+In one instruction, it multiplies two
+
+349
+00:14:30,200 --> 00:14:34,960
+small matrices and adds a third,
+
+350
+00:14:32,880 --> 00:14:37,320
+producing a whole tile of results at
+
+351
+00:14:34,960 --> 00:14:39,640
+once, where a CUDA core would grind
+
+352
+00:14:37,320 --> 00:14:41,560
+through them one at a time.
+
+353
+00:14:39,640 --> 00:14:44,520
+That operation is matrix multiply
+
+354
+00:14:41,560 --> 00:14:46,400
+accumulate, MMA, and it's all a tensor
+
+355
+00:14:44,520 --> 00:14:48,839
+core does.
+
+356
+00:14:46,400 --> 00:14:51,760
+That narrowness is the point.
+
+357
+00:14:48,839 --> 00:14:54,640
+A transformer spends well over 90% of
+
+358
+00:14:51,760 --> 00:14:57,200
+its arithmetic inside matrix multiplies.
+
+359
+00:14:54,640 --> 00:14:59,920
+So, a unit that does nothing else very
+
+360
+00:14:57,200 --> 00:15:01,800
+fast is the highest leverage silicon
+
+361
+00:14:59,920 --> 00:15:05,200
+Nvidia can build.
+
+362
+00:15:01,800 --> 00:15:06,760
+The H100 has 528 of them,
+
+363
+00:15:05,200 --> 00:15:08,160
+four per SM,
+
+364
+00:15:06,760 --> 00:15:10,920
+and they produce the overwhelming
+
+365
+00:15:08,160 --> 00:15:14,160
+majority of its peak throughput.
+
+366
+00:15:10,920 --> 00:15:16,320
+One caveat, that peak is theoretical,
+
+367
+00:15:14,160 --> 00:15:18,440
+the core's perfectly fed.
+
+368
+00:15:16,320 --> 00:15:21,680
+Sustained throughput in real kernels
+
+369
+00:15:18,440 --> 00:15:24,680
+typically reaches 50 to 80% of peak for
+
+370
+00:15:21,680 --> 00:15:27,800
+well-tuned code and considerably less
+
+371
+00:15:24,680 --> 00:15:29,480
+for unoptimized implementations.
+
+372
+00:15:27,800 --> 00:15:31,880
+There's a second level though, built
+
+373
+00:15:29,480 --> 00:15:33,680
+into the hardware rather than the code,
+
+374
+00:15:31,880 --> 00:15:35,560
+letting these cores run at lower
+
+375
+00:15:33,680 --> 00:15:38,080
+precision.
+
+376
+00:15:35,560 --> 00:15:40,360
+Lower precision is that second lever,
+
+377
+00:15:38,080 --> 00:15:42,640
+and it pays [music] off twice.
+
+378
+00:15:40,360 --> 00:15:44,680
+Storing a number in fewer bits lets the
+
+379
+00:15:42,640 --> 00:15:46,480
+tensor cores push more of them through
+
+380
+00:15:44,680 --> 00:15:48,760
+each second,
+
+381
+00:15:46,480 --> 00:15:50,520
+and leaves fewer bytes to haul across
+
+382
+00:15:48,760 --> 00:15:53,040
+the memory bus.
+
+383
+00:15:50,520 --> 00:15:55,320
+More compute and less memory traffic
+
+384
+00:15:53,040 --> 00:15:57,640
+from the same silicon.
+
+385
+00:15:55,320 --> 00:16:00,400
+So, every tensor core generation has
+
+386
+00:15:57,640 --> 00:16:02,680
+added a lower precision format.
+
+387
+00:16:00,400 --> 00:16:06,640
+Volta started with 16-bit floats in
+
+388
+00:16:02,680 --> 00:16:09,760
+2017, Hopper brought 8-bits in 2022, and
+
+389
+00:16:06,640 --> 00:16:11,640
+Blackwell added 4-bits in 2024. Each
+
+390
+00:16:09,760 --> 00:16:13,880
+having of the bits roughly doubles the
+
+391
+00:16:11,640 --> 00:16:16,480
+throughput.
+
+392
+00:16:13,880 --> 00:16:18,240
+Why can a model tolerate this?
+
+393
+00:16:16,480 --> 00:16:20,960
+A floating-point number splits into an
+
+394
+00:16:18,240 --> 00:16:24,080
+exponent, which sets its range, and a
+
+395
+00:16:20,960 --> 00:16:26,080
+mantissa, which sets its fine precision.
+
+396
+00:16:24,080 --> 00:16:28,400
+Deep learning leans on range while
+
+397
+00:16:26,080 --> 00:16:31,800
+staying forgiving about precision.
+
+398
+00:16:28,400 --> 00:16:33,040
+BF16, a 16-bit format, is the clean
+
+399
+00:16:31,800 --> 00:16:35,880
+example.
+
+400
+00:16:33,040 --> 00:16:38,560
+It keeps all eight of FP32's exponent
+
+401
+00:16:35,880 --> 00:16:41,080
+bits, so the range is identical, and
+
+402
+00:16:38,560 --> 00:16:42,080
+cuts the mantissa from 23 bits down to
+
+403
+00:16:41,080 --> 00:16:44,440
+seven.
+
+404
+00:16:42,080 --> 00:16:46,800
+Training barely notices.
+
+405
+00:16:44,440 --> 00:16:49,000
+And there's a safeguard, the multiplies
+
+406
+00:16:46,800 --> 00:16:52,440
+run in low precision, but the results
+
+407
+00:16:49,000 --> 00:16:54,120
+accumulate back in FP32, so errors don't
+
+408
+00:16:52,440 --> 00:16:56,040
+pile up.
+
+409
+00:16:54,120 --> 00:16:59,160
+One caution on the marketing,
+
+410
+00:16:56,040 --> 00:17:01,160
+when Nvidia headlines a 9x speedup, that
+
+411
+00:16:59,160 --> 00:17:04,480
+blends the precision gain with faster
+
+412
+00:17:01,160 --> 00:17:06,680
+interconnects and ideal benchmarks.
+
+413
+00:17:04,480 --> 00:17:11,120
+The honest per generation gain on real
+
+414
+00:17:06,680 --> 00:17:11,120
+work is more like 2 to 4x.
+
+415
+00:17:13,439 --> 00:17:18,400
+A frontier model doesn't fit on one GPU.
+
+416
+00:17:17,040 --> 00:17:21,760
+Its weights run to hundreds of
+
+417
+00:17:18,400 --> 00:17:23,880
+gigabytes, well past the 80 or 140 a
+
+418
+00:17:21,760 --> 00:17:26,280
+single chip holds. So, it gets split
+
+419
+00:17:23,880 --> 00:17:27,839
+across many GPUs that then have to talk
+
+420
+00:17:26,280 --> 00:17:29,560
+constantly.
+
+421
+00:17:27,839 --> 00:17:31,840
+How fast they can talk is the next
+
+422
+00:17:29,560 --> 00:17:33,320
+constraint.
+
+423
+00:17:31,840 --> 00:17:34,920
+There are two ways to wire them
+
+424
+00:17:33,320 --> 00:17:37,600
+together.
+
+425
+00:17:34,920 --> 00:17:40,160
+Scale-up packs many GPUs into one box or
+
+426
+00:17:37,600 --> 00:17:42,680
+rack joined by NVLink, Nvidia's
+
+427
+00:17:40,160 --> 00:17:45,200
+dedicated [music] GPU to GPU link, and a
+
+428
+00:17:42,680 --> 00:17:47,400
+crossbar called NV switch that lets
+
+429
+00:17:45,200 --> 00:17:48,760
+every GPU reach every other at full
+
+430
+00:17:47,400 --> 00:17:52,080
+speed.
+
+431
+00:17:48,760 --> 00:17:57,520
+NVLink is fast and keeps getting faster.
+
+432
+00:17:52,080 --> 00:18:02,640
+600 GB/s per GPU on the A100, 900 on the
+
+433
+00:17:57,520 --> 00:18:05,200
+H100, 1.8 TB/s on Blackwell.
+
+434
+00:18:02,640 --> 00:18:07,720
+Scale-out is the other way. Separate
+
+435
+00:18:05,200 --> 00:18:09,880
+boxes linked by ordinary data center
+
+436
+00:18:07,720 --> 00:18:12,160
+networking, InfiniBand [music]
+
+437
+00:18:09,880 --> 00:18:14,640
+at a few hundred gigabits a second,
+
+438
+00:18:12,160 --> 00:18:16,600
+roughly an order of magnitude slower per
+
+439
+00:18:14,640 --> 00:18:18,960
+byte.
+
+440
+00:18:16,600 --> 00:18:21,320
+Why does that gap matter? Tensor
+
+441
+00:18:18,960 --> 00:18:23,800
+parallelism splits each layer's matrix
+
+442
+00:18:21,320 --> 00:18:26,280
+multiply across GPUs, so they have to
+
+443
+00:18:23,800 --> 00:18:28,240
+exchange results at every layer dozens
+
+444
+00:18:26,280 --> 00:18:31,240
+of times per token.
+
+445
+00:18:28,240 --> 00:18:34,480
+Inside an NVLink domain, that's cheap.
+
+446
+00:18:31,240 --> 00:18:36,560
+Across InfiniBand, it's the bottleneck.
+
+447
+00:18:34,480 --> 00:18:37,840
+So, Nvidia keeps growing the fast
+
+448
+00:18:36,560 --> 00:18:41,240
+domain.
+
+449
+00:18:37,840 --> 00:18:44,080
+A DGX box held eight GPUs on both the
+
+450
+00:18:41,240 --> 00:18:47,800
+A100 and H100.
+
+451
+00:18:44,080 --> 00:18:49,920
+The Blackwell GB200 NVL72 puts 72 in one
+
+452
+00:18:47,800 --> 00:18:52,240
+liquid-cooled rack, all in a single
+
+453
+00:18:49,920 --> 00:18:53,800
+NVLink domain. So, far more of the model
+
+454
+00:18:52,240 --> 00:18:56,960
+fits in the fast neighborhood before
+
+455
+00:18:53,800 --> 00:18:58,880
+you're forced out onto the slow fabric.
+
+456
+00:18:56,960 --> 00:19:00,480
+One last thing, because it's easy to
+
+457
+00:18:58,880 --> 00:19:01,960
+come away thinking this is all about
+
+458
+00:19:00,480 --> 00:19:03,480
+Nvidia.
+
+459
+00:19:01,960 --> 00:19:05,440
+It isn't.
+
+460
+00:19:03,480 --> 00:19:07,680
+The physics we've covered, the memory
+
+461
+00:19:05,440 --> 00:19:10,160
+wall, the value of low precision,
+
+462
+00:19:07,680 --> 00:19:12,160
+scaling up before out, applies to anyone
+
+463
+00:19:10,160 --> 00:19:14,200
+building these chips, and there are real
+
+464
+00:19:12,160 --> 00:19:16,800
+alternatives.
+
+465
+00:19:14,200 --> 00:19:19,320
+Google's TPU throws out the SM model
+
+466
+00:19:16,800 --> 00:19:21,480
+entirely and builds the chip around one
+
+467
+00:19:19,320 --> 00:19:23,520
+giant systolic array.
+
+468
+00:19:21,480 --> 00:19:25,320
+A fixed grid of multiply accumulate
+
+469
+00:19:23,520 --> 00:19:27,400
+cells that data flows through
+
+470
+00:19:25,320 --> 00:19:29,680
+rhythmically with no trips back to a
+
+471
+00:19:27,400 --> 00:19:31,320
+register file in between.
+
+472
+00:19:29,680 --> 00:19:34,080
+That makes it well suited to dense
+
+473
+00:19:31,320 --> 00:19:36,480
+matrix multiply and not much else, and
+
+474
+00:19:34,080 --> 00:19:38,120
+it's rentable for now only on Google
+
+475
+00:19:36,480 --> 00:19:40,520
+Cloud.
+
+476
+00:19:38,120 --> 00:19:42,400
+AMD's MI300X
+
+477
+00:19:40,520 --> 00:19:44,720
+is closer to a GPU,
+
+478
+00:19:42,400 --> 00:19:48,720
+and on paper it beats the H100 where it
+
+479
+00:19:44,720 --> 00:19:51,560
+matters here. 192 GB of HBM, more than
+
+480
+00:19:48,720 --> 00:19:53,600
+double. So, a model that needs two H100s
+
+481
+00:19:51,560 --> 00:19:55,240
+can fit on one.
+
+482
+00:19:53,600 --> 00:19:57,480
+And yet most teams still reach for
+
+483
+00:19:55,240 --> 00:19:58,960
+Nvidia, and the deciding factor is
+
+484
+00:19:57,480 --> 00:20:01,200
+software.
+
+485
+00:19:58,960 --> 00:20:03,080
+CUDA has had almost two decades to build
+
+486
+00:20:01,200 --> 00:20:05,840
+up the libraries and tooling that all of
+
+487
+00:20:03,080 --> 00:20:08,960
+AI now sits on, and ROCm, AMD's
+
+488
+00:20:05,840 --> 00:20:11,080
+equivalent, is still catching up.
+
+489
+00:20:08,960 --> 00:20:14,200
+For most teams, that maturity is the
+
+490
+00:20:11,080 --> 00:20:15,840
+real binding constraint.
+
+491
+00:20:14,200 --> 00:20:17,440
+And that's a good place to end because
+
+492
+00:20:15,840 --> 00:20:19,440
+the software is exactly where we go
+
+493
+00:20:17,440 --> 00:20:21,480
+next.
+
+494
+00:20:19,440 --> 00:20:23,680
+We spent this video on the machine. The
+
+495
+00:20:21,480 --> 00:20:26,880
+next one is about the kernels, the code
+
+496
+00:20:23,680 --> 00:20:26,880
+that makes it fast.
+

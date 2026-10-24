@@ -15,7 +15,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | `atlases/V0N_Title.html` | One atlas per video (the deliverables) |
 | `atlases/*_animation.html` | Interactive companions, linked from the index |
 | `.claude/skills/srt-figure-atlas/` | The workflow: `SKILL.md`, design reference, drawing library, checker |
-| `transcripts/` | Caption files, one per video (not migrated yet — see below) |
+| `transcripts/` | Caption files, one per video (see below) |
 
 | # | Atlas | Figures | Video |
 |---|---|---|---|
@@ -44,12 +44,44 @@ rules that most often matter:
 
 ## Transcripts
 
-The `.srt`/`.vtt` files these atlases were built from were not in the Drive folder, so they are not
-here yet. Timestamp questions and new figures need them. Add them to `transcripts/` named to match
-the atlas (`V03_Kernels_and_Memory.srt`), then index one with:
+`transcripts/` holds the captions the atlases were built from, one `.srt` per video, named to match
+the atlas (`V03_Kernels_and_Memory.srt`). They are YouTube's auto-generated English captions for the
+playlist [The Engineering behind LLM Inference From First Principles](https://www.youtube.com/playlist?list=PLqO45Dg1pMhlDBZTMqVL2GU-14xYip2y2)
+(channel PY). The originals were downloaded through downsub.com and were not in the Drive folder;
+these copies were fetched again on 2026-10-24 with yt-dlp (track `en-orig`, saved exactly as YouTube
+serves it). Each file's last cue ends exactly at the video length in the table above (the atlases
+measured length that way), and figure stamps checked against the text agree.
+
+| # | YouTube ID |
+|---|---|
+| V1 | `ENkuf_2zbkc` |
+| V2 | `cbEhkd4ZeKs` |
+| V3 | `30IRJQ49M2g` |
+| V4 | `1JWnEze9V5g` |
+| V5 | `Kjq2vCIH3S8` |
+| V6 | `gskjdulkP00` |
+| V7 | `9gmHwe5-j0E` |
+| V8 | `jLDyJqAOrmQ` |
+| V9 | `3OmPtWuT9VA` |
+
+Because they come from speech recognition, the captions carry `[music]` marks mid-sentence and the
+odd misheard word (V1 5:57 has "bite-hungry" for "byte-hungry"), so search for a nearby phrase if a
+term does not hit.
+Read the window around a timestamp with:
 
 ```bash
 python3 .claude/skills/srt-figure-atlas/scripts/srt_tools.py transcripts/V03_Kernels_and_Memory.srt --window 18:42 --pad 90
+```
+
+To fetch a video's captions again (YouTube must be under the environment's allowed domains; from a
+cloud container the default yt-dlp clients hit YouTube's bot check, while `ios` and `web_embedded`
+got through, with a pause between videos to avoid HTTP 429):
+
+```bash
+pip install "yt-dlp[default]"
+yt-dlp --js-runtimes node --extractor-args "youtube:player_client=ios,web_embedded;player_skip=webpage" \
+  --skip-download --write-auto-subs --sub-langs en-orig --sub-format srt -o "%(id)s" \
+  "https://www.youtube.com/watch?v=30IRJQ49M2g"
 ```
 
 The per-video Python scripts that generated each atlas were not migrated either; only the HTML
