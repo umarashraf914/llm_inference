@@ -212,11 +212,11 @@ V.scene('ch15_s01', S => {
   S.add(fx.undim(searchLabel), 'b4~search');
   S.add(fx.pulse(search, { scale: 1.25, d: 0.5 }), 'b4~search');
   // appends never can: the answer ticks flash coral
-  S.add(fx.out(ansLabel, { d: 0.25 }), 'b4~hit#2-0.2');
-  S.add(fx.in(appendTag, { from: 'up', d: 0.45 }), 'b4~hit#2+0.05');
+  S.add(fx.out(ansLabel, { d: 0.25 }), 'b4~hit-0.2');
+  S.add(fx.in(appendTag, { from: 'up', d: 0.45 }), 'b4~hit+0.05');
   ticks.forEach((tk, k) => {
-    S.add(tk.recolor('bytes', { d: 0.22 }), S.t('b4~hit#2-0.1') + k * 0.03);
-    S.add(tk.recolor('struct', { d: 0.4 }), S.t('b4~hit#2+0.55') + k * 0.03);
+    S.add(tk.recolor('bytes', { d: 0.22 }), S.t('b4~hit-0.1') + k * 0.03);
+    S.add(tk.recolor('struct', { d: 0.4 }), S.t('b4~hit+0.55') + k * 0.03);
   });
   // closing hold: the header says it
   S.add(fx.out(head.parts, { d: 0.25, stagger: 0.02 }), 'b4>-0.15');
