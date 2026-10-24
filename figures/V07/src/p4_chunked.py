@@ -533,8 +533,8 @@ def a30():
         "when the stage before has finished it, and when it has finished its own previous one.",
         "When a prefill-heavy iteration costs 7 units and a decode-only one 1, the long ones stall every "
         f"stage behind them: {int(tu)} units with {f(iu * 100, 1)}% idle. Chunked so every iteration costs "
-        f"2.5, the same work takes {f(te, 1)} units with {f(ie * 100, 1)}% idle, exactly V5's bubble formula, "
-        "3 ÷ (8 + 3).",
+        f"2.5, the same work takes {f(te, 1)} units with {f(ie * 100, 1)}% idle: exactly V5's bubble formula, "
+        f"{nb('(stages − 1) ÷ (iterations + stages − 1)')} = {nb('3 ÷ 11')}.",
     ])
     emit("a30", st("by a second effect"), "Even iterations shrink the pipeline bubble", yb + 32, b + [body],
          "Same work, a third less time: an assembly line moves at the pace of its most uneven step. vLLM "

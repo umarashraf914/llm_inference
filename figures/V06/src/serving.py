@@ -526,8 +526,8 @@ def p40():
         f"{', '.join(str(g + 1) for g in sorted(kept))} and swaps the experts on nodes 3 and 5 for the next "
         "best inside the kept nodes: a small cost in quality.",
         "Machines talk over a network and the GPUs inside one machine over far faster links "
-        "({{fig:v05-o008}}). A token crosses to each target node once, over InfiniBand at 50 GB/s, then is "
-        "forwarded inside the node over NVLink at 160 GB/s, 3.2 times faster. So at most 4 copies, at one byte a number, cross "
+        f"({{{{fig:v05-o008}}}}). A token crosses to each target node once, over InfiniBand at {nb('50 GB/s')}, "
+        f"then is forwarded inside the node over NVLink at {nb('160 GB/s')}, 3.2 times faster. So at most 4 copies, at one byte a number, cross "
         "between machines per token per layer, instead of up to 8.",
     ])
     emit("p40", at("arranges its 256 experts into eight groups"), "Node-limited routing, worked", y + 32,

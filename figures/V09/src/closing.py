@@ -42,21 +42,18 @@ def o014():
     xa, xb = px(ANSWERS[0][1]), px(ANSWERS[-1][1])
     b.append(cell(xa - 1, AX - 8, xb - xa + 2, 16, "s", rx=2))
     b.append(txt(xb + 8, AX - 14, "2023-24", "sub2"))
-    b.append(f'<line class="conn" x1="{(xa + xb) / 2:.1f}" y1="{AX + 26}" x2="{(xa + xb) / 2:.1f}" y2="{AX + 52}"/>')
-    yl = AX + 70
+    yspan = AX + 40
+    b.append(cell(px(WALL), yspan, xa - px(WALL), 24, "h",
+                  label=f"{f(ANSWERS[0][1] - WALL, 1)} years from naming the wall to the first answer"))
+    b.append(cell(xa, yspan + 32, xb - xa, 24, "s"))
+    b.append(txt(xa - 10, yspan + 49, f"{round((ANSWERS[-1][1] - ANSWERS[0][1]) * 12)} months from the first "
+                 "answer to the last", "sub2", "end"))
+    yl = yspan + 104
+    b.append(txt(300, yl - 18, "the four answers", "cap"))
     for k, (name, _, when) in enumerate(ANSWERS):
-        b.append(txt(250, yl + k * 20, f"{name}: {when}", "sub2"))
-    b.append(txt(250, yl - 16, "the answers, all within eight months", "cap"))
-    ys = yl + 4 * 20 + 18
-    span = [("the wall to the first answer", ANSWERS[0][1] - WALL, "h"),
-            ("the first answer to the last", ANSWERS[-1][1] - ANSWERS[0][1], "s")]
-    SC = (X1 - X0) / (Y1 - Y0)
-    for k, (lab, yrs, c) in enumerate(span):
-        y = ys + k * 34
-        b.append(txt(40, y + 17, lab, "cap"))
-        b.append(cell(250, y, max(yrs * SC, 2), 24, c))
-        b.append(txt(250 + yrs * SC + 8, y + 17, f"{f(yrs, 1)} years" if yrs > 2 else f"{round(yrs * 12)} months", "sub2"))
-    body, yb = para(ys + 2 * 34 + 40, [
+        b.append(txt(300, yl + k * 20, f"{name}: {when}", "sub2"))
+    ys = yl + 3 * 20
+    body, yb = para(ys + 46, [
         "Most of the stack this series described did not exist five years ago. Paged caches, latent "
         "attention, the split between prefill and decode, and 4-bit microscaled numbers were all published "
         "in 2023 and 2024, within eight months of one another.",
@@ -96,38 +93,40 @@ def o015():
 
 
 # ---- N29-N30w: a sentence of 12 tokens ---------------------------------------------------------------------
-WORDS = ["the", "test", "fails", "because", "the", "parser", "subtracts", "where", "it", "should", "add", "."]
-PASSES = [[0, 5, 10], [1, 6, 11], [2, 3, 9], [4, 7, 8]]      # positions a diffusion model commits per pass
+WORDS = ["it", "should", "add", "a", "and", "b", "but", "it", "takes", "b", "from", "a"]
+PASSES = [[1, 2, 8], [0, 3, 5], [9, 10, 11], [4, 6, 7]]      # positions a diffusion model commits per pass
 assert sorted(sum(PASSES, [])) == list(range(12)) and all(len(p) == 3 for p in PASSES) and len(PASSES) == 12 // 3
 # one pass in close-up, illustrative confidences for the five blanks left after pass 2
-CLOSE = [(2, "fails", 0.91), (3, "because", 0.86), (9, "should", 0.83), (7, "where", 0.52), (8, "it", 0.47)]
-assert sorted(p for p, _, _ in CLOSE) == [2, 3, 7, 8, 9]
-assert [p for p, _, c in sorted(CLOSE, key=lambda r: -r[2])[:3]] == PASSES[2]       # the top three are kept
+CLOSE = [(9, "b", 0.90), (10, "from", 0.88), (11, "a", 0.84), (4, "and", 0.61), (6, "but", 0.55), (7, "it", 0.49)]
+assert sorted(p for p, _, _ in CLOSE) == sorted(set(range(12)) - set(PASSES[0] + PASSES[1]))
+assert sorted(p for p, _, c in sorted(CLOSE, key=lambda r: -r[2])[:3]) == PASSES[2]   # the top three are kept
+assert all(WORDS[p] == w for p, w, _ in CLOSE)
 
 
 def n29():
-    b = [hd(40, 46, "After two passes: seven positions filled, five still blank")]
-    CW, G_ = 46, 4
+    b = [hd(40, 46, "After two passes: six positions filled, six still blank")]
+    CW, G_ = 48, 2
     done = set(PASSES[0] + PASSES[1])
     for i, w in enumerate(WORDS):
         x = 40 + i * (CW + G_)
         if i in done:
-            b.append(cell(x, 66, CW, 28, "u", label=w if width(w, "sub") + 12 <= CW else w[:4] + "…"))
+            assert width(w, "sub") + 8 <= CW
+            b.append(cell(x, 66, CW, 28, "u", label=w))
         else:
             b.append(ghost(x, 66, CW, 28, label="?"))
-    b.append(txt(40, 118, "the model's top guess for each blank, and how sure it is", "cap"))
+    b.append(txt(40, 130, "the model's top guess for each blank, and how sure it is", "cap"))
     cols = [(40, "position"), (130, "top guess"), (250, "confidence"), (380, "this pass")]
     for x, s_ in cols:
-        b.append(txt(x, 144, s_, "sub2"))
+        b.append(txt(x, 156, s_, "sub2"))
     keep = set(PASSES[2])
     for k, (pos, w, c) in enumerate(sorted(CLOSE, key=lambda r: -r[2])):
-        y = 166 + k * 24
+        y = 178 + k * 24
         b.append(txt(40, y, str(pos + 1), "cap"))
         b.append(txt(130, y, w, "cap"))
         b.append(cell(250, y - 13, c * 100, 16, "m" if pos in keep else "u", rx=2))
         b.append(txt(250 + c * 100 + 8, y, f(c, 2), "sub2"))
         b.append(txt(380, y, "kept" if pos in keep else "masked again", "sub2"))
-    body, yb = para(166 + 5 * 24 + 30, [
+    body, yb = para(178 + len(CLOSE) * 24 + 30, [
         "A masked position is a blank. In training, random positions of real text are hidden and the "
         "model learns to restore them, scoring every token of its vocabulary for each blank, exactly as an "
         "ordinary model scores the next token ({{fig:v01-o008}}).",
@@ -135,9 +134,9 @@ def n29():
         "({{fig:v08-o005}}). The most confident guesses are kept and the rest are masked again for the next "
         "pass. LLaDA, a published diffusion model, uses this rule: it re-masks the predictions it is least "
         "sure of.",
-        "Nothing here waits for the position before it. Positions 3, 4 and 10 are kept in the same pass "
-        "while 8 and 9, between them, stay blank. An ordinary model can guess ahead too, but its positions "
-        "still settle one at a time ({{fig:v08-o014}}).",
+        "Nothing here waits for the position before it. Positions 10, 11 and 12 are kept in this pass "
+        "while 5, 7 and 8, earlier in the sentence, stay blank. An ordinary model can guess ahead too, but "
+        "its positions still settle one at a time ({{fig:v08-o014}}).",
     ])
     emit("n29", stamp(SRT, "A diffusion model starts from a masked"),
          "A masked position is a blank the model was trained to fill", yb + 30, b + [body],
@@ -197,7 +196,6 @@ N30_JS = r"""<script>(() => {
   function cellState(row, i) {                       // 0 masked, 1 filled earlier, 2 filled this pass
     if (row === 0) return i < k ? (i === k - 1 ? 2 : 1) : 0;
     let before = new Set(), now = new Set();
-    for (let j = 0; j < Math.min(k, P.length); j++) (j === Math.min(k, P.length) - 1 && k <= P.length ? now : before);
     for (let j = 0; j < Math.min(k, P.length); j++) {
       const into = (j === k - 1) ? now : before; P[j].forEach(p => into.add(p)); }
     return now.has(i) ? 2 : (before.has(i) ? 1 : 0);
@@ -247,7 +245,7 @@ def n30w():
     s = []
     ar, df, lines = state30(0)
     s.append(f'<text class="sub2" x="40" y="24" data-k="">{lines[0]}</text>')
-    CW, G_ = 46, 4
+    CW, G_ = 48, 2
     for row, (lab, st) in enumerate([("one position per pass", ar), ("three positions per pass", df)]):
         y0 = 56 + row * 96
         s.append(txt(40, y0, lab, "cap"))
@@ -283,7 +281,7 @@ def n31():
     rows = [("weight reads", [("one per pass", T, "h"), ("diffusion", PS, "s")], 256),
             ("positions computed", [("one per pass", T, "u"), ("diffusion", PS * T, "m")], PS * T),
             ("operations per byte", [("one per pass", 4, "h"), ("diffusion", 4 * T, "s")], 1250)]
-    y = 72
+    y = 86
     for title, pair, top in rows:
         b.append(txt(40, y, title, "hd"))
         sc = 400 / top
@@ -317,7 +315,7 @@ def n31():
 
 
 def n32():
-    b = [hd(40, 46, "Which earlier positions each position may attend to, 8 × 8")]
+    b = [hd(40, 46, "Which positions each position may attend to, 8 × 8")]
     S, G_ = 18, 2
     for k, (lab, causal) in enumerate([("one token at a time: the triangle", True),
                                        ("a diffusion model: the full square", False)]):
@@ -330,9 +328,9 @@ def n32():
                 b.append(cell(x, y, S, S, "s", rx=2) if ok else ghost(x, y, S, S, rx=2))
     yl = 88 + 8 * (S + G_) + 30
     b.append(txt(40, yl, "what the triangle made free", "cap"))
-    items = ["keeping each token's keys and values once they are made {{fig:v01-o136}}",
-             "reusing a cached prefix for every request that shares it {{fig:v01-o044}}",
-             "checking several drafted tokens in one pass {{fig:v08-o003}}"]
+    items = ["keeping each token's keys and values once they are made ({{fig:v01-o136}})",
+             "reusing a cached prefix for every request that shares it ({{fig:v01-o044}})",
+             "checking several drafted tokens in one pass ({{fig:v08-o003}})"]
     for k, s_ in enumerate(items):
         b.append(txt(40, yl + 24 + k * 20, s_, "sub2"))
     body, yb = para(yl + 24 + 3 * 20 + 36, [

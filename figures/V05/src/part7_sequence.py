@@ -57,7 +57,8 @@ def n31():
     for k in range(gpus):
         b.append(cell(X0 + k * each * SC, 110, each * SC - 3, 28, "s", label=f"{f(each / 1e9, 0)} GB"))
     edge = X0 + B200_MEM * SC
-    b.append(mark(edge, 50, edge, 94))
+    b.append(mark(edge, 46, edge, 56, ok=False))
+    b.append(mark(edge, 88, edge, 100, ok=False))
     b.append(txt(edge + 6, 48, "one B200: 192 GB", "sub2"))
     b.append(hd(40, 186, "What each split divides the cache by"))
     rows = [("tensor", "up to 8: one KV head per GPU ({{fig:v05-n15}})"),
@@ -89,9 +90,10 @@ def n32():
     remote = N * N - N
     causal_empty = N * (N - 1) // 2
     assert remote / (N * N) == 0.75 and causal_empty == 6
-    b = [hd(40, 40, "Every query against every key: 16 blocks over four GPUs")]
+    b = [hd(40, 34, "Every query against every key: 16 blocks over four GPUs")]
     for c in range(N):
-        b.append(txt(GX + c * (GW + 4) + GW / 2, 72, f"K, V of chunk {c + 1}", "sub2", "middle"))
+        b.append(txt(GX + c * (GW + 4) + GW / 2, 58, "K, V of", "sub2", "middle"))
+        b.append(txt(GX + c * (GW + 4) + GW / 2, 72, f"chunk {c + 1}", "sub2", "middle"))
     for r in range(N):
         y = GY + r * (GH + 4)
         b.append(txt(40, y + 25, f"GPU {r + 1}'s queries", "cap"))
@@ -347,7 +349,6 @@ WIDGET35 = r"""<script>(() => {
     const pts = []; for (let k = 0; k <= 50; k++) { const cc = 10 ** (1 + k / 10);
       pts.push(`${lx(cc).toFixed(1)},${ly(cc * C.TOKB / (b * 1e9)).toFixed(1)}`); }
     q('[data-tr]').setAttribute('points', pts.join(' '));
-    q('[data-tl]').setAttribute('y', (ly(2e5 * C.TOKB / (b * 1e9)) + 26).toFixed(1));
     q('[data-vline]').setAttribute('x1', lx(c).toFixed(1)); q('[data-vline]').setAttribute('x2', lx(c).toFixed(1));
     q('[data-dw]').setAttribute('cx', lx(c).toFixed(1)); q('[data-dw]').setAttribute('cy', ly(w).toFixed(1));
     q('[data-dx]').setAttribute('cx', lx(c).toFixed(1)); q('[data-dx]').setAttribute('cy', ly(x).toFixed(1));
@@ -383,9 +384,11 @@ def n35():
         s.append(ln(PL - 4, ly(v), PL, ly(v), "tick"))
     s.append(f'<polyline class="pl-m" points="{curve(lambda cc: times(cc, bgb)[0])}"/>')
     s.append(f'<polyline class="pl-h" points="{curve(lambda cc: times(cc, bgb)[1])}" data-tr=""/>')
-    s.append(txt(lx(3e4) - 8, ly(times(3e4, bgb)[0]) - 4, "compute: c × c × 32,768 ops", "sub2 halo", "end"))
-    s.append(f'<text class="sub2 halo" x="{lx(2e5)}" y="{ly(times(2e5, bgb)[1]) + 26:.1f}" '
-             f'text-anchor="middle" data-tl="">transfer: c × 4,096 bytes</text>')
+    for k, (cls, lab) in enumerate((("pl-m", "compute: c × c × 32,768 operations"),
+                                    ("pl-h", "transfer: c × 4,096 bytes"))):
+        yy = PT + 12 + k * 20                     # the top-left corner, which no line reaches
+        s.append(poly([(PL + 12, yy - 4), (PL + 36, yy - 4)], cls))
+        s.append(txt(PL + 44, yy, lab, "sub2"))
     s.append(f'<line class="axis" x1="{lx(c):.1f}" y1="{PT}" x2="{lx(c):.1f}" y2="{PB}" '
              f'stroke-dasharray="3 3" data-vline=""/>')
     for attr, yy, col in (("data-dw", ly(w), "--m"), ("data-dx", ly(x), "--h")):

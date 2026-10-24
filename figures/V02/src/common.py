@@ -196,6 +196,7 @@ DROPPED = {
     "o061": "replaced by p19 (32-byte sectors, four to a 128-byte line)",
     "o062": "replaced by p19 (the hardware cannot fetch a single value)",
     "o075": "merged into o074 (the roofline recap and the 295 decomposed)",
+    "o081": "merged into o080 (528 tensor cores; the caveat lives in o082)",
 }
 
 

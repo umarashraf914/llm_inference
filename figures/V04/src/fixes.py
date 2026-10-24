@@ -54,6 +54,11 @@ FIXES = [
     ("o049", "Fig 49 &nbsp;&middot;&nbsp; 6:47</div>", "Fig 49 &nbsp;&middot;&nbsp; 7:17</div>"),
     # §5 (checker): "how many share a scale" had 4px of room in its 138px box
     ("o050", '>how many share a scale</text>', '>who shares a scale</text>'),
+    # §2: W8 A8 speeds up decode too, once the batch is large (10:35)
+    ("o056", '>aimed at compute-bound prefill</text>', '>prefill, and decode at large batch</text>'),
+    ("o056", "<figcaption>Shrink the weights for decode. Shrink both for prefill.</figcaption>",
+     "<figcaption>Shrink the weights for decode. Shrink both for prefill, and for decode once a large "
+     "batch has made it compute bound too.</figcaption>"),
 ]
 
 

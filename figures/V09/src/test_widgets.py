@@ -97,7 +97,43 @@ def test_n27w(pg, static):
     return checked
 
 
-TESTS = {"v09-n07": (test_n07, "[data-r]"), "v09-n24w": (test_n24w, "[data-l]"), "v09-n27w": (test_n27w, None)}
+READ30 = """fid => { const f = document.getElementById(fid), q = s => f.querySelector(s);
+  const out = [q('[data-k]').textContent, q('[data-r="0"]').textContent, q('[data-r="1"]').textContent];
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 12; i++) { const g = q(`[data-c="${r}-${i}"]`);
+    out.push(g.getAttribute('class') + ':' + g.querySelector('text').textContent); }
+  return out; }"""
+
+
+def want30(k):
+    import closing as c
+    ar, df, lines = c.state30(k)
+    cells = [f"{['x', 'u', 'm'][st]}:{c.WORDS[i] if st else '?'}" for row in (ar, df) for i, st in enumerate(row)]
+    return lines + cells
+
+
+def test_n30w(pg, static):
+    import closing as c
+    fid = "v09-n30w"
+    assert static[fid] == want30(0), (static[fid], want30(0))
+    checked = 0
+    for k in range(13):
+        if k:
+            click(pg, fid, "Next")
+        got = pg.evaluate(READ30, fid)
+        assert got == want30(k), (k, got, want30(k))
+        checked += 3 + 24
+    for k in range(11, -1, -1):
+        click(pg, fid, "Back")
+        assert pg.evaluate(READ30, fid) == want30(k), k
+    click(pg, fid, "Next")
+    click(pg, fid, "Reset")
+    assert pg.evaluate(READ30, fid) == want30(0)
+    return checked
+
+
+TESTS = {"v09-n07": (test_n07, "[data-r]"), "v09-n24w": (test_n24w, "[data-l]"), "v09-n27w": (test_n27w, None),
+         "v09-n30w": (test_n30w, None)}
+READERS = {"v09-n27w": READ27, "v09-n30w": READ30}
 
 
 def main():
@@ -110,7 +146,7 @@ def main():
         ctx = b.new_context(java_script_enabled=False)
         st = ctx.new_page()
         st.goto(page.as_uri())
-        static = {fid: (texts(st, fid, sel) if sel else st.evaluate(READ27, fid))
+        static = {fid: (texts(st, fid, sel) if sel else st.evaluate(READERS[fid], fid))
                   for fid, (_, sel) in TESTS.items() if f"id='{fid}'" in html}
         ctx.close()
         pg.goto(page.as_uri())
@@ -120,7 +156,7 @@ def main():
             if f"id='{fid}'" not in html:
                 print(f"{fid}: not in this build")
                 continue
-            got = texts(pg, fid, sel) if sel else pg.evaluate(READ27, fid)
+            got = texts(pg, fid, sel) if sel else pg.evaluate(READERS[fid], fid)
             assert got == static[fid], f"{fid}: the script's first draw differs from Python's static state"
             k = fn(pg, static)
             total += k
