@@ -151,7 +151,8 @@ def a32():
 # ---- a33 · P30 ------------------------------------------------------------------------------------
 RATE = 10                                      # requests a second, as DistServe assumes
 TRAFFIC = RATE * OPT_REQ                       # bytes a second
-LINKS = [("100 Gb/s Ethernet", 100e9 / 8), ("400 Gb/s network port", 400e9 / 8), ("NVLink, H100", 900e9)]
+NVLINK = 450e9                                 # H100 NVLink each way; the quoted 900 adds both (V05 n7)
+LINKS = [("100 Gb/s Ethernet", 100e9 / 8), ("400 Gb/s network port", 400e9 / 8), ("NVLink, H100, each way", NVLINK)]
 
 
 def a33():
@@ -172,7 +173,7 @@ def a33():
         b.append(cell(X0, y, max(share * W, 2), 24, "h", rx=2))
         b.append(txt(round(X0 + W + 10, 1), y + 17, f"{f(share * 100, 1 if share < 0.1 else 0)}%", "sub2"))
     shares = [TRAFFIC / c_ for _, c_ in LINKS]
-    assert [round(s_ * 100, 1) for s_ in shares] == [96.6, 24.2, 1.3]
+    assert [round(s_ * 100, 1) for s_ in shares] == [96.6, 24.2, 2.7]
     body, yb = prose(156 + 3 * 36 + 34, [
         "Memory and file sizes are counted in bytes, network links in bits, and a byte is 8 bits "
         "({{fig:v01-o073}}): a link sold as 400 gigabits a second carries 50 gigabytes a second. NVLink "
@@ -184,7 +185,7 @@ def a33():
         "second, the unit would be wrong by a factor of 8.",
         "On one 100 Gb/s Ethernet link, the kind Sarathi-Serve's machines used, that traffic alone takes "
         f"{f(shares[0] * 100, 0)}% of the link; on a 400 Gb/s port, {f(shares[1] * 100, 0)}%; over NVLink "
-        "inside a node, about 1%.",
+        f"inside a node, {f(NVLINK / 1e9, 0)} GB/s each way ({{{{fig:v05-n7}}}}), about {f(shares[2] * 100, 0)}%.",
     ])
     emit("a33", st("roughly 90 GB per second"), "Networks count bits: 12.1 GB a second is 97 gigabits",
          yb + 32, b + [body],
@@ -198,8 +199,9 @@ def a34():
     rows = [("a 70B decode step, for scale", T_STEP70, "u", ""),
             ("OPT-66B, 400 Gb/s port", OPT_REQ / (400e9 / 8), "h", ""),
             ("Llama 3 70B, 400 Gb/s port", L70_REQ / (400e9 / 8), "s", ""),
-            ("OPT-66B, NVLink", OPT_REQ / 900e9, "s", "")]
-    assert [round(t * 1e3, 2) for _, t, _, _ in rows] == [41.79, 24.16, 3.36, 1.34]
+            ("OPT-66B, NVLink", OPT_REQ / NVLINK, "s", "")]
+    assert [round(t * 1e3, 2) for _, t, _, _ in rows] == [41.79, 24.16, 3.36, 2.68]
+    lo, hi = min(t for _, t, _, _ in rows[1:]), max(t for _, t, _, _ in rows[1:])
     b = [hd(40, 46, f"Time to move one {REQ}-token request's cache, to scale")]
     X0, SC = 250, 340 / T_STEP70
     for i, (lab, t, cls, note) in enumerate(rows):
@@ -209,7 +211,7 @@ def a34():
         b.append(txt(round(X0 + t * SC + 10, 1), y + 17, f"{f(t * 1e3, 2 if t < 0.01 else 1)} ms" + (f"  {note}" if note else ""), "sub2"))
     body, yb = prose(70 + 4 * 34 + 30, [
         f"Each request's cache crosses once, between its prefill and its first decode step. Over a 400 Gb/s "
-        f"port OPT-66B's 1.21 GB takes {f(rows[1][1] * 1e3, 1)} ms; over NVLink's 900 GB/s, "
+        f"port OPT-66B's 1.21 GB takes {f(rows[1][1] * 1e3, 1)} ms; over NVLink at {f(NVLINK / 1e9, 0)} GB/s each way, "
         f"{f(rows[3][1] * 1e3, 2)} ms. Llama 3 70B's {fc(L70_REQ / 1e6)} MB takes {f(rows[2][1] * 1e3, 1)} ms "
         "even over the network.",
         "That time is added to the request's time to first token. It can also be hidden: Mooncake streams a "
@@ -217,7 +219,8 @@ def a34():
         "A cluster with InfiniBand or NVLink absorbs that. A small deployment does not, which makes "
         "disaggregation a decision about how much traffic you have, not a default.",
     ])
-    emit("a34", st("A cluster with InfiniBand"), "One request's handoff takes 1 to 24 milliseconds, depending on the link",
+    emit("a34", st("A cluster with InfiniBand"),
+         f"One request's handoff takes {round(lo * 1e3)} to {round(hi * 1e3)} milliseconds, depending on the link",
          yb + 32, b + [body],
          "Fast links make the transfer a rounding error and slow ones make it the bottleneck. Disaggregation "
          "is only as good as the wire between the pools.")

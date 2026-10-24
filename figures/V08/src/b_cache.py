@@ -216,12 +216,12 @@ def b04():
     per_gpu = cache_128k / G
     blk_tokens = CTX // G
     blk_layer = blk_tokens * 2 * KV_HEADS * HEAD_DIM * BYTES        # one block's keys and values, one layer
-    nvlink = 900e9                                                    # H100 NVLink, V02 Fig 95
+    nvlink = 450e9                     # H100 NVLink one way (the quoted 900 adds both), V02 o095/p34
     t_move = blk_layer / nvlink
     flops = 4 * blk_tokens * blk_tokens * Q_HEADS * HEAD_DIM          # QK and PV for one block, one layer
     t_math = flops / H100_PEAK
     assert round(per_gpu / GB, 1) == 10.7 and round(blk_layer / 1e6) == 134
-    assert round(t_move * 1e3, 2) == 0.15 and round(t_math * 1e3) == 36 and t_math > 100 * t_move
+    assert round(t_move * 1e3, 2) == 0.30 and round(t_math * 1e3) == 36 and t_math > 100 * t_move
     names = "ABCD"
     holds = [[names[(g - s) % G] for s in range(G)] for g in range(G)]
     for g in range(G):                                                # every query meets every block
@@ -241,14 +241,15 @@ def b04():
     yy = Y0 + G * RH + 8
     b.append(txt(X0, yy + 12, "each step: attend to the block held, pass it on, receive the next", "sub2"))
     body, yb = prose(yy + 52, [
-        "Ring attention keeps every token and spreads the cache across devices, which episode 5 built "
-        "({{fig:v05-o020}}). Each GPU holds a slice of the sequence: its own queries, and the keys and "
+        "Ring attention ({{fig:v05-o020}}) keeps every token and spreads the cache across devices. "
+        "Each GPU holds a slice of the sequence: its own queries, and the keys and "
         f"values for {n0(blk_tokens)} tokens, {f(per_gpu / GB, 1)} GB instead of {f(cache_128k / GB, 1)} "
         "GB on one chip. After three passes round the ring, every query has met every block, and the "
         "result is exact.",
         f"What it needs is an interconnect fast enough to hide the passing behind the arithmetic. Per "
         f"layer, one block is {round(blk_layer / 1e6)} MB, about {f(t_move * 1e3, 2)} ms over NVLink at "
-        f"900 GB/s ({{{{fig:v02-o095}}}}). Attending {n0(blk_tokens)} queries to it is about "
+        f"{round(nvlink / 1e9)} GB/s each way, half the quoted 900 ({{{{fig:v02-o095}}}}). Attending "
+        f"{n0(blk_tokens)} queries to it is about "
         f"{round(t_math * 1e3)} ms of arithmetic at the H100's peak, so the next block arrives long "
         "before it is needed.",
     ])

@@ -111,7 +111,8 @@ def a07():
         "({{fig:v01-o140}}); grouped-query attention is why there are 8 KV heads and not 32 "
         "({{fig:v03-o089}}). The 70B model came to 327,680 bytes; with 32 layers instead of 80, the 8B "
         f"keeps {f(KV70 / KV8, 1)} times less per token.",
-        "Memory is counted in powers of two as often as in powers of ten. A KiB is 1,024 bytes, a MiB "
+        "Memory is counted in powers of two as often as in powers of ten ({{fig:v02-p16}}). A KiB is "
+        "1,024 bytes, a MiB "
         "is 1,024 KiB and a GiB is 1,024 MiB, so 131,072 bytes is exactly 128 KiB, and 8,192 tokens "
         "fill exactly 1 GiB, which is 1.07 GB.",
     ])
@@ -119,8 +120,7 @@ def a07():
     emit("a07", st("A KV cache is the opposite"), "One token of context costs 128 KiB on Llama 3 8B",
          yb + 32, b + [body],
          "A request's cache is rent paid per token, and every request pays its own. At 8,192 tokens one "
-         "conversation holds a gigabyte of the card.",
-         note="KiB against kB: point to the V1 or V2 figure that builds binary prefixes, once it exists")
+         "conversation holds a gigabyte of the card.")
 
 
 # ---- a08 · P8 -------------------------------------------------------------------------------------
