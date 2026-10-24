@@ -24,7 +24,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | V1 | The Memory Wall (+ animation, 20 acts) | 179 | 31:08 |
 | V2 | Inside the GPU | 123 | 20:26 |
 | V3 | Kernels and Memory (+ FlashAttention animation, 42 steps) | 129 | 49:21 |
-| V4 | Quantization | 83 | 20:47 |
+| V4 | Quantization | 118 | 20:47 |
 | V5 | Parallelism | 68 | 16:45 |
 | V6 | Mixture of Experts | 70 | 22:38 |
 | V7 | Serving in Production | 101 | 29:59 |
@@ -108,7 +108,5 @@ pip install "playwright==1.63.0"
 python3 .claude/skills/srt-figure-atlas/scripts/check_atlas.py atlases/V0*.html
 ```
 
-At migration it reported six faults, all minor. Five went with the depth pass; this one remains
-until V4 is rebuilt:
-
-- V04 fig 50 — "how many share a scale" has 4px of room
+At migration it reported six faults, all minor. The depth pass cleared them, and every atlas
+passes as of 2026-10-24. Keep it that way: a fault is fixed before the commit, not listed here.
