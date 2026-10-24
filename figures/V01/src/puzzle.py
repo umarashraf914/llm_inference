@@ -95,7 +95,7 @@ def o064():
         "a hundred billion operations, takes a tenth of a millisecond.",
         f"The budget is thirty milliseconds. On the arithmetic alone the chip could have finished "
         f"{g(BUDGET_MS / ARITH_MS - 1)} more tokens in the time left over: {g(BUDGET_MS / ARITH_MS)} in all.",
-        "The 10^11 is two operations for each of the model's 70 billion weights; {{fig:v01-o114}} shows "
+        "The 10^11 is two operations for each of the model's 70 billion weights; {{fig:v01-o111}} shows "
         "where the two comes from.",
     ])
     emit("o064", st("on the order of a hundred billion arithmetic"), "The arithmetic finishes almost instantly",

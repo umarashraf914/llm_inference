@@ -72,8 +72,8 @@ def p01():
     body, y = prose(268, [
         "Base ten gives each digit a place worth ten times the one to its right: 6,022 is 6 thousands, "
         "no hundreds, 2 tens and 2 ones. Base two works the same way with only two digits, 0 and 1, "
-        "and places worth 1, 2, 4, 8 and so on. To read a binary number, add up the places that hold "
-        "a 1.",
+        "and places worth 1, 2, 4, 8 and so on ({{fig:v01-p06}} counts eight of them). To read a binary "
+        "number, add up the places that hold a 1.",
         "Each extra bit doubles the number of patterns, so n bits give 2ⁿ of them: eight bits count "
         "from 0 to 255, and five, the size of FP16's exponent field, from 0 to 31. All ones is always "
         "one less than the next place up: 11111111 is 256 − 1. The middle row is the exponent field "
@@ -85,9 +85,7 @@ def p01():
     b.append(body)
     emit("p01", st("with what a number's bits actually do"), "Base two counts in powers of two", y + 26, b,
          "Nothing about binary is stranger than this. Every exponent field, integer code and stored word "
-         "later in this atlas is read by adding up the places that hold a 1.",
-         link="V1's place-value figure (V01 review §4 entry 6, 'Eight bits count from 0 to 255'), once "
-              "built: add a pointer in the first paragraph")
+         "later in this atlas is read by adding up the places that hold a 1.")
 
 
 # ---- p02: binary fractions ----------------------------------------------------------------------------

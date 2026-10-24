@@ -149,7 +149,7 @@ def b37():
         "match again further on ({{fig:v01-o045}}).",
         f"A hit is therefore the length of the shared beginning: {hit} of these {len(ARRIVING)} tokens, "
         f"with {len(ARRIVING) - hit} left to prefill. For a real follow-up question it is usually "
-        "most of the prompt: 906 of 911 tokens in {{fig:v01-o044}}.",
+        "most of the prompt: 784 of 788 tokens in {{fig:v01-o044}}.",
     ])
     emit("b37", stamp(SRT, "That works because attention is causal."),
          "Only a shared beginning can be reused, because attention looks back", yb + 32, b + [body],

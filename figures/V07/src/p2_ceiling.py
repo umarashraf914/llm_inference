@@ -111,7 +111,7 @@ def a07():
         "({{fig:v01-o140}}); grouped-query attention is why there are 8 KV heads and not 32 "
         "({{fig:v03-o089}}). The 70B model came to 327,680 bytes; with 32 layers instead of 80, the 8B "
         f"keeps {f(KV70 / KV8, 1)} times less per token.",
-        "Memory is counted in powers of two as often as in powers of ten ({{fig:v02-p16}}). A KiB is "
+        "Memory is counted in powers of two as often as in powers of ten ({{fig:v01-p30}}). A KiB is "
         "1,024 bytes, a MiB "
         "is 1,024 KiB and a GiB is 1,024 MiB, so 131,072 bytes is exactly 128 KiB, and 8,192 tokens "
         "fill exactly 1 GiB, which is 1.07 GB.",

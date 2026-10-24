@@ -26,8 +26,8 @@ def o011():
     assert X0 + whole * MS * px <= X1 and X0 + (whole + 1) * MS * px > X1
     body, yb = prose(Y + 110, [
         f"Thirty milliseconds is three hundredths of a second, so one second holds 1,000 ÷ 30 = "
-        f"{f(PER_S, 1)} of them: the {whole} slots above, with a sliver left over. That is faster "
-        "than anyone reads.",
+        f"{f(PER_S, 1)} of them: the {whole} slots above, with a sliver left over. That is several "
+        "times faster than anyone reads.",
         "The figure is a round one for a large model serving real traffic, not a law of nature. By the "
         "end of this atlas the time per token can be worked out from two numbers printed on a chip's "
         "specification sheet, for any model on any chip ({{fig:v01-p36}}).",

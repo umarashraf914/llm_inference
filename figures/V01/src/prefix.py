@@ -18,7 +18,8 @@ TS = st("share the cache across requests")
 assert TS == "25:43"
 
 # ---- one conversation, followed through Parts 13 and 14 ----------------------------------------
-# Token counts of the preamble are illustrative; one word or mark is one token, for drawing.
+# Token counts are illustrative; one word or mark is one token. The split of the 770-token preamble
+# between system prompt and tools is never shown, only its total.
 SYSTEM, TOOLS = 320, 450
 PRE = [f"s{i}" for i in range(SYSTEM)] + [f"t{i}" for i in range(TOOLS)]
 Q1 = "What is the capital of France ?".split()
@@ -317,9 +318,9 @@ def o048():
     b.append(ghost(150, 136, 438, 30, label="nothing that matches this conversation"))
     b.append(cell(140, 190, 400, 42, "h", rx=6, label=f"hit {HIT0}   ·   prefill all {g(len(TURN1))} tokens"))
     body, yb = prose(274, [
-        f"Nothing of this conversation has been seen before, so every token is processed from scratch: "
-        f"{SYSTEM} of system prompt, {TOOLS} of tool descriptions ({{{{fig:v01-o020}}}}) and the {len(Q1)} of "
-        "the question. This is the expensive case, and it is unavoidable the first time.",
+        f"Nothing of this conversation has been seen before, so every token is processed from scratch: the "
+        f"{len(PRE)} of system prompt and tool descriptions ({{{{fig:v01-o020}}}}) and the {len(Q1)} of the "
+        "question. This is the expensive case, and it is unavoidable the first time.",
         "One caveat: the system prompt and tools are identical for every user of this service, so on a busy "
         "machine they are very likely already cached from somebody else's request ({{fig:v01-o026}}).",
         f"Set those aside and the user's {len(Q1)} tokens are the only genuinely new work.",
