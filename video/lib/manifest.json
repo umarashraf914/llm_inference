@@ -1,1 +1,9 @@
-["tokens.js", "hardware.js", "time.js", "memory.js", "model.js", "charts.js"]
+[
+  "tokens.js",
+  "hardware.js",
+  "time.js",
+  "memory.js",
+  "model.js",
+  "charts.js",
+  "kit.js"
+]
