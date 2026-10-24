@@ -71,12 +71,13 @@ def p16():
     b = [hd(40, 46, "Areas to scale: a 70B model's weights, and all the fast memory on the chip")]
     b.append(f'<g class="h"><rect x="40" y="62" width="{W}" height="{H}" rx="4"/>'
              f'<text class="sub" x="56" y="86">140 GB of weights</text>'
-             f'<text class="sub" x="{86 + small:.1f}" y="{132 + small / 2 + 4:.1f}">{FAST / 1e6:.1f} MB: every register, '
+             f'<text class="sub" x="{86 + small:.1f}" y="{132 + small / 2 + 4:.1f}">{FAST / 1e6:.1f} million bytes: every register, '
              f'L1, shared memory and L2</text></g>')
     b.append(rect(70, 132, small, small, "s", rx=1))
     body, yb = prose(400, [
-        "Memory sizes count in powers of two: a kilobyte of memory is 1,024 bytes and a megabyte "
-        f"1,048,576. So the chip's registers are 33,792 KB = {CAP['registers']:,} bytes, the L1 and shared "
+        "On-chip memory counts in powers of two: NVIDIA's KB is 1,024 bytes, strictly a kibibyte (KiB), "
+        "and its MB 1,048,576 bytes (MiB), while a model's gigabytes, like a bandwidth's, are round "
+        f"billions. So the chip's registers are 33,792 KB = {CAP['registers']:,} bytes, the L1 and shared "
         f"memory the same again, and the 50 MB L2 is {CAP['L2']:,} bytes: {FAST / 1e6:.1f} million bytes "
         f"in all, {100 * FAST / MODEL:.3f}% of the 140 billion bytes of a 70B model.",
         f"The L2 alone holds one part in {round(l2_frac, -1):,.0f} of the weights. Generating a token reads every "
