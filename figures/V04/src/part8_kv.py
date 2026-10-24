@@ -123,12 +123,41 @@ def deepseek():
     return old, new, mla, both
 
 
-def fix_existing():
-    reprose("o071", 396, [
+def o071():
+    """Redrawn: each scale is a chip beside the cells it serves (the old teal bar covered two cells)."""
+    pitch, rowh, cw, ch_, x0 = 42, 24, 36, 18, 130
+    hot = (2, 7)
+    b = [hd(40, 46, "Keys: outliers sit in fixed channels")]
+    y0 = 66
+    for i in range(4):
+        for j in range(10):
+            b.append(rect(x0 + j * pitch, y0 + i * rowh, cw, ch_, "h" if j in hot else "u", rx=2))
+    for j in range(10):
+        b.append(cell(x0 + j * pitch, y0 + 4 * rowh + 6, cw, 18, "s", label="s"))
+    b.append(text(40, y0 + 13, "4 tokens", "sub2"))
+    b.append(text(40, y0 + 4 * rowh + 20, "scales", "sub2"))
+    b.append(text(x0, y0 + 4 * rowh + 50, "so one scale per channel, down the columns: the red channels get their own",
+                  "sub2"))
+    y1 = y0 + 4 * rowh + 100
+    b.append(hd(40, y1, "Values: no channel structure"))
+    y2 = y1 + 20
+    for i in range(4):
+        for j in range(10):
+            b.append(rect(x0 + j * pitch, y2 + i * rowh, cw, ch_, "u", rx=2))
+        b.append(cell(x0 + 10 * pitch + 6, y2 + i * rowh, cw, ch_, "s", label="s"))
+    b.append(text(40, y2 + 13, "4 tokens", "sub2"))
+    b.append(text(x0, y2 + 4 * rowh + 22, "so one scale per token, along the rows", "sub2"))
+    body, y = prose(y2 + 4 * rowh + 64, [
         "KIVI and KVQuant, two groups working independently, arrived at this same recipe; "
         "{{fig:v04-p30}} works it in numbers. The asymmetry is empirical rather than designed: keys "
         "happen to carry per-channel structure and values happen not to.",
     ])
+    b.append(body)
+    emit("o071", "14:05", "Keys and values need different treatment", y + 26, b,
+         "A good illustration that the right granularity is a property of the data, not a universal choice.")
+
+
+def fix_existing():
     old, new, mla, both = deepseek()
     reprose("o072", 174, [
         "Rather than compressing each stored value, MLA caches a small learned summary, the latent, and "
@@ -136,8 +165,9 @@ def fix_existing():
         "cache shrinking 93.3% and maximum generation throughput rising 5.76 times over their previous "
         "model, DeepSeek 67B.",
         "That 93.3% holds both approaches at once. DeepSeek 67B cached 2 × 8 × 128 = 2,048 numbers a "
-        "token in each of its 95 layers; DeepSeek-V2 caches 512 + 64 = 576 in each of 60. At 16 bits "
-        f"apiece that alone is {f(100 * mla, 1)}% smaller. The deployed V2 also stores its cache at about "
+        f"token in each of its 95 layers, {fi(old)} in all; DeepSeek-V2 caches 512 + 64 = 576 in each of "
+        f"60, {fi(new)} in all. At 16 bits apiece that alone is {f(100 * mla, 1)}% smaller. The deployed "
+        "V2 also stores its cache at about "
         "6 bits a number, citing KVQuant, and "
         + nb(f"1 − ({fi(new)} × 6) ÷ ({fi(old)} × 16) = {f(100 * both, 1)}%") + ". {{fig:v03-p39}} draws "
         "the three sources to scale.",
@@ -148,4 +178,5 @@ def fix_existing():
 
 if __name__ == "__main__":
     p30()
+    o071()
     fix_existing()
