@@ -1,6 +1,6 @@
 """V2 Part 5, the two cardinal sins: Figs 47 and 48 merged (o048 rewritten, o047 dropped).
 
-  python3 figures/V02/src/sins.py     writes o048
+  python3 figures/V02/src/sins.py     writes o048; edits o049 (a warp shares one memory request)
 """
 from common import *  # noqa: F401,F403
 
@@ -41,5 +41,11 @@ def o048():
          "results, which is why it shows up as lost throughput, never as waiting.")
 
 
+def o049():
+    edit_item("o049", replace=[(">instruction and one memory transaction, and both are wasted when the thirty-two disagree.<",
+                                ">instruction and one memory request, and both are wasted when the thirty-two disagree.<")])
+
+
 if __name__ == "__main__":
     o048()
+    o049()

@@ -117,6 +117,9 @@ def fixes():
         "fetched is used once ({{fig:v01-o112}}).",
     ], caption="The trade is not free for genuinely serial work. Decode is not that: its chain is long but "
                "every link is wide, and what it lacks is reuse of each byte, not parallel work.")
+    edit_item("o013", caption="The dependency question is the one that matters. Keep it in mind: it returns as "
+                              "the reason a whole prompt can be processed at once while new tokens come one at "
+                              "a time.")
 
 
 if __name__ == "__main__":

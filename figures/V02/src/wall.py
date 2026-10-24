@@ -123,7 +123,13 @@ def o071():
     ])
 
 
+def o067():
+    edit_item("o067", replace=[(">arithmetic rate, and each generation adds a narrower number format that multiplies it again.<",
+                                ">arithmetic rate, and most generations add a narrower number format that multiplies it again.<")])
+
+
 if __name__ == "__main__":
+    o067()
     o069()
     p21()
     p22()

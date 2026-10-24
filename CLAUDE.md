@@ -22,7 +22,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | # | Atlas | Figures | Video |
 |---|---|---|---|
 | V1 | The Memory Wall (+ animation, 20 acts) | 147 | 31:08 |
-| V2 | Inside the GPU | 100 | 20:26 |
+| V2 | Inside the GPU | 123 | 20:26 |
 | V3 | Kernels and Memory (+ FlashAttention animation, 42 steps) | 100 | 49:21 |
 | V4 | Quantization | 83 | 20:47 |
 | V5 | Parallelism | 68 | 16:45 |
@@ -108,10 +108,9 @@ pip install "playwright==1.63.0"
 python3 .claude/skills/srt-figure-atlas/scripts/check_atlas.py atlases/V0*.html
 ```
 
-At migration it reported six faults, all minor. V8's and V9's went with their depth pass; these
-four remain until V1–V4 are rebuilt:
+At migration it reported six faults, all minor. V2's, V8's and V9's went with their depth pass; these
+three remain until V1, V3 and V4 are rebuilt:
 
 - V01 fig 14 — one element outside the canvas
-- V02 fig 86 — "plus or minus" collides with "roughly how big"
 - V03 fig 100 — "graph replay" has 6px of room
 - V04 fig 50 — "how many share a scale" has 4px of room
