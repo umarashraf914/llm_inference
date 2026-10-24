@@ -75,7 +75,7 @@ def prose(y, paras, x=40, width=88, cls="cap"):
     for k, p in enumerate(paras):
         if k:
             y += 40
-        for j, line in enumerate(textwrap.wrap(p, width)):
+        for j, line in enumerate(textwrap.wrap(p, width, break_on_hyphens=False, break_long_words=False)):
             if j:
                 y += 20
             o.append(txt(x, y, line, cls))

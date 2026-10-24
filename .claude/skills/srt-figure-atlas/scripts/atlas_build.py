@@ -174,6 +174,9 @@ def build(v: str, out: Path | None) -> None:
     if a >= 0:
         shell = shell[:a] + WIDGET_CSS.lstrip("\n") + shell[shell.index("</style>", a):]
     page = resolve(shell, v, cache).replace("<!--ITEMS-->", "".join(parts))
+    left = re.findall(r"\{\{[^}]*\}?\}?", page)
+    if left:
+        sys.exit(f"{v}: unresolved or broken pointers {left[:5]} (a pointer split across two lines?)")
     target = out or atlas_file(v)
     target.write_text(page, encoding="utf-8")
     print(f"{v}: {n} figures -> {target}")

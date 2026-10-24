@@ -16,16 +16,17 @@ from bcommon import (SRT, JS_FMT, cell, emit, emit_widget, f, g, hd, js_fill, ln
                      txt)
 
 # ---- o016 ---------------------------------------------------------------------------------------
-TTFT_T, TPOT_T, TOKENS = 500, 50, 200                     # targets in ms, and tokens per request
-TTFT = [210, 340, 450, 900, 280, 120, 470, 300, 190, 360]  # illustrative
-TPOT = [32, 41, 47, 38, 44, 29, 49, 61, 36, 40]
+from p5_disagg import REQS, TTFT_T, TPOT_T                 # a35's ten requests and DistServe's targets
+TOKENS = 200                                               # tokens per request, illustrative
+TTFT = [a for a, _ in REQS]
+TPOT = [p for _, p in REQS]
 
 
 def o016():
     ok1 = [v <= TTFT_T for v in TTFT]
     ok2 = [v <= TPOT_T for v in TPOT]
     both = [a and b for a, b in zip(ok1, ok2)]
-    assert (sum(ok1), sum(ok2), sum(both)) == (9, 9, 8)
+    assert (sum(ok1), sum(ok2), sum(both)) == (9, 9, 8) and not ok1[3] and not ok2[5]
     thr, good = TOKENS * len(TTFT), TOKENS * sum(both)
     assert (thr, good) == (2000, 1600)
     b = [hd(40, 46, f"Ten requests against two targets: {TTFT_T} ms to the first token, {TPOT_T} ms per token")]
@@ -50,22 +51,20 @@ def o016():
     b.append(txt(X0 + good * SC + 10, 275, f"{g(good)}: the {sum(both)} in time", "sub2"))
     body, yb = prose(320, [
         "Throughput counts every token the cluster produces. Goodput, the measure from "
-        "{{fig:v01-o145}}, counts only the tokens of requests that met their latency targets, here "
-        f"{TTFT_T} ms to the first token and {TPOT_T} ms per token after it, both illustrative. A "
-        "request counts only if it meets both at once.",
-        f"Request 4 started too late and request 8 streamed too slowly. Each target alone is met by "
-        f"{sum(ok1)} of the 10; both together by {sum(both)}. Every request produced {TOKENS} tokens, "
-        f"so {g(thr)} were made and {g(good)} count. The share of requests inside both targets, "
-        f"{pc(sum(both) / 10, 0)} here, is called attainment.",
+        "{{fig:v01-o145}}, counts only the tokens of requests that met their latency targets. These "
+        "are the ten requests of {{fig:v07-a35}} again, on DistServe's chatbot targets of "
+        f"{TTFT_T} ms to the first token and {TPOT_T} ms per token after it; a request counts only if "
+        "it meets both at once.",
+        f"Request 4 started too late and request 6 streamed too slowly, so {sum(both)} of the 10 count: "
+        f"the {pc(sum(both) / 10, 0)} attainment of {{{{fig:v07-a35}}}}. Every request produced "
+        f"{TOKENS} tokens, so {g(thr)} were made and {g(good)} count.",
         "A token generated for a request that already blew its deadline is work paid for that cannot "
         "be sold. So a cluster can run at full utilisation and deliver very little.",
     ])
     emit("o016", stamp(SRT, "What all of it optimizes is not"),
          "Goodput counts only the requests that met both targets", yb + 32, b + [body],
-         "Bars to scale, latencies illustrative. Two filters applied together: missing either "
-         "target is a miss, so attainment is always at or below the worse of the two.",
-         links=["P32 (Part 5, 13:47), the both-targets table: point 'a request counts only if it meets "
-                "both at once' at it once it exists, and check the two examples agree"])
+         f"Bars to scale, requests illustrative. Goodput is throughput with the late work taken out: "
+         f"the {g(thr - good)} tokens of requests 4 and 6 were paid for and count for nothing.")
 
 
 # ---- b48: per-GPU goodput, read off a queue -----------------------------------------------------
@@ -169,7 +168,8 @@ def b48():
         f"busy {pc(u_top, 0)} of the time and only {pc(a_top, 0)} are on time. This toy checks only the "
         "first-token target; a real measurement checks both.",
         f"Counted per GPU, goodput becomes cost per query. The 96-GPU run's 20 cents per million "
-        f"tokens, at 2,787.5 output tokens a second per GPU, implies ${f(PRICE)} per GPU-hour. At "
+        f"tokens, at 2,787.5 output tokens a second per GPU, implies ${f(PRICE)} per GPU-hour "
+        f"({{{{fig:v07-a38}}}}). At "
         f"{f(BEST, 1)} queries a second, {g(per_hour)} an hour, each costs ${f(cpq, 5)}. Priced on raw "
         f"throughput at {f(RATES[-1], 1)} a second it would look like ${f(cpq_thr, 5)}, for queries "
         "nine in ten of which arrived late. The arithmetic was checked in Python.",
@@ -183,9 +183,7 @@ def b48():
                 yb + 26,
                 "A toy queue, exact for its assumptions. Utilisation climbs in a straight line while "
                 "the share on time falls off a cliff: the GPU is busiest exactly when it is least "
-                "useful.", js,
-                links=["P35 (Part 5, 15:05), twenty cents per million: point the $2.01 per GPU-hour "
-                       "derivation at it once it exists"])
+                "useful.", js)
 
 
 if __name__ == "__main__":

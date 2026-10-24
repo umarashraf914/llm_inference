@@ -221,13 +221,12 @@ def b12():
         "Why a sliding branch at all: local patterns are the easiest thing to learn, so without a branch "
         "of their own the other two would learn those and not much else. Trained this way from the "
         "start, the paper's model matches or exceeds full attention on general benchmarks (fixed sets "
-        "of test questions), long-context tasks and reasoning.",
+        "of test questions, {{fig:v08-a34}}), long-context tasks and reasoning.",
     ])
     emit("b12", stamp("A learned gate blends"),
          "A learned gate gives each branch a weight between 0 and 1", yb + 30, b + [body],
          "Numbers illustrative, arithmetic exact. The blend itself is learned, so the model decides, "
-         "query by query, how much each way of looking should count.",
-         note="link: point 'benchmarks' at the benchmark figure in Part 5 (review G4) once it exists")
+         "query by query, how much each way of looking should count.")
 
 
 # ---- b13: DSA ----------------------------------------------------------------------------------------------------

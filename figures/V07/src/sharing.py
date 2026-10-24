@@ -266,6 +266,11 @@ def b47():
     for tt in (100, 700, 5000):
         s2, _, _, c2 = bill(n, tt, 0)
         assert abs(s2 / c2 - sent / cost) < 1e-12
+    # and a starting context never makes the saving smaller, at any setting the widget allows
+    for nn in range(1, 51):
+        for tt in range(100, 5001, 100):
+            ratios = [(lambda r: r[0] / r[3])(bill(nn, tt, p)) for p in range(0, 20001, 1000)]
+            assert all(b_ >= a_ - 1e-12 for a_, b_ in zip(ratios, ratios[1:]))
     G = dict(X=60, W=560, B=250, H=170)
     s = [hd(40, 34, "Tokens each step sends: the part sent before, and the part that is new")]
     top = p0 + n * t

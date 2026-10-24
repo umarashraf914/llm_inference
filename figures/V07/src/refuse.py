@@ -323,7 +323,8 @@ def b54():
     b.append(cell(X0 + 120, 232, 12, 12, "s")); b.append(txt(X0 + 138, 242, "decode GPUs", "sub2"))
     body, yb = prose(284, [
         "Prefill GPUs are needed in proportion to prompt tokens, decode GPUs in proportion to output "
-        f"tokens. Take the per-GPU rates of the 96-GPU SGLang run: 52,300 ÷ 8 = {g(IN_GPU, 1)} prompt "
+        f"tokens. Take the per-GPU rates of the 96-GPU SGLang run ({{{{fig:v07-a38}}}}): 52,300 ÷ 8 = "
+        f"{g(IN_GPU, 1)} prompt "
         f"tokens a second on a prefill GPU, and 22,300 ÷ 8 = {g(OUT_GPU, 1)} output tokens on a decode "
         f"GPU. At {RATE} requests a second, long prompts with short answers need {RATE} × 2,000 ÷ "
         f"{g(IN_GPU, 1)} = {f(res[0][3])} prefill GPUs and {RATE} × 200 ÷ {g(OUT_GPU, 1)} = "
@@ -338,8 +339,7 @@ def b54():
     emit("b54", stamp(SRT, "And when the pools themselves are the"),
          "The right split between the pools follows the traffic", yb + 32, b + [body],
          "Rates borrowed from one measured run and applied to other mixes, so illustrative. The point "
-         "survives any rates: the split is a property of the traffic, not of the model.",
-         links=["the 96-GPU SGLang run (P35, Part 5): point the per-GPU rates at it once it exists"])
+         "survives any rates: the split is a property of the traffic, not of the model.")
 
 
 if __name__ == "__main__":

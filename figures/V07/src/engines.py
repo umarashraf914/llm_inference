@@ -28,7 +28,7 @@ def o015():
         "now a project of the PyTorch Foundation (the body that looks after PyTorch, a widely used "
         "open-source library for building neural networks), runs on NVIDIA and AMD GPUs, on Google's "
         "and Amazon's own AI chips (TPUs and Inferentia), on Intel and on Apple Silicon. SGLang is the "
-        "engine behind the 96-GPU DeepSeek reproduction. "
+        "engine behind the 96-GPU DeepSeek reproduction ({{fig:v07-a38}}). "
         "TensorRT-LLM is NVIDIA's own, tuned hardest for NVIDIA hardware. Hugging Face's Text "
         "Generation Inference (TGI) is the serving toolkit built around models from the Hugging Face "
         "Hub, a public library of model files.",
@@ -44,9 +44,7 @@ def o015():
     emit("o015", stamp(SRT, "All of this lives in software, and that"),
          "An engine runs one machine; an orchestrator runs a fleet of engines", yb + 32, b + [body],
          "Reading a benchmark correctly depends on knowing which layer it measures. An engine number "
-         "and a fleet number are not comparable.",
-         links=["the 96-GPU DeepSeek reproduction (P35 or o011, Part 5): point 'SGLang is the engine "
-                "behind' at it once Part 5 is built"])
+         "and a fleet number are not comparable.")
 
 
 if __name__ == "__main__":

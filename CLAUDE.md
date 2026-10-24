@@ -27,9 +27,9 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | V4 | Quantization | 83 | 20:47 |
 | V5 | Parallelism | 25 | 16:45 |
 | V6 | Mixture of Experts | 70 | 22:38 |
-| V7 | Serving in Production | 26 | 29:59 |
-| V8 | Speculative Decoding and Long Context | 32 | 29:58 |
-| V9 | The Whole Stack | 15 | 9:02 |
+| V7 | Serving in Production | 101 | 29:59 |
+| V8 | Speculative Decoding and Long Context | 101 | 29:58 |
+| V9 | The Whole Stack | 50 | 9:02 |
 
 ## How to work here
 
@@ -42,6 +42,9 @@ rules that most often matter:
   insert them where they belong in the video's order, and rebuild; the build renumbers. Never
   hand-edit a built atlas, and never create `_v2`, `_final` or addendum files.
 - When an atlas's figure count changes, update its row and the totals in `atlases/index.html`.
+- Figures that predate the depth pass (`oNNN` items) exist only as HTML; the scripts that drew them
+  were not migrated, so edit those items directly. Newer figures are drawn by the scripts in
+  `figures/V0N/src/`: change the script and rerun it, or the next run undoes the edit.
 - Verify every number in Python before it goes into a figure.
 - Run the checker on every atlas you touch and fix what it reports before committing.
 - Never answer a timestamp question from memory; read the transcript window first.
@@ -91,9 +94,6 @@ yt-dlp --js-runtimes node --extractor-args "youtube:player_client=ios,web_embedd
   "https://www.youtube.com/watch?v=30IRJQ49M2g"
 ```
 
-The per-video Python scripts that generated each atlas were not migrated; only the HTML output
-exists. Edit the HTML directly, using `scripts/atlas.py` helpers to produce any new SVG.
-
 ## Running the checker
 
 `check_atlas.py` drives headless Chromium through Python Playwright. The cloud container preinstalls
@@ -108,11 +108,10 @@ pip install "playwright==1.63.0"
 python3 .claude/skills/srt-figure-atlas/scripts/check_atlas.py atlases/V0*.html
 ```
 
-At migration it reported six existing faults, all minor, and still did on 2026-10-24:
+At migration it reported six faults, all minor. V8's and V9's went with their depth pass; these
+four remain until V1–V4 are rebuilt:
 
 - V01 fig 14 — one element outside the canvas
 - V02 fig 86 — "plus or minus" collides with "roughly how big"
 - V03 fig 100 — "graph replay" has 6px of room
 - V04 fig 50 — "how many share a scale" has 4px of room
-- V08 fig 27 — "rises first when capacity runs o…" has 3px of room
-- V09 fig 13 — two prose labels collide
