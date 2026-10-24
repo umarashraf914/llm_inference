@@ -61,11 +61,21 @@ def main():
     ap.add_argument("--name", default="film")
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--no-music", action="store_true", help="narration only, no ambient bed track")
+    ap.add_argument("--only", nargs="+", help="assemble just these chapters (e.g. ch01), each with its title card")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     build = film / "build"
     timing = json.loads((build / "timing.json").read_text())
     order = timing["order"]
+    if a.only:
+        # a stand-alone cut: keep the chosen chapters and restart the clock at zero
+        order = [s for s in order if s.split("_")[0] in a.only]
+        t0 = timing["scenes"][order[0]]["globalStart"]
+        for sid in order:
+            timing["scenes"][sid] = dict(timing["scenes"][sid], globalStart=timing["scenes"][sid]["globalStart"] - t0)
+        timing["total"] = sum(timing["scenes"][s]["duration"] for s in order)
+        if timing["scenes"][order[0]]["kind"] == "title":
+            timing["scenes"][order[0]] = dict(timing["scenes"][order[0]], chapter=dict(timing["scenes"][order[0]]["chapter"]))
 
     # 1. video: check every segment, then concatenate without re-encoding
     lst = build / "concat.txt"
@@ -107,7 +117,7 @@ def main():
         g = sc["globalStart"]
         for b in sc["beats"]:
             cues += cues_for_beat(b, g)
-        if sc["kind"] == "title" or (sc["chapter"]["id"] == "ch00" and sc["chapter"].get("enter")):
+        if sc["kind"] == "title" or (sc["chapter"]["id"] == "ch00" and sc["chapter"].get("enter")) or (a.only and sid == order[0]):
             meta += ["[CHAPTER]", "TIMEBASE=1/1000", f"START={int(g * 1000)}", "END=__END__",
                      f"title={sc['chapter']['number']} {sc['chapter']['title']}"]
     # chapter ends = next chapter's start
@@ -123,7 +133,7 @@ def main():
     # 4. final mux: video copied; track 1 = narration (normalised to -16 LUFS) over a quiet ducked ambient bed,
     #    track 2 = narration only; soft subtitles; chapters
     final = build / f"{a.name}.mp4"
-    music = build / "music.wav"
+    music = build / ("music.wav" if not a.only else "music_cut.wav")
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(video), "-i", str(narr), "-i", str(srt), "-i", str(metaf)]
     if not a.no_music:
         if not music.exists():
