@@ -18,8 +18,7 @@
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
 Needs build/timing.json from tools/tts.py and scenes/<scene>.js (plus optional scenes/<chapter>_common.js).
 """
-import argparse, base64, http.server, json, os, socketserver, subprocess, sys, threading, time
-from functools import partial
+import argparse, base64, json, os, subprocess, sys, time, urllib.parse
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -30,20 +29,27 @@ CRF = os.environ.get("CRF", "18")
 PRESET = os.environ.get("PRESET", "slow")
 
 
-def serve():
-    class Quiet(http.server.SimpleHTTPRequestHandler):
-        def log_message(self, *a):
-            pass
+# The stage's files are answered from disk inside the browser session (Playwright request routing), so there is
+# no web server: a local one worked on Linux, but on macOS a burst of ~60 requests overflowed its listen queue
+# and the kernel reset connections at random, losing scripts and fonts. The host is never contacted.
+ORIGIN = "http://stage.localhost"
+TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+         ".json": "application/json; charset=utf-8", ".woff2": "font/woff2", ".svg": "image/svg+xml", ".png": "image/png"}
 
-        def end_headers(self):
-            self.send_header("Cache-Control", "no-store")
-            super().end_headers()
 
-    handler = partial(Quiet, directory=str(VIDEO))
-    srv = socketserver.ThreadingTCPServer(("127.0.0.1", 0), handler)
-    srv.daemon_threads = True
-    threading.Thread(target=srv.serve_forever, daemon=True).start()
-    return srv.server_address[1]
+def serve_files(page):
+    root = VIDEO.resolve()
+
+    def answer(route):
+        rel = urllib.parse.unquote(urllib.parse.urlsplit(route.request.url).path).lstrip("/")
+        f = (root / rel).resolve()
+        if f.is_file() and root in f.parents:
+            route.fulfill(status=200, body=f.read_bytes(), headers={
+                "Content-Type": TYPES.get(f.suffix.lower(), "application/octet-stream"), "Cache-Control": "no-store"})
+        else:
+            route.fulfill(status=404, body=b"", headers={"Cache-Control": "no-store"})
+
+    page.route(ORIGIN + "/**", answer)
 
 
 def select(timing, sel):
@@ -67,29 +73,40 @@ def select(timing, sel):
 
 
 class Stage:
-    def __init__(self, film, port, debug=False, scale=1):
+    def __init__(self, film, debug=False, scale=1):
         from playwright.sync_api import sync_playwright
         self.pw = sync_playwright().start()
         self.browser = self.pw.chromium.launch(args=["--disable-gpu", "--font-render-hinting=none", "--force-color-profile=srgb",
                                                       "--disable-lcd-text", "--hide-scrollbars"])
         # the stage is always laid out at 1920x1080; scale only sets how many pixels draw it (2 -> 3840x2160)
         self.page = self.browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
+        serve_files(self.page)
         self.errors = []
         self.page.on("pageerror", lambda e: self.errors.append(str(e)))
         self.page.on("console", lambda m: self.errors.append(m.text) if m.type == "error" else None)
+        self.page.on("requestfailed", lambda r: self.errors.append(f"{r.url.replace(ORIGIN, '')}: {r.failure}"))
         self.cdp = self.page.context.new_cdp_session(self.page)
         # a bare CDP capture is 1920x1080 whatever the density; a clip with a scale renders it at that density
         self.shot = {} if scale == 1 else {"clip": {"x": 0, "y": 0, "width": 1920, "height": 1080, "scale": scale}}
-        self.film, self.port, self.debug = film, port, debug
+        self.film, self.debug = film, debug
         self.loaded_chapter = None
 
-    def load(self, entry):
+    def load(self, entry, tries=3):
         sid = entry["id"]
-        url = f"http://127.0.0.1:{self.port}/engine/stage.html?film={self.film.name}&scene={sid}"
-        self.page.goto(url)
-        self.page.wait_for_function("window.__chapterLoaded !== undefined && window.V !== undefined", timeout=20000)
-        if self.page.evaluate("window.__chapterLoaded") == "error":
-            raise RuntimeError(f"{sid}: could not load the stage: {self.page.evaluate('window.__loadError')}")
+        url = f"{ORIGIN}/engine/stage.html?film={self.film.name}&scene={sid}"
+        for attempt in range(1, tries + 1):
+            self.errors.clear()
+            self.page.goto(url)
+            # the stage sets __chapterLoaded to true once the engine, the scene and every font are in, or to 'error'
+            try:
+                self.page.wait_for_function("window.__chapterLoaded !== undefined", timeout=60000, polling=100)
+                state, why = self.page.evaluate("[window.__chapterLoaded, window.__loadError]")
+            except Exception as e:                      # playwright's TimeoutError
+                state, why = "error", f"not loaded after 60 s ({type(e).__name__})"
+            if state is True:
+                break
+            if attempt == tries:
+                raise RuntimeError(f"{sid}: could not load the stage ({tries} tries): {why}; browser: {self.errors[:6]}")
         self.errors.clear()
         res = self.page.evaluate("([id, t, dbg]) => V.load(id, t, {debug: dbg})", [sid, entry, self.debug])
         if self.errors:
@@ -125,8 +142,7 @@ def stills_times(entry, at):
 
 
 def do_stills(film, timing, ids, at, debug, scale=1):
-    port = serve()
-    st = Stage(film, port, debug, scale)
+    st = Stage(film, debug, scale)
     root = film / "build" / "stills"
     for sid in ids:
         entry = timing["scenes"][sid]
@@ -150,8 +166,7 @@ def do_stills(film, timing, ids, at, debug, scale=1):
 
 
 def do_audit(film, timing, ids, step):
-    port = serve()
-    st = Stage(film, port)
+    st = Stage(film)
     total = 0
     for sid in ids:
         entry = timing["scenes"][sid]
@@ -179,8 +194,7 @@ def do_audit(film, timing, ids, step):
 
 def render_one(args):
     film, entry, fps, outdir, scale = args
-    port = serve()
-    st = Stage(Path(film), port, scale=scale)
+    st = Stage(Path(film), scale=scale)
     st.load(entry)
     n = round(entry["duration"] * fps)
     out = Path(outdir) / f"{entry['id']}.mp4"

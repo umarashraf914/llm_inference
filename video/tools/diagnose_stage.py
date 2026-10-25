@@ -33,20 +33,19 @@ def probe(sid, scale, tag=""):
     say = lambda m: out.append(f"{tag}[{time.time() - t0:6.2f}s] {m}") or print(out[-1], flush=True)
     timing = json.loads((FILM / "build" / "timing.json").read_text())
     entry = timing["scenes"][sid]
-    port = render.serve()
-    say(f"server on 127.0.0.1:{port}")
     from playwright.sync_api import sync_playwright
     pw = sync_playwright().start()
     browser = pw.chromium.launch(args=["--disable-gpu", "--font-render-hinting=none", "--force-color-profile=srgb",
                                        "--disable-lcd-text", "--hide-scrollbars"])
     say(f"browser launched: {browser.browser_type.name} {browser.version}")
     page = browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
+    render.serve_files(page)
     page.on("console", lambda m: say(f"console.{m.type}: {m.text[:300]}"))
     page.on("pageerror", lambda e: say(f"PAGE ERROR: {str(e)[:300]}"))
     page.on("requestfailed", lambda r: say(f"REQUEST FAILED: {r.url.split('/', 3)[-1]} {r.failure}"))
     page.on("response", lambda r: r.status >= 400 and say(f"HTTP {r.status}: {r.url.split('/', 3)[-1]}"))
     page.add_init_script("window.__rafCount = 0; (function t(){ window.__rafCount++; requestAnimationFrame(t); })();")
-    url = f"http://127.0.0.1:{port}/engine/stage.html?film=v01&scene={sid}"
+    url = f"{render.ORIGIN}/engine/stage.html?film=v01&scene={sid}"
     page.goto(url)
     say("goto done (load event)")
     last, ok = None, False
@@ -59,7 +58,7 @@ def probe(sid, scale, tag=""):
         if st["loaded"] != "undefined" and st["V"] != "undefined":
             ok = st["loaded"] == "true"
             break
-        time.sleep(0.5)
+        page.wait_for_timeout(500)      # (routed requests are answered only while playwright is waiting)
     else:
         say(f"NOT LOADED after 90 s: {json.dumps(page.evaluate(STATE))}")
     if ok:
@@ -93,9 +92,9 @@ def main():
     ap.add_argument("--scale", type=float, default=2)
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args()
-    import playwright
+    from importlib.metadata import version
     print(f"python {sys.version.split()[0]} ({sys.executable}) on {platform.platform()} {platform.machine()}, "
-          f"cpus {os.cpu_count()}, playwright {getattr(playwright, '__version__', '?')}, "
+          f"cpus {os.cpu_count()}, playwright {version('playwright')}, "
           f"start method {multiprocessing.get_start_method()}", flush=True)
     print("== one scene, in this process", flush=True)
     ok = probe(a.scene, a.scale)
