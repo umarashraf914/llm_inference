@@ -22,7 +22,7 @@ takeaway. Smaller API examples: `video/dev/scenes/ch01_s0*.js`. Run everything f
 python3 tools/build_icons.py                          # after adding icon ids
 python3 tools/render.py v01 stills ch05_s02           # end + middle of every beat, and a contact sheet
 python3 tools/render.py v01 stills ch05_s02 --at 12.5,14 --debug   # specific times, with a 120px grid
-python3 tools/render.py v01 audit ch05                # overlapping / off-screen / tiny text, text on lines
+python3 tools/render.py v01 audit ch05                # overlapping / off-screen / tiny / crowded text, text on lines or icons
 ```
 
 Stills land in `v01/build/stills/<scene>/` and `<scene>_sheet.jpg`. **Look at them** (Read the PNG)
@@ -185,9 +185,15 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
 - Use `fromTo` (not `from`) for anything that animates the same property more than once.
 - Text that changes value: `fx.count` (numbers) or `fx.swap` (words). Do not set `textContent`
   outside the timeline.
-- Text must not straddle the edge of a filled shape and must not sit on a line or curve: the audit
-  checks both. Put labels inside a card, or clearly outside it with ≥ 12 px clearance; route lines
-  around labels. Mark deliberate exceptions with `el.setAttribute('data-audit','ignore')`.
+- Text must not straddle the edge of a filled shape and must not sit on a line, a curve or an icon:
+  the audit checks all three. Put labels inside a card, or clearly outside it with ≥ 12 px clearance;
+  route lines around labels. The audit measures the glyphs themselves (not the line box), and also flags
+  a label that touches the inside edge of its box (`text-tight`: size the box from `S.measure`), two
+  labels that meet end to end on one line (`text-touch`), and a label flush against a box or disc beside
+  it (`text-touches-box`). Mark deliberate exceptions with `el.setAttribute('data-audit','ignore')`; for
+  things in flight, only while they move. `V.audit({ touchGap: 8 })` sweeps for near-misses.
+- A line that joins two pictures meets each at its visual centre: the centre of the whole composite
+  (a server with its cache stack, a laptop with its base, a card), not of one part of it.
 - `S.text(..., {maxW})` shrinks text to fit and warns: if it shrinks more than ~15%, make the box
   bigger or the words shorter.
 - Many particles cost render time: keep `S.flow` to ≤ 8 simultaneous paths and `every ≥ 0.06`.
