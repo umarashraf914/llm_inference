@@ -34,6 +34,7 @@ V.scene('ch17_s01', S => {
   /** an envelope: a <g> centred on (0, 0), positioned by its transform; hidden (opacity attribute 0) */
   const envelope = (size = 38, parent, glow) => {
     const g = S.g({ opacity: 0 }, parent);
+    g.setAttribute('data-audit', 'ignore');   // letters in flight pass over the labels
     S.rect({ x: -size * 0.42, y: -size * 0.3, w: size * 0.84, h: size * 0.6, r: 4, fill: '#0c1326' }, g);
     S.icon('ph:envelope-simple-duotone', { x: 0, y: 0, size, color: 'struct' }, g);
     if (glow) g.setAttribute('filter', 'url(#glow-struct)');

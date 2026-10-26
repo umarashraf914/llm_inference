@@ -23,7 +23,7 @@ V.scene('ch06_s10', S => {
   const comp = S.g();
   const cTop = S.g(null, comp);
   S.card({ x: 140, y: 118, w: 560, h: 84, tone: 'compute', r: 20 }, cTop);
-  S.text('Compute scales with one thing', { x: 420, y: 161, size: 34, weight: 700, anchor: 'middle', color: 'compute' }, cTop);
+  S.text('Compute scales with one thing', { x: 420, y: 161, size: 31, weight: 700, anchor: 'middle', color: 'compute' }, cTop);
   const cDen = S.g(null, comp);
   S.card({ x: 230, y: 222, w: 380, h: 66, tone: 'compute', r: 16 }, cDen);
   S.text('transistor density', { x: 420, y: 256, size: 30, weight: 600, anchor: 'middle', color: 'ink' }, cDen);

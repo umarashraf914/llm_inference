@@ -18,6 +18,7 @@ V.scene('ch10_s07', S => {
 
   // ================================================================ the two lanes
   const lanesG = S.g();
+  const GX = 404;   // the toll gate, clear of the 'load once' box (x 140-340) even under its stamp
   const mkLane = (y, title) => {
     const g = S.g(null, lanesG);
     S.rect({ x: 110, y, w: 1700, h: 110, r: 20, fill: '#0b1224', fillOpacity: 0.8, stroke: 'struct', strokeOpacity: 0.5, sw: 2 }, g);
@@ -27,8 +28,8 @@ V.scene('ch10_s07', S => {
     S.rect({ x: 140, y: cy - 24, w: 200, h: 48, r: 10, fill: 'url(#card-bytes)', stroke: 'bytes', sw: 2 }, box);
     S.icon('ph:memory-duotone', { x: 166, y: cy, size: 30, color: 'bytes' }, box);
     S.text('load once', { x: 190, y: cy + 1, size: 24, weight: 700, color: 'bytes' }, box);
-    S.icon('ph:barricade-duotone', { x: 384, y: cy, size: 36, color: 'muted' }, g);
-    const stamp = S.pill('140 GB', { x: 384, y: cy, tone: 'bytes', size: 22, h: 36, style: 'solid', mono: true }, g);
+    S.icon('ph:barricade-duotone', { x: GX, y: cy, size: 36, color: 'muted' }, g).setAttribute('data-audit', 'ignore');   // the stamp lands on it
+    const stamp = S.pill('140 GB', { x: GX, y: cy, tone: 'bytes', size: 22, h: 36, style: 'solid', mono: true }, g);
     hide(stamp);
     const cntL = S.text('uses of this weight', { x: 1790, y: cy - 22, size: 20, weight: 600, anchor: 'end', color: 'muted' }, g);
     const cnt = S.text('0', { x: 1790, y: cy + 14, size: 34, weight: 750, family: 'mono', anchor: 'end', color: 'compute' }, g);
@@ -54,7 +55,7 @@ V.scene('ch10_s07', S => {
   const flow = (lane, toXs, t0, toY) => {
     const g = S.g(null, lane);
     g.setAttribute('data-audit', 'ignore');
-    const paths = toXs.map(x => S.path({ d: `M408,${lane.cy} C470,${lane.cy} ${x - 40},${toY} ${x},${toY - 18}`, stroke: 'bytes', sw: 1.4, strokeOpacity: 0.5 }, g));
+    const paths = toXs.map(x => S.path({ d: `M${GX + 24},${lane.cy} C${GX + 86},${lane.cy} ${x - 40},${toY} ${x},${toY - 18}`, stroke: 'bytes', sw: 1.4, strokeOpacity: 0.5 }, g));
     paths.forEach(p => K.draw(p, 1600, t0, 0.5));
     const pr = S.rand(7 + toXs.length), dots = Array.from({ length: 16 }, () => ({ p: paths[Math.floor(pr() * paths.length)], ph: pr(), el: S.circle({ x: 0, y: 0, r: 3, fill: 'bytes', opacity: 0 }, g) }));
     whole(t => {
@@ -76,7 +77,7 @@ V.scene('ch10_s07', S => {
     const t1 = t0 + 0.5 + dt * xs.length;
     whole(t => {
       let x;
-      if (t < t0 + 0.5) x = lerp(408, xs[0], EIO(cl((t - t0) / 0.5)));
+      if (t < t0 + 0.5) x = lerp(GX + 24, xs[0], EIO(cl((t - t0) / 0.5)));
       else x = lerp(xs[0], xs[xs.length - 1], cl((t - t0 - 0.5) / Math.max(0.01, dt * (xs.length - 1))));
       w.setAttribute('transform', `translate(${x.toFixed(1)},${lane.cy - 30})`);
       setO(w, t > t0 && t < t1 + 0.3 ? Math.min(1, (t - t0) * 6, (t1 + 0.3 - t) * 4) : 0);
@@ -102,7 +103,7 @@ V.scene('ch10_s07', S => {
 
   // ================================================================ b2: the same toll; payoff × 2,000
   const tToll = T('b2~toll') - 0.1;
-  [pre, dec].forEach(l => S.add(K.drive(1.4, k => { const s = k < 0.2 ? lerp(1.6, 1, E('back.out(2)')(k / 0.2)) : 1; setO(l.stamp, k < 0.85 ? Math.min(1, k * 8) : (1 - k) / 0.15); l.stamp.setAttribute('transform', `translate(${384 - 384 * s},${l.cy - l.cy * s}) scale(${s})`); }), tToll));
+  [pre, dec].forEach(l => S.add(K.drive(1.4, k => { const s = k < 0.2 ? lerp(1.6, 1, E('back.out(2)')(k / 0.2)) : 1; setO(l.stamp, k < 0.85 ? Math.min(1, k * 8) : (1 - k) / 0.15); l.stamp.setAttribute('transform', `translate(${GX - GX * s},${l.cy - l.cy * s}) scale(${s})`); }), tToll));
   const x2k = S.pill('× 2,000', { x: 1650, y: 290, tone: 'compute', size: 26, h: 44, style: 'solid', mono: true });
   hide(x2k);
   const tTh = T('b2~thousands') - 0.1;

@@ -192,7 +192,7 @@ V.scene('ch06_s05', S => {
   // the label in the gap: 'close ≠ on', then 'the memory wall'
   const plate = (w, y) => S.rect({ x: 960 - w / 2, y: y - 44, w, h: 88, r: 22, fill: '#0b1124', fillOpacity: 0.94, stroke: 'ink', strokeOpacity: 0.2, sw: 2 });
   const lab = S.g();
-  const labPlate = plate(470, 540);
+  const labPlate = plate(Math.round(Math.max(S.measure('close ≠ on', { size: 56, weight: 700, family: 'display' }), S.measure('the memory wall', { size: 52, weight: 700, family: 'display' })) + 64), 540);
   lab.appendChild(labPlate);
   const closeNe = S.text('close ≠ on', { x: 960, y: 542, size: 56, weight: 700, family: 'display', anchor: 'middle', color: 'ink' }, lab);
   const wallT = S.text('the memory wall', { x: 960, y: 542, size: 52, weight: 700, family: 'display', anchor: 'middle', color: 'bytes' }, lab);

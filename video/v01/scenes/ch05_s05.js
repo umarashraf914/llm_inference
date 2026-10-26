@@ -16,8 +16,8 @@ V.scene('ch05_s05', S => {
   const p15 = ch05Pow(S, 15, { x: PX, y: DY, size: 72, anchor: 'start', tone: 'compute', family: 'mono' }, den);
   const uD = S.text('operations', { x: p15.r + 18, y: DY + 4, size: US, weight: 650, color: 'ink' }, den);
   const perX = p15.r + 18 + S.measure('operations', { size: US, weight: 650 }) + 16;
-  const uPer = S.text('per second', { x: perX, y: DY + 4, size: US, weight: 650, color: 'ink' }, den);
-  const barW = perX + S.measure('per second', { size: US, weight: 650 }) - PX + 40;
+  const uPer = S.text('per Second', { x: perX, y: DY + 4, size: US, weight: 650, color: 'ink', case: 'keep' }, den);   // continues 'Operations': 'per' stays small
+  const barW = perX + S.measure('per Second', { size: US, weight: 650, case: 'keep' }) - PX + 40;
   const bar = S.line({ x1: PX - 20, y1: BY, x2: PX - 20 + barW, y2: BY, stroke: 'ink', sw: 4, cap: 'round' });
   S.set([num, den, bar], { autoAlpha: 0 }, 0);
   S.add(ch05Wipe(S, num, { d: 0.7 }), 0.4);
@@ -193,7 +193,7 @@ V.scene('ch05_s05', S => {
   S.rect({ x: WP.x, y: WP.y, w: WP.w, h: WP.h, r: 22, fill: '#0c1326', stroke: 'muted', strokeOpacity: 0.6, sw: 2 }, wrong);
   S.text('the wrong way', { x: WP.x + 28, y: WP.y + 46, size: 30, weight: 700, color: 'muted' }, wrong);
   const w1 = S.text('operations × operations', { x: WP.x + WP.w / 2, y: WP.y + 140, size: 36, anchor: 'middle', weight: 650, color: 'muted' }, wrong);
-  const w1b = S.text('per second', { x: WP.x + WP.w / 2, y: WP.y + 190, size: 36, anchor: 'middle', weight: 650, color: 'muted' }, wrong);
+  const w1b = S.text('per Second', { x: WP.x + WP.w / 2, y: WP.y + 190, size: 36, anchor: 'middle', weight: 650, color: 'muted', case: 'keep' }, wrong);
   const w2 = S.text('operations² per second', { x: WP.x + WP.w / 2, y: WP.y + 166, size: 40, anchor: 'middle', weight: 700, color: 'ink' }, wrong);
   S.set([wrong, w2], { autoAlpha: 0 }, 0);
   S.add(fx.in(wrong, { from: 'right', d: 0.5, dist: 30 }), B5 + 0.4);

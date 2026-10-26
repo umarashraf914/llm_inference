@@ -1168,9 +1168,22 @@
       }
       strokePts.push({ s, pts, box });
     }
+    // icons, by the box of their glyph: a label set against one with no gap reads as a collision
+    const icons = [];
+    for (const s of document.querySelectorAll('#scene-root svg')) {
+      const g = s.parentNode;
+      if (!g || !g.__icon || g.closest('[data-audit="ignore"]') || effOpacity(g) < 0.3) continue;
+      const r = s.getBoundingClientRect();
+      if (r.width >= 4 && r.height >= 4) icons.push({ id: g.__icon, r });
+    }
     for (const v of vis) {
       if (v.t.closest('#kicker')) continue;
       const a = v.ink;
+      for (const { id, r } of icons) {
+        const ix = Math.min(a.right + 2, r.right) - Math.max(a.left - 2, r.left);
+        const iy = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
+        if (ix > 0 && iy > 0.25 * Math.min(a.height, r.height)) { issues.push({ kind: 'text-on-icon', text: v.label, icon: id }); break; }
+      }
       const core = { left: a.left + 2, right: a.right - 2, top: a.top + a.height * 0.15, bottom: a.bottom - a.height * 0.15 };
       for (const { s, pts, box } of strokePts) {
         if (s.parentNode === v.t.parentNode && s.__strike) continue;
@@ -1187,6 +1200,11 @@
         const inside = core.left >= r.left - 1 && core.right <= r.right + 1 && core.top >= r.top - 1 && core.bottom <= r.bottom + 1;
         if (!inside) {
           issues.push({ kind: 'crosses-shape-edge', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
+          break;
+        }
+        // inside, but touching an edge: the box is too small for its label
+        if (s.tagName === 'rect' && (Math.min(a.left - r.left, r.right - a.right) < (o.tightX ?? 3) || Math.min(a.top - r.top, r.bottom - a.bottom) < (o.tightY ?? 2))) {
+          issues.push({ kind: 'text-tight', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
           break;
         }
       }

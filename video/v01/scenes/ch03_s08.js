@@ -39,8 +39,8 @@ V.scene('ch03_s08', S => {
   const impl = S.g();
   S.rect({ x: IC.x, y: IC.y, w: IC.w, h: IC.h, r: 24, fill: '#0c1326', filter: 'url(#shadow)' }, impl);
   S.rect({ x: IC.x, y: IC.y, w: IC.w, h: IC.h, r: 24, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.22, sw: 2 }, impl);
-  S.icon('ph:file-code-duotone', { x: IC.x + 38, y: IC.y + 46, size: 38, color: 'muted' }, impl);
-  S.text('The implementation', { x: IC.x + 68, y: IC.y + 47, size: 30, weight: 700, color: 'ink' }, impl);
+  S.icon('ph:file-code-duotone', { x: IC.x + 36, y: IC.y + 46, size: 36, color: 'muted' }, impl);
+  S.text('The implementation', { x: IC.x + 60, y: IC.y + 47, size: 28, weight: 700, color: 'ink' }, impl);
   S.text('the code that actually runs', { x: IC.x + 22, y: IC.y + 88, size: 24, weight: 550, color: 'muted' }, impl);
   // code lines inside a clip, scrolled by the painter while the code runs
   const cid = 's08-code-clip';
@@ -158,10 +158,11 @@ V.scene('ch03_s08', S => {
   const lap = libDevice(S, { x: 1730, y: 380, w: 140 }, homes);
   const codeChip = (x, y) => {
     const g = S.g(null, homes);
-    S.rect({ x: x - 50, y: y - 24, w: 100, h: 48, r: 12, fill: '#0c1326' }, g);
-    S.rect({ x: x - 50, y: y - 24, w: 100, h: 48, r: 12, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.35, sw: 2 }, g);
-    S.icon('ph:file-code-duotone', { x: x - 22, y, size: 30, color: 'muted' }, g);
-    S.text('code', { x: x + 16, y: y + 1, size: 22, anchor: 'middle', weight: 600, color: 'ink' }, g);
+    const w = Math.round(14 + 30 + 8 + S.measure('code', { size: 22, weight: 600 }) + 16), l = x - w / 2;
+    S.rect({ x: l, y: y - 24, w, h: 48, r: 12, fill: '#0c1326' }, g);
+    S.rect({ x: l, y: y - 24, w, h: 48, r: 12, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.35, sw: 2 }, g);
+    S.icon('ph:file-code-duotone', { x: l + 14 + 15, y, size: 30, color: 'muted' }, g);
+    S.text('code', { x: l + 14 + 30 + 8, y: y + 1, size: 22, weight: 600, color: 'ink' }, g);
     return g;
   };
   const chipS = codeChip(1530, 290), chipL = codeChip(1730, 290);

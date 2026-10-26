@@ -218,7 +218,7 @@ V.scene('ch09_s03', S => {
 
   // ================================================================ b4: pure overhead
   fade([rate, foot], 1, 0, tB4, 0.35);
-  const store = ch09ChipStore(S, { x: CH[0], y: CH[1], size: 64, label: '≈ 0.1 GB', labelSize: 22, labelPos: 'below' }, world);
+  const store = ch09ChipStore(S, { x: CH[0], y: CH[1], size: 56, label: '≈ 0.1 GB', labelSize: 20, labelPos: 'below' }, world);   // label clear of the die's frame
   hide(store);
   fade(store, 0, 1, tB4, 0.4);
   // a ribbon of layer slices, passing through the chip's store a few at a time

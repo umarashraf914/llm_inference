@@ -27,9 +27,10 @@ V.scene('ch11_s07', S => {
   const rGlow = S.circle({ x: R[0], y: R[1], r: 24, fill: 'white', opacity: 0 });
   rGlow.setAttribute('data-audit', 'ignore');
   const qBox = S.g();
-  S.rect({ x: R[0] - 230, y: R[1] - 78, w: 210, h: 46, r: 10, fill: '#0c1326', stroke: 'white', sw: 2 }, qBox);
-  const qT = S.text('? ops per byte', { x: R[0] - 125, y: R[1] - 54, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, qBox);
-  const aT = S.text('295 ops per byte', { x: R[0] - 125, y: R[1] - 54, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, qBox);
+  const QW = Math.round(S.measure('295 ops per byte', { size: 24, weight: 750 }) + 36), QX = R[0] - 20 - QW;   // sized to the longer label
+  S.rect({ x: QX, y: R[1] - 78, w: QW, h: 46, r: 10, fill: '#0c1326', stroke: 'white', sw: 2 }, qBox);
+  const qT = S.text('? ops per byte', { x: QX + QW / 2, y: R[1] - 54, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, qBox);
+  const aT = S.text('295 ops per byte', { x: QX + QW / 2, y: R[1] - 54, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, qBox);
   hide(aT);
   void ridge;
 

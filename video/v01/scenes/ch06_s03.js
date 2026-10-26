@@ -302,12 +302,15 @@ V.scene('ch06_s03', S => {
   const bez = (a, c, b, u) => [0, 1].map(i => (1 - u) * (1 - u) * a[i] + 2 * (1 - u) * u * c[i] + u * u * b[i]);
   const tF0 = T('b3~make#2') - 0.1, tF1 = tF0 + 0.55, tF2 = tF1 + 0.65;
   S.add(fx.in(file, { from: 'fade', d: 0.25 }), tF0 - 0.25);
+  S.add(fx.out(engTag, { d: 0.3 }), tF0 - 0.6);   // the file appears where the dimmed caption sits
   ch06Clock(S, tF0 - 0.25, tF2 + 0.3, t => {
     let p;
     if (t < tF0) p = P0;
     else if (t < tF1) p = bez(P0, C1, P1, E('power2.in')((t - tF0) / (tF1 - tF0)));
     else p = bez(P1, C2, P2, E('sine.inOut')(cl((t - tF1) / (tF2 - tF1))));
     file.setAttribute('transform', `translate(${p[0].toFixed(2)},${p[1].toFixed(2)})`);
+    if (t > tF0 && t < tF2) file.setAttribute('data-audit', 'ignore');   // in flight: it crosses the dimmed caption
+    else file.removeAttribute('data-audit');
   });
   // the tiny chip flinches as the file hits it; the memory takes it in
   S.add(gsap.fromTo(chipO, { x: 0 }, { x: 5, duration: 0.06, yoyo: true, repeat: 3, ease: 'sine.inOut', immediateRender: false }), tF1);

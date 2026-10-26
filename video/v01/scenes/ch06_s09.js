@@ -78,7 +78,7 @@ V.scene('ch06_s09', S => {
   // the coral lane grows to 41.8 ms; 'moving the weights' rides its leading edge
   const W_M = PXMS * MS_M;
   const coral = S.rect({ x: AX0, y: LM - LH / 2, w: 0, h: LH, fill: 'bytes', fillOpacity: 0.62 }, lanes);
-  const lblM = S.text('140 GB ÷ 3.35 TB/s ≈ 41.8 ms', { x: AX0 + 24, y: LM + 1, size: 28, weight: 700, color: 'ink' }, lanes);
+  const lblM = S.text('140 GB ÷ 3.35 TB/s ≈ 41.8 ms', { x: AX0 + 24, y: LM + 1, size: 26, weight: 700, color: 'ink' }, lanes);   // 26: the tall '/' clears the 40 px bar
   const rider = S.text('moving the weights', { x: AX0, y: LM - LH / 2 - 24, size: 24, weight: 650, anchor: 'end', color: 'bytes' }, lanes);
   [lblM, rider].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
   const tM0 = T('b2~Reading') - 0.05, tM1 = T('b2~milliseconds') + 0.2;
@@ -89,7 +89,11 @@ V.scene('ch06_s09', S => {
     rider.setAttribute('x', Math.max(AX0 + 260, AX0 + w - 12).toFixed(2));
   });
   S.add(fx.in(rider, { from: 'fade', d: 0.3 }), tM0 + 0.35);
-  S.add(fx.in(lblM, { from: 'fade', d: 0.4 }), tM0 + 0.7);
+  // the label waits until the growing bar has passed its end, so the edge never cuts through the text
+  const needM = 24 + S.measure('140 GB ÷ 3.35 TB/s ≈ 41.8 ms', { size: 26, weight: 700 }) + 24;
+  let uM = 0;
+  while (uM < 1 && W_M * eIO2(uM) < needM) uM += 0.01;
+  S.add(fx.in(lblM, { from: 'fade', d: 0.4 }), Math.max(tM0 + 0.7, tM0 + uM * (tM1 - tM0)));
 
   // ================================================================ b3: slices, the pace, idle, no average
   const N = 12, SG = 4, SW = (W_M - SG * (N - 1)) / N;

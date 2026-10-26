@@ -99,7 +99,7 @@ V.scene('ch13_s11', S => {
   K.draw(bp, 330, tSplit + 0.4, 0.4);
   hide(bp);
   fade(bp, 0, 1, tSplit + 0.4, 0.05);
-  const bT = S.text('one cache per conversation', { x: (cacheX(0) + cacheX(4) + 48) / 2, y: 398, size: 22, weight: 700, anchor: 'middle', color: 'ink' }, brk);
+  const bT = S.text('one cache per conversation', { x: (cacheX(0) + cacheX(4) + 48) / 2, y: 398, size: 20, weight: 700, anchor: 'middle', color: 'ink' }, brk);
   hide(bT);
   fade(bT, 0, 1, tSplit + 0.6, 0.35);
   const shared = S.pill('read once, shared', { x: 340, y: 392, tone: 'helps', size: 22, h: 36 });

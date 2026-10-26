@@ -28,7 +28,7 @@ V.scene('ch05_s04', S => {
   const tok = ch05Token(S, { x: TX, y: 160, size: 30, hidden: true });
   S.add(tok.pop({ d: 0.45 }), 'b1~token-0.3');
   const mad = S.g();
-  const RY = i => 236 + i * 40, IX = 1330, WXc = 1430, ADD = { x: 1620, y: 270, w: 190, h: 76 };
+  const RY = i => 236 + i * 40, IX = 1330, WXc = 1430, ADD = { x: 1620, y: 270, w: 214, h: 76 };
   const times = [], tiles = [];
   for (let i = 0; i < 5; i++) {
     S.rect({ x: IX - 25, y: RY(i) - 15, w: 50, h: 30, r: 6, fill: 'url(#card-struct)', stroke: 'struct', sw: 1.5 }, mad);

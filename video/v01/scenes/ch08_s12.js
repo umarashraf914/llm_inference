@@ -208,7 +208,8 @@ V.scene('ch08_s12', S => {
   const path = S.g();
   const boxA = S.g(null, path);
   S.rect({ x: 130, y: 600, w: 260, h: 80, r: 14, fill: 'url(#card-struct)', stroke: 'struct', sw: 2 }, boxA);
-  S.text('embedding lookup', { x: 260, y: 641, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, boxA);
+  S.text('embedding', { x: 260, y: 625, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, boxA);
+  S.text('lookup', { x: 260, y: 657, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, boxA);
   S.rect({ x: 816, y: 538, w: 28, h: 204, r: 5, fill: 'none', stroke: 'white', strokeOpacity: 0.55, sw: 2 }, path);   // frames the shrunken matrix
   const arr = (x1, y1, x2, y2) => S.arrow({ x1, y1, x2, y2, color: 'muted', sw: 2.5 }, path);
   const arrows = [arr(260, RY - 24, 260, 688), arr(394, 640, 478, 640), arr(680, 640, 806, 640), arr(852, 640, 984, 640)];

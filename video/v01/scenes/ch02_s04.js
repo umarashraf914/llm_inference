@@ -25,8 +25,8 @@ V.scene('ch02_s04', S => {
   S.set(fills, { autoAlpha: 0 }, 0);
   S.add(gsap.to(fills, { autoAlpha: 1, duration: 0.3, stagger: 0.08 }), 'b1~all seventy');
   // only a tenth of a gigabyte fits on the chip
-  const tiny = S.rect({ x: die.x + 18, y: die.y + 18, w: 14, h: 14, r: 2, fill: 'compute' });
-  const tinyTag = S.text('≈ 0.1 GB fits here', { x: die.x + 42, y: die.y + 26, size: 24, color: 'ink', weight: 600 });
+  const tiny = S.rect({ x: die.x + 18, y: die.y + 29, w: 14, h: 14, r: 2, fill: 'compute' });
+  const tinyTag = S.text('≈ 0.1 GB fits here', { x: die.x + 42, y: die.y + 37, size: 24, color: 'ink', weight: 600 });
   S.set(tiny, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(tiny, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, yoyo: true, repeat: 3 }), 'b1~cannot');
   S.add(fx.in(tinyTag, { from: 'left', d: 0.35 }), 'b1~cannot');

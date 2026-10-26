@@ -50,13 +50,13 @@ V.scene('ch14_s03', S => {
   const WTS = [0.1, 0.3, 0.1, 0.2, 0.3];
   const tBl = T('b1~blends') - 0.1;
   const keys = [0, 1, 2, 3, 4].map(j => S.icon('ph:key-duotone', { x: LX(j), y: 776, size: 28, color: 'struct' }, att));
-  const qI = S.icon('ph:magnifying-glass-duotone', { x: 886, y: 700, size: 38, color: 'ink' }, att);
-  const qGlow = S.circle({ x: 886, y: 700, r: 30, fill: 'url(#pglow-struct)', opacity: 0 }, att);
+  const qI = S.icon('ph:magnifying-glass-duotone', { x: 902, y: 726, size: 32, color: 'ink' }, att);   // clear of the '0.3' above bar 5
+  const qGlow = S.circle({ x: 900, y: 724, r: 26, fill: 'url(#pglow-struct)', opacity: 0 }, att);
   qGlow.setAttribute('data-audit', 'ignore');
   att.insertBefore(qGlow, qI);
   pulse(qGlow, tBl, 1, 0.8);
   const dashes = [0, 1, 2, 3, 4].map(j => {
-    const p = S.path({ d: `M870,712 C${lerp(870, LX(j), 0.4)},${740} ${LX(j) + 20},${748} ${LX(j) + 10},${760}`, stroke: 'ink', strokeOpacity: 0.55, sw: 1.8, dash: '4 5' }, att);
+    const p = S.path({ d: `M893,733 C${lerp(893, LX(j), 0.4)},${752} ${LX(j) + 20},${752} ${LX(j) + 10},${760}`, stroke: 'ink', strokeOpacity: 0.55, sw: 1.8, dash: '4 5' }, att);
     p.setAttribute('data-audit', 'ignore');
     hide(p);
     fade(p, 0, 1, tBl + 0.1 + 0.05 * (4 - j), 0.3);

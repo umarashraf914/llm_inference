@@ -16,7 +16,7 @@ V.scene('ch16_s03', S => {
   const rise = (e, at, dy = 12, d = 0.4) => { hide(e); S.add(K.drive(d, k => { setO(e, k); e.setAttribute('transform', `translate(0,${(dy * (1 - E('power3.out')(k))).toFixed(1)})`); }), at); };
   const AY = 440, CY = 566, H = 58;
   const ANS = ['The', 'capital', 'of', 'France', 'is', 'Paris', '.'], NEW = ['And', 'its', 'population', '?'];
-  const L = ch16Lay(S, [{ label: 'system', w: 118 }, { label: 'tools', w: 98 }, { label: 'question 1', w: 150 }, ...ANS.map(label => ({ label, case: 'keep' })), ...NEW.map(label => ({ label, case: 'keep' }))], { x0: 250, size: 26, pad: 20, minW: 52 });
+  const L = ch16Lay(S, [{ label: 'system', w: 118 }, { label: 'tools', w: 98 }, { label: 'question 1', w: 164 }, ...ANS.map(label => ({ label, case: 'keep' })), ...NEW.map(label => ({ label, case: 'keep' }))], { x0: 250, size: 26, pad: 20, minW: 52 });
   const SEG = L.slice(0, 3), AP = L.slice(3, 10), NP = L.slice(10);
   const XC = AP[6].r + 3;  // where the cache row ends: the first difference
 

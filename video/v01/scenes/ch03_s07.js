@@ -110,7 +110,7 @@ V.scene('ch03_s07', S => {
   const srvAll = libServer(S, { x: IX, y: SHELF[2].y + 112, w: 112, detail: 'min', seed: 6 }, shelfG[2]);
   badgeIcon(IX + 50, SHELF[2].y + 88, 'ph:globe-duotone', shelfG[2]);
   const titles = ['On your device', 'On the server, for you', 'On the server, for everyone'].map((t, i) =>
-    S.text(t, { x: 236, y: SHELF[i].y + 44, size: 28, weight: 650, color: 'ink' }, shelfG[i]));
+    S.text(t, { x: 236, y: SHELF[i].y + 44, size: 26, weight: 650, color: 'ink' }, shelfG[i]));
   const sub3 = S.text('one copy, shared by all', { x: 236, y: SHELF[2].y + 80, size: 24, weight: 550, color: 'muted' }, shelfG[2]);
   S.set(sub3, { autoAlpha: 0 }, 0);
   const pDev = mkPill('dev', 236, SHELF[0].y + 126, {}, shelfG[0]);

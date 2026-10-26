@@ -321,6 +321,11 @@ function ch13Formula(S, o = {}, parent) {
       if (need > span) S.warn(`ch13Formula: labels "${a}" and "${b}" run together (${Math.round(need - span)} px short; set o.room)`);
     }
   };
+  // a label wider than its factor's slot stays inside the bar: 'one key, one value' under the '2' moves right
+  const labelX = (i, str) => {
+    const hw = S.measure(str, { size: lSize, weight: 550 }) / 2;
+    return Math.min(Math.max(terms[i].x, cx - W / 2 + 28 + hw), cx + W / 2 - 28 - hw);
+  };
   const note = (i, kind, text, no = {}) => {
     const tm = terms[i], tl = gsap.timeline(), d = no.d ?? 0.4;
     const old = tm[kind];
@@ -330,7 +335,7 @@ function ch13Formula(S, o = {}, parent) {
     if (text != null && text !== '') {
       const e = kind === 'value'
         ? txt(String(text), tm.x, valueY, { size: vSize, weight: 600, family: 'mono', color: no.tone || 'ink' }, tm.g)
-        : txt(String(text), tm.x, labelY, { size: lSize, weight: 550, color: 'muted' }, tm.g);
+        : txt(String(text), labelX(i, String(text)), labelY, { size: lSize, weight: 550, color: 'muted' }, tm.g);
       vis(e, 0);
       tl.add(gsap.fromTo(e, { autoAlpha: 0, y: kind === 'value' ? -10 : 8 }, { autoAlpha: 1, y: 0, duration: d, ease: 'power2.out', immediateRender: false }), old ? d * 0.62 : 0);
       e.__op = 1;
@@ -340,7 +345,7 @@ function ch13Formula(S, o = {}, parent) {
     if (kind === 'label') notesFit();
     return tl;
   };
-  (o.labels || []).forEach((t, i) => { if (t) { const e = txt(t, terms[i].x, labelY, { size: lSize, weight: 550, color: 'muted' }, terms[i].g); e.__op = 1; terms[i].label = e; terms[i].labelText = t; } });
+  (o.labels || []).forEach((t, i) => { if (t) { const e = txt(t, labelX(i, t), labelY, { size: lSize, weight: 550, color: 'muted' }, terms[i].g); e.__op = 1; terms[i].label = e; terms[i].labelText = t; } });
   (o.values || []).forEach((t, i) => { if (t != null) { const e = txt(String(t), terms[i].x, valueY, { size: vSize, weight: 600, family: 'mono' }, terms[i].g); e.__op = 1; terms[i].value = e; } });
   notesFit();
 

@@ -7,7 +7,7 @@
    b3  pills fill the outline (20 slots, 'schematic'); it turns solid, 'context length' / 'the window';
        then each new pill pushes the window right and the oldest drop and grey: 'out of reach'.
    b4  the fan pulses with each token; 'not only a storage limit' greys aside; 'a recurring cost'.
-   Slots: x 140 + 70·i, pills 62 wide at y 760; the window is 20 slots (1,400 px). One painter draws the
+   Slots: x 96 + 74·i, pills 68 wide at y 760; the window is 20 slots (1,480 px). One painter draws the
    strip, the window, the fan and the counter from the arrival times. */
 V.scene('ch08_s05', S => {
   const { fx } = S;
@@ -54,7 +54,7 @@ V.scene('ch08_s05', S => {
   fade(headA, 0, 1, T('b2~Context') - 0.05, 0.5);
   fade(headB, 0, 1, T('b2~everything') - 0.1, 0.5);
   const WORDS = ['Read', 'the', 'notes', 'from', 'our', 'last', 'call', 'and', 'list', 'three', 'risks', 'we', 'face', 'next', 'week', 'with', 'one', 'fix', 'for', 'each', 'and', 'a', 'cost', 'note'];
-  const SX = i => 140 + 70 * i, SY = 760, PW = 62, PH = 40, WIN = 20;
+  const SLOT = 74, SX = i => 96 + SLOT * i, SY = 760, PW = 68, PH = 40, WIN = 20;
   const pills = WORDS.map((w, i) => {
     const g = S.g();
     const bg = S.rect({ x: SX(i) - PW / 2, y: SY - PH / 2, w: PW, h: PH, r: 10, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.7, sw: 1.8 }, g);
@@ -72,7 +72,7 @@ V.scene('ch08_s05', S => {
   for (let i = 20; i < 24; i++) ta.push(T('b3~fall') - 0.05 + 0.45 * (i - 20));
   const nAt = t => ta.filter(x => x <= t).length;
   // the window: dashed, then solid; it slides right a slot at a time once the strip is longer than it
-  const win = S.rect({ x: SX(0) - PW / 2 - 8, y: SY - PH / 2 - 10, w: WIN * 70 + 2, h: PH + 20, r: 14, stroke: 'ink', strokeOpacity: 0.7, sw: 2.5, dash: '10 8' });
+  const win = S.rect({ x: SX(0) - PW / 2 - 8, y: SY - PH / 2 - 10, w: WIN * SLOT + 2, h: PH + 20, r: 14, stroke: 'ink', strokeOpacity: 0.7, sw: 2.5, dash: '10 8' });
   // its labels hang under its left end (the fan rises above the strip)
   const winLbl = S.text('context length', { x: 0, y: SY + PH / 2 + 34, size: 28, weight: 700, color: 'ink' });
   const winSub = S.text('the window', { x: 0, y: SY + PH / 2 + 66, size: 24, weight: 550, color: 'muted' });
@@ -94,6 +94,7 @@ V.scene('ch08_s05', S => {
   fade(promptBr, 0, 1, T('b2~prompt') - 0.1, 0.4);
   fade(promptBr, 1, 0, T('b2~Each') - 0.1, 0.35);
   const newest = S.text('newest token', { x: 0, y: SY + 46, size: 24, weight: 650, anchor: 'middle', color: 'struct' });
+  const NEWEST_HW = S.measure('newest token', { size: 24, weight: 650 }) / 2;
   ch08Hide(newest);
   fade(newest, 0, 1, T('b2~newest') - 0.1, 0.4);
   const ring = S.rect({ x: 0, y: SY - PH / 2 - 5, w: PW + 10, h: PH + 10, r: 13, stroke: 'white', sw: 2.5 });
@@ -116,7 +117,7 @@ V.scene('ch08_s05', S => {
     // the window slides a slot as each pill pushes in
     let wx = 0;
     for (let i = WIN; i < ta.length; i++) wx += E('power2.inOut')(cl((t - ta[i]) / 0.4));
-    const winX = SX(0) - PW / 2 - 8 + 70 * wx;
+    const winX = SX(0) - PW / 2 - 8 + SLOT * wx;
     win.setAttribute('x', winX.toFixed(1));
     winLbl.setAttribute('x', (winX + 6).toFixed(1)); winSub.setAttribute('x', (winX + 6).toFixed(1));
     pills.forEach((g, i) => {
@@ -129,7 +130,7 @@ V.scene('ch08_s05', S => {
     });
     const nw = Math.max(0, n - 1);
     ring.setAttribute('x', (SX(nw) - PW / 2 - 5).toFixed(1));
-    newest.setAttribute('x', SX(nw).toFixed(1));
+    newest.setAttribute('x', Math.min(SX(nw), 1856 - NEWEST_HW).toFixed(1));   // kept inside the safe area at the far end
     // bracket over the prompt so far
     const x0 = SX(0) - PW / 2, x1 = SX(nw) + PW / 2, yb = SY - PH / 2 - 14;
     pbPath.setAttribute('d', `M${x0},${yb} v-10 H${x1} v10`);

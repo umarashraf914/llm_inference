@@ -105,7 +105,7 @@ V.scene('ch07_s05', S => {
   const c2 = S.text('per output number', { x: 90, y: 604, size: 26, weight: 550, color: 'muted' }, ctr);
   const c3 = S.text('128,255 of them × 0', { x: 90, y: 652, size: 26, weight: 600, color: 'faint' }, ctr);
   const c4 = S.text('× 8,192 output numbers', { x: 90, y: 708, size: 28, weight: 650, color: 'ink' }, ctr);
-  const c5 = S.text('≈ 1.05 billion multiplications', { x: 90, y: 764, size: 30, weight: 750, color: 'compute' }, ctr);
+  const c5 = S.text('≈ 1.05 billion multiplications', { x: 90, y: 764, size: 28, weight: 750, color: 'compute' }, ctr);
   ch07Hide([ctr, c3, c4, c5]);
   S.add(ch07Fade(ctr, 0, 1, { d: 0.45, dy0: 12, dy1: 0 }), 'b2~column');
   // 'all but one times zero': the column's cells grey out, except row 4271's

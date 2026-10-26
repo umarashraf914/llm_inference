@@ -36,8 +36,8 @@ V.scene('ch04_s07', S => {
     g.bg = S.rect({ x, y: CY0, w: CW, h: CH, r: 20, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.2, sw: 2 }, g);
     g.lit = S.rect({ x, y: CY0, w: CW, h: CH, r: 20, fill: 'url(#card-struct)', stroke: 'struct', sw: 3 }, g);
     S.set(g.lit, { autoAlpha: 0 }, 0);
-    S.icon(st.icon, { x: x + 40, y: CY0 + 40, size: 40, color: 'ink' }, g);
-    S.text(st.name, { x: x + 70, y: CY0 + 41, size: 28, weight: 700, color: 'ink' }, g);
+    S.icon(st.icon, { x: x + 36, y: CY0 + 40, size: 38, color: 'ink' }, g);
+    S.text(st.name, { x: x + 62, y: CY0 + 41, size: 26, weight: 700, color: 'ink' }, g);
     g.sub = S.text(st.sub, { x: cx(i), y: SUBY, size: 26, anchor: 'middle', weight: 600, color: 'muted' }, world);
     S.set([g, g.sub], { autoAlpha: 0 }, 0);
     S.add(fx.in(g, { from: 'up', d: 0.45, dist: 14 }), 0.7 + i * 0.15);

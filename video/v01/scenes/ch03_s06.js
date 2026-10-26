@@ -108,7 +108,7 @@ V.scene('ch03_s06', S => {
   const PILLS = ['system prompt', 'conversation', 'your question'];
   let px = ST.x + 16;
   const pills = PILLS.map((t, i) => {
-    const p = libToken(S, { text: t, x: px, y: ST.y + ST.h / 2, size: 26, anchor: 'start', state: i === 2 ? 'token' : 'token' });
+    const p = libToken(S, { text: t, x: px, y: ST.y + ST.h / 2, size: 26, anchor: 'start', state: 'token', case: 'label' });
     px += p.w + 12;
     S.set(p, { autoAlpha: 0 }, 0);
     return p;
