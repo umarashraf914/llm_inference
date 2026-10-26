@@ -1,22 +1,32 @@
 #!/usr/bin/env python3
-"""Render a finished film in 4K on this computer and save it as one video file in Downloads.
+"""Render a released film in 4K on this computer and save it as one video file in Downloads.
 
-  python video/tools/make_4k.py              # the newest finished film (asks which, if several are ready)
-  python video/tools/make_4k.py v01          # -> Downloads/V01_The_Memory_Wall_4K.mp4
+  python video/tools/make_4k.py              # asks which film and which version (the latest unless you pick another)
+  python video/tools/make_4k.py v01          # V01's latest version -> Downloads/V01_The_Memory_Wall_4K_version1.mp4
+  python video/tools/make_4k.py v01 --version 1
+  python video/tools/make_4k.py --list       # the films, where each came from, and their versions
 
 Or double-click make_film.bat (Windows) or make_film.command (Mac) at the top of the repository: they update from
-GitHub first, then run this. It works the same way on every computer and sets itself up for each one:
+GitHub first, then run this.
 
-- First run on a computer: a private Python environment in video/.venv (Playwright with its own Chromium, numpy, a
-  bundled ffmpeg), GSAP from npm, and a check of the graphics card and hardware video encoder (NVIDIA NVENC, Apple
-  VideoToolbox) against the software path. Whatever matches the software look and is faster is used from then on.
-  The result stays on that computer: --recheck redoes it, --cpu renders in software for one run.
+Every film keeps all its versions (video/vNN/film.json lists them, tools/release.py adds one). A version renders
+from exactly the files it was released with, its scenes and narration and the shared engine as they were then, so
+work on other films or on the engine never changes it.
+
+- Each computer sets itself up on its first run: a private Python environment in video/.venv (Playwright with its
+  own Chromium, numpy, a bundled ffmpeg), GSAP from npm, and a check of the graphics card and hardware video
+  encoder (NVIDIA NVENC, Apple VideoToolbox) against the software path. Whatever matches the software look and is
+  faster is used from then on. The result stays on that computer: --recheck redoes it, --cpu renders in software
+  for one run.
 - Narration: from the repository (video/vNN/narration, kept up to date by git pull); failing that, the film's
   narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home folder; failing that, it
   is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
 - Rendering takes from under an hour on a big workstation to several hours on a small computer. Stop it at any time
   (Ctrl+C, or close the window) and run the same command again: finished scenes are kept.
 
+  --version N        render this version of the film (default: its latest)
+  --working-copy     render the film's files as they are now, released or not (a draft)
+  --list             list the films and their versions, and stop
   --out PATH         where to save the film (default: your Downloads folder)
   --workers N        scenes rendered at once (default: from CPU cores, memory and the encoder)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
@@ -68,42 +78,91 @@ def venv_python():
     return VENV / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
 
 
-# ---------------------------------------------------------------- which film
-def films():
-    """The films in this copy of the repository, oldest first: (folder, film.json) for each video/vNN."""
-    return [(d, json.loads((d / "film.json").read_text())) for d in sorted(VIDEO.glob("v[0-9][0-9]"))
-            if (d / "film.json").is_file()]
+# ---------------------------------------------------------------- which film, which version
+sys.path.insert(0, str(TOOLS))
+import films  # noqa: E402  (standard library only: the menu works before the environment exists)
 
 
-def choose_film(arg):
-    have = films()
-    if arg:
-        want = "v" + arg.lower().lstrip("v").zfill(2)          # v01, V01, 01 and 1 all mean video/v01
-        for d, meta in have:
-            if d.name == want:
-                return d, meta
-        sys.exit(f"there is no film {arg!r} here (films: {', '.join(d.name for d, _ in have) or 'none'}); "
-                 f"git pull brings new ones")
-    ready = [(d, m) for d, m in have if m.get("ready")]
-    if not ready:
-        sys.exit("there is no finished film in this copy yet; git pull brings new ones")
-    if len(ready) == 1 or not sys.stdin.isatty():
-        return ready[-1]
-    print("\nFilms ready to render:")
-    for i, (d, m) in enumerate(ready, 1):
-        print(f"  {i}. {d.name.upper()}  {m['title']}")
-    pick = input(f"Which one? [{len(ready)}] ").strip()
-    n = int(pick) if pick.isdigit() else (len(ready) if not pick else 0)
-    if not 1 <= n <= len(ready):
-        sys.exit(f"{pick!r} is not one of 1-{len(ready)}")
-    return ready[n - 1]
+def ask(title, options, default):
+    """The index of the option picked on a terminal; with one option, or no terminal to ask on, the default."""
+    if len(options) == 1 or not sys.stdin.isatty():
+        return default
+    print(f"\n{title}")
+    for i, o in enumerate(options, 1):
+        print(f"  {i}. {o}")
+    pick = input(f"Which one? [{default + 1}] ").strip()
+    n = int(pick) if pick.isdigit() else (default + 1 if not pick else 0)
+    if not 1 <= n <= len(options):
+        sys.exit(f"{pick!r} is not one of 1-{len(options)}")
+    return n - 1
 
 
-def use_film(folder, meta):
+def version_line(v, latest):
+    return f"version {v['version']}, {v['date']}: {v.get('notes', '')}" + ("  (latest)" if latest else "")
+
+
+def list_films():
+    for d, m in films.films():
+        print(films.describe(d, m))
+        vs = m.get("versions") or []
+        for v in reversed(vs):
+            print("    " + version_line(v, v is vs[-1]))
+        if not vs:
+            print("    not released yet")
+
+
+def choose(a):
+    """(film folder, film.json, version, or None for the working copy): as the arguments say, else asked on a
+    terminal, else the newest film's latest version."""
+    if a.film:
+        hit = films.find(a.film)
+        if not hit:
+            sys.exit(f"there is no film {a.film!r} here (films: {', '.join(d.name for d, _ in films.films()) or 'none'}); "
+                     f"git pull brings new ones")
+        folder, meta = hit
+    else:
+        released = [(d, m) for d, m in films.films() if m.get("versions")]
+        if not released:
+            sys.exit("there is no released film in this copy yet; git pull brings new ones")
+        lines = [f"{films.describe(d, m)}   [latest: version {m['versions'][-1]['version']}, {m['versions'][-1]['date']}"
+                 + (f"; {len(m['versions'])} versions]" if len(m["versions"]) > 1 else "]") for d, m in released]
+        folder, meta = released[ask("Films:", lines, len(released) - 1)]
+    if a.working_copy:
+        return folder, meta, None
+    vs = meta.get("versions") or []
+    if not vs:
+        sys.exit(f"{folder.name.upper()} has no released version yet (--working-copy renders its files as they are now)")
+    if a.version is not None:
+        v = next((v for v in vs if v["version"] == a.version), None)
+        if v is None:
+            sys.exit(f"{folder.name.upper()} has no version {a.version} (it has {', '.join(str(v['version']) for v in vs)})")
+        return folder, meta, v
+    if a.film:                                  # a film named on the command line means its latest version
+        return folder, meta, vs[-1]
+    newest_first = vs[::-1]
+    return folder, meta, newest_first[ask(f"{folder.name.upper()} versions:", [version_line(v, i == 0) for i, v in
+                                                                               enumerate(newest_first)], 0)]
+
+
+def inner_argv(a, folder, version):
+    """The arguments that repeat this choice exactly, for the run inside video/.venv (which then asks nothing)."""
+    argv = [folder.name] + (["--version", str(version["version"])] if version else ["--working-copy"])
+    for flag, val in (("--out", a.out), ("--workers", a.workers), ("--narration", a.narration), ("--preset", a.preset),
+                      ("--crf", a.crf)):
+        if val is not None:
+            argv += [flag, str(val)]
+    if a.only:
+        argv += ["--only", *a.only]
+    return argv + [f for f, on in (("--keep-segments", a.keep_segments), ("--cpu", a.cpu),
+                                   ("--recheck", a.recheck or a.gpu_recheck)) if on]
+
+
+def use_film(film_dir, meta, version):
     global FILM, NAME, PACK
-    FILM = folder
-    NAME = f"{folder.name.upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', meta['title']).strip('_')}_4K"
-    PACK = f"{folder.name.upper()}_narration_pack"
+    FILM = film_dir
+    tag = f"version{version['version']}" if version else "working_copy"
+    NAME = f"{film_dir.name.upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', meta['title']).strip('_')}_4K_{tag}"
+    PACK = f"{film_dir.name.upper()}_narration_pack"
 
 
 # ---------------------------------------------------------------- setup
@@ -170,12 +229,19 @@ def _fetch(url, dst, ctx):
     return None if dst else buf.getvalue()
 
 
-def ensure_gsap():
-    vendor = VIDEO / "engine" / "vendor"
+def ensure_gsap(root):
+    """GSAP in root/engine/vendor: the release root/package-lock.json pins (copied from this checkout when it is the
+    same one, else fetched from npm and checked against the lock)."""
+    vendor = root / "engine" / "vendor"
     if all((vendor / f"{f}.min.js").exists() for f in GSAP_FILES):
         return
+    lock = json.loads((root / "package-lock.json").read_text())["packages"]["node_modules/gsap"]
+    here = VIDEO / "engine" / "vendor"
+    if (root != VIDEO and all((here / f"{f}.min.js").exists() for f in GSAP_FILES)
+            and json.loads((VIDEO / "package-lock.json").read_text())["packages"]["node_modules/gsap"] == lock):
+        shutil.copytree(here, vendor, dirs_exist_ok=True)
+        return
     step("Fetching GSAP (the animation library) from npm")
-    lock = json.loads((VIDEO / "package-lock.json").read_text())["packages"]["node_modules/gsap"]
     data = fetch(lock["resolved"])
     algo, digest = lock["integrity"].split("-", 1)
     if base64.b64encode(hashlib.new(algo, data).digest()).decode() != digest:
@@ -383,7 +449,10 @@ def seg_dir(gpu, encoder):
 # ---------------------------------------------------------------- main
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("film", nargs="?", help="v01, v02, ... (default: the newest finished film)")
+    ap.add_argument("film", nargs="?", help="v01, v02, ... (default: asked, or the newest film)")
+    ap.add_argument("--version", type=int)
+    ap.add_argument("--working-copy", action="store_true")
+    ap.add_argument("--list", action="store_true")
     ap.add_argument("--out")
     ap.add_argument("--workers", type=int)
     ap.add_argument("--narration")
@@ -396,16 +465,20 @@ def main(argv):
     ap.add_argument("--gpu", action="store_true", help=argparse.SUPPRESS)            # (the default now)
     ap.add_argument("--gpu-recheck", action="store_true", help=argparse.SUPPRESS)    # (old name of --recheck)
     a = ap.parse_args(argv)
-    bootstrap(argv)
+    if a.list:
+        return list_films()
+    folder, meta, version = choose(a)
+    bootstrap(inner_argv(a, folder, version))       # from here on: inside video/.venv, with nothing left to ask
 
-    use_film(*choose_film(a.film))
     t0 = time.time()
-    step(f"{FILM.name.upper()} in 4K on this computer: {describe_machine()}")
+    root = films.snapshot(version["commit"]) if version else VIDEO
+    use_film(root / folder.name, meta, version)
+    what = f"version {version['version']} ({version['date']})" if version else "working copy (not a release)"
+    step(f"{folder.name.upper()} {meta['title']}, {what}, in 4K on this computer: {describe_machine()}")
     ensure_packages(REQS, "base")
     install_browser()
-    ensure_gsap()
+    ensure_gsap(root)
     ensure_narration(a.narration)
-    sys.path.insert(0, str(TOOLS))
     from ffbin import frames_and_fps
 
     prof = {"gpu": None, "encoder": "x264"} if a.cpu else render_profile(a.recheck or a.gpu_recheck)
@@ -445,8 +518,11 @@ def main(argv):
                 (seg / f"{s}.mp4").unlink(missing_ok=True)
             except OSError:                     # (a virus scanner holding it; a leftover file does no harm)
                 pass
+        if version:
+            films.discard(version["commit"])    # the version's extracted files; the next render extracts them again
     h = (time.time() - t0) / 3600
-    print(f"\nDone in {h:.1f} h: {out}  ({out.stat().st_size / 1e9:.2f} GB, 3840x2160, {n:,} frames at {fps:g} fps, {how})")
+    print(f"\nDone in {h:.1f} h: {out}  ({out.stat().st_size / 1e9:.2f} GB, 3840x2160, {n:,} frames at {fps:g} fps, {how}; "
+          f"{folder.name.upper()} {what})")
 
 
 if __name__ == "__main__":

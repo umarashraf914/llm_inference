@@ -83,8 +83,10 @@ TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=u
          ".json": "application/json; charset=utf-8", ".woff2": "font/woff2", ".svg": "image/svg+xml", ".png": "image/png"}
 
 
-def serve_files(page):
-    root = VIDEO.resolve()
+def serve_files(page, root=VIDEO):
+    """Answer the stage's requests from root: the video/ folder holding engine/, lib/ and the film (this checkout's,
+    or a released version's snapshot, so a version renders with the engine it was released with)."""
+    root = Path(root).resolve()
 
     def answer(route):
         rel = urllib.parse.unquote(urllib.parse.urlsplit(route.request.url).path).lstrip("/")
@@ -125,7 +127,7 @@ class Stage:
         self.browser = self.pw.chromium.launch(**launch_options(gpu))
         # the stage is always laid out at 1920x1080; scale only sets how many pixels draw it (2 -> 3840x2160)
         self.page = self.browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
-        serve_files(self.page)
+        serve_files(self.page, Path(film).parent)
         self.errors = []
         self.page.on("pageerror", lambda e: self.errors.append(str(e)))
         self.page.on("console", lambda m: self.errors.append(m.text) if m.type == "error" else None)

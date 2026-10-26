@@ -39,7 +39,7 @@ def probe(sid, scale, tag=""):
                                        "--disable-lcd-text", "--hide-scrollbars"])
     say(f"browser launched: {browser.browser_type.name} {browser.version}")
     page = browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
-    render.serve_files(page)
+    render.serve_files(page, FILM.parent)
     page.on("console", lambda m: say(f"console.{m.type}: {m.text[:300]}"))
     page.on("pageerror", lambda e: say(f"PAGE ERROR: {str(e)[:300]}"))
     page.on("requestfailed", lambda r: say(f"REQUEST FAILED: {r.url.split('/', 3)[-1]} {r.failure}"))

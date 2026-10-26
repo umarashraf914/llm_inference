@@ -1,4 +1,11 @@
 {
   "title": "The Memory Wall",
-  "ready": true
+  "source": {
+    "lecture": 1,
+    "length": "31:08",
+    "youtube": "ENkuf_2zbkc",
+    "atlas": "atlases/V01_The_Memory_Wall.html",
+    "transcript": "transcripts/V01_The_Memory_Wall.srt"
+  },
+  "versions": []
 }

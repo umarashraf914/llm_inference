@@ -6,3 +6,4 @@ video/*/build/
 video/.venv/
 figures/*/.order.lock
 figures/*/order.tmp
+video/.versions/
