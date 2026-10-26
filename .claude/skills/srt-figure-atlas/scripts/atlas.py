@@ -67,9 +67,63 @@ def eq(x, y, w, s, cls="u", h=42):
     return cell(x, y, w, h, cls, rx=6, label=s)
 
 
+def prose(y, paras, x=40, width=88, cls="cap"):
+    """Body prose: wrap each paragraph to `width` characters, 20px lines, a blank line between.
+    A line never breaks inside a hyphenated word, between a number and its unit ("2.68 ms"), or
+    inside a sum between numbers ("3 × 4 = 12"); those spaces become no-break spaces. A {{fig:…}}
+    pointer is measured at its printed length, "V1 Fig 179", not its raw one.
+    Returns (svg, y of the last baseline)."""
+    import re, textwrap
+    unit = re.compile(r"(\d) (GB/s|TB/s|Gb/s|Tb/s|MB/s|KB/s|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|"
+                      r"ms|µs|ns|s|GHz|MHz|W|kW|bits|bytes|tokens|GPUs|layers)(?![\w/])")
+    op = re.compile(r"(?<=[\d)]) ([+×÷=−]) (?=[\d(−])")
+    o = []
+    for k, p in enumerate(paras):
+        p = op.sub("\u00a0\\1\u00a0", unit.sub("\\1\u00a0\\2", p))
+        refs = re.findall(r"\{\{(?:fig|ref):[^}]+\}\}", p)
+        for i, r in enumerate(refs):
+            p = p.replace(r, f"\u0001{i:08d}\u0001", 1)          # ten characters, like "V1 Fig 179"
+        if k:
+            y += 40
+        for j, line in enumerate(textwrap.wrap(p, width, break_on_hyphens=False, break_long_words=False)):
+            for i, r in enumerate(refs):
+                line = line.replace(f"\u0001{i:08d}\u0001", r)
+            if j:
+                y += 20
+            o.append(txt(x, y, line, cls))
+    return "".join(o), y
+
+
+def item(ts, title, h, body, caption, cls=None):
+    """One figure as an item file for figures/V0N/items/. The build fills in its number."""
+    c = f" class='{cls}'" if cls else ""
+    return (f"<figure{c}><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; {ts}</div><h3>{esc(title)}</h3>"
+            f"<svg viewBox='0 0 680 {h}' role='img'><title>{esc(title)}</title>{''.join(body)}</svg>"
+            f"<figcaption>{esc(caption)}</figcaption></figure>")
+
+
+def stamp(srt, phrase):
+    """M:SS of the first caption cue that contains `phrase` (case-insensitive), from a .srt file."""
+    import re
+    norm = lambda s: re.sub(r"\s+", " ", s.lower()).strip()
+    cues = []
+    for blk in re.split(r"\n\s*\n", open(srt, encoding="utf-8").read().strip()):
+        L = blk.splitlines()
+        if len(L) >= 3 and "-->" in L[1]:
+            h, m, s = L[1].split("-->")[0].strip().split(":")
+            cues.append((int(h) * 3600 + int(m) * 60 + int(s.split(",")[0]), norm(" ".join(L[2:]))))
+    want = norm(phrase)
+    for i in range(len(cues)):      # a phrase may run across two or three cues
+        window = " ".join(c[1] for c in cues[i:i + 3])
+        if want in window and want not in " ".join(c[1] for c in cues[i + 1:i + 3]):
+            t = cues[i][0]
+            return f"{t // 3600}:{t % 3600 // 60:02d}:{t % 60:02d}" if t >= 3600 else f"{t // 60}:{t % 60:02d}"
+    raise ValueError(f"{phrase!r} is not in {srt}")
+
+
 def brace(x1, x2, y, label):
     return (ln(x1, y, x2, y, "tick") + ln(x1, y, x1, y + 6, "tick") + ln(x2, y, x2, y + 6, "tick")
-            + txt((x1 + x2) / 2, y + 22, label, "cap", "middle"))
+            + txt((x1 + x2) / 2, y + 22, label, "sub2", "middle"))
 
 
 CSS = """

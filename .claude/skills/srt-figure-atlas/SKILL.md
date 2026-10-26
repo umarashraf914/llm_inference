@@ -147,9 +147,42 @@ Two that reliably replace it:
 `V01_The_Video_Title.html`. Zero-padded index, video title, underscores, nothing else. No `_v2`, no
 `_complete`, no `_final`.
 
-**When asked to add figures or depth to an existing atlas: edit that file.** Insert the new figures
-at the point in the video's sequence where they belong, renumber every figure sequentially, and
-return the same filename. The old version stops existing. Never create a companion or addendum file.
+**When asked to add figures or depth to an existing atlas: edit its source and rebuild.** Insert the
+new figures at the point in the video's sequence where they belong; the build renumbers every figure
+and writes the same filename. The old version stops existing. Never create a companion or addendum
+file, and never hand-edit a built atlas.
+
+## Building from source
+
+Each atlas in this repository is built from `figures/V0N/` by `scripts/atlas_build.py`:
+
+| Piece | What it is |
+|---|---|
+| `shell.html` | head, styles, header and footer, with `<!--ITEMS-->` where the items go |
+| `items/<id>.html` | one part heading (`s07`) or figure each. Figures from before the depth pass are `o013` (their old number); new ones are named for the plan entry (`p15`) |
+| `order.txt` | the items top to bottom, one id per line |
+| `src/<name>.py` | the Python that generated a group of items. Rerun it to regenerate them |
+
+```bash
+python3 .claude/skills/srt-figure-atlas/scripts/atlas_build.py list V06               # numbers, stamps, ids, titles
+python3 .claude/skills/srt-figure-atlas/scripts/atlas_build.py insert V06 o013 p15 p16  # after o013
+python3 .claude/skills/srt-figure-atlas/scripts/atlas_build.py move V06 o009 o010     # o009 to after o010
+python3 .claude/skills/srt-figure-atlas/scripts/atlas_build.py drop V06 o002          # out of the order
+python3 .claude/skills/srt-figure-atlas/scripts/atlas_build.py build V06 [--out F]    # assemble and renumber
+python3 .claude/skills/srt-figure-atlas/scripts/atlas_build.py index                  # counts in index.html
+```
+
+Every figure gets a permanent id (`v06-p15`) that survives renumbering. Point to another figure
+with `{{fig:v01-o085}}` (becomes "V1 Fig 85", for SVG text) or `{{ref:v01-o085}}` (the same as a
+link, for captions). Only point at a figure after reading it.
+
+In `scripts/atlas.py`, `item()` writes a figure, `prose()` wraps body text at the standard measure
+(never inside a hyphenated word, between a number and its unit, or inside a short sum, and with
+each pointer measured at its printed length), and `stamp(srt, phrase)` finds where a phrase is
+spoken, so stamps come from the transcript rather than memory. Label classes follow the series: `cap` for free-standing row labels, `sub2` for values
+and annotations, `sub`/`lbl` only inside a coloured box. `figures/V06/src/router.py` is a worked
+example of a build-up and an inline widget: numbers computed in code, every claim asserted, the
+widget's initial state drawn in Python and its JavaScript checked against Python in a browser.
 
 ## Quality gate
 
@@ -165,6 +198,9 @@ return the same filename. The old version stops existing. Never create a compani
 | cramped | a label with under 6px of room inside its own box |
 | over-box | a line drawn across a filled box |
 | crowding | body prose starting less than 18px under the drawing above it |
+| split-word | a word cut in two across neighbouring labels |
+| order | a stamp earlier than the figure before it (mark a deliberate recap `<figure class='recap'>`) |
+| numbering, ids | figure numbers that do not run 1, 2, 3; an id used twice |
 
 **Text must never sit on a line.** If a label genuinely belongs over a plot curve, give it
 `class="... halo"` — the CSS strokes it in the page colour underneath, so the curve is knocked out

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quality gate for figure atlases. Four checks; all must pass before shipping.
+"""Quality gate for figure atlases. All checks must pass before shipping.
 
   python3 check_atlas.py atlas.html ...          report only
   python3 check_atlas.py --fix atlas.html ...    auto-fix padding, then report
@@ -8,19 +8,28 @@
   collisions  text over text, or text clipping a box edge
   padding     a child box crowding or crossing its container
   alignment   a label not vertically centred in its box
+  split-word  a word cut in two across neighbouring labels
+  order       a stamp earlier than the figure before it (mark a deliberate recap <figure class='recap'>)
+  numbering   figure numbers not running 1, 2, 3 …
+  ids         an id used twice
+
+Elements hidden on arrival (display:none, visibility:hidden) are skipped: a widget's other states are
+checked by driving the widget, not here.
+
+An atlas built from figures/V0N/ is fixed at its source: --fix writes into the items and rebuilds.
 
 Deliberately allowed (do not "fix" these):
   - a filled bar sitting exactly on its dashed track: they share edges on purpose
   - dashed annotation outlines hugging their contents: boundaries, not containers
 """
-import sys, os, re
+import html, sys, os, re
 from playwright.sync_api import sync_playwright
 
 BOUNDS = """() => [...document.querySelectorAll('svg[viewBox]')].map((s,i)=>{
   const W=s.viewBox.baseVal.width, H=s.viewBox.baseVal.height; let n=0;
   s.querySelectorAll('rect,text,line,polyline').forEach(e=>{try{const b=e.getBBox();
     if(b.x+b.width>W+2||b.x<-2||b.y+b.height>H+2)n++;}catch(_){}});
-  return n?`fig ${i+1}: ${n} element(s) outside the canvas`:null;}).filter(Boolean)"""
+  return n?`fig ${__fn(s,i)}: ${n} element(s) outside the canvas`:null;}).filter(Boolean)"""
 
 COLLIDE = """() => {
   const out=[];
@@ -36,7 +45,7 @@ COLLIDE = """() => {
       if(A.tag==='text'&&B.tag==='text'){ if(ix(A.b,B.b,1.5)) hits.add(`"${A.txt}" x "${B.txt}"`); }
       else if(A.tag!==B.tag){ const T=A.tag==='text'?A:B,R=A.tag==='text'?B:A;
         if(ix(T.b,R.b,1.5)&&!inside(T.b,R.b)) hits.add(`"${T.txt}" clips a box`); }}
-    if(hits.size)out.push(`fig ${fi+1}: ${[...hits].slice(0,3).join(' | ')}`);
+    if(hits.size)out.push(`fig ${__fn(svg,fi)}: ${[...hits].slice(0,3).join(' | ')}`);
   }); return out; }"""
 
 ALIGN = """() => {
@@ -55,7 +64,7 @@ ALIGN = """() => {
       const bot=Math.max(...v.ts.map(x=>x.tb.y+x.tb.height));
       const off=(top+bot)/2-(v.b.y+v.b.height/2);
       if(Math.abs(off)>2.5)bad.push(`"${v.ts[0].t.textContent.slice(0,20)}" ${off>0?'+':''}${off.toFixed(1)}px`);});
-    if(bad.length)out.push(`fig ${fi+1}: ${bad.slice(0,3).join(', ')}`);
+    if(bad.length)out.push(`fig ${__fn(svg,fi)}: ${bad.slice(0,3).join(', ')}`);
   }); return out; }"""
 
 
@@ -90,7 +99,7 @@ LINES = r"""() => {
         if(solid.some(r=>r.oi>s.oi&&b.x>=r.b.x-2&&b.x+b.width<=r.b.x+r.b.width+2&&
                           b.y>=r.b.y-2&&b.y+b.height<=r.b.y+r.b.height+2))continue;
         if(cross(s,b)){bad.push(`"${t.textContent.slice(0,28)}"`);break;}}});
-    if(bad.length)out.push(`fig ${fi+1}: ${[...new Set(bad)].slice(0,3).join(", ")} over a line`);
+    if(bad.length)out.push(`fig ${__fn(svg,fi)}: ${[...new Set(bad)].slice(0,3).join(", ")} over a line`);
   });
   return out; }"""
 
@@ -109,7 +118,7 @@ CRAMPED = r"""() => {
       if(!host)return;
       const pad=Math.min(tb.x-host.b.x,(host.b.x+host.b.width)-(tb.x+tb.width));
       if(pad<6)bad.push(`"${t.textContent.slice(0,32)}" has ${Math.round(pad)}px of room`);});
-    if(bad.length)out.push(`fig ${fi+1}: ${bad.slice(0,3).join(", ")}`);
+    if(bad.length)out.push(`fig ${__fn(svg,fi)}: ${bad.slice(0,3).join(", ")}`);
   });return out;}"""
 
 OVERBOX = r"""() => {
@@ -141,7 +150,7 @@ OVERBOX = r"""() => {
     for(const s of segs)for(const r of rects)
       if(!r.container&&r.oi<s.oi&&cross(s,r.b))
         bad.add(`a ${s.e.getAttribute("class")||"line"} is drawn across a filled box`);
-    if(bad.size)out.push(`fig ${fi+1}: ${[...bad].join(", ")}`);
+    if(bad.size)out.push(`fig ${__fn(svg,fi)}: ${[...bad].join(", ")}`);
   });return out;}"""
 
 
@@ -164,7 +173,7 @@ CROWD = r"""() => {
       const gap=tb.y-best;
       if(gap<MIN)bad.push(`"${t.textContent.slice(0,30)}" sits ${Math.round(gap)}px under the drawing`);
     });
-    if(bad.length)out.push(`fig ${fi+1}: ${bad.slice(0,2).join(" | ")}`);
+    if(bad.length)out.push(`fig ${__fn(svg,fi)}: ${bad.slice(0,2).join(" | ")}`);
   });return out;}"""
 
 PAD = r"""(DRY) => {
@@ -191,7 +200,7 @@ PAD = r"""(DRY) => {
         const kr=Math.max(...ks.map(k=>k.b.x+k.b.width));
         if(Ar-kr<2){ const dx=(kr+6)-Ar;
           if(!DRY)A.e.setAttribute('width',A.b.width+dx);
-          log.push(`fig ${fi+1}: container too narrow by ${Math.round(dx)}px`); acted=true; break;}
+          log.push(`fig ${__fn(svg,fi)}: container too narrow by ${Math.round(dx)}px`); acted=true; break;}
         if(Ab-kb<MIN){ const dy=Math.round((kb+TARGET)-Ab);
           if(!DRY){ A.e.setAttribute('height',A.b.height+dy);
             const grpTop=new Map();      // a box and its label move together or not at all
@@ -208,10 +217,92 @@ PAD = r"""(DRY) => {
                   return `${x},${+y+dy}`;}).join(' '));}
               else e.setAttribute('y',+e.getAttribute('y')+dy);});
             svg.setAttribute('viewBox',`0 0 ${vb.width} ${Math.round(vb.height+dy)}`);}
-          log.push(`fig ${fi+1}: child crowds the container bottom by ${Math.round(dy)}px`);
+          log.push(`fig ${__fn(svg,fi)}: child crowds the container bottom by ${Math.round(dy)}px`);
           acted=true; break;}}
       if(!acted)break; }});
   return {log, html:[...document.querySelectorAll('svg[viewBox]')].map(s=>s.outerHTML)}; }"""
+
+
+FIGNO = """() => { window.__fn = (svg, i) => { const f = svg.closest('figure');
+  const ts = f && f.querySelector('.ts'); const m = ts && ts.textContent.match(/Fig\\s+(\\d+)/);
+  return m ? m[1] : '#' + (i + 1); }; }"""
+
+# A widget's other states sit in the page hidden. Measure only what the reader sees on arrival: the
+# widget's own test drives the other states. Runs after --fix has written, so nothing is lost.
+HIDDEN = """() => document.querySelectorAll('svg[viewBox] *').forEach(e => {
+  if (!e.isConnected) return;
+  const cs = getComputedStyle(e);
+  if (cs.display === 'none' || cs.visibility === 'hidden') e.remove(); })"""
+
+SVGS = """() => [...document.querySelectorAll('svg[viewBox]')].map(s =>
+  [s.closest('figure') ? s.closest('figure').id : '', s.outerHTML])"""
+
+
+def source_checks(f, src):
+    """Checks on the HTML source: words cut across labels, stamp order, numbering, ids."""
+    out = []
+    figs = re.split(r"<figure\b", src)[1:]
+    # a word split across two adjacent labels: the joined word is common, a fragment is not
+    corpus = ""
+    for g in os.listdir(os.path.dirname(os.path.abspath(f))):
+        if g.endswith(".html"):
+            corpus += open(os.path.join(os.path.dirname(os.path.abspath(f)), g), encoding="utf-8").read()
+    words = {}
+    for w in re.findall(r"[A-Za-z][A-Za-z'-]*", html.unescape(re.sub(r"<[^>]+>", " ", corpus))):
+        words[w.lower()] = words.get(w.lower(), 0) + 1
+    prev, prev_no = None, 0
+    for k, fg in enumerate(figs, 1):
+        m = re.search(r"class=['\"]ts['\"]>Fig (\d+) &nbsp;&middot;&nbsp; ([0-9:]+)<", fg)
+        no = m.group(1) if m else f"#{k}"
+        if m and int(m.group(1)) != prev_no + 1:
+            out.append(f"  [numbering] fig {no}: follows fig {prev_no}")
+        if m:
+            prev_no = int(m.group(1))
+            parts = [int(x) for x in m.group(2).split(":")]
+            t = sum(x * 60 ** i for i, x in enumerate(reversed(parts)))
+            recap = re.match(r"[^>]*class=['\"][^'\"]*\brecap\b", fg)
+            if prev is not None and t < prev[0] and not recap:
+                out.append(f"  [order] fig {no}: stamped {m.group(2)}, before fig {prev[1]}'s {prev[2]}")
+            if not recap:
+                prev = (t, no, m.group(2))
+        texts = [html.unescape(re.sub(r"<[^>]+>", "", x)) for x in re.findall(r"<text[^>]*>(.*?)</text>", fg, re.S)]
+        for a, b in zip(texts, texts[1:]):
+            if a and b and a[-1].isalpha() and b[0].isalpha() and b[0].islower():
+                wa = re.findall(r"[A-Za-z'-]+$", a)
+                wb = re.findall(r"^[A-Za-z'-]+", b)
+                if not wa or not wb:              # Greek and other non-Latin letters: not a split
+                    continue
+                wa, wb = wa[0], wb[0]
+                if words.get((wa + wb).lower(), 0) >= 2 and min(words.get(wa.lower(), 0), words.get(wb.lower(), 0)) <= 2:
+                    out.append(f'  [split-word] fig {no}: "{a[-24:]}" | "{b[:24]}"')
+    ids = re.findall(r"\sid=['\"]([^'\"]+)['\"]", src)
+    for i in sorted({i for i in ids if ids.count(i) > 1}):
+        out.append(f"  [ids] {i} is used more than once")
+    return out
+
+
+def write_fix(f, before, after):
+    """Save auto-fixed SVGs: into figures/V0N/items when the atlas is built from them, else in place."""
+    changed = [(fid, k, new) for k, ((fid, old), new) in enumerate(zip(before, after)) if old != new]
+    if not changed:
+        return
+    m = re.match(r"(V\d\d)_", os.path.basename(f))
+    items = os.path.join(os.getcwd(), "figures", m.group(1), "items") if m else ""
+    if items and os.path.isdir(items) and all(fid for fid, _, _ in changed):
+        for fid, k, new in changed:
+            item = os.path.join(items, fid.split("-", 1)[1] + ".html")
+            src = open(item, encoding="utf-8").read()
+            nth = sum(1 for fid2, _ in before[:k] if fid2 == fid)   # which svg of this figure
+            svgs = re.findall(r"<svg viewBox.*?</svg>", src, re.S)
+            src = src.replace(svgs[nth], new, 1)
+            open(item, "w", encoding="utf-8").write(src)
+        build = os.path.join(os.path.dirname(os.path.abspath(__file__)), "atlas_build.py")
+        os.system(f'"{sys.executable}" "{build}" build {m.group(1)}')
+        return
+    src = open(f, encoding="utf-8").read()
+    for old, new in zip(re.findall(r"<svg viewBox.*?</svg>", src, re.S), after):
+        src = src.replace(old, new, 1)
+    open(f, "w", encoding="utf-8").write(src)
 
 
 def main():
@@ -224,15 +315,16 @@ def main():
         b = p.chromium.launch(); pg = b.new_page(viewport={"width": 900, "height": 1000})
         for f in files:
             pg.goto(f"file://{os.path.abspath(f)}"); pg.wait_for_timeout(800)
+            pg.evaluate(FIGNO)
             if fix:
+                before = pg.evaluate(SVGS)
                 r = pg.evaluate(PAD, False)
                 if r["log"]:
-                    src = open(f, encoding="utf-8").read()
-                    for old, new in zip(re.findall(r"<svg viewBox.*?</svg>", src, re.S), r["html"]):
-                        src = src.replace(old, new, 1)
-                    open(f, "w", encoding="utf-8").write(src)
+                    write_fix(f, before, r["html"])
                     pg.goto(f"file://{os.path.abspath(f)}"); pg.wait_for_timeout(800)
-            found = []
+                    pg.evaluate(FIGNO)
+            pg.evaluate(HIDDEN)
+            found = source_checks(f, open(f, encoding="utf-8").read())
             for label, js, arg in [("bounds", BOUNDS, None), ("collisions", COLLIDE, None),
                                    ("padding", PAD, True), ("alignment", ALIGN, None),
                                    ("lines", LINES, None), ("cramped", CRAMPED, None),
@@ -244,7 +336,7 @@ def main():
                 for line in sorted(set(out)):
                     found.append(f"  [{label}] {line}")
             name = os.path.basename(f)
-            n = len(re.findall(r"<figure>", open(f, encoding="utf-8").read()))
+            n = len(re.findall(r"<figure\b", open(f, encoding="utf-8").read()))
             if found:
                 print(f"\n=== {name}  ({n} figures) ===")
                 print("\n".join(found)); problems += len(found)

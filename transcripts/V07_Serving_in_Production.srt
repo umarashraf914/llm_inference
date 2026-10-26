@@ -1,0 +1,3064 @@
+1
+00:00:00,000 --> 00:00:04,400
+In the last episode, we saw that a
+
+2
+00:00:01,880 --> 00:00:07,200
+mixture of experts model runs only a few
+
+3
+00:00:04,400 --> 00:00:11,320
+of its experts for any single token. In
+
+4
+00:00:07,200 --> 00:00:13,320
+Deep Seek V3's case, eight out of 256,
+
+5
+00:00:11,320 --> 00:00:14,360
+while the full set stays resident in
+
+6
+00:00:13,320 --> 00:00:16,680
+memory.
+
+7
+00:00:14,360 --> 00:00:18,240
+A design like that only works when
+
+8
+00:00:16,680 --> 00:00:20,480
+enough requests are flowing through the
+
+9
+00:00:18,240 --> 00:00:22,400
+machine at the same moment to keep every
+
+10
+00:00:20,480 --> 00:00:24,480
+expert busy.
+
+11
+00:00:22,400 --> 00:00:26,920
+This episode is about the layer whose
+
+12
+00:00:24,480 --> 00:00:29,560
+job is to create that condition.
+
+13
+00:00:26,920 --> 00:00:32,200
+The serving system, which takes a fixed
+
+14
+00:00:29,560 --> 00:00:35,280
+set of GPUs running a trillion parameter
+
+15
+00:00:32,200 --> 00:00:39,040
+model and serves as many users as it can
+
+16
+00:00:35,280 --> 00:00:41,520
+without missing anyone's latency target.
+
+17
+00:00:39,040 --> 00:00:44,640
+The place to start is the worst case,
+
+18
+00:00:41,520 --> 00:00:46,920
+one GPU serving one request.
+
+19
+00:00:44,640 --> 00:00:49,120
+To generate a single token, the GPU
+
+20
+00:00:46,920 --> 00:00:51,600
+reads every weight the token touches out
+
+21
+00:00:49,120 --> 00:00:53,880
+of high-bandwidth memory, runs a thin
+
+22
+00:00:51,600 --> 00:00:56,680
+matrix vector product against them, and
+
+23
+00:00:53,880 --> 00:00:58,400
+writes the token back. The tensor cores
+
+24
+00:00:56,680 --> 00:01:01,000
+barely warm up.
+
+25
+00:00:58,400 --> 00:01:03,440
+Arithmetic intensity, the useful work
+
+26
+00:01:01,000 --> 00:01:05,560
+done per byte moved, sits far to the
+
+27
+00:01:03,440 --> 00:01:07,680
+left of the roofline's ridge, and the
+
+28
+00:01:05,560 --> 00:01:11,600
+chip spends nearly all of its time
+
+29
+00:01:07,680 --> 00:01:14,120
+waiting on memory rather than computing.
+
+30
+00:01:11,600 --> 00:01:16,680
+And nothing about that expensive read
+
+31
+00:01:14,120 --> 00:01:18,800
+was specific to the request. The same
+
+32
+00:01:16,680 --> 00:01:21,560
+full pass over the weights would have
+
+33
+00:01:18,800 --> 00:01:23,560
+happened whether one user was connected
+
+34
+00:01:21,560 --> 00:01:25,480
+or 64.
+
+35
+00:01:23,560 --> 00:01:27,080
+That observation raises the question
+
+36
+00:01:25,480 --> 00:01:28,320
+that we'll try to answer in this
+
+37
+00:01:27,080 --> 00:01:30,440
+episode.
+
+38
+00:01:28,320 --> 00:01:33,160
+How many tokens does the system get out
+
+39
+00:01:30,440 --> 00:01:35,520
+of each full read of the weights?
+
+40
+00:01:33,160 --> 00:01:38,080
+Serving one request at a time, it gets
+
+41
+00:01:35,520 --> 00:01:40,120
+exactly one, and nearly every technique
+
+42
+00:01:38,080 --> 00:01:42,080
+we're about to see is a way of raising
+
+43
+00:01:40,120 --> 00:01:44,760
+that number.
+
+44
+00:01:42,080 --> 00:01:47,000
+Batching is how a serving system raises
+
+45
+00:01:44,760 --> 00:01:49,800
+that number, and it works for one
+
+46
+00:01:47,000 --> 00:01:51,880
+reason. The weights are identical for
+
+47
+00:01:49,800 --> 00:01:54,400
+every request.
+
+48
+00:01:51,880 --> 00:01:56,760
+When the GPU pulls a weight matrix out
+
+49
+00:01:54,400 --> 00:01:58,760
+of high-bandwidth memory, nothing about
+
+50
+00:01:56,760 --> 00:01:59,880
+that matrix belongs to any particular
+
+51
+00:01:58,760 --> 00:02:01,520
+user.
+
+52
+00:01:59,880 --> 00:02:04,120
+So, instead of reading the weights,
+
+53
+00:02:01,520 --> 00:02:06,680
+computing one token, and starting over,
+
+54
+00:02:04,120 --> 00:02:09,360
+the system gathers N requests that each
+
+55
+00:02:06,680 --> 00:02:10,920
+need a decode step, reads each weight
+
+56
+00:02:09,360 --> 00:02:13,480
+matrix once,
+
+57
+00:02:10,920 --> 00:02:15,959
+and multiplies it against all N token
+
+58
+00:02:13,480 --> 00:02:18,680
+vectors at the same time.
+
+59
+00:02:15,959 --> 00:02:21,959
+The thin matrix vector product becomes a
+
+60
+00:02:18,680 --> 00:02:23,160
+fat matrix matrix product.
+
+61
+00:02:21,959 --> 00:02:24,760
+Look at what that does to the
+
+62
+00:02:23,160 --> 00:02:27,520
+arithmetic.
+
+63
+00:02:24,760 --> 00:02:29,800
+The bytes moved stay almost flat because
+
+64
+00:02:27,520 --> 00:02:31,560
+the weights are still read only once,
+
+65
+00:02:29,800 --> 00:02:33,360
+while the useful floating-point work
+
+66
+00:02:31,560 --> 00:02:35,480
+grows with N.
+
+67
+00:02:33,360 --> 00:02:38,000
+Arithmetic intensity rises by roughly a
+
+68
+00:02:35,480 --> 00:02:40,200
+factor of N, and decode walks up the
+
+69
+00:02:38,000 --> 00:02:42,280
+roofline, away from the memory-bound
+
+70
+00:02:40,200 --> 00:02:44,520
+floor, and toward the compute-bound
+
+71
+00:02:42,280 --> 00:02:46,280
+region where the tensor cores finally
+
+72
+00:02:44,520 --> 00:02:48,560
+run hot.
+
+73
+00:02:46,280 --> 00:02:50,959
+One read of the weights now produces N
+
+74
+00:02:48,560 --> 00:02:53,600
+tokens instead of one.
+
+75
+00:02:50,959 --> 00:02:55,959
+Arithmetic intensity is what decides
+
+76
+00:02:53,600 --> 00:02:58,400
+whether those cores are used at all, and
+
+77
+00:02:55,959 --> 00:03:00,080
+batch size is what moves it,
+
+78
+00:02:58,400 --> 00:03:02,040
+which is why most of what follows in
+
+79
+00:03:00,080 --> 00:03:04,440
+this episode is about keeping the batch
+
+80
+00:03:02,040 --> 00:03:07,320
+full, or about repairing a problem that
+
+81
+00:03:04,440 --> 00:03:09,920
+keeping it full creates.
+
+82
+00:03:07,320 --> 00:03:11,400
+That N, though, is not a number anyone
+
+83
+00:03:09,920 --> 00:03:13,680
+sets.
+
+84
+00:03:11,400 --> 00:03:16,160
+It is however many requests happen to be
+
+85
+00:03:13,680 --> 00:03:17,760
+generating tokens at that particular
+
+86
+00:03:16,160 --> 00:03:20,040
+step.
+
+87
+00:03:17,760 --> 00:03:23,239
+In the first serving systems, it was
+
+88
+00:03:20,040 --> 00:03:25,440
+fixed the moment the batch was formed.
+
+89
+00:03:23,239 --> 00:03:28,160
+They scheduled at the granularity of a
+
+90
+00:03:25,440 --> 00:03:29,440
+whole request, collecting a batch,
+
+91
+00:03:28,160 --> 00:03:32,280
+running it,
+
+92
+00:03:29,440 --> 00:03:34,880
+and holding its composition unchanged
+
+93
+00:03:32,280 --> 00:03:37,440
+until every sequence had emitted an
+
+94
+00:03:34,880 --> 00:03:39,760
+end-of-sequence token.
+
+95
+00:03:37,440 --> 00:03:44,920
+Take four requests that arrive together
+
+96
+00:03:39,760 --> 00:03:46,480
+and happen to need 8, 24, 60, and 512
+
+97
+00:03:44,920 --> 00:03:49,640
+decode steps.
+
+98
+00:03:46,480 --> 00:03:51,080
+The batch is locked for 512 steps
+
+99
+00:03:49,640 --> 00:03:53,720
+because that is when the last one
+
+100
+00:03:51,080 --> 00:03:55,960
+finishes. The first request is done
+
+101
+00:03:53,720 --> 00:03:59,400
+after eight, and its slot keeps running
+
+102
+00:03:55,960 --> 00:04:01,080
+for the remaining 504.
+
+103
+00:03:59,400 --> 00:04:03,720
+Add up the work the batch actually
+
+104
+00:04:01,080 --> 00:04:05,800
+delivers, and it comes to under a third
+
+105
+00:04:03,720 --> 00:04:07,920
+of what it had room for.
+
+106
+00:04:05,800 --> 00:04:11,280
+With a single request active for the
+
+107
+00:04:07,920 --> 00:04:14,320
+final 452 steps, while three slots
+
+108
+00:04:11,280 --> 00:04:16,320
+compute nothing anyone asked for.
+
+109
+00:04:14,320 --> 00:04:18,840
+And a finished request cannot even be
+
+110
+00:04:16,320 --> 00:04:20,959
+returned to its user until the whole
+
+111
+00:04:18,840 --> 00:04:23,080
+batch drains.
+
+112
+00:04:20,959 --> 00:04:26,400
+So, the count of requests doing useful
+
+113
+00:04:23,080 --> 00:04:28,480
+work falls step by step toward one,
+
+114
+00:04:26,400 --> 00:04:29,720
+while each iteration still reads every
+
+115
+00:04:28,480 --> 00:04:31,520
+weight.
+
+116
+00:04:29,720 --> 00:04:34,400
+The tokens coming out of each read of
+
+117
+00:04:31,520 --> 00:04:36,200
+the weights slide back toward one, and
+
+118
+00:04:34,400 --> 00:04:39,680
+they do it exactly when a long
+
+119
+00:04:36,200 --> 00:04:42,120
+generation is holding the batch open.
+
+120
+00:04:39,680 --> 00:04:44,000
+Suppose the batch does stay full. There
+
+121
+00:04:42,120 --> 00:04:46,160
+is still a ceiling on how large it can
+
+122
+00:04:44,000 --> 00:04:48,320
+get, and it comes from the one thing in
+
+123
+00:04:46,160 --> 00:04:49,960
+the forward pass that no two requests
+
+124
+00:04:48,320 --> 00:04:52,040
+share.
+
+125
+00:04:49,960 --> 00:04:54,800
+The weights are identical for every
+
+126
+00:04:52,040 --> 00:04:57,000
+request, which is why a single read of
+
+127
+00:04:54,800 --> 00:04:59,720
+them serves the whole batch.
+
+128
+00:04:57,000 --> 00:05:02,240
+A KV cache is the opposite.
+
+129
+00:04:59,720 --> 00:05:04,560
+Every request carries its own keys and
+
+130
+00:05:02,240 --> 00:05:07,280
+values, the running record of its own
+
+131
+00:05:04,560 --> 00:05:10,440
+sequence. So, attention has to read each
+
+132
+00:05:07,280 --> 00:05:13,360
+cache separately, one read per request
+
+133
+00:05:10,440 --> 00:05:16,800
+on every step. Those reads scale with
+
+134
+00:05:13,360 --> 00:05:18,680
+the batch, and none of them amortize.
+
+135
+00:05:16,800 --> 00:05:20,360
+So, attention stays on the memory bound
+
+136
+00:05:18,680 --> 00:05:22,520
+floor no matter how large the batch
+
+137
+00:05:20,360 --> 00:05:25,120
+grows. And while those caches are being
+
+138
+00:05:22,520 --> 00:05:26,640
+loaded, the arithmetic units sit nearly
+
+139
+00:05:25,120 --> 00:05:29,200
+idle.
+
+140
+00:05:26,640 --> 00:05:31,280
+The same caches decide the ceiling.
+
+141
+00:05:29,200 --> 00:05:33,240
+Model weights are a fixed cost in
+
+142
+00:05:31,280 --> 00:05:35,480
+memory, and activations take very
+
+143
+00:05:33,240 --> 00:05:38,000
+little. So, whatever high-bandwidth
+
+144
+00:05:35,480 --> 00:05:40,000
+memory is left over is what holds KV
+
+145
+00:05:38,000 --> 00:05:42,040
+caches, and that is what sets the
+
+146
+00:05:40,000 --> 00:05:44,200
+maximum batch size.
+
+147
+00:05:42,040 --> 00:05:46,760
+Hand every spare byte on the card to KV
+
+148
+00:05:44,200 --> 00:05:49,360
+cache, and you still fit only a few tens
+
+149
+00:05:46,760 --> 00:05:52,600
+of concurrent requests. You run out of
+
+150
+00:05:49,360 --> 00:05:55,120
+room before you run out of arithmetic.
+
+151
+00:05:52,600 --> 00:05:57,720
+That is what makes paged attention from
+
+152
+00:05:55,120 --> 00:05:59,920
+episode 3 matter here.
+
+153
+00:05:57,720 --> 00:06:02,160
+The systems before it pre-allocated a
+
+154
+00:05:59,920 --> 00:06:04,800
+contiguous block of memory for each
+
+155
+00:06:02,160 --> 00:06:07,160
+request sized for the longest output
+
+156
+00:06:04,800 --> 00:06:10,440
+that request might ever produce.
+
+157
+00:06:07,160 --> 00:06:13,160
+And profiling found that only 20 to 38%
+
+158
+00:06:10,440 --> 00:06:14,800
+of it ever held real token data.
+
+159
+00:06:13,160 --> 00:06:16,240
+The rest was reservation and
+
+160
+00:06:14,800 --> 00:06:18,840
+fragmentation.
+
+161
+00:06:16,240 --> 00:06:21,640
+Storing the cache in non-contiguous
+
+162
+00:06:18,840 --> 00:06:24,640
+fixed-size blocks, the way an operating
+
+163
+00:06:21,640 --> 00:06:27,400
+system pages memory, brings that waste
+
+164
+00:06:24,640 --> 00:06:30,240
+near zero. So, more sequences fit on the
+
+165
+00:06:27,400 --> 00:06:32,200
+same card, the batch grows,
+
+166
+00:06:30,240 --> 00:06:34,040
+and each read of the weights covers more
+
+167
+00:06:32,200 --> 00:06:36,200
+tokens.
+
+168
+00:06:34,040 --> 00:06:38,520
+Capacity sets how large the batch can
+
+169
+00:06:36,200 --> 00:06:40,640
+be. Keeping it that large is a
+
+170
+00:06:38,520 --> 00:06:42,960
+scheduling problem. And the static
+
+171
+00:06:40,640 --> 00:06:45,240
+approach fails it by freezing the batch
+
+172
+00:06:42,960 --> 00:06:49,560
+the moment it forms.
+
+173
+00:06:45,240 --> 00:06:52,200
+Orca, presented at OSDI in 2022, changed
+
+174
+00:06:49,560 --> 00:06:53,640
+what the scheduler hands to the engine.
+
+175
+00:06:52,200 --> 00:06:56,400
+Rather than a batch to run to
+
+176
+00:06:53,640 --> 00:06:58,919
+completion, it hands over a batch and
+
+177
+00:06:56,400 --> 00:07:01,960
+asks for exactly one iteration, one
+
+178
+00:06:58,919 --> 00:07:04,720
+token for every active request.
+
+179
+00:07:01,960 --> 00:07:06,800
+The engine runs that step and returns.
+
+180
+00:07:04,720 --> 00:07:08,240
+Between steps, the scheduler drops
+
+181
+00:07:06,800 --> 00:07:10,600
+whatever just emitted [music] an end of
+
+182
+00:07:08,240 --> 00:07:12,600
+sequence token, admits whatever has been
+
+183
+00:07:10,600 --> 00:07:13,919
+waiting, and rebuilds the batch for the
+
+184
+00:07:12,600 --> 00:07:15,840
+next step.
+
+185
+00:07:13,919 --> 00:07:18,120
+Orca called this iteration-level
+
+186
+00:07:15,840 --> 00:07:20,160
+scheduling. It is now usually called
+
+187
+00:07:18,120 --> 00:07:22,600
+continuous batching.
+
+188
+00:07:20,160 --> 00:07:25,040
+It works because one iteration is the
+
+189
+00:07:22,600 --> 00:07:26,400
+same small unit of work for every
+
+190
+00:07:25,040 --> 00:07:29,080
+request.
+
+191
+00:07:26,400 --> 00:07:31,960
+Whether a sequence is on its fifth token
+
+192
+00:07:29,080 --> 00:07:34,240
+or its 500th, a step advances it by
+
+193
+00:07:31,960 --> 00:07:36,840
+exactly one. So, the batch can be
+
+194
+00:07:34,240 --> 00:07:39,040
+rebuilt between any two steps without
+
+195
+00:07:36,840 --> 00:07:41,120
+interrupting anyone.
+
+196
+00:07:39,040 --> 00:07:43,600
+Take the same four requests. The
+
+197
+00:07:41,120 --> 00:07:45,880
+eight-step one now leaves at step eight,
+
+198
+00:07:43,600 --> 00:07:48,960
+and a waiting request takes its seat,
+
+199
+00:07:45,880 --> 00:07:51,920
+and the same happens at 24 and at 60.
+
+200
+00:07:48,960 --> 00:07:53,840
+No seat sits idle for hundreds of steps,
+
+201
+00:07:51,920 --> 00:07:56,640
+and the batch stays full instead of
+
+202
+00:07:53,840 --> 00:07:59,280
+draining to a single survivor.
+
+203
+00:07:56,640 --> 00:08:02,120
+Against Nvidia's FasterTransformer on
+
+204
+00:07:59,280 --> 00:08:05,200
+GPT-3 175B,
+
+205
+00:08:02,120 --> 00:08:08,120
+holding a median latency of 190
+
+206
+00:08:05,200 --> 00:08:10,800
+milliseconds per generated token,
+
+207
+00:08:08,120 --> 00:08:12,120
+Orca served 6.81
+
+208
+00:08:10,800 --> 00:08:15,680
+requests per second, where
+
+209
+00:08:12,120 --> 00:08:18,800
+FasterTransformer served 0.185,
+
+210
+00:08:15,680 --> 00:08:20,480
+a factor of 36.9.
+
+211
+00:08:18,800 --> 00:08:23,240
+VLLM,
+
+212
+00:08:20,480 --> 00:08:26,720
+measured against Orca a year later,
+
+213
+00:08:23,240 --> 00:08:28,600
+reported two to four times.
+
+214
+00:08:26,720 --> 00:08:30,800
+But those requests now sit at different
+
+215
+00:08:28,600 --> 00:08:32,479
+positions in their sequences, so the
+
+216
+00:08:30,800 --> 00:08:34,880
+tensors flowing through attention have
+
+217
+00:08:32,479 --> 00:08:37,520
+different shapes, and Orca's paper is
+
+218
+00:08:34,880 --> 00:08:39,520
+explicit that for any two of them,
+
+219
+00:08:37,520 --> 00:08:41,320
+there is no guarantee the next iteration
+
+220
+00:08:39,520 --> 00:08:43,280
+can be merged into one batched
+
+221
+00:08:41,320 --> 00:08:45,440
+operation.
+
+222
+00:08:43,280 --> 00:08:47,680
+Orca's second contribution is the
+
+223
+00:08:45,440 --> 00:08:50,320
+observation that this problem does not
+
+224
+00:08:47,680 --> 00:08:52,720
+apply to every operation.
+
+225
+00:08:50,320 --> 00:08:54,760
+Most of a transformer layer treats each
+
+226
+00:08:52,720 --> 00:08:57,560
+token on its own.
+
+227
+00:08:54,760 --> 00:09:00,000
+The linear projections, the layer norms,
+
+228
+00:08:57,560 --> 00:09:02,240
+the activation function, none of them
+
+229
+00:09:00,000 --> 00:09:03,240
+need to know which request a token came
+
+230
+00:09:02,240 --> 00:09:05,000
+from.
+
+231
+00:09:03,240 --> 00:09:07,440
+So the engine stops organizing by
+
+232
+00:09:05,000 --> 00:09:10,440
+request and stacks every token from
+
+233
+00:09:07,440 --> 00:09:12,960
+every request into one flat tensor.
+
+234
+00:09:10,440 --> 00:09:15,680
+In the paper's example, four requests
+
+235
+00:09:12,960 --> 00:09:17,280
+contribute seven tokens between them,
+
+236
+00:09:15,680 --> 00:09:19,880
+and the layers' weight matrix
+
+237
+00:09:17,280 --> 00:09:21,839
+multiplications run once across those
+
+238
+00:09:19,880 --> 00:09:24,040
+seven rows.
+
+239
+00:09:21,839 --> 00:09:26,160
+Attention is the exception because it is
+
+240
+00:09:24,040 --> 00:09:27,240
+the operation that mixes tokens with one
+
+241
+00:09:26,160 --> 00:09:29,520
+another.
+
+242
+00:09:27,240 --> 00:09:32,080
+A token may attend only to tokens from
+
+243
+00:09:29,520 --> 00:09:34,320
+its own request, so attention has to
+
+244
+00:09:32,080 --> 00:09:36,640
+respect where each request begins and
+
+245
+00:09:34,320 --> 00:09:39,560
+ends, and each request carries a
+
+246
+00:09:36,640 --> 00:09:42,400
+different length of history.
+
+247
+00:09:39,560 --> 00:09:44,640
+Selective batching does both at once.
+
+248
+00:09:42,400 --> 00:09:46,920
+It batches every other operation across
+
+249
+00:09:44,640 --> 00:09:50,360
+all the tokens together and splits
+
+250
+00:09:46,920 --> 00:09:52,781
+attention out to run request by request.
+
+251
+00:09:50,360 --> 00:09:53,080
+Splitting it out costs almost nothing.
+
+252
+00:09:52,781 --> 00:09:54,680
+>> [music]
+
+253
+00:09:53,080 --> 00:09:56,480
+>> And the reason reaches back to why
+
+254
+00:09:54,680 --> 00:09:58,480
+batching worked at all.
+
+255
+00:09:56,480 --> 00:10:01,120
+Batching pays by making one read of the
+
+256
+00:09:58,480 --> 00:10:03,600
+weights serve many requests.
+
+257
+00:10:01,120 --> 00:10:05,720
+Attention has no weights of its own,
+
+258
+00:10:03,600 --> 00:10:08,520
+only keys and values belonging to
+
+259
+00:10:05,720 --> 00:10:11,080
+individual requests. So, there was never
+
+260
+00:10:08,520 --> 00:10:13,080
+anything there to share.
+
+261
+00:10:11,080 --> 00:10:14,960
+There is one kind of work in that batch,
+
+262
+00:10:13,080 --> 00:10:17,600
+unlike the rest.
+
+263
+00:10:14,960 --> 00:10:20,320
+A decode step advances a request by a
+
+264
+00:10:17,600 --> 00:10:22,880
+single token. But, a request that has
+
+265
+00:10:20,320 --> 00:10:25,480
+just been admitted has to process its
+
+266
+00:10:22,880 --> 00:10:27,760
+whole prompt first and prompts run to
+
+267
+00:10:25,480 --> 00:10:29,920
+thousands of tokens.
+
+268
+00:10:27,760 --> 00:10:32,440
+Both are one iteration.
+
+269
+00:10:29,920 --> 00:10:34,720
+So, the moment a new request joins, that
+
+270
+00:10:32,440 --> 00:10:37,360
+iteration stops being a step and becomes
+
+271
+00:10:34,720 --> 00:10:39,760
+a bulk job with everyone else's next
+
+272
+00:10:37,360 --> 00:10:42,280
+token sitting behind it. Against a
+
+273
+00:10:39,760 --> 00:10:44,200
+decode-only batch, mixing them naively
+
+274
+00:10:42,280 --> 00:10:47,000
+stretched the time between tokens by as
+
+275
+00:10:44,200 --> 00:10:48,880
+much as 28 times. And in vLLM, it
+
+276
+00:10:47,000 --> 00:10:50,520
+produced generation stalls lasting
+
+277
+00:10:48,880 --> 00:10:53,360
+several seconds.
+
+278
+00:10:50,520 --> 00:10:54,960
+Where users, mid-answer, simply stop
+
+279
+00:10:53,360 --> 00:10:57,800
+receiving text [music] while a
+
+280
+00:10:54,960 --> 00:11:01,040
+stranger's prompt is processed.
+
+281
+00:10:57,800 --> 00:11:03,720
+Sarathi, a 2023 paper from Microsoft
+
+282
+00:11:01,040 --> 00:11:06,440
+Research India and Georgia Tech, splits
+
+283
+00:11:03,720 --> 00:11:08,920
+the prefill into near-equal chunks and
+
+284
+00:11:06,440 --> 00:11:10,800
+its follow-up, Sarathi Serve, builds a
+
+285
+00:11:08,920 --> 00:11:13,360
+scheduler around them.
+
+286
+00:11:10,800 --> 00:11:14,600
+Each iteration gets a fixed token
+
+287
+00:11:13,360 --> 00:11:16,760
+budget.
+
+288
+00:11:14,600 --> 00:11:19,040
+The running decodes are packed in first,
+
+289
+00:11:16,760 --> 00:11:20,680
+one token each, and whatever is left of
+
+290
+00:11:19,040 --> 00:11:22,560
+the budget is filled with a chunk of a
+
+291
+00:11:20,680 --> 00:11:24,920
+waiting prompt.
+
+292
+00:11:22,560 --> 00:11:27,360
+That bounds the cost of an iteration and
+
+293
+00:11:24,920 --> 00:11:29,280
+makes it nearly independent of how long
+
+294
+00:11:27,360 --> 00:11:31,760
+the incoming prompt is.
+
+295
+00:11:29,280 --> 00:11:34,200
+Admitting new work no longer pauses
+
+296
+00:11:31,760 --> 00:11:36,400
+generation already in flight, which is
+
+297
+00:11:34,200 --> 00:11:38,080
+what the authors call a stall-free
+
+298
+00:11:36,400 --> 00:11:40,760
+schedule.
+
+299
+00:11:38,080 --> 00:11:43,400
+Chunk size is a real trade.
+
+300
+00:11:40,760 --> 00:11:45,520
+Small chunks keep each iteration short
+
+301
+00:11:43,400 --> 00:11:48,120
+and the token stream smooth, but the
+
+302
+00:11:45,520 --> 00:11:50,720
+prompt needs more iterations to finish,
+
+303
+00:11:48,120 --> 00:11:53,400
+so its own first token arrives later,
+
+304
+00:11:50,720 --> 00:11:55,680
+and every chunk rereads [music] the KV
+
+305
+00:11:53,400 --> 00:11:58,600
+cache the earlier ones wrote.
+
+306
+00:11:55,680 --> 00:12:01,080
+Large chunks reverse both.
+
+307
+00:11:58,600 --> 00:12:03,920
+Under tail latency limits, Sarathi serve
+
+308
+00:12:01,080 --> 00:12:07,960
+reported 2.6 times the serving capacity
+
+309
+00:12:03,920 --> 00:12:12,200
+of vLLM for Mistral 7B on 1 A100, and up
+
+310
+00:12:07,960 --> 00:12:14,200
+to 3.7 times for E34B on 2.
+
+311
+00:12:12,200 --> 00:12:15,800
+With pipeline parallelism on Falcon
+
+312
+00:12:14,200 --> 00:12:18,720
+180B,
+
+313
+00:12:15,800 --> 00:12:21,000
+the gain reached up to 5.6 times, helped
+
+314
+00:12:18,720 --> 00:12:23,400
+by a second effect, iterations of
+
+315
+00:12:21,000 --> 00:12:25,120
+uniform size leave fewer pipeline
+
+316
+00:12:23,400 --> 00:12:27,680
+bubbles.
+
+317
+00:12:25,120 --> 00:12:29,640
+vLLM now enables chunked prefill by
+
+318
+00:12:27,680 --> 00:12:32,520
+default.
+
+319
+00:12:29,640 --> 00:12:35,400
+Chunked prefill lets prefill and decode
+
+320
+00:12:32,520 --> 00:12:38,000
+share one GPU without the stalls, but
+
+321
+00:12:35,400 --> 00:12:40,160
+they remain opposite workloads.
+
+322
+00:12:38,000 --> 00:12:42,440
+Prefill processes thousands of prompt
+
+323
+00:12:40,160 --> 00:12:44,480
+tokens at once and saturates the
+
+324
+00:12:42,440 --> 00:12:47,240
+arithmetic units.
+
+325
+00:12:44,480 --> 00:12:49,400
+Decode produces one token per request
+
+326
+00:12:47,240 --> 00:12:51,960
+and leaves those same units starved,
+
+327
+00:12:49,400 --> 00:12:54,480
+held back by memory bandwidth.
+
+328
+00:12:51,960 --> 00:12:56,920
+One machine means one hardware choice
+
+329
+00:12:54,480 --> 00:12:59,520
+and one parallelism strategy for both,
+
+330
+00:12:56,920 --> 00:13:02,320
+which compromises each.
+
+331
+00:12:59,520 --> 00:13:05,080
+Disaggregation gives each its own.
+
+332
+00:13:02,320 --> 00:13:07,320
+Prefill runs on one pool of GPUs, decode
+
+333
+00:13:05,080 --> 00:13:09,800
+on another, each configured for its own
+
+334
+00:13:07,320 --> 00:13:11,760
+bottleneck, and the KV cache the prefill
+
+335
+00:13:09,800 --> 00:13:14,680
+pool builds is shipped across the
+
+336
+00:13:11,760 --> 00:13:17,080
+interconnect to the decode pool. [music]
+
+337
+00:13:14,680 --> 00:13:18,680
+That transfer is the price, and disserve
+
+338
+00:13:17,080 --> 00:13:23,160
+put a number on it.
+
+339
+00:13:18,680 --> 00:13:27,120
+A single 512 token request on OPT-66B
+
+340
+00:13:23,160 --> 00:13:29,360
+produces about 1.13 GB of KV cache, so
+
+341
+00:13:27,120 --> 00:13:32,400
+at 10 requests a second, you need
+
+342
+00:13:29,360 --> 00:13:34,920
+roughly 90 GB per second of network just
+
+343
+00:13:32,400 --> 00:13:37,360
+to keep the transfer invisible.
+
+344
+00:13:34,920 --> 00:13:39,000
+A cluster with InfiniBand or NVLink
+
+345
+00:13:37,360 --> 00:13:41,480
+absorbs that.
+
+346
+00:13:39,000 --> 00:13:43,960
+A small deployment does not, which makes
+
+347
+00:13:41,480 --> 00:13:47,280
+disaggregation a decision about how much
+
+348
+00:13:43,960 --> 00:13:49,320
+traffic you have, not a default.
+
+349
+00:13:47,280 --> 00:13:51,400
+DisServe and SplitWise were concurrent
+
+350
+00:13:49,320 --> 00:13:53,320
+independent research work arriving at
+
+351
+00:13:51,400 --> 00:13:56,920
+the same conclusion.
+
+352
+00:13:53,320 --> 00:14:00,160
+DisServe reported serving 7.4 times more
+
+353
+00:13:56,920 --> 00:14:02,880
+requests or meeting targets 12.6 times
+
+354
+00:14:00,160 --> 00:14:05,560
+tighter while holding over 90% of
+
+355
+00:14:02,880 --> 00:14:07,600
+requests inside both their first token
+
+356
+00:14:05,560 --> 00:14:10,760
+and per token budgets
+
+357
+00:14:07,600 --> 00:14:12,400
+on models from 13 to 175 billion
+
+358
+00:14:10,760 --> 00:14:14,520
+parameters.
+
+359
+00:14:12,400 --> 00:14:17,960
+SplitWise reported 1.4 times the
+
+360
+00:14:14,520 --> 00:14:21,240
+throughput at 20% lower cost or 2.35
+
+361
+00:14:17,960 --> 00:14:23,360
+times at the same cost and power.
+
+362
+00:14:21,240 --> 00:14:24,960
+Production pushed it further, and here
+
+363
+00:14:23,360 --> 00:14:26,680
+we go back to what we covered in the
+
+364
+00:14:24,960 --> 00:14:29,120
+last episode.
+
+365
+00:14:26,680 --> 00:14:31,720
+DeepSeek runs its prefill pool at 32-way
+
+366
+00:14:29,120 --> 00:14:34,000
+expert parallelism and its decode pool
+
+367
+00:14:31,720 --> 00:14:36,560
+at 144-way.
+
+368
+00:14:34,000 --> 00:14:39,920
+The reason is sparsity. With eight of
+
+369
+00:14:36,560 --> 00:14:42,080
+256 experts firing per token, only an
+
+370
+00:14:39,920 --> 00:14:43,800
+enormous combined batch gives every
+
+371
+00:14:42,080 --> 00:14:44,260
+expert enough tokens to be worth
+
+372
+00:14:43,800 --> 00:14:44,400
+running,
+
+373
+00:14:44,260 --> 00:14:46,200
+>> [music]
+
+374
+00:14:44,400 --> 00:14:47,920
+>> and decode is where that batch gets
+
+375
+00:14:46,200 --> 00:14:50,560
+assembled.
+
+376
+00:14:47,920 --> 00:14:52,600
+MoonCake, the platform behind Kimi,
+
+377
+00:14:50,560 --> 00:14:54,400
+built its whole architecture around the
+
+378
+00:14:52,600 --> 00:14:58,160
+KV cache.
+
+379
+00:14:54,400 --> 00:15:00,680
+And by 2025, the pattern was standard.
+
+380
+00:14:58,160 --> 00:15:04,320
+Nvidia Dynamo, the Kubernetes native
+
+381
+00:15:00,680 --> 00:15:08,560
+LLMD, and SG Lang's reproduction on 96
+
+382
+00:15:04,320 --> 00:15:12,600
+H100s, which sustained 52.3K input and
+
+383
+00:15:08,560 --> 00:15:14,880
+22.3K output tokens per second per node
+
+384
+00:15:12,600 --> 00:15:16,880
+at about 20 cents per million output
+
+385
+00:15:14,880 --> 00:15:18,800
+tokens.
+
+386
+00:15:16,880 --> 00:15:21,120
+Splitting the pools made each phase
+
+387
+00:15:18,800 --> 00:15:22,880
+efficient, but it did not reduce the
+
+388
+00:15:21,120 --> 00:15:25,080
+amount of work.
+
+389
+00:15:22,880 --> 00:15:27,960
+The pre-filled pool still computes every
+
+390
+00:15:25,080 --> 00:15:31,520
+prompt from scratch, even when requests
+
+391
+00:15:27,960 --> 00:15:33,080
+share long stretches of identical text.
+
+392
+00:15:31,520 --> 00:15:36,280
+In production, that overlap is the
+
+393
+00:15:33,080 --> 00:15:38,840
+normal case, rather than the exception.
+
+394
+00:15:36,280 --> 00:15:41,440
+A system prompt sent on every call, the
+
+395
+00:15:38,840 --> 00:15:44,240
+same few-shot examples, a retrieved
+
+396
+00:15:41,440 --> 00:15:46,040
+document reused across many questions,
+
+397
+00:15:44,240 --> 00:15:47,080
+the growing transcript of a multi-turn
+
+398
+00:15:46,040 --> 00:15:49,240
+chat,
+
+399
+00:15:47,080 --> 00:15:51,440
+an agent resending its entire context on
+
+400
+00:15:49,240 --> 00:15:53,600
+every step, etc.
+
+401
+00:15:51,440 --> 00:15:55,120
+So, compute the shared part once and
+
+402
+00:15:53,600 --> 00:15:57,920
+reuse it.
+
+403
+00:15:55,120 --> 00:16:00,320
+That works because attention is causal.
+
+404
+00:15:57,920 --> 00:16:02,440
+A token's keys and values are determined
+
+405
+00:16:00,320 --> 00:16:04,640
+by the text up to and including that
+
+406
+00:16:02,440 --> 00:16:06,120
+token, and nothing that comes after
+
+407
+00:16:04,640 --> 00:16:08,240
+changes them.
+
+408
+00:16:06,120 --> 00:16:11,200
+So, the same prefix produces the same
+
+409
+00:16:08,240 --> 00:16:13,360
+keys and values every time.
+
+410
+00:16:11,200 --> 00:16:15,600
+A request arriving with that prefix
+
+411
+00:16:13,360 --> 00:16:19,040
+skips straight past the shared part of
+
+412
+00:16:15,600 --> 00:16:21,280
+its pre-fill to its first new token.
+
+413
+00:16:19,040 --> 00:16:24,760
+S G Lang's radix attention keeps them in
+
+414
+00:16:21,280 --> 00:16:26,920
+a radix tree keyed on token sequences.
+
+415
+00:16:24,760 --> 00:16:29,400
+A radix tree is a prefix tree whose
+
+416
+00:16:26,920 --> 00:16:31,720
+edges can carry whole sequences, rather
+
+417
+00:16:29,400 --> 00:16:34,800
+than single tokens, which is what makes
+
+418
+00:16:31,720 --> 00:16:36,960
+it compact. Requests sharing a prefix
+
+419
+00:16:34,800 --> 00:16:38,960
+walk the same path through it, and the
+
+420
+00:16:36,960 --> 00:16:41,360
+tree branches only at the token where
+
+421
+00:16:38,960 --> 00:16:43,600
+their sequences first differ.
+
+422
+00:16:41,360 --> 00:16:46,560
+When memory runs short, it evicts the
+
+423
+00:16:43,600 --> 00:16:48,960
+least recently used leaf, working inward
+
+424
+00:16:46,560 --> 00:16:50,839
+toward the shared trunk, and a reference
+
+425
+00:16:48,960 --> 00:16:52,720
+count on each node keeps it from
+
+426
+00:16:50,839 --> 00:16:54,560
+evicting anything a running request is
+
+427
+00:16:52,720 --> 00:16:56,280
+still using.
+
+428
+00:16:54,560 --> 00:16:57,400
+This works because the cache was already
+
+429
+00:16:56,280 --> 00:16:59,280
+paged.
+
+430
+00:16:57,400 --> 00:17:01,520
+Sharing a prefix is two sequences
+
+431
+00:16:59,280 --> 00:17:03,280
+pointing at the same physical blocks.
+
+432
+00:17:01,520 --> 00:17:05,360
+Nothing is copied because those [music]
+
+433
+00:17:03,280 --> 00:17:07,480
+blocks can never change.
+
+434
+00:17:05,360 --> 00:17:10,199
+Only the one partially filled block at
+
+435
+00:17:07,480 --> 00:17:12,480
+the point of divergence gets copied,
+
+436
+00:17:10,199 --> 00:17:15,959
+exactly the copy-on-write an operating
+
+437
+00:17:12,480 --> 00:17:18,120
+system does when it forks a process.
+
+438
+00:17:15,959 --> 00:17:21,000
+One consequence reaches up into the
+
+439
+00:17:18,120 --> 00:17:23,360
+cluster. A cached prefix lives in one
+
+440
+00:17:21,000 --> 00:17:25,880
+replica's memory, so a request only
+
+441
+00:17:23,360 --> 00:17:28,480
+benefits if it lands on that replica,
+
+442
+00:17:25,880 --> 00:17:30,920
+and routing has to become cache aware.
+
+443
+00:17:28,480 --> 00:17:33,160
+Send each request to the machine already
+
+444
+00:17:30,920 --> 00:17:35,840
+holding its prefix, not to whichever
+
+445
+00:17:33,160 --> 00:17:37,800
+machine is least busy.
+
+446
+00:17:35,840 --> 00:17:39,080
+The pricing tells you what this is
+
+447
+00:17:37,800 --> 00:17:41,800
+worth.
+
+448
+00:17:39,080 --> 00:17:44,680
+Anthropic and OpenAI both build a cached
+
+449
+00:17:41,800 --> 00:17:45,800
+prompt read at 1/10 of the normal input
+
+450
+00:17:44,680 --> 00:17:47,760
+price.
+
+451
+00:17:45,800 --> 00:17:51,240
+Anthropic charges a premium to write the
+
+452
+00:17:47,760 --> 00:17:53,840
+cache. 1.25 times normal for a 5-minute
+
+453
+00:17:51,240 --> 00:17:56,120
+lifetime, so a prefix used twice has
+
+454
+00:17:53,840 --> 00:17:58,680
+already paid for itself.
+
+455
+00:17:56,120 --> 00:18:00,840
+Agents lean on this hardest because an
+
+456
+00:17:58,680 --> 00:18:04,320
+agent replays its whole accumulated
+
+457
+00:18:00,840 --> 00:18:06,440
+history on every single step, and almost
+
+458
+00:18:04,320 --> 00:18:08,240
+all of it is a prefix it has sent
+
+459
+00:18:06,440 --> 00:18:10,560
+before.
+
+460
+00:18:08,240 --> 00:18:12,640
+All of this lives in software, and that
+
+461
+00:18:10,560 --> 00:18:15,080
+software comes in two layers that get
+
+462
+00:18:12,640 --> 00:18:16,960
+conflated constantly.
+
+463
+00:18:15,080 --> 00:18:19,480
+An inference engine runs the model on
+
+464
+00:18:16,960 --> 00:18:21,640
+one GPU or one node. It owns the
+
+465
+00:18:19,480 --> 00:18:23,440
+scheduler, the KV cache, and the
+
+466
+00:18:21,640 --> 00:18:27,120
+kernels.
+
+467
+00:18:23,440 --> 00:18:31,200
+VLLM, now a PyTorch Foundation project,
+
+468
+00:18:27,120 --> 00:18:34,760
+runs on Nvidia, AMD, Google TPUs, AWS
+
+469
+00:18:31,200 --> 00:18:37,840
+Inferentia, Intel, and Apple Silicon.
+
+470
+00:18:34,760 --> 00:18:39,960
+SGLang is the engine behind the 96 GPU
+
+471
+00:18:37,840 --> 00:18:41,600
+Deep Seek reproduction.
+
+472
+00:18:39,960 --> 00:18:44,800
+TensorRT-LLM
+
+473
+00:18:41,600 --> 00:18:46,280
+is Nvidia's own tuned hardest for Nvidia
+
+474
+00:18:44,800 --> 00:18:48,360
+hardware.
+
+475
+00:18:46,280 --> 00:18:51,120
+And Hugging Face's text generation
+
+476
+00:18:48,360 --> 00:18:53,760
+inference is the serving toolkit built
+
+477
+00:18:51,120 --> 00:18:56,040
+around models from the hub.
+
+478
+00:18:53,760 --> 00:18:58,160
+An orchestration layer sits above them
+
+479
+00:18:56,040 --> 00:19:00,280
+and coordinates a fleet.
+
+480
+00:18:58,160 --> 00:19:02,920
+Nvidia Dynamo and the Kubernetes native
+
+481
+00:19:00,280 --> 00:19:03,800
+LLMD do the work no single engine can
+
+482
+00:19:02,920 --> 00:19:06,200
+see,
+
+483
+00:19:03,800 --> 00:19:08,920
+placing prefill and decode pools across
+
+484
+00:19:06,200 --> 00:19:11,800
+nodes, routing each request to the
+
+485
+00:19:08,920 --> 00:19:15,240
+replica that already holds its prefix,
+
+486
+00:19:11,800 --> 00:19:17,600
+and moving KV cache between machines.
+
+487
+00:19:15,240 --> 00:19:20,160
+Neither replaces an engine.
+
+488
+00:19:17,600 --> 00:19:23,080
+Both run engines underneath, and that is
+
+489
+00:19:20,160 --> 00:19:25,000
+the important distinction.
+
+490
+00:19:23,080 --> 00:19:26,160
+What all of it optimizes is not
+
+491
+00:19:25,000 --> 00:19:27,640
+throughput.
+
+492
+00:19:26,160 --> 00:19:29,320
+Throughput counts every token the
+
+493
+00:19:27,640 --> 00:19:31,120
+cluster produces.
+
+494
+00:19:29,320 --> 00:19:33,360
+Goodput, the metric from the first
+
+495
+00:19:31,120 --> 00:19:36,600
+episode, counts only the ones that
+
+496
+00:19:33,360 --> 00:19:38,880
+arrived inside their latency targets.
+
+497
+00:19:36,600 --> 00:19:41,400
+Serving adds a per GPU version of the
+
+498
+00:19:38,880 --> 00:19:44,440
+same idea. The highest request rate a
+
+499
+00:19:41,400 --> 00:19:46,320
+single GPU can sustain while 90% of
+
+500
+00:19:44,440 --> 00:19:48,880
+requests still meet both their first
+
+501
+00:19:46,320 --> 00:19:51,000
+token and per token targets.
+
+502
+00:19:48,880 --> 00:19:53,360
+A token generated for a request that
+
+503
+00:19:51,000 --> 00:19:56,040
+already blew its deadline is work you
+
+504
+00:19:53,360 --> 00:19:58,720
+paid for and cannot sell. So, a cluster
+
+505
+00:19:56,040 --> 00:20:00,040
+can run at full utilization and deliver
+
+506
+00:19:58,720 --> 00:20:02,760
+very little.
+
+507
+00:20:00,040 --> 00:20:04,480
+And counted per GPU, goodput converts
+
+508
+00:20:02,760 --> 00:20:05,960
+directly into the number the business
+
+509
+00:20:04,480 --> 00:20:08,320
+cares about.
+
+510
+00:20:05,960 --> 00:20:09,560
+Cost per query.
+
+511
+00:20:08,320 --> 00:20:12,000
+Defending goodput falls to the
+
+512
+00:20:09,560 --> 00:20:14,680
+scheduler, and much of what it does is
+
+513
+00:20:12,000 --> 00:20:17,520
+decide which work to refuse.
+
+514
+00:20:14,680 --> 00:20:19,440
+Memory runs out first. KV caches grow as
+
+515
+00:20:17,520 --> 00:20:21,880
+their sequences grow, so [music] a batch
+
+516
+00:20:19,440 --> 00:20:24,240
+that fit a minute ago may not fit now,
+
+517
+00:20:21,880 --> 00:20:27,200
+and something has to be evicted.
+
+518
+00:20:24,240 --> 00:20:29,320
+vLLM evicts a whole sequence at a time,
+
+519
+00:20:27,200 --> 00:20:31,080
+all of its blocks or none, because
+
+520
+00:20:29,320 --> 00:20:33,760
+attention needs all of them together
+
+521
+00:20:31,080 --> 00:20:35,280
+anyway. Getting that sequence back costs
+
+522
+00:20:33,760 --> 00:20:37,480
+one of two things.
+
+523
+00:20:35,280 --> 00:20:40,520
+Swapping copies its blocks out to CPU
+
+524
+00:20:37,480 --> 00:20:42,000
+memory and later back again. Paid in bus
+
+525
+00:20:40,520 --> 00:20:44,480
+bandwidth.
+
+526
+00:20:42,000 --> 00:20:47,640
+Recomputing discards them and rebuilds
+
+527
+00:20:44,480 --> 00:20:49,800
+them later. Paid in arithmetic.
+
+528
+00:20:47,640 --> 00:20:51,760
+Recomputing is cheaper than it sounds,
+
+529
+00:20:49,800 --> 00:20:53,920
+because the tokens the request already
+
+530
+00:20:51,760 --> 00:20:56,200
+generated can be appended to its
+
+531
+00:20:53,920 --> 00:20:58,880
+original prompt, and the whole cache
+
+532
+00:20:56,200 --> 00:21:01,160
+rebuilt in a single prefill pass instead
+
+533
+00:20:58,880 --> 00:21:03,920
+of one token at a time.
+
+534
+00:21:01,160 --> 00:21:06,400
+Which one wins depends on the machine.
+
+535
+00:21:03,920 --> 00:21:10,560
+How much bandwidth sits between CPU and
+
+536
+00:21:06,400 --> 00:21:12,200
+GPU against how much compute is spare.
+
+537
+00:21:10,560 --> 00:21:15,200
+When one deployment serves many
+
+538
+00:21:12,200 --> 00:21:17,880
+customers, a single heavy user can crowd
+
+539
+00:21:15,200 --> 00:21:20,400
+out the rest and counting requests will
+
+540
+00:21:17,880 --> 00:21:23,640
+not catch it because one request can be
+
+541
+00:21:20,400 --> 00:21:26,440
+a hundred times the size of another.
+
+542
+00:21:23,640 --> 00:21:28,960
+The virtual token counter from a 2024
+
+543
+00:21:26,440 --> 00:21:31,360
+fairness paper keeps a running total of
+
+544
+00:21:28,960 --> 00:21:33,760
+the input and output tokens each tenant
+
+545
+00:21:31,360 --> 00:21:36,120
+has consumed and serves whoever has
+
+546
+00:21:33,760 --> 00:21:37,960
+received the least.
+
+547
+00:21:36,120 --> 00:21:40,480
+When more requests arrive than the
+
+548
+00:21:37,960 --> 00:21:42,440
+system can possibly finish in budget,
+
+549
+00:21:40,480 --> 00:21:45,080
+accepting all of them spreads the
+
+550
+00:21:42,440 --> 00:21:48,160
+machine so thin that everyone misses
+
+551
+00:21:45,080 --> 00:21:51,720
+their deadline and good put goes to zero
+
+552
+00:21:48,160 --> 00:21:53,760
+while the GPUs sit at full utilization.
+
+553
+00:21:51,720 --> 00:21:56,400
+Admission control refuses the excess
+
+554
+00:21:53,760 --> 00:21:58,800
+instead. Predict which requests cannot
+
+555
+00:21:56,400 --> 00:22:01,880
+finish in time, then reject or defer
+
+556
+00:21:58,800 --> 00:22:04,880
+them so the remainder still lands.
+
+557
+00:22:01,880 --> 00:22:08,640
+Mooncake serving Kimi does this with a
+
+558
+00:22:04,880 --> 00:22:10,320
+prediction-based early rejection policy.
+
+559
+00:22:08,640 --> 00:22:13,600
+And when the pools themselves are the
+
+560
+00:22:10,320 --> 00:22:16,760
+wrong shape, auto scaling corrects them.
+
+561
+00:22:13,600 --> 00:22:20,200
+Dynamo's planner watches load across the
+
+562
+00:22:16,760 --> 00:22:22,480
+prefill and decode pools and moves GPUs
+
+563
+00:22:20,200 --> 00:22:24,760
+from one to the other so the split
+
+564
+00:22:22,480 --> 00:22:26,960
+tracks the traffic actually arriving
+
+565
+00:22:24,760 --> 00:22:29,840
+rather than the traffic someone assumed
+
+566
+00:22:26,960 --> 00:22:31,640
+when the cluster was deployed.
+
+567
+00:22:29,840 --> 00:22:32,680
+The scheduler decides which requests
+
+568
+00:22:31,640 --> 00:22:34,720
+run.
+
+569
+00:22:32,680 --> 00:22:37,840
+What comes out of them is decided one
+
+570
+00:22:34,720 --> 00:22:40,720
+stage later by the sampler.
+
+571
+00:22:37,840 --> 00:22:43,240
+Every forward pass ends the same way.
+
+572
+00:22:40,720 --> 00:22:45,360
+A vector of logits, one raw score for
+
+573
+00:22:43,240 --> 00:22:47,320
+every token in the vocabulary, which
+
+574
+00:22:45,360 --> 00:22:48,800
+softmax turns into a probability
+
+575
+00:22:47,320 --> 00:22:50,840
+distribution.
+
+576
+00:22:48,800 --> 00:22:53,320
+The sampler's job is to pick one token
+
+577
+00:22:50,840 --> 00:22:55,640
+from it and relative to a forward pass
+
+578
+00:22:53,320 --> 00:22:56,825
+over a trillion parameters, that job is
+
+579
+00:22:55,640 --> 00:22:57,080
+nearly free.
+
+580
+00:22:56,825 --> 00:22:59,040
+>> [music]
+
+581
+00:22:57,080 --> 00:23:01,320
+>> It is also where every user-facing
+
+582
+00:22:59,040 --> 00:23:03,040
+quality knob lives.
+
+583
+00:23:01,320 --> 00:23:05,600
+The obvious approach is to take the
+
+584
+00:23:03,040 --> 00:23:07,280
+highest scoring token every time. It
+
+585
+00:23:05,600 --> 00:23:10,160
+does not work.
+
+586
+00:23:07,280 --> 00:23:13,000
+Holtzman and colleagues showed in 2020
+
+587
+00:23:10,160 --> 00:23:15,640
+that maximization based decoding, greedy
+
+588
+00:23:13,000 --> 00:23:18,240
+or beam search, produces what they named
+
+589
+00:23:15,640 --> 00:23:20,400
+degeneration. Text that is bland,
+
+590
+00:23:18,240 --> 00:23:21,800
+incoherent, or stuck in repetitive
+
+591
+00:23:20,400 --> 00:23:24,760
+loops.
+
+592
+00:23:21,800 --> 00:23:27,000
+In their example, beam search on GPT-2
+
+593
+00:23:24,760 --> 00:23:28,440
+repeats the same university name over
+
+594
+00:23:27,000 --> 00:23:30,800
+and over.
+
+595
+00:23:28,440 --> 00:23:33,000
+Models do assign high probability to
+
+596
+00:23:30,800 --> 00:23:35,160
+well-formed text, but the highest
+
+597
+00:23:33,000 --> 00:23:37,840
+scoring long continuations tend to be
+
+598
+00:23:35,160 --> 00:23:39,200
+generic and repetitive.
+
+599
+00:23:37,840 --> 00:23:41,000
+Sampling straight from the raw
+
+600
+00:23:39,200 --> 00:23:42,360
+distribution fails in the opposite
+
+601
+00:23:41,000 --> 00:23:45,360
+direction.
+
+602
+00:23:42,360 --> 00:23:47,480
+A language model's tail is unreliable.
+
+603
+00:23:45,360 --> 00:23:49,560
+Thousands of tokens, each holding a tiny
+
+604
+00:23:47,480 --> 00:23:51,720
+share of the probability, and enough
+
+605
+00:23:49,560 --> 00:23:54,520
+mass between them that incoherent
+
+606
+00:23:51,720 --> 00:23:56,800
+choices get drawn regularly.
+
+607
+00:23:54,520 --> 00:23:59,240
+So, the sampler does two things. It
+
+608
+00:23:56,800 --> 00:24:01,160
+reshapes the distribution, and it cuts
+
+609
+00:23:59,240 --> 00:24:03,480
+off the tail.
+
+610
+00:24:01,160 --> 00:24:06,120
+Temperature does the reshaping.
+
+611
+00:24:03,480 --> 00:24:07,566
+Divide every logit by a temperature T
+
+612
+00:24:06,120 --> 00:24:07,840
+before the softmax.
+
+613
+00:24:07,566 --> 00:24:10,680
+>> [music]
+
+614
+00:24:07,840 --> 00:24:13,320
+>> At T of 1, nothing changes.
+
+615
+00:24:10,680 --> 00:24:15,120
+Below 1, the gaps between scores widen,
+
+616
+00:24:13,320 --> 00:24:17,360
+and the distribution sharpens toward a
+
+617
+00:24:15,120 --> 00:24:18,480
+spike on the highest score, approaching
+
+618
+00:24:17,360 --> 00:24:20,600
+greedy.
+
+619
+00:24:18,480 --> 00:24:23,880
+Above 1, it flattens, spreading
+
+620
+00:24:20,600 --> 00:24:25,880
+probability toward unlikely tokens.
+
+621
+00:24:23,880 --> 00:24:27,400
+Truncation does the cutting in one of
+
+622
+00:24:25,880 --> 00:24:30,080
+three ways.
+
+623
+00:24:27,400 --> 00:24:32,920
+Top K keeps the K highest probability
+
+624
+00:24:30,080 --> 00:24:36,280
+tokens, a fixed short list that pays no
+
+625
+00:24:32,920 --> 00:24:39,040
+attention to how confident the model is.
+
+626
+00:24:36,280 --> 00:24:41,120
+Top P, or nucleus sampling, keeps the
+
+627
+00:24:39,040 --> 00:24:43,600
+smallest set whose probability is some
+
+628
+00:24:41,120 --> 00:24:45,200
+past P, which means it reads the shape
+
+629
+00:24:43,600 --> 00:24:47,120
+of the distribution.
+
+630
+00:24:45,200 --> 00:24:49,640
+When the model is confident, the set is
+
+631
+00:24:47,120 --> 00:24:51,280
+tiny, and when it is unsure, the set
+
+632
+00:24:49,640 --> 00:24:53,760
+widens.
+
+633
+00:24:51,280 --> 00:24:56,160
+Min P sets its cut-off by scaling the
+
+634
+00:24:53,760 --> 00:24:58,640
+top token's probability, keeping only
+
+635
+00:24:56,160 --> 00:25:00,640
+tokens at least some fraction as likely
+
+636
+00:24:58,640 --> 00:25:03,200
+as the best one.
+
+637
+00:25:00,640 --> 00:25:05,520
+Whatever survives is re-normalized into
+
+638
+00:25:03,200 --> 00:25:07,840
+a distribution that sums to one, and a
+
+639
+00:25:05,520 --> 00:25:10,120
+single token is drawn.
+
+640
+00:25:07,840 --> 00:25:12,640
+Not one weight has changed.
+
+641
+00:25:10,120 --> 00:25:15,120
+The sampler only reshapes what the model
+
+642
+00:25:12,640 --> 00:25:17,080
+already produced.
+
+643
+00:25:15,120 --> 00:25:19,040
+Sampling chooses among the tokens the
+
+644
+00:25:17,080 --> 00:25:20,880
+model proposes.
+
+645
+00:25:19,040 --> 00:25:22,720
+Constraint decoding changes which tokens
+
+646
+00:25:20,880 --> 00:25:24,560
+are on offer in the first place, one
+
+647
+00:25:22,720 --> 00:25:26,120
+stage earlier.
+
+648
+00:25:24,560 --> 00:25:28,640
+You need it whenever the output will be
+
+649
+00:25:26,120 --> 00:25:31,160
+read by a machine rather than a person.
+
+650
+00:25:28,640 --> 00:25:33,600
+JSON that a parser will consume, a query
+
+651
+00:25:31,160 --> 00:25:36,920
+that has to match a schema, a tool call
+
+652
+00:25:33,600 --> 00:25:38,960
+whose arguments have to type check, etc.
+
+653
+00:25:36,920 --> 00:25:41,080
+Asking for the format in the prompt is
+
+654
+00:25:38,960 --> 00:25:43,480
+not a guarantee, because eventually the
+
+655
+00:25:41,080 --> 00:25:45,600
+model emits one stray token and the
+
+656
+00:25:43,480 --> 00:25:48,960
+parser fails.
+
+657
+00:25:45,600 --> 00:25:51,280
+So, the engine intervenes at the logits.
+
+658
+00:25:48,960 --> 00:25:53,400
+Before the sampler runs, it sets the
+
+659
+00:25:51,280 --> 00:25:55,880
+logit of every token that would break
+
+660
+00:25:53,400 --> 00:25:59,000
+the format to negative infinity.
+
+661
+00:25:55,880 --> 00:26:01,000
+Softmax turns those into exactly zero,
+
+662
+00:25:59,000 --> 00:26:03,280
+and a token with probability zero can
+
+663
+00:26:01,000 --> 00:26:05,640
+never be drawn, whatever sampler is
+
+664
+00:26:03,280 --> 00:26:07,640
+running above it.
+
+665
+00:26:05,640 --> 00:26:10,320
+What decides which tokens would break
+
+666
+00:26:07,640 --> 00:26:12,640
+the format is an automaton that tracks
+
+667
+00:26:10,320 --> 00:26:14,120
+the output so far.
+
+668
+00:26:12,640 --> 00:26:16,400
+For output shaped like a regular
+
+669
+00:26:14,120 --> 00:26:18,400
+expression, a finite state machine is
+
+670
+00:26:16,400 --> 00:26:21,560
+enough, and that is the approach
+
+671
+00:26:18,400 --> 00:26:23,480
+outlines takes, reformulating generation
+
+672
+00:26:21,560 --> 00:26:25,160
+as transitions between the states of a
+
+673
+00:26:23,480 --> 00:26:28,440
+state machine.
+
+674
+00:26:25,160 --> 00:26:29,680
+Grammars that nest, like JSON or SQL,
+
+675
+00:26:28,440 --> 00:26:31,480
+need more,
+
+676
+00:26:29,680 --> 00:26:33,880
+because a state machine cannot remember
+
+677
+00:26:31,480 --> 00:26:36,280
+how many brackets are still open.
+
+678
+00:26:33,880 --> 00:26:38,760
+That takes a pushdown automaton, a state
+
+679
+00:26:36,280 --> 00:26:40,680
+machine plus a stack, which is what X
+
+680
+00:26:38,760 --> 00:26:43,440
+grammar runs.
+
+681
+00:26:40,680 --> 00:26:46,600
+The obvious worry is cost, because this
+
+682
+00:26:43,440 --> 00:26:50,160
+runs at every single token.
+
+683
+00:26:46,600 --> 00:26:52,440
+Done naively, you would test all 100,000
+
+684
+00:26:50,160 --> 00:26:55,120
+or more tokens in the vocabulary against
+
+685
+00:26:52,440 --> 00:26:57,800
+the automaton at every step.
+
+686
+00:26:55,120 --> 00:27:00,560
+Outlines removes that by pre-computing
+
+687
+00:26:57,800 --> 00:27:02,360
+once per schema an index from each state
+
+688
+00:27:00,560 --> 00:27:04,760
+of the machine to the set of tokens
+
+689
+00:27:02,360 --> 00:27:08,560
+allowed in it. So, the per step work
+
+690
+00:27:04,760 --> 00:27:11,680
+becomes a look up constant on average.
+
+691
+00:27:08,560 --> 00:27:13,440
+X grammar splits the vocabulary instead.
+
+692
+00:27:11,680 --> 00:27:16,440
+Most tokens can be checked ahead of
+
+693
+00:27:13,440 --> 00:27:19,040
+time. Only a few need the live stack and
+
+694
+00:27:16,440 --> 00:27:20,840
+the mask for those is built on the CPU
+
+695
+00:27:19,040 --> 00:27:22,400
+while the GPU is still running the
+
+696
+00:27:20,840 --> 00:27:24,440
+forward pass.
+
+697
+00:27:22,400 --> 00:27:26,920
+Their masks land in under 40
+
+698
+00:27:24,440 --> 00:27:30,480
+microseconds per token against [music] a
+
+699
+00:27:26,920 --> 00:27:32,320
+decode step measured in milliseconds.
+
+700
+00:27:30,480 --> 00:27:35,120
+The guarantee this buys is exact and
+
+701
+00:27:32,320 --> 00:27:36,960
+narrow. The output will parse.
+
+702
+00:27:35,120 --> 00:27:37,920
+Nothing about it is guaranteed to be
+
+703
+00:27:36,960 --> 00:27:39,440
+true.
+
+704
+00:27:37,920 --> 00:27:42,400
+And because the mask can remove the
+
+705
+00:27:39,440 --> 00:27:44,560
+token the model most wanted, generation
+
+706
+00:27:42,400 --> 00:27:46,800
+can be pushed down a path it would not
+
+707
+00:27:44,560 --> 00:27:48,800
+otherwise have taken.
+
+708
+00:27:46,800 --> 00:27:50,680
+And the mechanism generalizes [music]
+
+709
+00:27:48,800 --> 00:27:52,240
+past formatting.
+
+710
+00:27:50,680 --> 00:27:54,160
+Restricting the next token to an
+
+711
+00:27:52,240 --> 00:27:57,240
+approved set [music] is how an agent's
+
+712
+00:27:54,160 --> 00:27:59,560
+actions are held inside a vetted schema.
+
+713
+00:27:57,240 --> 00:28:01,760
+It cannot emit a call that is not on the
+
+714
+00:27:59,560 --> 00:28:03,880
+list because those tokens are never
+
+715
+00:28:01,760 --> 00:28:05,600
+available to it.
+
+716
+00:28:03,880 --> 00:28:07,480
+The serving layer is the last place
+
+717
+00:28:05,600 --> 00:28:10,160
+anything can be enforced before tokens
+
+718
+00:28:07,480 --> 00:28:12,680
+reach a user or a tool.
+
+719
+00:28:10,160 --> 00:28:15,120
+Step back and the whole stack is a chain
+
+720
+00:28:12,680 --> 00:28:16,760
+of repairs.
+
+721
+00:28:15,120 --> 00:28:19,680
+Batching lets one read of the weights
+
+722
+00:28:16,760 --> 00:28:21,600
+serve many requests at once.
+
+723
+00:28:19,680 --> 00:28:23,680
+Static batches drain as the requests
+
+724
+00:28:21,600 --> 00:28:26,000
+finish, so scheduling moved to one
+
+725
+00:28:23,680 --> 00:28:28,260
+iteration at a time.
+
+726
+00:28:26,000 --> 00:28:30,880
+Attention never amortizes and KV caches
+
+727
+00:28:28,260 --> 00:28:33,920
+[music] cap how many requests fit, so
+
+728
+00:28:30,880 --> 00:28:35,880
+paging the cache made room for more.
+
+729
+00:28:33,920 --> 00:28:37,280
+Admitting a new request stalled everyone
+
+730
+00:28:35,880 --> 00:28:40,520
+mid-generation.
+
+731
+00:28:37,280 --> 00:28:42,200
+So, prefills got sliced into chunks.
+
+732
+00:28:40,520 --> 00:28:43,880
+Prefill and decode wanted different
+
+733
+00:28:42,200 --> 00:28:45,960
+hardware, so they were split into
+
+734
+00:28:43,880 --> 00:28:48,080
+separate pools.
+
+735
+00:28:45,960 --> 00:28:49,880
+Shared prompts were being recomputed, so
+
+736
+00:28:48,080 --> 00:28:52,120
+their keys and values got stored in a
+
+737
+00:28:49,880 --> 00:28:54,440
+tree and reused.
+
+738
+00:28:52,120 --> 00:28:57,080
+Around all of it, the scheduler defends
+
+739
+00:28:54,440 --> 00:28:59,160
+good put by choosing what to refuse, and
+
+740
+00:28:57,080 --> 00:29:02,600
+the sampler and the constraint machinery
+
+741
+00:28:59,160 --> 00:29:04,240
+decide what actually comes out.
+
+742
+00:29:02,600 --> 00:29:05,680
+Now, look at what every one of those has
+
+743
+00:29:04,240 --> 00:29:07,280
+in common.
+
+744
+00:29:05,680 --> 00:29:09,640
+Each raises the number of tokens
+
+745
+00:29:07,280 --> 00:29:11,800
+produced per read of the weights, and
+
+746
+00:29:09,640 --> 00:29:15,000
+each does it the same way, by putting
+
+747
+00:29:11,800 --> 00:29:18,000
+more requests behind that one read.
+
+748
+00:29:15,000 --> 00:29:20,800
+So, set the number of requests to one.
+
+749
+00:29:18,000 --> 00:29:22,560
+A single user, one conversation, nothing
+
+750
+00:29:20,800 --> 00:29:24,680
+else on the machine.
+
+751
+00:29:22,560 --> 00:29:27,210
+Every technique in this episode still
+
+752
+00:29:24,680 --> 00:29:27,480
+runs, and not one of them helps.
+
+753
+00:29:27,210 --> 00:29:29,800
+>> [music]
+
+754
+00:29:27,480 --> 00:29:32,880
+>> That stream pays a full weight read for
+
+755
+00:29:29,800 --> 00:29:35,600
+every single token it produces, exactly
+
+756
+00:29:32,880 --> 00:29:38,560
+as it did at the start of this episode.
+
+757
+00:29:35,600 --> 00:29:40,200
+It is as memory-bound as it ever was,
+
+758
+00:29:38,560 --> 00:29:42,400
+because there is nothing to share the
+
+759
+00:29:40,200 --> 00:29:44,840
+read with.
+
+760
+00:29:42,400 --> 00:29:46,840
+There is one direction left. If you
+
+761
+00:29:44,840 --> 00:29:49,200
+cannot put more requests behind a weight
+
+762
+00:29:46,840 --> 00:29:51,480
+read, the only thing left is to get more
+
+763
+00:29:49,200 --> 00:29:53,120
+than one token out of it for the same
+
+764
+00:29:51,480 --> 00:29:55,320
+request.
+
+765
+00:29:53,120 --> 00:29:59,040
+That is speculative decoding, and it is
+
+766
+00:29:55,320 --> 00:29:59,040
+where the next episode starts.
+

@@ -1,0 +1,45 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 30:25</div><h3>Any model, any chip: bytes per token over bandwidth</h3><div class='wg'><div class='ctl'><label class='opt'><input type='radio' name='v01-p36-model' value='70B' checked> Llama 3 70B</label><label class='opt'><input type='radio' name='v01-p36-model' value='8B'> Llama 3 8B</label><label class='opt'><input type='radio' name='v01-p36-bits' value='16' checked> 16-bit weights</label><label class='opt'><input type='radio' name='v01-p36-bits' value='8'> 8-bit weights</label><label class='opt'><input type='radio' name='v01-p36-bits' value='4'> 4-bit weights</label></div><div class='ctl'><label class='opt'><input type='radio' name='v01-p36-chip' value='H100' checked> H100</label><label class='opt'><input type='radio' name='v01-p36-chip' value='H200'> H200</label><label class='opt'><input type='radio' name='v01-p36-chip' value='B200'> B200</label></div><div class='ctl'><label>context <input type='range' min='0' max='8' step='1' value='0'><span class='val'>0</span></label><label>batch <input type='range' min='0' max='8' step='1' value='0'><span class='val'>1</span></label></div><div class='ctl'><label>price per hour <input type='range' min='0' max='9' step='1' value='4'><span class='val'>$3.00</span></label><button type='button'>Reset</button></div><svg viewBox='0 0 680 736' role='img'><title>Any model, any chip: bytes per token over bandwidth</title><text class="hd" x="40" y="34">Bytes per token over bandwidth, for any of these choices</text><text class="cap" x="40" y="75" text-anchor="start">reading</text><g class="h"><rect data-bar="0" x="160" y="56" width="380.0" height="28" rx="2"/></g><text class="sub2" x="550.0" y="75" data-bl="0">41.8 ms</text><text class="cap" x="40" y="115" text-anchor="start">arithmetic</text><g class="m"><rect data-bar="1" x="160" y="96" width="1.3" height="28" rx="2"/></g><text class="sub2" x="171.3" y="115" data-bl="1">0.142 ms</text><text class="sub2" x="40" y="160" data-r="0">each step reads 140 GB of weights and 0 GB of caches</text><text class="sub2" x="40" y="182" data-r="1">one step: 41.8 ms, memory bound</text><text class="sub2" x="40" y="204" data-r="2">tokens a second: 23.9 for each user, 23.9 in total</text><text class="sub2" x="40" y="226" data-r="3">arithmetic units busy: 0.339% of the step</text><text class="sub2" x="40" y="248" data-r="4">at $3.00 an hour: $34.8 per million tokens</text><text class="sub2" x="40" y="270" data-r="5">memory needed: 140 GB, where one H100 holds 80 GB</text><text class="hd" x="40" y="314">Four settings to try, with no cache and one request</text><text class="sub2" x="60" y="340" text-anchor="start">model</text><text class="sub2" x="200" y="340" text-anchor="start">chip</text><text class="sub2" x="300" y="340" text-anchor="start">weights</text><text class="sub2" x="420" y="340" text-anchor="start">one step</text><text class="sub2" x="60" y="364" text-anchor="start">Llama 3 70B</text><text class="sub2" x="200" y="364" text-anchor="start">H100</text><text class="sub2" x="300" y="364" text-anchor="start">16-bit</text><text class="sub2" x="420" y="364" text-anchor="start">41.8 ms</text><text class="sub2" x="60" y="386" text-anchor="start">Llama 3 70B</text><text class="sub2" x="200" y="386" text-anchor="start">H200</text><text class="sub2" x="300" y="386" text-anchor="start">16-bit</text><text class="sub2" x="420" y="386" text-anchor="start">29.2 ms</text><text class="sub2" x="60" y="408" text-anchor="start">Llama 3 8B</text><text class="sub2" x="200" y="408" text-anchor="start">H100</text><text class="sub2" x="300" y="408" text-anchor="start">16-bit</text><text class="sub2" x="420" y="408" text-anchor="start">4.78 ms</text><text class="sub2" x="60" y="430" text-anchor="start">Llama 3 70B</text><text class="sub2" x="200" y="430" text-anchor="start">B200</text><text class="sub2" x="300" y="430" text-anchor="start">4-bit</text><text class="sub2" x="420" y="430" text-anchor="start">4.38 ms</text><text class="cap" x="40" y="474" text-anchor="start">Decode reads every weight and every cached key and value once per step, so a step takes</text><text class="cap" x="40" y="494" text-anchor="start">the bytes divided by the bandwidth, unless the arithmetic takes longer. That is the</text><text class="cap" x="40" y="514" text-anchor="start">whole method of this atlas: the 30 milliseconds of the opening ({{fig:v01-o067}}) from two</text><text class="cap" x="40" y="534" text-anchor="start">hardware numbers, for any model on any chip.</text><text class="cap" x="40" y="574" text-anchor="start">Fewer bits shrink the weights' bytes; a batch shares them; a long context adds bytes</text><text class="cap" x="40" y="594" text-anchor="start">that are not shared. Each later video of the series moves one of these terms.</text><text class="cap" x="40" y="634" text-anchor="start">Weights are the round 70 and 8 billion of the names, stored in the bits chosen and</text><text class="cap" x="40" y="654" text-anchor="start">multiplied in 16-bit; caches are 16-bit, 327,680 bytes a token for the 70B and 131,072</text><text class="cap" x="40" y="674" text-anchor="start">for the 8B; the price is illustrative. Memory beyond one chip's is counted as if one</text><text class="cap" x="40" y="694" text-anchor="start">chip held it all ({{fig:v01-o014}}). The readouts were checked against Python at every</text><text class="cap" x="40" y="714" text-anchor="start">setting.</text></svg></div><figcaption>The opening's promise, kept: the time per token from bytes and bandwidth, for either of these models on any of these chips.</figcaption><script>(() => {
+
+  const MINUS = '−';
+  const fx = (v, d = 2) => { const s = Math.abs(v).toFixed(d); return (v < 0 && +s !== 0 ? MINUS : '') + s; };
+  const gx = (v, d = 0) => { const s = Math.abs(v).toFixed(d); const [a, b] = s.split('.');
+    const t = a.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (v < 0 && +s !== 0 ? MINUS : '') + t + (b !== undefined ? '.' + b : ''); };
+
+  const sig3 = v => { if (v === 0) return '0'; const d = Math.max(0, 2 - Math.floor(Math.log10(Math.abs(v))));
+    return gx(v, d); };
+  const fig = document.currentScript.closest('figure');
+  const M = {"70B": {"n": 70000000000.0, "d": 8192, "layers": 80, "kv": 327680}, "8B": {"n": 8000000000.0, "d": 4096, "layers": 32, "kv": 131072}}, C = {"H100": {"peak": 989000000000000.0, "bw": 3350000000000.0, "cap": 80000000000.0}, "H200": {"peak": 989000000000000.0, "bw": 4800000000000.0, "cap": 141000000000.0}, "B200": {"peak": 2250000000000000.0, "bw": 8000000000000.0, "cap": 180000000000.0}}, CTXS = [0, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000], BS = [1, 2, 4, 8, 16, 32, 64, 128, 256], PR = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10], S0 = {"model": "70B", "bits": 16, "chip": "H100", "ctx": 0, "batch": 1, "price": 3};
+  const sl = [...fig.querySelectorAll('input[type=range]')], vals = [...fig.querySelectorAll('.val')];
+  const rad = n => [...fig.querySelectorAll(`input[name="v01-p36-${n}"]`)], q = s => fig.querySelector(s);
+  const pick = n => rad(n).find(r => r.checked).value;
+  function draw() {
+    const model = pick('model'), bits = +pick('bits'), chip = pick('chip');
+    const ctx = CTXS[+sl[0].value], batch = BS[+sl[1].value], price = PR[+sl[2].value];
+    vals[0].textContent = gx(ctx); vals[1].textContent = gx(batch); vals[2].textContent = '$' + fx(price, 2);
+    const m = M[model], c = C[chip];
+    const wb = m.n * bits / 8, cb = batch * ctx * m.kv, ops = batch * (2 * m.n + 4 * m.d * m.layers * ctx);
+    const tr = (wb + cb) / c.bw, tm = ops / c.peak, t = Math.max(tr, tm), total = batch / t;
+    const L = [`each step reads ${sig3(wb / 1e9)} GB of weights and ${sig3(cb / 1e9)} GB of caches`,
+      `one step: ${sig3(t * 1e3)} ms, ${tr >= tm ? 'memory' : 'compute'} bound`,
+      `tokens a second: ${sig3(1 / t)} for each user, ${sig3(total)} in total`,
+      `arithmetic units busy: ${sig3(100 * tm / t)}% of the step`,
+      `at $${fx(price, 2)} an hour: $${sig3(price / (total * 3600) * 1e6)} per million tokens`,
+      `memory needed: ${sig3((wb + cb) / 1e9)} GB, where one ${chip} holds ${gx(c.cap / 1e9)} GB`];
+    L.forEach((s, k) => q(`[data-r="${k}"]`).textContent = s);
+    [tr, tm].forEach((v, k) => {
+      const w = +(380 * v / t).toFixed(1);
+      q(`[data-bar="${k}"]`).setAttribute('width', w);
+      const lb = q(`[data-bl="${k}"]`); lb.setAttribute('x', +(160 + w + 10).toFixed(1));
+      lb.textContent = `${sig3(v * 1e3)} ms`;
+    });
+  }
+  sl.forEach(s => s.addEventListener('input', draw));
+  ['model', 'bits', 'chip'].forEach(n => rad(n).forEach(r => r.addEventListener('change', draw)));
+  q('button').addEventListener('click', () => {
+    ['model', 'bits', 'chip'].forEach(n => rad(n).forEach(r => r.checked = r.value === String(S0[n])));
+    sl[0].value = CTXS.indexOf(S0.ctx); sl[1].value = BS.indexOf(S0.batch); sl[2].value = PR.indexOf(S0.price);
+    draw();
+  });
+  draw();
+})();</script></figure>

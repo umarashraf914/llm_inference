@@ -1,0 +1,2816 @@
+1
+00:00:00,400 --> 00:00:05,120
+Speculative decoding starts with a small
+
+2
+00:00:02,639 --> 00:00:07,520
+model guessing the next few tokens. And
+
+3
+00:00:05,120 --> 00:00:10,080
+because that model is small, it produces
+
+4
+00:00:07,520 --> 00:00:12,080
+those guesses quickly. The large model
+
+5
+00:00:10,080 --> 00:00:14,480
+then takes the whole batch of guesses
+
+6
+00:00:12,080 --> 00:00:16,640
+and checks them in one pass. When the
+
+7
+00:00:14,480 --> 00:00:18,960
+guesses hold up, that single pass
+
+8
+00:00:16,640 --> 00:00:21,199
+returns several tokens instead of one,
+
+9
+00:00:18,960 --> 00:00:24,160
+and it reads the weights exactly once to
+
+10
+00:00:21,199 --> 00:00:26,800
+do it. Nothing in the last episode
+
+11
+00:00:24,160 --> 00:00:29,760
+worked that way. batching, [music]
+
+12
+00:00:26,800 --> 00:00:31,760
+continuous scheduling, and paged caches
+
+13
+00:00:29,760 --> 00:00:34,399
+all worked by putting more requests
+
+14
+00:00:31,760 --> 00:00:36,399
+behind each read of the weights. None of
+
+15
+00:00:34,399 --> 00:00:39,280
+that helps a machine that is running one
+
+16
+00:00:36,399 --> 00:00:43,840
+request on its own. To produce a single
+
+17
+00:00:39,280 --> 00:00:46,559
+token, the GPU reads all 140 GB of a 70
+
+18
+00:00:43,840 --> 00:00:49,600
+billion parameter model. Then it reads
+
+19
+00:00:46,559 --> 00:00:52,480
+the same 140 GB again for the next
+
+20
+00:00:49,600 --> 00:00:56,079
+token. And the arithmetic units sit
+
+21
+00:00:52,480 --> 00:00:57,920
+nearly idle during the reads.
+
+22
+00:00:56,079 --> 00:01:00,640
+So each read of the weights has to
+
+23
+00:00:57,920 --> 00:01:03,600
+produce more than one token. Each
+
+24
+00:01:00,640 --> 00:01:06,720
+technique ahead does one of two things.
+
+25
+00:01:03,600 --> 00:01:09,040
+It either moves fewer bytes per token or
+
+26
+00:01:06,720 --> 00:01:12,159
+it gets more work out of the bytes that
+
+27
+00:01:09,040 --> 00:01:14,320
+already moved. Speculative decoding is
+
+28
+00:01:12,159 --> 00:01:17,200
+the kind that gets more work out of the
+
+29
+00:01:14,320 --> 00:01:19,600
+same bytes. The long context ideas that
+
+30
+00:01:17,200 --> 00:01:23,200
+we'll discuss later on mostly move fewer
+
+31
+00:01:19,600 --> 00:01:24,960
+of them. First let's look at speculative
+
+32
+00:01:23,200 --> 00:01:27,280
+decoding.
+
+33
+00:01:24,960 --> 00:01:29,520
+The GPU reads the model's weights once
+
+34
+00:01:27,280 --> 00:01:31,840
+per forward pass, no matter how many
+
+35
+00:01:29,520 --> 00:01:34,079
+token positions are in that pass.
+
+36
+00:01:31,840 --> 00:01:37,680
+Ordinary decode has one position. So
+
+37
+00:01:34,079 --> 00:01:39,840
+those 140 GB produce a single token.
+
+38
+00:01:37,680 --> 00:01:43,200
+Verification puts five positions in one
+
+39
+00:01:39,840 --> 00:01:46,560
+pass. So a single read of those 140 GB
+
+40
+00:01:43,200 --> 00:01:48,960
+covers all five. The small model writes
+
+41
+00:01:46,560 --> 00:01:51,360
+its guesses the normal way, one token at
+
+42
+00:01:48,960 --> 00:01:54,399
+a time, feeding [music] each one back in
+
+43
+00:01:51,360 --> 00:01:57,600
+to produce the next. Five guesses take
+
+44
+00:01:54,399 --> 00:01:59,920
+five of its own forward passes. The
+
+45
+00:01:57,600 --> 00:02:03,040
+small model is the drafter and the large
+
+46
+00:01:59,920 --> 00:02:05,200
+model that checks it is the target. The
+
+47
+00:02:03,040 --> 00:02:07,280
+2022 speculative decoding paper found
+
+48
+00:02:05,200 --> 00:02:10,000
+the drafter usually works best at about
+
+49
+00:02:07,280 --> 00:02:12,319
+100 times smaller than the target. At
+
+50
+00:02:10,000 --> 00:02:16,080
+that size, five drafter passes move
+
+51
+00:02:12,319 --> 00:02:18,640
+roughly 7 GB in total, next to 140 for
+
+52
+00:02:16,080 --> 00:02:20,720
+one pass of the large model.
+
+53
+00:02:18,640 --> 00:02:23,200
+The large model then takes the text so
+
+54
+00:02:20,720 --> 00:02:26,720
+far with those five guesses added to the
+
+55
+00:02:23,200 --> 00:02:29,200
+end. It runs one pass over the whole
+
+56
+00:02:26,720 --> 00:02:31,760
+sequence [music] and at every position
+
+57
+00:02:29,200 --> 00:02:34,480
+it produces its own distribution over
+
+58
+00:02:31,760 --> 00:02:36,959
+what the next token should be there.
+
+59
+00:02:34,480 --> 00:02:39,920
+Attention is causal. So each position
+
+60
+00:02:36,959 --> 00:02:42,080
+sees only the tokens before it. So the
+
+61
+00:02:39,920 --> 00:02:44,560
+prediction at the third guess depends
+
+62
+00:02:42,080 --> 00:02:47,040
+only on the first two which is exactly
+
+63
+00:02:44,560 --> 00:02:49,680
+the information the large model has when
+
+64
+00:02:47,040 --> 00:02:51,920
+it writes that position itself.
+
+65
+00:02:49,680 --> 00:02:53,680
+The large model then compares each guess
+
+66
+00:02:51,920 --> 00:02:56,239
+against the prediction sitting at its
+
+67
+00:02:53,680 --> 00:02:58,560
+position. It keeps the guesses it agrees
+
+68
+00:02:56,239 --> 00:03:01,360
+with and throws away everything from the
+
+69
+00:02:58,560 --> 00:03:03,840
+first disagreement onward. If all five
+
+70
+00:03:01,360 --> 00:03:06,080
+survive, the pass gives back a sixth
+
+71
+00:03:03,840 --> 00:03:07,840
+token for free because the model has
+
+72
+00:03:06,080 --> 00:03:09,440
+already made a prediction at the last
+
+73
+00:03:07,840 --> 00:03:11,840
+position.
+
+74
+00:03:09,440 --> 00:03:14,959
+It does mean that we have five times the
+
+75
+00:03:11,840 --> 00:03:16,879
+arithmetic compared to a single token.
+
+76
+00:03:14,959 --> 00:03:19,280
+But arithmetic was never the bottleneck
+
+77
+00:03:16,879 --> 00:03:21,599
+for decode. The paper assumes those
+
+78
+00:03:19,280 --> 00:03:25,040
+extra positions run in parallel on idle
+
+79
+00:03:21,599 --> 00:03:27,360
+compute and add no wall clock time. The
+
+80
+00:03:25,040 --> 00:03:30,080
+tokens that survive were still written
+
+81
+00:03:27,360 --> 00:03:31,840
+by the weaker model. The obvious worry
+
+82
+00:03:30,080 --> 00:03:33,519
+in this case is that the output gets
+
+83
+00:03:31,840 --> 00:03:35,599
+worse.
+
+84
+00:03:33,519 --> 00:03:38,640
+Whether the output gets worse depends on
+
+85
+00:03:35,599 --> 00:03:40,879
+how the guesses are accepted. One option
+
+86
+00:03:38,640 --> 00:03:43,280
+is to keep a guess whenever the drafter
+
+87
+00:03:40,879 --> 00:03:45,200
+was confident, but that means sampling
+
+88
+00:03:43,280 --> 00:03:47,519
+from the small model and the small
+
+89
+00:03:45,200 --> 00:03:49,920
+model's distribution is not the one the
+
+90
+00:03:47,519 --> 00:03:53,120
+customer asked for. The rule in the
+
+91
+00:03:49,920 --> 00:03:55,280
+original paper avoids that completely.
+
+92
+00:03:53,120 --> 00:03:58,239
+It works through the drafted tokens one
+
+93
+00:03:55,280 --> 00:03:59,920
+at a time. The large model has its own
+
+94
+00:03:58,239 --> 00:04:02,400
+probability for the token the small
+
+95
+00:03:59,920 --> 00:04:04,480
+model proposed and the small model had
+
+96
+00:04:02,400 --> 00:04:06,959
+one too. When the large model's
+
+97
+00:04:04,480 --> 00:04:09,840
+probability is at least as high, the
+
+98
+00:04:06,959 --> 00:04:12,080
+token is accepted outright. When it is
+
+99
+00:04:09,840 --> 00:04:14,080
+lower, the token is accepted with
+
+100
+00:04:12,080 --> 00:04:17,040
+probability equal to the large models
+
+101
+00:04:14,080 --> 00:04:19,440
+number divided by the small models. For
+
+102
+00:04:17,040 --> 00:04:22,880
+example, a token the drafter rated at
+
+103
+00:04:19,440 --> 00:04:26,240
+60% and the target rated at 30% has a
+
+104
+00:04:22,880 --> 00:04:28,639
+50% probability of being accepted.
+
+105
+00:04:26,240 --> 00:04:32,000
+A rejected token is replaced rather than
+
+106
+00:04:28,639 --> 00:04:33,600
+dropped. The large model samples the
+
+107
+00:04:32,000 --> 00:04:35,680
+replacement from the difference between
+
+108
+00:04:33,600 --> 00:04:37,840
+the two distributions.
+
+109
+00:04:35,680 --> 00:04:40,400
+It takes its own probability for every
+
+110
+00:04:37,840 --> 00:04:42,720
+token in the vocabulary, subtracts the
+
+111
+00:04:40,400 --> 00:04:45,583
+drafters, clips anything negative to
+
+112
+00:04:42,720 --> 00:04:47,759
+zero, and renormalizes what is left.
+
+113
+00:04:45,583 --> 00:04:49,680
+[music] That leftover distribution has
+
+114
+00:04:47,759 --> 00:04:52,320
+weight only where the target wanted a
+
+115
+00:04:49,680 --> 00:04:54,560
+token more than the drafter did.
+
+116
+00:04:52,320 --> 00:04:56,880
+Accepting covers the probability the two
+
+117
+00:04:54,560 --> 00:04:58,880
+models already agreed on. The
+
+118
+00:04:56,880 --> 00:05:01,520
+replacement covers exactly the amount
+
+119
+00:04:58,880 --> 00:05:03,840
+the drafter was shot. Put them together
+
+120
+00:05:01,520 --> 00:05:06,639
+and the targets distribution is back
+
+121
+00:05:03,840 --> 00:05:08,800
+token for token. Tokens produced this
+
+122
+00:05:06,639 --> 00:05:12,080
+way have exactly the same distribution
+
+123
+00:05:08,800 --> 00:05:13,759
+as tokens sampled from the target alone.
+
+124
+00:05:12,080 --> 00:05:16,720
+Nothing in that argument depends on the
+
+125
+00:05:13,759 --> 00:05:18,720
+drafter being good. A bad drafter simply
+
+126
+00:05:16,720 --> 00:05:21,280
+gets rejected more often which makes it
+
+127
+00:05:18,720 --> 00:05:23,600
+slower and cannot make the output wrong.
+
+128
+00:05:21,280 --> 00:05:25,759
+Later methods do loosen this rule to get
+
+129
+00:05:23,600 --> 00:05:28,960
+more guesses accepted and they give up
+
+130
+00:05:25,759 --> 00:05:30,800
+the guarantee when they do. The 2022
+
+131
+00:05:28,960 --> 00:05:33,600
+paper measured a speed up of two to
+
+132
+00:05:30,800 --> 00:05:37,120
+three times on T5XXL with identical
+
+133
+00:05:33,600 --> 00:05:39,840
+outputs. A second paper from deep mind
+
+134
+00:05:37,120 --> 00:05:42,000
+derived the same rule independently. It
+
+135
+00:05:39,840 --> 00:05:45,600
+reported two to two and a half times on
+
+136
+00:05:42,000 --> 00:05:47,600
+chinchilla a 70 billion parameter model.
+
+137
+00:05:45,600 --> 00:05:49,919
+The targets distribution held to within
+
+138
+00:05:47,600 --> 00:05:52,880
+hardware numeric.
+
+139
+00:05:49,919 --> 00:05:54,479
+So the drafter's quality never touches
+
+140
+00:05:52,880 --> 00:05:56,320
+correctness.
+
+141
+00:05:54,479 --> 00:05:58,560
+All it changes is how many guesses
+
+142
+00:05:56,320 --> 00:06:02,000
+survive each pass and that is where the
+
+143
+00:05:58,560 --> 00:06:04,400
+speed up comes from. The ordinary way to
+
+144
+00:06:02,000 --> 00:06:07,280
+produce three tokens is three trips
+
+145
+00:06:04,400 --> 00:06:11,199
+through the large model. Each trip reads
+
+146
+00:06:07,280 --> 00:06:13,120
+all 140 GB. So the three of them move
+
+147
+00:06:11,199 --> 00:06:15,600
+420.
+
+148
+00:06:13,120 --> 00:06:19,120
+A speculative step produces those same
+
+149
+00:06:15,600 --> 00:06:21,919
+three tokens with one read of 140 plus
+
+150
+00:06:19,120 --> 00:06:23,919
+the 7 GB the drafter moved for its five
+
+151
+00:06:21,919 --> 00:06:27,840
+guesses.
+
+152
+00:06:23,919 --> 00:06:31,039
+147 against 420 is a factor of just
+
+153
+00:06:27,840 --> 00:06:33,280
+under three. So the speed up follows the
+
+154
+00:06:31,039 --> 00:06:35,199
+acceptance length. The average number of
+
+155
+00:06:33,280 --> 00:06:38,000
+drafted tokens that survive each
+
+156
+00:06:35,199 --> 00:06:40,240
+verification step. The real speed up
+
+157
+00:06:38,000 --> 00:06:43,120
+always lands a little under that because
+
+158
+00:06:40,240 --> 00:06:46,400
+the drafter adds 7 GB to every weight
+
+159
+00:06:43,120 --> 00:06:48,319
+read. One pass of the large model also
+
+160
+00:06:46,400 --> 00:06:51,360
+has a ceiling on how many extra
+
+161
+00:06:48,319 --> 00:06:53,600
+positions it can check. Verification is
+
+162
+00:06:51,360 --> 00:06:55,840
+close to free only while the large model
+
+163
+00:06:53,600 --> 00:06:58,160
+has compute sitting idle. During
+
+164
+00:06:55,840 --> 00:07:00,800
+ordinary decode, nearly all of it is
+
+165
+00:06:58,160 --> 00:07:03,120
+idle. The more requests you put behind a
+
+166
+00:07:00,800 --> 00:07:06,479
+single weight read, the less room is
+
+167
+00:07:03,120 --> 00:07:08,960
+left for those five extra positions.
+
+168
+00:07:06,479 --> 00:07:11,840
+Speculative decoding helps most on a
+
+169
+00:07:08,960 --> 00:07:13,919
+machine serving a single user and least
+
+170
+00:07:11,840 --> 00:07:15,680
+on a machine already packed with other
+
+171
+00:07:13,919 --> 00:07:17,919
+requests.
+
+172
+00:07:15,680 --> 00:07:20,080
+Every method that we'll discuss after
+
+173
+00:07:17,919 --> 00:07:22,240
+this tries to raise that acceptance
+
+174
+00:07:20,080 --> 00:07:24,240
+length and some drop the drafter
+
+175
+00:07:22,240 --> 00:07:26,560
+altogether.
+
+176
+00:07:24,240 --> 00:07:29,039
+That drafter is a second model running
+
+177
+00:07:26,560 --> 00:07:31,280
+beside the target. Its weights sit in
+
+178
+00:07:29,039 --> 00:07:33,840
+memory beside the targets and it needs
+
+179
+00:07:31,280 --> 00:07:36,160
+retraining whenever the target changes.
+
+180
+00:07:33,840 --> 00:07:38,720
+The two models also have to share one
+
+181
+00:07:36,160 --> 00:07:42,000
+vocabulary because verification compares
+
+182
+00:07:38,720 --> 00:07:44,240
+their probabilities token for token. How
+
+183
+00:07:42,000 --> 00:07:46,800
+closely the two agree decides how many
+
+184
+00:07:44,240 --> 00:07:48,800
+guesses survive each pass. So a drafter
+
+185
+00:07:46,800 --> 00:07:51,199
+that has drifted away from the target
+
+186
+00:07:48,800 --> 00:07:54,160
+slows everything down.
+
+187
+00:07:51,199 --> 00:07:56,639
+Medusa from 2024 removes [music] that
+
+188
+00:07:54,160 --> 00:07:59,680
+second model. Instead of a second
+
+189
+00:07:56,639 --> 00:08:02,319
+network, it adds extra decoding heads to
+
+190
+00:07:59,680 --> 00:08:04,800
+the model already running. Each head is
+
+191
+00:08:02,319 --> 00:08:07,599
+a small output layer reading the same
+
+192
+00:08:04,800 --> 00:08:09,840
+hidden state the model just produced.
+
+193
+00:08:07,599 --> 00:08:12,400
+The first head guesses the token two
+
+194
+00:08:09,840 --> 00:08:16,400
+positions ahead. The second head three
+
+195
+00:08:12,400 --> 00:08:19,199
+positions ahead and so on all at once.
+
+196
+00:08:16,400 --> 00:08:21,520
+But nothing links one head to the next.
+
+197
+00:08:19,199 --> 00:08:23,759
+The head guessing three positions ahead
+
+198
+00:08:21,520 --> 00:08:26,400
+has no idea what the head before it
+
+199
+00:08:23,759 --> 00:08:29,440
+settled on. A single chain of guesses
+
+200
+00:08:26,400 --> 00:08:31,759
+would usually break early. Medusa takes
+
+201
+00:08:29,440 --> 00:08:33,599
+the top few candidates from each head
+
+202
+00:08:31,759 --> 00:08:36,080
+and combines them into a tree of
+
+203
+00:08:33,599 --> 00:08:38,159
+possible continuations.
+
+204
+00:08:36,080 --> 00:08:40,719
+The model verifies the whole tree in one
+
+205
+00:08:38,159 --> 00:08:43,519
+forward pass. An attention mask lets
+
+206
+00:08:40,719 --> 00:08:46,080
+each token see only its own ancestors,
+
+207
+00:08:43,519 --> 00:08:49,360
+never its siblings. With the backbone
+
+208
+00:08:46,080 --> 00:08:51,279
+left frozen, Medusa 1 reports over 2.2
+
+209
+00:08:49,360 --> 00:08:55,040
+times speed up without compromising
+
+210
+00:08:51,279 --> 00:08:57,279
+generation quality. Medusa 2 fine-tunes
+
+211
+00:08:55,040 --> 00:09:01,040
+the whole model along with the heads and
+
+212
+00:08:57,279 --> 00:09:04,320
+reaches 2.3 to 3.6 times.
+
+213
+00:09:01,040 --> 00:09:06,320
+Medusa also changed the acceptance test.
+
+214
+00:09:04,320 --> 00:09:08,320
+The paper argues that matching the
+
+215
+00:09:06,320 --> 00:09:10,480
+distribution of the original model is
+
+216
+00:09:08,320 --> 00:09:12,959
+typically unnecessary.
+
+217
+00:09:10,480 --> 00:09:15,200
+A drafted token survives whenever the
+
+218
+00:09:12,959 --> 00:09:18,080
+target's own probability for it clears a
+
+219
+00:09:15,200 --> 00:09:20,160
+threshold. That threshold drops when the
+
+220
+00:09:18,080 --> 00:09:22,560
+target is uncertain because in a
+
+221
+00:09:20,160 --> 00:09:24,240
+genuinely open spot, many tokens are
+
+222
+00:09:22,560 --> 00:09:26,720
+reasonable.
+
+223
+00:09:24,240 --> 00:09:28,880
+More guesses survive and in exchange,
+
+224
+00:09:26,720 --> 00:09:32,000
+the output is no longer guaranteed to
+
+225
+00:09:28,880 --> 00:09:34,000
+match what the target alone produces.
+
+226
+00:09:32,000 --> 00:09:36,320
+The heads still guess several positions
+
+227
+00:09:34,000 --> 00:09:38,800
+ahead from a single snapshot of the
+
+228
+00:09:36,320 --> 00:09:41,040
+model state taken before any of these
+
+229
+00:09:38,800 --> 00:09:43,519
+guesses were made.
+
+230
+00:09:41,040 --> 00:09:46,320
+Eagle is a family of drafting methods
+
+231
+00:09:43,519 --> 00:09:48,399
+from 2024 and it changes what the
+
+232
+00:09:46,320 --> 00:09:50,240
+drafter predicts.
+
+233
+00:09:48,399 --> 00:09:52,560
+Instead of guessing the next token,
+
+234
+00:09:50,240 --> 00:09:55,120
+Eagle One predicts the target model's
+
+235
+00:09:52,560 --> 00:09:57,600
+own internal vector at its second to top
+
+236
+00:09:55,120 --> 00:10:00,080
+layer, it turns that vector into a token
+
+237
+00:09:57,600 --> 00:10:02,480
+afterwards. Those internal vectors
+
+238
+00:10:00,080 --> 00:10:04,320
+change smoothly from one position to the
+
+239
+00:10:02,480 --> 00:10:06,480
+next, which [music] makes them easier to
+
+240
+00:10:04,320 --> 00:10:09,600
+predict than a token choice that jumps
+
+241
+00:10:06,480 --> 00:10:11,519
+between discrete options. It also leaves
+
+242
+00:10:09,600 --> 00:10:14,397
+the distribution of the generated text
+
+243
+00:10:11,519 --> 00:10:16,720
+unchanged, so the output stays exact.
+
+244
+00:10:14,397 --> 00:10:20,480
+[music] Eagle one arranges its guesses
+
+245
+00:10:16,720 --> 00:10:23,040
+into a tree the same way Medusa does.
+
+246
+00:10:20,480 --> 00:10:25,200
+Eagle 2 leaves the drafting alone and
+
+247
+00:10:23,040 --> 00:10:27,519
+changes the shape of that tree. Whether
+
+248
+00:10:25,200 --> 00:10:30,240
+a guess gets accepted depends heavily on
+
+249
+00:10:27,519 --> 00:10:33,200
+context. A tree with a fixed shape
+
+250
+00:10:30,240 --> 00:10:36,640
+wastess branches in easy contexts and
+
+251
+00:10:33,200 --> 00:10:38,480
+runs short of them in hard ones. Eagle 2
+
+252
+00:10:36,640 --> 00:10:40,320
+grows the tree where the drafter is
+
+253
+00:10:38,480 --> 00:10:43,360
+confident and prunes it where the
+
+254
+00:10:40,320 --> 00:10:46,560
+drafter is not. That is another 20 to
+
+255
+00:10:43,360 --> 00:10:48,800
+40% over eagle 1, still without changing
+
+256
+00:10:46,560 --> 00:10:52,480
+the output distribution.
+
+257
+00:10:48,800 --> 00:10:54,880
+Eagle 3 reverses the original idea. It
+
+258
+00:10:52,480 --> 00:10:56,959
+goes back to predicting tokens directly,
+
+259
+00:10:54,880 --> 00:10:59,040
+but it feeds the drafter a mixture of
+
+260
+00:10:56,959 --> 00:11:02,000
+internal vectors taken from several of
+
+261
+00:10:59,040 --> 00:11:04,000
+the targets layers instead of just one.
+
+262
+00:11:02,000 --> 00:11:06,480
+that removed a ceiling on how much the
+
+263
+00:11:04,000 --> 00:11:09,760
+drafter improves as it trains on more
+
+264
+00:11:06,480 --> 00:11:11,279
+data. The paper reports up to 6 and 1/2
+
+265
+00:11:09,760 --> 00:11:14,720
+times.
+
+266
+00:11:11,279 --> 00:11:17,920
+The same paper also reports 1.38 times
+
+267
+00:11:14,720 --> 00:11:20,959
+throughput at a batch size of 64. Those
+
+268
+00:11:17,920 --> 00:11:23,279
+two numbers both describe Eagle 3. The 6
+
+269
+00:11:20,959 --> 00:11:27,680
+and 1/2 is one request on an idle
+
+270
+00:11:23,279 --> 00:11:29,839
+machine. The 1.38 is a machine with 64
+
+271
+00:11:27,680 --> 00:11:31,839
+requests already competing for its
+
+272
+00:11:29,839 --> 00:11:33,920
+compute.
+
+273
+00:11:31,839 --> 00:11:36,160
+Look ahead decoding gets several tokens
+
+274
+00:11:33,920 --> 00:11:38,800
+out of a single pass with no drafter at
+
+275
+00:11:36,160 --> 00:11:41,279
+all. It runs the model on several future
+
+276
+00:11:38,800 --> 00:11:44,160
+positions at once, taking a rough guess
+
+277
+00:11:41,279 --> 00:11:45,839
+at all of them. Then it runs again,
+
+278
+00:11:44,160 --> 00:11:49,519
+improving the whole set of guesses
+
+279
+00:11:45,839 --> 00:11:51,839
+together. On its own, that barely helps.
+
+280
+00:11:49,519 --> 00:11:54,160
+A position only settles once everything
+
+281
+00:11:51,839 --> 00:11:56,800
+before it has settled. So the sequence
+
+282
+00:11:54,160 --> 00:11:59,120
+still fills in about one token at a time
+
+283
+00:11:56,800 --> 00:12:02,079
+and the guesses that do land correctly
+
+284
+00:11:59,120 --> 00:12:03,839
+get overwritten on the next round. But a
+
+285
+00:12:02,079 --> 00:12:06,320
+guess in the wrong position is not the
+
+286
+00:12:03,839 --> 00:12:08,368
+same as a wrong guess. A short run of
+
+287
+00:12:06,320 --> 00:12:10,320
+tokens can sit in the wrong place and
+
+288
+00:12:08,368 --> 00:12:13,040
+[music] still be a real continuation the
+
+289
+00:12:10,320 --> 00:12:16,320
+model would produce somewhere. So look
+
+290
+00:12:13,040 --> 00:12:18,880
+ahead keeps every one of them in a pool.
+
+291
+00:12:16,320 --> 00:12:20,639
+Each time the model emits a real token,
+
+292
+00:12:18,880 --> 00:12:22,480
+it pulls out the fragments that begin
+
+293
+00:12:20,639 --> 00:12:25,040
+with that [music] token and checks them
+
+294
+00:12:22,480 --> 00:12:27,600
+in the same pass. The model ends up
+
+295
+00:12:25,040 --> 00:12:30,160
+drafting for itself out of its own
+
+296
+00:12:27,600 --> 00:12:34,000
+discarded work with nothing extra to
+
+297
+00:12:30,160 --> 00:12:36,320
+train. The paper reports up to 1.8 times
+
+298
+00:12:34,000 --> 00:12:39,120
+on empty bench, which is a benchmark for
+
+299
+00:12:36,320 --> 00:12:42,320
+evaluating LLMs in multi-turn dialogues
+
+300
+00:12:39,120 --> 00:12:44,399
+with the output still exact.
+
+301
+00:12:42,320 --> 00:12:46,720
+Every one of these gets more tokens out
+
+302
+00:12:44,399 --> 00:12:48,240
+of a single read of the weights. The
+
+303
+00:12:46,720 --> 00:12:50,880
+weights are not the only thing being
+
+304
+00:12:48,240 --> 00:12:52,720
+read on every step though.
+
+305
+00:12:50,880 --> 00:12:55,839
+The other thing being read is the cache
+
+306
+00:12:52,720 --> 00:12:58,240
+of keys and values. The model turns
+
+307
+00:12:55,839 --> 00:13:00,880
+every token it reads into a key and a
+
+308
+00:12:58,240 --> 00:13:03,360
+value and every later token needs those
+
+309
+00:13:00,880 --> 00:13:05,200
+in order to attend to it. Storing them
+
+310
+00:13:03,360 --> 00:13:08,639
+saves the model from processing the
+
+311
+00:13:05,200 --> 00:13:10,880
+whole context again at every step. At
+
+312
+00:13:08,639 --> 00:13:13,760
+long context, that cache is a bigger
+
+313
+00:13:10,880 --> 00:13:16,000
+problem than the weights. For a 70
+
+314
+00:13:13,760 --> 00:13:18,959
+billion parameter model, that cache runs
+
+315
+00:13:16,000 --> 00:13:22,000
+about 320 kilobytes for every token of
+
+316
+00:13:18,959 --> 00:13:25,680
+context. A single request stretched out
+
+317
+00:13:22,000 --> 00:13:28,720
+to 128,000 tokens is carrying roughly 40
+
+318
+00:13:25,680 --> 00:13:31,040
+GB of cache on its own. Four requests
+
+319
+00:13:28,720 --> 00:13:33,600
+that long hold more between them than
+
+320
+00:13:31,040 --> 00:13:36,720
+the model holds in weights.
+
+321
+00:13:33,600 --> 00:13:39,519
+And that cache does not just sit there.
+
+322
+00:13:36,720 --> 00:13:42,880
+The GPU reads the whole cache back out
+
+323
+00:13:39,519 --> 00:13:44,720
+of memory on every decode step. So those
+
+324
+00:13:42,880 --> 00:13:47,200
+bytes compete with the weights for the
+
+325
+00:13:44,720 --> 00:13:48,880
+same bandwidth.
+
+326
+00:13:47,200 --> 00:13:51,120
+Flash attention already cut what
+
+327
+00:13:48,880 --> 00:13:53,680
+attention has to move and it did that
+
+328
+00:13:51,120 --> 00:13:55,440
+without changing a single output but it
+
+329
+00:13:53,680 --> 00:13:57,519
+never touched the size of the cache
+
+330
+00:13:55,440 --> 00:13:59,120
+which still grows with every token that
+
+331
+00:13:57,519 --> 00:14:01,680
+arrives.
+
+332
+00:13:59,120 --> 00:14:04,800
+One way out is to keep every token and
+
+333
+00:14:01,680 --> 00:14:06,959
+spread the cash across many devices.
+
+334
+00:14:04,800 --> 00:14:10,160
+That is ring attention which we covered
+
+335
+00:14:06,959 --> 00:14:12,639
+in episode 5. Each device holds a slice
+
+336
+00:14:10,160 --> 00:14:14,784
+of the sequence and passes its block of
+
+337
+00:14:12,639 --> 00:14:17,760
+keys and values around a ring until
+
+338
+00:14:14,784 --> 00:14:20,480
+[music] every query has seen everyone.
+
+339
+00:14:17,760 --> 00:14:22,959
+The result stays exact and what it needs
+
+340
+00:14:20,480 --> 00:14:24,880
+is a set of devices with an interconnect
+
+341
+00:14:22,959 --> 00:14:27,199
+fast enough to hide those transfers
+
+342
+00:14:24,880 --> 00:14:29,360
+behind the arithmetic.
+
+343
+00:14:27,199 --> 00:14:31,920
+The other ways we'll talk about next all
+
+344
+00:14:29,360 --> 00:14:34,480
+give something up. You can make the
+
+345
+00:14:31,920 --> 00:14:37,040
+model attend to fewer tokens, store
+
+346
+00:14:34,480 --> 00:14:40,079
+fewer of them, or keep them out of the
+
+347
+00:14:37,040 --> 00:14:42,399
+context in the first place. Each of the
+
+348
+00:14:40,079 --> 00:14:44,240
+three can drop the very token the answer
+
+349
+00:14:42,399 --> 00:14:46,800
+needed. In ring attention, [music]
+
+350
+00:14:44,240 --> 00:14:49,040
+that token is still there.
+
+351
+00:14:46,800 --> 00:14:51,199
+Attending to fewer tokens works because
+
+352
+00:14:49,040 --> 00:14:54,000
+a trained model already ignores most of
+
+353
+00:14:51,199 --> 00:14:56,639
+them. Most of the attention weight lands
+
+354
+00:14:54,000 --> 00:14:58,720
+on a handful of tokens. computing every
+
+355
+00:14:56,639 --> 00:15:01,600
+pair anyway spends nearly all of the
+
+356
+00:14:58,720 --> 00:15:03,519
+work on pairs that barely matter.
+
+357
+00:15:01,600 --> 00:15:06,480
+The simplest version restricts each
+
+358
+00:15:03,519 --> 00:15:10,800
+token to a fixed window of recent ones.
+
+359
+00:15:06,480 --> 00:15:13,519
+Mistral 7B sets that window at 4,096
+
+360
+00:15:10,800 --> 00:15:16,560
+tokens. That looks like everything older
+
+361
+00:15:13,519 --> 00:15:19,120
+is simply gone. It is not because the
+
+362
+00:15:16,560 --> 00:15:22,399
+tokens inside that window have windows
+
+363
+00:15:19,120 --> 00:15:25,440
+of their own. A token sees the 4,000
+
+364
+00:15:22,399 --> 00:15:28,880
+positions behind it. Each of those has
+
+365
+00:15:25,440 --> 00:15:31,040
+already seen the 4,000 behind itself. So
+
+366
+00:15:28,880 --> 00:15:33,760
+after two layers, the newest token is
+
+367
+00:15:31,040 --> 00:15:36,320
+carrying information from 8,000 back.
+
+368
+00:15:33,760 --> 00:15:38,959
+After 32 layers that reaches about
+
+369
+00:15:36,320 --> 00:15:40,800
+130,000 tokens in theory, even though no
+
+370
+00:15:38,959 --> 00:15:44,000
+single layer ever looks further than
+
+371
+00:15:40,800 --> 00:15:46,240
+4,000. Once the window has moved past a
+
+372
+00:15:44,000 --> 00:15:48,399
+token, nothing will ever attend to it
+
+373
+00:15:46,240 --> 00:15:51,440
+again. So its key and value can be
+
+374
+00:15:48,399 --> 00:15:54,880
+thrown away. Each new token overwrites
+
+375
+00:15:51,440 --> 00:15:58,160
+the entry 4,096 positions behind it, and
+
+376
+00:15:54,880 --> 00:16:00,560
+the cash stops growing.
+
+377
+00:15:58,160 --> 00:16:02,720
+Deepseek's native sparse attention makes
+
+378
+00:16:00,560 --> 00:16:04,240
+the sparsity something the model learns
+
+379
+00:16:02,720 --> 00:16:05,759
+rather than something bolted on
+
+380
+00:16:04,240 --> 00:16:08,480
+afterwards.
+
+381
+00:16:05,759 --> 00:16:11,440
+Every query runs three branches at once,
+
+382
+00:16:08,480 --> 00:16:13,519
+each with its own keys and values. A
+
+383
+00:16:11,440 --> 00:16:16,560
+compression branch cuts the older tokens
+
+384
+00:16:13,519 --> 00:16:19,600
+into blocks of a fixed size and squashes
+
+385
+00:16:16,560 --> 00:16:21,279
+each block into one course summary. A
+
+386
+00:16:19,600 --> 00:16:23,680
+selection branch picks out a few
+
+387
+00:16:21,279 --> 00:16:26,399
+important blocks and keeps them at full
+
+388
+00:16:23,680 --> 00:16:28,959
+detail. A sliding branch handles
+
+389
+00:16:26,399 --> 00:16:30,959
+whatever is nearby. Local patterns are
+
+390
+00:16:28,959 --> 00:16:33,040
+the easiest thing to learn. So without
+
+391
+00:16:30,959 --> 00:16:36,000
+it, the other two would learn those and
+
+392
+00:16:33,040 --> 00:16:39,040
+not much else. A learned gate blends the
+
+393
+00:16:36,000 --> 00:16:40,480
+three outputs together because the model
+
+394
+00:16:39,040 --> 00:16:42,800
+works out where to look during
+
+395
+00:16:40,480 --> 00:16:44,959
+pre-training rather than after it.
+
+396
+00:16:42,800 --> 00:16:47,360
+Native sparse attention matches or
+
+397
+00:16:44,959 --> 00:16:50,079
+exceeds full attention across general
+
+398
+00:16:47,360 --> 00:16:53,120
+benchmarks, long context tasks, and
+
+399
+00:16:50,079 --> 00:16:56,959
+reasoning. It also runs substantially
+
+400
+00:16:53,120 --> 00:16:59,199
+faster on 64,000 token sequences.
+
+401
+00:16:56,959 --> 00:17:02,079
+Deepseek shipped a relative of it as
+
+402
+00:16:59,199 --> 00:17:04,160
+deepseek sparse attention in v3.2
+
+403
+00:17:02,079 --> 00:17:06,799
+experimental which [music] picks single
+
+404
+00:17:04,160 --> 00:17:09,280
+tokens rather than whole blocks. They
+
+405
+00:17:06,799 --> 00:17:11,760
+cut their API prices by more than half
+
+406
+00:17:09,280 --> 00:17:14,319
+on the same day.
+
+407
+00:17:11,760 --> 00:17:17,120
+Moonshot's mixture of block attention or
+
+408
+00:17:14,319 --> 00:17:20,480
+MOA roots queries instead of compressing
+
+409
+00:17:17,120 --> 00:17:22,480
+tokens. It cuts the context into blocks
+
+410
+00:17:20,480 --> 00:17:24,799
+and puts a learned gate in front of
+
+411
+00:17:22,480 --> 00:17:27,520
+them. So each query goes only to the
+
+412
+00:17:24,799 --> 00:17:30,320
+blocks it needs. That is the mixture of
+
+413
+00:17:27,520 --> 00:17:32,240
+experts idea from episode 6 applied to
+
+414
+00:17:30,320 --> 00:17:34,880
+attention instead of to the feed forward
+
+415
+00:17:32,240 --> 00:17:37,200
+network. The model decides where to
+
+416
+00:17:34,880 --> 00:17:40,080
+attend instead of being handed a fixed
+
+417
+00:17:37,200 --> 00:17:42,720
+pattern which MOBA's authors call a less
+
+418
+00:17:40,080 --> 00:17:44,880
+structure principle. The same mechanism
+
+419
+00:17:42,720 --> 00:17:47,520
+can fall back to full attention whenever
+
+420
+00:17:44,880 --> 00:17:50,880
+it needs to. Moonshot deployed it to
+
+421
+00:17:47,520 --> 00:17:52,640
+serve Kimy's long context requests.
+
+422
+00:17:50,880 --> 00:17:55,919
+All of these change how much of the
+
+423
+00:17:52,640 --> 00:17:58,080
+cache the GPU reads on each step. Apart
+
+424
+00:17:55,919 --> 00:18:00,960
+from the rolling buffer, the tokens
+
+425
+00:17:58,080 --> 00:18:02,480
+themselves are all still there.
+
+426
+00:18:00,960 --> 00:18:04,240
+The other option is to delete them
+
+427
+00:18:02,480 --> 00:18:07,039
+outright.
+
+428
+00:18:04,240 --> 00:18:09,520
+Streaming LLM starts with the soft max,
+
+429
+00:18:07,039 --> 00:18:11,440
+the step that decides how a new token
+
+430
+00:18:09,520 --> 00:18:14,000
+spreads its attention across everything
+
+431
+00:18:11,440 --> 00:18:16,160
+before it. Those weights have to add up
+
+432
+00:18:14,000 --> 00:18:18,480
+to one. So even when nothing in the
+
+433
+00:18:16,160 --> 00:18:21,679
+context is a good match, that weight
+
+434
+00:18:18,480 --> 00:18:23,840
+still has to land somewhere. Every token
+
+435
+00:18:21,679 --> 00:18:26,307
+in the context ends up with a sliver of
+
+436
+00:18:23,840 --> 00:18:26,559
+it, even the ones that match nothing.
+
+437
+00:18:26,307 --> 00:18:28,559
+>> [music]
+
+438
+00:18:26,559 --> 00:18:30,640
+>> The model resolves this by dumping the
+
+439
+00:18:28,559 --> 00:18:33,679
+leftover onto the first few tokens of
+
+440
+00:18:30,640 --> 00:18:36,720
+the sequence. Those tokens work because
+
+441
+00:18:33,679 --> 00:18:38,799
+every later position can see them.
+
+442
+00:18:36,720 --> 00:18:40,559
+Streaming LLM keeps those sync tokens
+
+443
+00:18:38,799 --> 00:18:43,679
+alongside a rolling window of recent
+
+444
+00:18:40,559 --> 00:18:45,520
+ones and evicts everything in between. A
+
+445
+00:18:43,679 --> 00:18:47,679
+model trained on a finite window can
+
+446
+00:18:45,520 --> 00:18:50,720
+then keep generating over a stream of 4
+
+447
+00:18:47,679 --> 00:18:53,120
+million tokens and more. That is not a 4
+
+448
+00:18:50,720 --> 00:18:55,440
+million token memory. The window never
+
+449
+00:18:53,120 --> 00:18:58,000
+grows and whatever falls out of it is
+
+450
+00:18:55,440 --> 00:19:01,280
+gone permanently.
+
+451
+00:18:58,000 --> 00:19:04,240
+H2O, the heavy hitter oracle, is a paper
+
+452
+00:19:01,280 --> 00:19:06,799
+from 2023 with a second way to choose
+
+453
+00:19:04,240 --> 00:19:08,960
+what to evict. It keeps tokens by
+
+454
+00:19:06,799 --> 00:19:11,840
+attention received rather than by
+
+455
+00:19:08,960 --> 00:19:13,360
+position. A small fraction of tokens
+
+456
+00:19:11,840 --> 00:19:16,720
+account for most of the attention
+
+457
+00:19:13,360 --> 00:19:20,160
+weight. H2O keeps those alongside recent
+
+458
+00:19:16,720 --> 00:19:23,280
+ones and runs on about 20% of the cache.
+
+459
+00:19:20,160 --> 00:19:25,200
+Snap KV applies the same idea earlier,
+
+460
+00:19:23,280 --> 00:19:28,080
+compressing the prompts cache before
+
+461
+00:19:25,200 --> 00:19:29,840
+generation even starts. Both estimate
+
+462
+00:19:28,080 --> 00:19:31,039
+importance from attention that has
+
+463
+00:19:29,840 --> 00:19:33,440
+already happened. [music]
+
+464
+00:19:31,039 --> 00:19:36,640
+So both can discard a token that only
+
+465
+00:19:33,440 --> 00:19:39,280
+becomes relevant later. Quantizing the
+
+466
+00:19:36,640 --> 00:19:42,720
+cash instead of evicting it keeps every
+
+467
+00:19:39,280 --> 00:19:45,440
+token and shrinks each one. Episode 4
+
+468
+00:19:42,720 --> 00:19:49,919
+covered that in detail.
+
+469
+00:19:45,440 --> 00:19:52,160
+A 2025 study called the sparse frontier
+
+470
+00:19:49,919 --> 00:19:55,120
+measured what all of this does to
+
+471
+00:19:52,160 --> 00:19:58,320
+accuracy and found that how much you can
+
+472
+00:19:55,120 --> 00:20:01,760
+throw away varies dramatically from task
+
+473
+00:19:58,320 --> 00:20:04,559
+to task. A question that needs one fact
+
+474
+00:20:01,760 --> 00:20:07,919
+buried in the context survives even when
+
+475
+00:20:04,559 --> 00:20:09,520
+95% of the attention is thrown away. A
+
+476
+00:20:07,919 --> 00:20:12,320
+question that needs several facts
+
+477
+00:20:09,520 --> 00:20:14,400
+assembled starts failing at 80. No
+
+478
+00:20:12,320 --> 00:20:17,440
+method wins everywhere and the right
+
+479
+00:20:14,400 --> 00:20:19,600
+choice depends on the task. When it does
+
+480
+00:20:17,440 --> 00:20:21,919
+go wrong, the answer still comes back
+
+481
+00:20:19,600 --> 00:20:23,760
+fluent with the missing fact quietly
+
+482
+00:20:21,919 --> 00:20:25,840
+replaced.
+
+483
+00:20:23,760 --> 00:20:28,159
+Retrieval augmented generation keeps the
+
+484
+00:20:25,840 --> 00:20:30,240
+documents outside the prompt and pulls
+
+485
+00:20:28,159 --> 00:20:33,440
+in only the few pieces each question
+
+486
+00:20:30,240 --> 00:20:36,240
+needs. The corpus is everything you want
+
+487
+00:20:33,440 --> 00:20:38,799
+the model to be able to draw on. It gets
+
+488
+00:20:36,240 --> 00:20:41,360
+split into chunks and indexed ahead of
+
+489
+00:20:38,799 --> 00:20:44,480
+time. Each chunk is stored as a vector
+
+490
+00:20:41,360 --> 00:20:46,400
+that captures roughly what it says. When
+
+491
+00:20:44,480 --> 00:20:48,640
+a question arrives, the system turns the
+
+492
+00:20:46,400 --> 00:20:51,039
+question into a vector, too. It finds
+
+493
+00:20:48,640 --> 00:20:53,919
+the chunks nearest to it and puts only
+
+494
+00:20:51,039 --> 00:20:55,760
+those few in the prompt. The context
+
+495
+00:20:53,919 --> 00:20:58,240
+stays a few thousand tokens long, no
+
+496
+00:20:55,760 --> 00:21:01,039
+matter how large the corpus is, so the
+
+497
+00:20:58,240 --> 00:21:04,320
+cash never gets a chance to grow.
+
+498
+00:21:01,039 --> 00:21:07,120
+A 2020 paper introduced this using a
+
+499
+00:21:04,320 --> 00:21:09,840
+dense vector index of Wikipedia with a
+
+500
+00:21:07,120 --> 00:21:12,000
+trained retriever in front of it. Saving
+
+501
+00:21:09,840 --> 00:21:14,400
+memory was not what its authors were
+
+502
+00:21:12,000 --> 00:21:17,120
+after. They wanted a model that could
+
+503
+00:21:14,400 --> 00:21:19,360
+reach knowledge it had never memorized.
+
+504
+00:21:17,120 --> 00:21:23,039
+Keeping the context short is a side
+
+505
+00:21:19,360 --> 00:21:25,520
+effect that turned out to matter later.
+
+506
+00:21:23,039 --> 00:21:27,919
+In exchange, the retriever now decides
+
+507
+00:21:25,520 --> 00:21:29,840
+what the model is allowed to know. If
+
+508
+00:21:27,919 --> 00:21:33,120
+the retriever misses the chunk holding
+
+509
+00:21:29,840 --> 00:21:35,600
+the answer, the model never sees it. No
+
+510
+00:21:33,120 --> 00:21:38,400
+amount of capability recovers a document
+
+511
+00:21:35,600 --> 00:21:40,400
+that was never put in front of it. You
+
+512
+00:21:38,400 --> 00:21:42,720
+are also running a second system now
+
+513
+00:21:40,400 --> 00:21:46,080
+with its own index to build, refresh,
+
+514
+00:21:42,720 --> 00:21:49,120
+and tune. It fits badly with prefix
+
+515
+00:21:46,080 --> 00:21:52,080
+caching, too. That technique that we
+
+516
+00:21:49,120 --> 00:21:54,240
+discussed in episode 7 works because an
+
+517
+00:21:52,080 --> 00:21:56,880
+identical run of tokens produces
+
+518
+00:21:54,240 --> 00:21:59,520
+identical keys and values. So the shared
+
+519
+00:21:56,880 --> 00:22:02,240
+front of a prompt can be computed once
+
+520
+00:21:59,520 --> 00:22:04,640
+and reused. Retrieve chunks change from
+
+521
+00:22:02,240 --> 00:22:07,280
+query to query and they sit near the
+
+522
+00:22:04,640 --> 00:22:09,600
+front of the prompt. Two requests
+
+523
+00:22:07,280 --> 00:22:12,080
+diverge almost immediately and there is
+
+524
+00:22:09,600 --> 00:22:14,159
+little left to share. Nothing about them
+
+525
+00:22:12,080 --> 00:22:17,360
+tells you whether the service built on
+
+526
+00:22:14,159 --> 00:22:19,760
+top is meeting anyone's deadline.
+
+527
+00:22:17,360 --> 00:22:21,600
+Two numbers decide whether a service is
+
+528
+00:22:19,760 --> 00:22:24,559
+hitting its deadlines [music] and we
+
+529
+00:22:21,600 --> 00:22:26,799
+covered both of them in episode 1. Time
+
+530
+00:22:24,559 --> 00:22:28,159
+to first token is prefill plus however
+
+531
+00:22:26,799 --> 00:22:30,880
+long the request sat in [music] the
+
+532
+00:22:28,159 --> 00:22:33,120
+queue. Time per output token comes from
+
+533
+00:22:30,880 --> 00:22:34,799
+memory bound decode.
+
+534
+00:22:33,120 --> 00:22:37,520
+In production, we do not watch the
+
+535
+00:22:34,799 --> 00:22:39,840
+average of either. We watch the tail,
+
+536
+00:22:37,520 --> 00:22:42,799
+the 99th percentile, which is the
+
+537
+00:22:39,840 --> 00:22:45,600
+slowest one request in a 100. That is
+
+538
+00:22:42,799 --> 00:22:47,840
+the request a user remembers and the one
+
+539
+00:22:45,600 --> 00:22:50,400
+that decides whether the service met the
+
+540
+00:22:47,840 --> 00:22:53,360
+latency it promised.
+
+541
+00:22:50,400 --> 00:22:55,600
+Sizing the fleet works the same way. A
+
+542
+00:22:53,360 --> 00:22:57,760
+fleet sized for the mean fails [music]
+
+543
+00:22:55,600 --> 00:23:00,480
+at the peaks which is when the most
+
+544
+00:22:57,760 --> 00:23:04,080
+people are using it. So you build
+
+545
+00:23:00,480 --> 00:23:06,320
+against the load at the 99th percentile.
+
+546
+00:23:04,080 --> 00:23:09,200
+GPU utilization is the figure most
+
+547
+00:23:06,320 --> 00:23:11,200
+dashboards lead with. Nvidia's own
+
+548
+00:23:09,200 --> 00:23:14,159
+definition is the percentage of time
+
+549
+00:23:11,200 --> 00:23:17,120
+over a sample period during which one or
+
+550
+00:23:14,159 --> 00:23:19,200
+more kernels was executing. That tells
+
+551
+00:23:17,120 --> 00:23:21,520
+you whether the chip is busy, not
+
+552
+00:23:19,200 --> 00:23:23,840
+whether it is getting anything done. A
+
+553
+00:23:21,520 --> 00:23:26,400
+decode stepalled on memory leaves the
+
+554
+00:23:23,840 --> 00:23:29,039
+arithmetic units nearly idle, but it is
+
+555
+00:23:26,400 --> 00:23:31,919
+still a kernel executing. So utilization
+
+556
+00:23:29,039 --> 00:23:34,000
+reports 100%.
+
+557
+00:23:31,919 --> 00:23:36,320
+So the numbers worth tracking are the
+
+558
+00:23:34,000 --> 00:23:38,400
+ones that actually move. [music] Tokens
+
+559
+00:23:36,320 --> 00:23:41,120
+per second is the product itself.
+
+560
+00:23:38,400 --> 00:23:43,440
+Batchfulness counts how many requests
+
+561
+00:23:41,120 --> 00:23:45,520
+share each weight read and Q weight
+
+562
+00:23:43,440 --> 00:23:47,840
+climbs before anything else when
+
+563
+00:23:45,520 --> 00:23:49,840
+capacity runs short.
+
+564
+00:23:47,840 --> 00:23:51,679
+agents work differently, running the
+
+565
+00:23:49,840 --> 00:23:54,000
+model over and over and feeding the
+
+566
+00:23:51,679 --> 00:23:57,360
+whole history back in each time. The
+
+567
+00:23:54,000 --> 00:23:59,679
+Manis team said the KV cache hit rate is
+
+568
+00:23:57,360 --> 00:24:02,080
+the single most important metric for a
+
+569
+00:23:59,679 --> 00:24:06,240
+production agent because it affects both
+
+570
+00:24:02,080 --> 00:24:09,039
+latency and cost. An agent reads about
+
+571
+00:24:06,240 --> 00:24:12,960
+100 tokens of history for every token it
+
+572
+00:24:09,039 --> 00:24:15,840
+generates. In episode 7, we priced a
+
+573
+00:24:12,960 --> 00:24:19,919
+cached read at a tenth of an uncashed
+
+574
+00:24:15,840 --> 00:24:23,360
+one. So, at a 90% hit rate, those 100
+
+575
+00:24:19,919 --> 00:24:25,200
+reads come out at 19.
+
+576
+00:24:23,360 --> 00:24:27,440
+None of these numbers say anything about
+
+577
+00:24:25,200 --> 00:24:28,960
+money. That comes from dividing what the
+
+578
+00:24:27,440 --> 00:24:30,799
+machine costs by what it actually
+
+579
+00:24:28,960 --> 00:24:33,120
+produced.
+
+580
+00:24:30,799 --> 00:24:36,159
+The cost of a million tokens is what you
+
+581
+00:24:33,120 --> 00:24:38,480
+rent the GPU for in an hour divided by
+
+582
+00:24:36,159 --> 00:24:42,159
+the tokens it produced in that hour.
+
+583
+00:24:38,480 --> 00:24:44,000
+Renting an H100 runs about $3 an hour,
+
+584
+00:24:42,159 --> 00:24:46,880
+though across providers that spans
+
+585
+00:24:44,000 --> 00:24:49,360
+anywhere from 1.5 to8.
+
+586
+00:24:46,880 --> 00:24:52,240
+At the low end of utilization, Nvidia
+
+587
+00:24:49,360 --> 00:24:55,679
+measured Llama 3.370B
+
+588
+00:24:52,240 --> 00:24:59,200
+on a single H200 one request at a time
+
+589
+00:24:55,679 --> 00:25:04,000
+at 51 output tokens a second over an
+
+590
+00:24:59,200 --> 00:25:07,840
+hour. That is 184,000 tokens. $3 divided
+
+591
+00:25:04,000 --> 00:25:09,919
+by 184,000 comes to about $16 per
+
+592
+00:25:07,840 --> 00:25:11,679
+million tokens.
+
+593
+00:25:09,919 --> 00:25:13,360
+Filling the machine changes that number
+
+594
+00:25:11,679 --> 00:25:17,360
+completely.
+
+595
+00:25:13,360 --> 00:25:22,559
+Perplexity measured Llama 270B on two
+
+596
+00:25:17,360 --> 00:25:24,720
+H100s running 128 requests at once. That
+
+597
+00:25:22,559 --> 00:25:28,799
+came to 767
+
+598
+00:25:24,720 --> 00:25:32,240
+output tokens a second per GPU. That is
+
+599
+00:25:28,799 --> 00:25:35,600
+2.76 million tokens an hour. So the same
+
+600
+00:25:32,240 --> 00:25:37,520
+$3 now works out to about $19 per
+
+601
+00:25:35,600 --> 00:25:40,400
+million.
+
+602
+00:25:37,520 --> 00:25:43,200
+That is $16 against one on the same
+
+603
+00:25:40,400 --> 00:25:46,240
+hourly rate and the same model size
+
+604
+00:25:43,200 --> 00:25:48,720
+roughly 15 times apart. Nothing about
+
+605
+00:25:46,240 --> 00:25:50,720
+the chip changed. All that changed is
+
+606
+00:25:48,720 --> 00:25:52,559
+how many requests were sharing each read
+
+607
+00:25:50,720 --> 00:25:54,480
+of the weights.
+
+608
+00:25:52,559 --> 00:25:56,559
+Those two measurements come from
+
+609
+00:25:54,480 --> 00:25:59,600
+different machines and different prompt
+
+610
+00:25:56,559 --> 00:26:02,080
+lengths and both are vendor best cases.
+
+611
+00:25:59,600 --> 00:26:05,039
+So the dollar figures are illustrative.
+
+612
+00:26:02,080 --> 00:26:08,640
+The ratio is the part that holds.
+
+613
+00:26:05,039 --> 00:26:11,039
+It also settles which decision matters.
+
+614
+00:26:08,640 --> 00:26:12,880
+What you pay per GPU hour varies by two
+
+615
+00:26:11,039 --> 00:26:15,279
+or three times between comparable
+
+616
+00:26:12,880 --> 00:26:17,600
+providers. What you get out of that hour
+
+617
+00:26:15,279 --> 00:26:20,799
+varies by more than 10. Choosing a
+
+618
+00:26:17,600 --> 00:26:22,559
+cheaper chip is the small optimization.
+
+619
+00:26:20,799 --> 00:26:24,960
+The denominator needs one correction
+
+620
+00:26:22,559 --> 00:26:26,880
+though. A token generated after its
+
+621
+00:26:24,960 --> 00:26:29,360
+deadline has already used the compute
+
+622
+00:26:26,880 --> 00:26:31,200
+and it cannot be sold. So the tokens
+
+623
+00:26:29,360 --> 00:26:33,679
+that count are the ones delivered inside
+
+624
+00:26:31,200 --> 00:26:36,240
+their latency targets.
+
+625
+00:26:33,679 --> 00:26:38,000
+That is goodput and goodput per dollar
+
+626
+00:26:36,240 --> 00:26:39,600
+is what the whole stack is arranged
+
+627
+00:26:38,000 --> 00:26:41,919
+around.
+
+628
+00:26:39,600 --> 00:26:44,640
+The workload itself is changing and the
+
+629
+00:26:41,919 --> 00:26:46,559
+change makes decode matter more.
+
+630
+00:26:44,640 --> 00:26:49,279
+Reasoning models think before they
+
+631
+00:26:46,559 --> 00:26:51,039
+answer producing a long internal chain
+
+632
+00:26:49,279 --> 00:26:54,000
+of thought that is not part of the
+
+633
+00:26:51,039 --> 00:26:56,400
+answer. That is a few hundred tokens for
+
+634
+00:26:54,000 --> 00:26:58,240
+an easy question and tens of thousands
+
+635
+00:26:56,400 --> 00:27:00,480
+for a hard one.
+
+636
+00:26:58,240 --> 00:27:03,279
+Every one of those thinking tokens is a
+
+637
+00:27:00,480 --> 00:27:05,760
+decode step. Each one is memory bound
+
+638
+00:27:03,279 --> 00:27:08,159
+and takes a full read of the weights.
+
+639
+00:27:05,760 --> 00:27:11,039
+All of it happens before the user has
+
+640
+00:27:08,159 --> 00:27:13,120
+seen a single word of the answer. The
+
+641
+00:27:11,039 --> 00:27:16,080
+longer a model reasons, the more of the
+
+642
+00:27:13,120 --> 00:27:18,559
+work in one answer is decoded.
+
+643
+00:27:16,080 --> 00:27:20,640
+The same shift shows up in training too.
+
+644
+00:27:18,559 --> 00:27:22,799
+The reinforcement learning that produces
+
+645
+00:27:20,640 --> 00:27:25,120
+reasoning models is dominated by
+
+646
+00:27:22,799 --> 00:27:27,679
+rollouts where the model generates its
+
+647
+00:27:25,120 --> 00:27:30,640
+own attempts and they get scored.
+
+648
+00:27:27,679 --> 00:27:33,039
+And a roll out is just inference. The
+
+649
+00:27:30,640 --> 00:27:36,080
+Rhyme RL team profiled this with
+
+650
+00:27:33,039 --> 00:27:38,799
+responses capped at 16,000 tokens.
+
+651
+00:27:36,080 --> 00:27:40,880
+Rollouts took 91% of an entire
+
+652
+00:27:38,799 --> 00:27:43,064
+reinforcement learning step for a math
+
+653
+00:27:40,880 --> 00:27:44,640
+model. For a code model, it was 84%.
+
+654
+00:27:43,064 --> 00:27:49,200
+[music]
+
+655
+00:27:44,640 --> 00:27:51,440
+At 32,000 tokens, both pass 95%.
+
+656
+00:27:49,200 --> 00:27:54,399
+Their explanation is the one this series
+
+657
+00:27:51,440 --> 00:27:57,039
+started with. Generating each token
+
+658
+00:27:54,399 --> 00:27:59,760
+requires a forward pass and that pass is
+
+659
+00:27:57,039 --> 00:28:02,059
+constrained by memory bandwidth.
+
+660
+00:27:59,760 --> 00:28:05,120
+Training a reasoning model is now mostly
+
+661
+00:28:02,059 --> 00:28:07,520
+[music] an inference workload.
+
+662
+00:28:05,120 --> 00:28:10,159
+Speculative decoding got several tokens
+
+663
+00:28:07,520 --> 00:28:11,760
+out of a single weight read. Ring
+
+664
+00:28:10,159 --> 00:28:14,159
+attention spread the cash across
+
+665
+00:28:11,760 --> 00:28:16,399
+devices. Sparse attention read less of
+
+666
+00:28:14,159 --> 00:28:18,640
+it each step. Cash eviction deleted
+
+667
+00:28:16,399 --> 00:28:20,640
+parts of it outright. And retrieval kept
+
+668
+00:28:18,640 --> 00:28:23,760
+the context short enough that it never
+
+669
+00:28:20,640 --> 00:28:26,640
+grew. Goodput decides whether any of
+
+670
+00:28:23,760 --> 00:28:29,279
+that arrived inside its deadline.
+
+671
+00:28:26,640 --> 00:28:32,960
+The Stanford AI index tracked the price
+
+672
+00:28:29,279 --> 00:28:36,880
+of a GPT 3.5 level score on the standard
+
+673
+00:28:32,960 --> 00:28:39,840
+knowledge benchmark. In November 2022,
+
+674
+00:28:36,880 --> 00:28:43,679
+that was $20 per million tokens. By
+
+675
+00:28:39,840 --> 00:28:45,944
+October 2024, it was 7.
+
+676
+00:28:43,679 --> 00:28:48,880
+That is more than 280 times cheaper
+
+677
+00:28:45,944 --> 00:28:51,120
+[music] in under 2 years. The capability
+
+678
+00:28:48,880 --> 00:28:54,399
+is held fixed and only the model
+
+679
+00:28:51,120 --> 00:28:56,640
+changes. An 8 billion parameter model
+
+680
+00:28:54,399 --> 00:28:59,039
+reached that score running on a stack
+
+681
+00:28:56,640 --> 00:29:01,360
+built over 3 years to move fewer bytes
+
+682
+00:28:59,039 --> 00:29:04,720
+per token.
+
+683
+00:29:01,360 --> 00:29:07,360
+The hardware did not stand still either.
+
+684
+00:29:04,720 --> 00:29:10,720
+Memory bandwidth roughly quadrupled over
+
+685
+00:29:07,360 --> 00:29:14,240
+4 years from about 2 tab a second on the
+
+686
+00:29:10,720 --> 00:29:16,720
+A100 to around 8 on [music] Blackwell.
+
+687
+00:29:14,240 --> 00:29:19,360
+Compute climbed faster still. So the gap
+
+688
+00:29:16,720 --> 00:29:21,760
+that decode falls into is wider now than
+
+689
+00:29:19,360 --> 00:29:24,320
+when this series started.
+
+690
+00:29:21,760 --> 00:29:26,720
+Every technique in these eight episodes
+
+691
+00:29:24,320 --> 00:29:28,880
+is a way of getting more useful work out
+
+692
+00:29:26,720 --> 00:29:30,399
+of every bite that crosses the memory
+
+693
+00:29:28,880 --> 00:29:32,799
+bus.
+
+694
+00:29:30,399 --> 00:29:34,720
+Each arrived on its own answering its
+
+695
+00:29:32,799 --> 00:29:37,520
+own bottleneck and we have discussed
+
+696
+00:29:34,720 --> 00:29:40,000
+them one at a time. A request arriving
+
+697
+00:29:37,520 --> 00:29:42,720
+in production meets all of them at once
+
+698
+00:29:40,000 --> 00:29:45,200
+in a single pass.
+
+699
+00:29:42,720 --> 00:29:47,279
+The last episode in this LLM inference
+
+700
+00:29:45,200 --> 00:29:51,039
+engineering series follows one real
+
+701
+00:29:47,279 --> 00:29:53,039
+request into a rack of 72 GPUs. It goes
+
+702
+00:29:51,039 --> 00:29:55,039
+from the routing decision that picks its
+
+703
+00:29:53,039 --> 00:29:58,039
+machine to the last token it streams
+
+704
+00:29:55,039 --> 00:29:58,039
+back.
+

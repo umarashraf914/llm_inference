@@ -1,0 +1,35 @@
+<figure class='widget'><div class='ts'>Fig ?? &nbsp;&middot;&nbsp; 25:19</div><h3>In a batch the weights are shared; the caches are not</h3><div class='wg'><div class='ctl'><label>users <input type='range' min='0' max='6' step='1' value='3'><span class='val'>32</span></label><label>tokens each <input type='range' min='0' max='7' step='1' value='4'><span class='val'>10,000</span></label><button type='button'>Reset</button></div><svg viewBox='0 0 680 806' role='img'><title>In a batch the weights are shared; the caches are not</title><text class="hd" x="40" y="34">Each user's cache is read only for that user, so a batch's caches add up</text><line class="axis" x1="100" y1="390" x2="500" y2="390"/><line class="axis" x1="100" y1="70" x2="100" y2="390"/><line class="tick" x1="100" y1="390" x2="100" y2="394"/><text class="sub2" x="100" y="408" text-anchor="middle">0.1</text><line class="tick" x1="180" y1="390" x2="180" y2="394"/><text class="sub2" x="180" y="408" text-anchor="middle">1</text><line class="tick" x1="260" y1="390" x2="260" y2="394"/><text class="sub2" x="260" y="408" text-anchor="middle">10</text><line class="tick" x1="340" y1="390" x2="340" y2="394"/><text class="sub2" x="340" y="408" text-anchor="middle">100</text><line class="tick" x1="420" y1="390" x2="420" y2="394"/><text class="sub2" x="420" y="408" text-anchor="middle">1,000</text><line class="tick" x1="500" y1="390" x2="500" y2="394"/><text class="sub2" x="500" y="408" text-anchor="middle">10,000</text><line class="tick" x1="96" y1="390" x2="100" y2="390"/><text class="sub2" x="92" y="394" text-anchor="end">100 G</text><line class="tick" x1="96" y1="326" x2="100" y2="326"/><text class="sub2" x="92" y="330" text-anchor="end">1 T</text><line class="tick" x1="96" y1="262" x2="100" y2="262"/><text class="sub2" x="92" y="266" text-anchor="end">10 T</text><line class="tick" x1="96" y1="198" x2="100" y2="198"/><text class="sub2" x="92" y="202" text-anchor="end">100 T</text><line class="tick" x1="96" y1="134" x2="100" y2="134"/><text class="sub2" x="92" y="138" text-anchor="end">1 P</text><line class="tick" x1="96" y1="70" x2="100" y2="70"/><text class="sub2" x="92" y="74" text-anchor="end">10 P</text><text class="sub2" x="300.0" y="428" text-anchor="middle">arithmetic intensity: operations per byte (log scale)</text><text class="sub2" x="92" y="56" text-anchor="start">operations per second (log scale)</text><polyline class="pl-m" points="100.0,356.4 377.6,134.3 500.0,134.3"/><line class="mark" x1="377.6" y1="138.3" x2="377.6" y2="390"/><text class="sub2 halo" x="383.6" y="380" text-anchor="start">ridge, 295</text><circle data-pt="" cx="281.0" cy="211.6" r="6" fill="var(--s-fill)" stroke="var(--s)" stroke-width="2"/><text class="sub2" x="140" y="460" data-r="0">32 users at 10,000 tokens each: 245 GB per step, 105 GB of it cache</text><text class="sub2" x="140" y="480" data-r="1">one step: 73.1 ms; intensity 18.3 operations per byte</text><text class="sub2" x="140" y="500" data-r="2">all users together: 438 tokens a second</text><text class="sub2" x="140" y="520" data-r="3">without the caches it would be 766</text><text class="cap" x="40" y="564" text-anchor="start">Batching shares one read of the weights among every user in the batch ({{fig:v01-p24}}). It</text><text class="cap" x="40" y="584" text-anchor="start">cannot share the caches: each user's keys and values belong to that user's conversation,</text><text class="cap" x="40" y="604" text-anchor="start">and each step reads all of them.</text><text class="cap" x="40" y="644" text-anchor="start">So at 32 users with 10,000 tokens each, a step reads 140 GB of weights and 104.9 GB of</text><text class="cap" x="40" y="664" text-anchor="start">caches, and the batch makes 438 tokens a second instead of 766. At 64 users, 613 instead</text><text class="cap" x="40" y="684" text-anchor="start">of 1,531. Long conversations drag the point back down the slope, toward where a single</text><text class="cap" x="40" y="704" text-anchor="start">user started.</text><text class="cap" x="40" y="744" text-anchor="start">That is the number behind the claim that this data structure is why every other</text><text class="cap" x="40" y="764" text-anchor="start">optimisation in the series exists. The readouts were checked against Python at every</text><text class="cap" x="40" y="784" text-anchor="start">setting.</text></svg></div><figcaption>The weights stop being the problem once enough users share them. What each user brings with them, their conversation's keys and values, is what is left.</figcaption><script>(() => {
+
+  const MINUS = '−';
+  const fx = (v, d = 2) => { const s = Math.abs(v).toFixed(d); return (v < 0 && +s !== 0 ? MINUS : '') + s; };
+  const gx = (v, d = 0) => { const s = Math.abs(v).toFixed(d); const [a, b] = s.split('.');
+    const t = a.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (v < 0 && +s !== 0 ? MINUS : '') + t + (b !== undefined ? '.' + b : ''); };
+
+  const RL = 100, RR = 500, RT = 70, RB = 390, XD = 80, YD = 64;
+  const xs = i => +(RL + (Math.log10(i) + 1) * XD).toFixed(1);
+  const ys = p => +(RB - (Math.log10(p) - 11) * YD).toFixed(1);
+  const roofPts = (peak, bw) => { const r = peak / bw;
+    return `${xs(0.1)},${ys(bw * 0.1)} ${xs(r)},${ys(peak)} ${xs(1e4)},${ys(peak)}`; };
+  const sig3 = v => { if (v === 0) return '0'; const d = Math.max(0, 2 - Math.floor(Math.log10(Math.abs(v))));
+    return gx(v, d); };
+
+  const fig = document.currentScript.closest('figure');
+  const N = 70000000000.0, PEAK = 989000000000000.0, BW = 3350000000000.0, W = 140000000000.0, KV = 327680, BS = [1, 8, 16, 32, 64, 128, 256], CS = [0, 1000, 2000, 5000, 10000, 20000, 50000, 100000], I0 = [3, 4];
+  const sl = [...fig.querySelectorAll('input[type=range]')], val = [...fig.querySelectorAll('.val')];
+  const q = s => fig.querySelector(s);
+  function draw() {
+    const bsz = BS[+sl[0].value], ctx = CS[+sl[1].value];
+    val[0].textContent = gx(bsz); val[1].textContent = gx(ctx);
+    const by = W + bsz * ctx * KV, ops = 2 * N * bsz, t = Math.max(by / BW, ops / PEAK);
+    const t0 = Math.max(W / BW, ops / PEAK), i = ops / by, a = Math.min(PEAK, BW * i), cache = bsz * ctx * KV;
+    const pt = q('[data-pt]'); pt.setAttribute('cx', xs(i)); pt.setAttribute('cy', ys(a));
+    const L = [`${bsz} users at ${gx(ctx)} tokens each: ${sig3(by / 1e9)} GB per step, ${sig3(cache / 1e9)} GB of it cache`,
+      `one step: ${sig3(t * 1000)} ms; intensity ${sig3(i)} operations per byte`,
+      `all users together: ${sig3(bsz / t)} tokens a second`, `without the caches it would be ${sig3(bsz / t0)}`];
+    L.forEach((s, k) => q(`[data-r="${k}"]`).textContent = s);
+  }
+  sl.forEach(s => s.addEventListener('input', draw));
+  q('button').addEventListener('click', () => { sl[0].value = I0[0]; sl[1].value = I0[1]; draw(); });
+  draw();
+})();</script></figure>
