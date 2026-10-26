@@ -1,0 +1,157 @@
+{
+  "chapter": "ch21",
+  "title": "Other bets, and the three answers",
+  "kicker": "21 · Other bets, and the three answers",
+  "figs": [119, 120, 121, 122, 123],
+  "scenes": [
+    {
+      "id": "ch21_s01",
+      "name": "a different bet: the systolic array",
+      "figs": [119],
+      "visual": "A physical comparison between the GPU multiprocessor architecture and the Google TPU systolic array. In a systolic array, multiply-accumulate cells form a rigid 2D grid. Data streams rhythmically from the edges, each cell passing results directly to its neighbour with zero trips back to registers.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The graphics multiprocessor is one way to organise silicon around matrix multiplication, but it is not the only way.",
+          "show": "Split screen contrasts the H100 multiprocessor floor plan on the left with a TPU systolic array on the right."
+        },
+        {
+          "id": "b2",
+          "say": "Google's tensor processing unit makes a radically different bet: a massive, rigid two-dimensional grid of multiply-accumulate cells called a systolic array.",
+          "show": "The systolic grid illuminates: cells arranged in a regular 2D lattice like heart valves pulsing blood."
+        },
+        {
+          "id": "b3",
+          "say": "Data streams in from the edges, and each cell passes its intermediate product directly to its neighbour on every clock tick, with zero round trips back to a register file.",
+          "show": "Operands march across rows while partial sums flow down columns: no register file read-write cycles."
+        },
+        {
+          "id": "b4",
+          "say": "Where a graphics processor solves arithmetic intensity through software caching and thread scheduling, a systolic array bakes data reuse directly into the copper wiring.",
+          "show": "Comparison card highlights: 'GPU: software tiling and dynamic scheduling' vs 'TPU: hardwired spatial reuse'. Takeaway: 'systolic arrays hardwire operand reuse directly into silicon wiring'."
+        }
+      ]
+    },
+    {
+      "id": "ch21_s02",
+      "name": "a systolic array beat by beat",
+      "figs": [120],
+      "visual": "An animated 3x3 systolic array completing matrix multiplication in seven beats. Weights remain stationary in cells. Input matrix A enters on a diagonal slant from the left, while running sums cascade downward. All 27 multiply-accumulate operations finish in 7 cycles with zero register memory traffic.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Watch a three-by-three systolic array step through time. Weights are held stationary inside each cell, while input values enter on a slant from the left.",
+          "show": "A 3×3 grid of cells holds weights stationary. Input values queue on a 45-degree diagonal wavefront."
+        },
+        {
+          "id": "b2",
+          "say": "On each beat, a cell multiplies its stored weight by the number arriving from the left, adds the sum arriving from above, and passes both forward.",
+          "show": "Beat-by-beat clock pulses: running totals step downward as operands shift rightward."
+        },
+        {
+          "id": "b3",
+          "say": "In just seven beats, all twenty-seven multiply-adds finish, and completed results emerge from the bottom of each column without a single trip to memory.",
+          "show": "Seven beats animate to completion. The finished 3×3 matrix C drops out of the bottom row: '27 operations in 7 beats'."
+        },
+        {
+          "id": "b4",
+          "say": "Production units expand this to one hundred and twenty-eight cells on a side, executing sixteen thousand three hundred and eighty-four operations on every single clock beat.",
+          "show": "Scale-up view expands grid to 128×128: '16,384 multiply-adds per beat in B float sixteen'. Takeaway: 'systolic grids compute matrix products rhythmically in 3n minus 2 beats'."
+        }
+      ]
+    },
+    {
+      "id": "ch21_s03",
+      "name": "the software ecosystem constraint",
+      "figs": [121, 122],
+      "visual": "Hardware versus software reality. Top: AMD MI300X specs (192 GB memory, 5.3 TB/s) outshine H100 (80 GB, 3.35 TB/s). Bottom: The 4-layer software stack connecting models to silicon. Highlights CUDA's two decades of proprietary libraries and hand-tuned kernels as the deciding factor.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "On pure hardware specifications, competition is fierce. AMD's M I three hundred X offers one hundred and ninety-two gigabytes of fast memory against eighty on an H one hundred, letting models that require two chips fit onto one.",
+          "show": "Hardware spec comparison bars: 'MI300X: 192 GB at 5.3 TB/s' vs 'H100: 80 GB at 3.35 TB/s'."
+        },
+        {
+          "id": "b2",
+          "say": "Yet most artificial intelligence teams continue to choose Nvidia. The deciding factor is not silicon physics, but software.",
+          "show": "A transition leads to the software hierarchy: 'The binding constraint is software maturity'."
+        },
+        {
+          "id": "b3",
+          "say": "Between a model and bare silicon sit four distinct layers: high-level frameworks, thousands of hand-tuned math libraries, optimizing compilers, and hardware drivers.",
+          "show": "A four-tier stack illuminates: 1. Model framework, 2. Hand-tuned libraries, 3. Compiler & driver, 4. Silicon hardware."
+        },
+        {
+          "id": "b4",
+          "say": "CUDA has had twenty years to accumulate finely tuned kernels for every conceivable operation. A chip specification describes only the silicon layer at the bottom, but teams experience all four.",
+          "show": "Brackets highlight the upper three software tiers: 'Two decades of library tuning creates an insurmountable moat'. Takeaway: 'software ecosystem maturity frequently outweighs raw silicon specifications'."
+        }
+      ]
+    },
+    {
+      "id": "ch21_s04",
+      "name": "the three questions answered",
+      "figs": [123],
+      "visual": "The grand synthesis returning to the three founding questions of the film. Box 1: Why different from a laptop CPU? One bet: parallel throughput lanes, not single-thread anticipation. Box 2: Why are bytes expensive? DRAM capacitor physics, the memory ladder, and the 295-to-1 ridge. Box 3: What does hardware do? Latency hiding, sector coalescing, tensor tiling, lower precision, and rack-scale fabrics.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "We can now answer the three fundamental questions we began with.",
+          "show": "The three opening cards from chapter one reappear side by side in full glory."
+        },
+        {
+          "id": "b2",
+          "say": "Why is this chip so different from a laptop C P U? Because it makes one foundational bet: modern work consists of billions of identical operations. It discards complex branch anticipation to pack sixteen thousand arithmetic lanes and five hundred tensor cores onto a single die.",
+          "show": "Card 1 answers: 'One bet: parallel lanes, not anticipation · 16,896 CUDA cores, 528 tensor cores · waiting is cheap with 64 warps per SM'."
+        },
+        {
+          "id": "b3",
+          "say": "Why is a byte so expensive next to an operation? Because of physics. A memory cell is a tiny capacitor hidden behind millimetres of wire, creating a two-hundred-and-ninety-five to one gap between arithmetic and data delivery.",
+          "show": "Card 2 answers: 'Physics and geometry · DRAM capacitor behind long wires · fast memory is small · 295 ops per byte ridge'."
+        },
+        {
+          "id": "b4",
+          "say": "And what does the hardware do to fight back? It hides latency behind thousands of resident threads, coalesces bytes into clean thirty-two-byte sectors, reuses numbers dozens of times inside tensor cores, halves precision to shrink circuits, and unifies entire racks into single high-speed domains.",
+          "show": "Card 3 answers: 'Architectural defences · latency hiding & coalescing · tensor core tile reuse · BF16/FP8 precision · rack-scale NVLink'."
+        },
+        {
+          "id": "b5",
+          "say": "Hardware provides the raw silicon capability. But how code unlocks that capability, and how software commands these multiprocessors, is the subject of the next film: inside G P U kernels.",
+          "show": "Final title card transitions to the next film: 'Next: Inside GPU Kernels'. Full film recap banner closes cleanly."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Systolic array beats formula: 3*n - 2 for 3x3 = 7 beats",
+      "python": "3 * 3 - 2",
+      "result": "7"
+    },
+    {
+      "claim": "Systolic operations: 3x3 matrix multiply = 3*3*3 = 27 multiply-adds",
+      "python": "3**3",
+      "result": "27"
+    },
+    {
+      "claim": "TPU array operations per beat: 128 * 128 = 16,384",
+      "python": "128 * 128",
+      "result": "16384"
+    },
+    {
+      "claim": "AMD MI300X memory vs H100: 192 GB vs 80 GB",
+      "python": "192 / 80",
+      "result": "2.4"
+    },
+    {
+      "claim": "H100 core counts: 132 SMs * 128 CUDA cores = 16,896; 132 * 4 tensor cores = 528",
+      "python": "132 * 128, 132 * 4",
+      "result": "(16896, 528)"
+    },
+    {
+      "claim": "H100 ridge at 16-bit: 989.429e12 / 3.352e12 = 295.17, quoted as 295 ops per byte",
+      "python": "round(989.42976e12 / 3.352e12)",
+      "result": "295"
+    }
+  ]
+}

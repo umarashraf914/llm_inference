@@ -1,0 +1,129 @@
+{
+  "chapter": "ch09",
+  "title": "Filling a multiprocessor",
+  "kicker": "09 · Filling a multiprocessor",
+  "figs": [44, 45, 46, 47, 48],
+  "scenes": [
+    {
+      "id": "ch09_s01",
+      "name": "sixty-four warps and the turn counter",
+      "figs": [44, 45],
+      "visual": "A calendar grid of 48 clock cycles for one scheduler. With all 16 of its warps ready, warp zero gets a turn on tick 1, tick 17, tick 33, and tick 48. A clock timeline demonstrates that each thread executes once every 16 ticks, illustrating why individual threads are slow while the aggregate is fast.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Sixty-four warps of thirty-two threads fill one multiprocessor to capacity: two thousand and forty-eight resident threads.",
+          "show": "A multiprocessor card displays 64 warp slots in four columns of 16. A gauge reads 'Occupancy: 100% · 2,048 resident threads'."
+        },
+        {
+          "id": "b2",
+          "say": "Every cycle, each of the four schedulers issues one instruction. Spread over sixteen warps, each thread moves once every sixteen ticks.",
+          "show": "A timeline of ticks scrolls by. Gold cells highlight every sixteenth tick: tick 1, tick 17, tick 33, showing warp zero's turns."
+        },
+        {
+          "id": "b3",
+          "say": "At nearly two billion ticks a second, that is about a hundred and twenty-four million instructions a second per thread.",
+          "show": "A rate readout lands beside the timeline: '1.98 GHz ÷ 16 = ~124 million instructions per second per thread'."
+        },
+        {
+          "id": "b4",
+          "say": "Across the entire chip, that adds up to thirty-three point five trillion thread-instructions every second. The speed is in the count, not in any single thread.",
+          "show": "The counter multiplies across all 132 multiprocessors to '33.5 trillion thread-instructions per second'. Takeaway: 'slow threads are not a bug; they are how 64 warps share 4 schedulers'."
+        }
+      ]
+    },
+    {
+      "id": "ch09_s02",
+      "name": "Little's law: what must be on the road",
+      "figs": [46, 47],
+      "visual": "The pizza delivery analogy of Little's Law, transitioning to HBM. To deliver 3,352 bytes every nanosecond across a 273 nanosecond round trip, 915 kilobytes must be in flight at all times. A bar chart verifies that 2,048 threads per SM provide just enough requests to saturate the memory bus.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To keep any delivery pipeline full, you must know how much work has to be on the road.",
+          "show": "A roadside delivery diagram appears: an oven on the left, customers on the right, and delivery drivers in transit between them."
+        },
+        {
+          "id": "b2",
+          "say": "If a pizza leaves every five minutes and a round trip takes thirty minutes, you need six drivers on the road at all times, or the oven sits idle.",
+          "show": "Six delivery vehicles animate along the route. Formula: 'items in flight = rate × trip time = 12 per hour × 0.5 hours = 6 drivers'."
+        },
+        {
+          "id": "b3",
+          "say": "This is Little's law. For high-bandwidth memory delivering three thousand three hundred and fifty-two bytes a nanosecond across a two hundred and seventy nanosecond trip, nine hundred and fifteen thousand bytes must be on the road at every moment.",
+          "show": "The diagram transforms into the HBM memory bus: '3,352 bytes/ns × 273 ns = 915,096 bytes in flight'. Tag: '≈ 915 KB must be requested and traveling at all times'."
+        },
+        {
+          "id": "b4",
+          "say": "Divided across one hundred and thirty-two multiprocessors, each unit must keep about seven thousand bytes in flight.",
+          "show": "The required load splits: '915,096 bytes ÷ 132 SMs = 6,933 bytes in flight per SM'."
+        },
+        {
+          "id": "b5",
+          "say": "If every one of the two thousand and forty-eight threads has one four-byte load outstanding, that is eight thousand bytes: just enough to saturate the bus.",
+          "show": "A comparison bar appears: '6,933 bytes needed' vs '8,192 bytes from 2,048 threads (1.18×)'. Takeaway: 'full thread occupancy is what provides enough memory requests to reach full bandwidth'."
+        }
+      ]
+    },
+    {
+      "id": "ch09_s03",
+      "name": "the complete execution chain",
+      "figs": [48],
+      "visual": "The complete execution hierarchy assembled into one nesting diagram: from an individual thread lane up to the full H100 GPU package.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here is the complete hierarchy of execution on the chip, from the thread to the package.",
+          "show": "A nested diagram begins with a single thread lane: 'Thread · one sequence of arithmetic'."
+        },
+        {
+          "id": "b2",
+          "say": "Thirty-two threads make a warp, executing one shared instruction in lockstep.",
+          "show": "The thread nests inside a warp container: 'Warp · 32 threads, 1 instruction'."
+        },
+        {
+          "id": "b3",
+          "say": "A block holds up to thirty-two warps, sharing one slice of on-chip scratchpad memory.",
+          "show": "The warp nests inside a block container: 'Block · up to 32 warps (1,024 threads), 1 shared memory'."
+        },
+        {
+          "id": "b4",
+          "say": "A multiprocessor holds up to sixty-four warps across four schedulers, and one hundred and thirty-two multiprocessors make the chip.",
+          "show": "The block nests inside a multiprocessor tile: 'Multiprocessor · 64 warps (2,048 threads)'. That tile multiplies into the full chip: 'H100 · 132 SMs = 270,336 threads in flight'. Takeaway pill: 'threads make warps, warps make blocks, blocks fill multiprocessors'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Thread instruction rate: 1.98 GHz / 16 cycles = 123.75 million instructions per second per thread",
+      "python": "1.98e9 / 16 / 1e6",
+      "result": "123.75"
+    },
+    {
+      "claim": "Chip thread instruction rate: 132 SMs * 128 lanes * 1.98 GHz = 33.454 trillion instructions per second",
+      "python": "132 * 128 * 1.98e9 / 1e12",
+      "result": "33.45408"
+    },
+    {
+      "claim": "Little's law bytes in flight: 3,352 GB/s * 273 ns = 915,096 bytes",
+      "python": "3352e9 * 273e-9",
+      "result": "915096.0"
+    },
+    {
+      "claim": "Per SM bytes needed: 915,096 / 132 = 6,932.55 bytes",
+      "python": "915096 / 132",
+      "result": "6932.545454545455"
+    },
+    {
+      "claim": "2,048 threads * 4 bytes = 8,192 bytes, which is 8,192 / 6,932.55 = 1.18x of needed",
+      "python": "2048 * 4, (2048 * 4) / (915096 / 132)",
+      "result": "(8192, 1.181672742531931)"
+    },
+    {
+      "claim": "Execution chain total: 32 threads * 64 warps * 132 SMs = 270,336 threads in flight",
+      "python": "32 * 64 * 132",
+      "result": "270336"
+    }
+  ]
+}

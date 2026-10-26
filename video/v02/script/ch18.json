@@ -1,0 +1,142 @@
+{
+  "chapter": "ch18",
+  "title": "Precision and the square law",
+  "kicker": "18 · Precision and the square law",
+  "figs": [95, 96, 97, 98],
+  "scenes": [
+    {
+      "id": "ch18_s01",
+      "name": "lower precision pays off twice",
+      "figs": [95],
+      "visual": "A dual-arrow diagram showing the double benefit of quantization. One arrow points to tensor cores: fewer bits means more operations per cycle. The other arrow points to the memory bus: fewer bytes per weight cuts memory traffic across the bus.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Lower precision is the single lever that attacks both bottlenecks at the exact same time.",
+          "show": "A central number chip labeled 'Fewer bits per number' illuminates in gold."
+        },
+        {
+          "id": "b2",
+          "say": "On the arithmetic side, narrower numbers allow tensor cores to process twice as many calculations each second.",
+          "show": "An amber arrow extends upward to the tensor core: 'More operations through tensor cores'."
+        },
+        {
+          "id": "b3",
+          "say": "On the memory side, narrower numbers mean fewer bytes cross the bus for every weight. You move less data to do the same work.",
+          "show": "A coral arrow extends downward to the bus: 'Fewer bytes across the memory bus'. Takeaway: 'lower precision accelerates arithmetic while cutting memory traffic in half'."
+        }
+      ]
+    },
+    {
+      "id": "ch18_s02",
+      "name": "binary long multiplication and the square law",
+      "figs": [96],
+      "visual": "A worked binary long multiplication: 11 (1011) multiplied by 13 (1101) = 143 (10001111). A 4x4 grid of AND gates demonstrates that multiplier circuit area scales with the square of the bit width.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Multiplying in binary is simply long multiplication with a trivial times table: each digit is either zero or one.",
+          "show": "Binary multiplication sets up: '1011 (11)' on top, '1101 (13)' below, with an arithmetic line beneath."
+        },
+        {
+          "id": "b2",
+          "say": "Multiply eleven by thirteen, and the shifted rows sum to one hundred and forty-three.",
+          "show": "The four shifted partial products appear and sum: '10001111 = 128 + 8 + 4 + 2 + 1 = 143'."
+        },
+        {
+          "id": "b3",
+          "say": "Every bit of the first number pairs with every bit of the second through an A N D gate. The work grows with the square of the width.",
+          "show": "A 4 by 4 grid of 16 AND gates illuminates: 'width × width = 4 × 4 = 16 gates'."
+        },
+        {
+          "id": "b4",
+          "say": "Sixteen gates at four bits, sixty-four at eight bits, two hundred and fifty-six at sixteen bits, and over a thousand at thirty-two bits. Halve the bit width, and the multiplier circuit shrinks to a quarter.",
+          "show": "Four multiplier area blocks scale up: 16 gates (4-bit), 64 gates (8-bit), 256 gates (16-bit), and 1,024 gates (32-bit). Takeaway: 'multiplier area scales with width squared: narrow numbers shrink circuits by 4×'."
+        }
+      ]
+    },
+    {
+      "id": "ch18_s03",
+      "name": "why tensor cores double instead of quadruple",
+      "figs": [97],
+      "visual": "A physical area allocation diagram. The silicon footprint of one 32-bit multiplier can physically fit sixteen 8-bit multipliers. Yet the tensor core throughput doubles rather than quadrupling, showing the operand delivery bottleneck.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "By silicon area alone, the footprint of one thirty-two-bit multiplier can fit sixteen eight-bit multipliers.",
+          "show": "A large 32-bit square (1,024 units) splits into sixteen smaller 8-bit squares (64 units each)."
+        },
+        {
+          "id": "b2",
+          "say": "Yet when an H one hundred switches from sixteen-bit to eight-bit numbers, its throughput doubles rather than quadrupling: from nine hundred and eighty-nine trillion to nearly two thousand trillion.",
+          "show": "A throughput meter jumps from 989.4 TFLOP/s at 16-bit to 1,978.9 TFLOP/s at 8-bit: a 2× increase, not 4×."
+        },
+        {
+          "id": "b3",
+          "say": "Why twice and not four times? Because of operand delivery. The internal wires carrying numbers to the units have a fixed bit width.",
+          "show": "Data paths feeding the multipliers highlight with fixed bandwidth capacity: 'delivery paths move fixed bits per tick'."
+        },
+        {
+          "id": "b4",
+          "say": "The square law sets how much arithmetic fits in silicon. Data delivery sets how fast it can be fed.",
+          "show": "A summary card balances the two constraints: 'Silicon area allows 4×; delivery bandwidth limits to 2×'. Takeaway: 'operand delivery paths, not multiplier area, set the throughput scaling'."
+        }
+      ]
+    },
+    {
+      "id": "ch18_s04",
+      "name": "the generational format ladder",
+      "figs": [98],
+      "visual": "A timeline of format introductions: FP16 on Volta (125 TFLOP/s), FP8 on Hopper (1,979 TFLOP/s), and FP4 on Blackwell (9,000 TFLOP/s), showing a compounded 72-fold gain.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Every tensor-core generation has introduced a narrower native format.",
+          "show": "A ladder of format standards appears: 'FP16 (2017)', 'FP8 (2022)', and 'FP4 (2024)'."
+        },
+        {
+          "id": "b2",
+          "say": "Volta introduced sixteen-bit tensor cores in twenty-seventeen at a hundred and twenty-five trillion operations a second.",
+          "show": "First milestone: 'Volta V100 · 16-bit FP16 · 125 TFLOP/s'."
+        },
+        {
+          "id": "b3",
+          "say": "Hopper introduced eight-bit floats at nearly two thousand trillion. Blackwell introduces four-bit floats at nine thousand trillion operations a second.",
+          "show": "Subsequent milestones light up: 'Hopper H100 · 8-bit FP8 · 1,979 TFLOP/s' → 'Blackwell B200 · 4-bit FP4 · 9,000 TFLOP/s'."
+        },
+        {
+          "id": "b4",
+          "say": "From Volta's sixteen-bit rate to Blackwell's four-bit rate is a seventy-two-fold increase in dense arithmetic throughput.",
+          "show": "A massive growth arrow connects V100 125 T to B200 9,000 T: '72× throughput growth across four generations'. Takeaway pill: 'shrinking precision compounds with architectural gains for massive throughput'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Binary multiplication: 11 * 13 = 143",
+      "python": "11 * 13",
+      "result": "143"
+    },
+    {
+      "claim": "Multiplier area scaling: 4^2 = 16, 8^2 = 64, 16^2 = 256, 32^2 = 1,024",
+      "python": "4**2, 8**2, 16**2, 32**2",
+      "result": "(16, 64, 256, 1024)"
+    },
+    {
+      "claim": "H100 8-bit peak: 989.429 * 2 = 1,978.86 TFLOP/s, quoted as 'nearly two thousand trillion'",
+      "python": "989.42976 * 2",
+      "result": "1978.85952"
+    },
+    {
+      "claim": "B200 FP4 peak: 2,250 * 4 = 9,000 TFLOP/s",
+      "python": "2250 * 4",
+      "result": "9000"
+    },
+    {
+      "claim": "Compounded gain: 9,000 / 125 = 72x",
+      "python": "9000 / 125",
+      "result": "72.0"
+    }
+  ]
+}

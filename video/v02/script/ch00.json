@@ -1,0 +1,114 @@
+{
+  "chapter": "ch00",
+  "title": "Cold open: a thousand trillion, waiting",
+  "kicker": "00 · A thousand trillion, waiting",
+  "figs": [],
+  "scenes": [
+    {
+      "id": "ch00_s01",
+      "name": "a thousand trillion operations, waiting",
+      "figs": [],
+      "visual": "A dark navy stage. At center-left, an amber-tinted die glows with high density circuitry, labeled 'compute die'. An amber headline counter at top center displays '989.4 trillion operations per second'. Below, an active progress timeline for one generated token shows a tiny amber sliver of calculation, surrounded by a massive coral span of waiting.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "On its specification sheet, a modern data-centre G P U can perform close to a thousand trillion operations every single second.",
+          "show": "The dark canvas fades in. At center-left, an amber square representing the compute die draws on. Above it, the headline counter counts up from 0 to '989,400,000,000,000', with unit label 'operations per second' in amber mono text."
+        },
+        {
+          "id": "b2",
+          "say": "Nine hundred and eighty-nine trillion additions and multiplications, packed onto a square of silicon no larger than a postage stamp.",
+          "show": "A dimension bracket measures the die at '29 mm × 29 mm' with a grey tag '814 mm²'. The counter settles on '989.4 trillion'. Microscopic grid lines pulse across the die, indicating thousands of arithmetic units operating in parallel."
+        },
+        {
+          "id": "b3",
+          "say": "Yet when you ask a language model to generate an answer, that vast engine of arithmetic spends more than ninety-nine percent of its time waiting.",
+          "show": "A horizontal timeline bar draws across the screen representing one thirty-millisecond token. An amber sliver only five pixels wide lights up at the left end: 'arithmetic: under 1%'. The remaining ninety-nine percent fills with coral diagonal stripes: 'waiting for data: over 99%'."
+        }
+      ]
+    },
+    {
+      "id": "ch00_s02",
+      "name": "the five-thousand-wire bottle",
+      "figs": [],
+      "visual": "The camera pulls back to reveal the complete package: the central compute die flanked by five coral memory stacks. Between the die and the memory stacks, a wide bus of parallel lines pulses with data. Coral tiles representing model weights flow across the bus, each flashing amber as it touches the die.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The arithmetic for one token takes about a tenth of a millisecond. The rest is spent waiting for numbers to arrive from memory.",
+          "show": "A magnifier highlights the amber sliver, labeled 'arithmetic ≈ 0.1 ms'. Beside it, the coral waiting block glows with a stopwatch readout reading '≈ 30 ms per token'. Coral weight tiles begin queuing outside the compute die."
+        },
+        {
+          "id": "b2",
+          "say": "Between the memory stacks and the chip sits a bus of five thousand one hundred and twenty tiny wires. And those wires set the pace.",
+          "show": "The five coral H B M memory stacks illuminate around the die. Between each stack and the die, parallel bus traces illuminate in bright coral. A bracket groups them with the label '5,120 wires at 3.35 terabytes per second'."
+        },
+        {
+          "id": "b3",
+          "say": "Every weight the model uses must cross that bridge, token after token. The chip is not slow; it is starved for data.",
+          "show": "A continuous stream of coral tiles flows from memory across the five thousand wires into the die. Each tile flashes amber for a fraction of a tick as it is multiplied, then vanishes. A tag under the bus reads '140 gigabytes, every token'."
+        }
+      ]
+    },
+    {
+      "id": "ch00_s03",
+      "name": "what is inside the package",
+      "figs": [],
+      "visual": "The full package schematic transforms into an architectural floor plan. The 132 multiprocessors appear as a regular grid of tiles on the die, one unit zooming in to reveal its schedulers, register files, and tensor cores. Then the diagram clears for the title card.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To understand why this happens, we have to look inside the package, down to the transistors and the clock cycles.",
+          "show": "The camera pushes into the central die. The solid surface dissolves into an array of one hundred and thirty-two identical multiprocessor tiles, with one tile highlighted in gold."
+        },
+        {
+          "id": "b2",
+          "say": "Why does fetching one number from memory take five hundred ticks of the clock, while adding two numbers takes only one?",
+          "show": "A vertical memory ladder card appears on the left with four rungs: registers, shared memory, L two cache, and H B M. A tick counter on the registers reads '1 tick'; on H B M it reads '≈ 479 ticks'."
+        },
+        {
+          "id": "b3",
+          "say": "How do sixty-four warps of threads hide that wait, and why does a single wrong turn cut throughput in half?",
+          "show": "Inside the multiprocessor tile, sixty-four blue warp indicators cycle smoothly across four schedulers, swapping whenever a warp stalls. Beside them, a branching path illustrates thread divergence with half the lanes greyed out."
+        },
+        {
+          "id": "b4",
+          "say": "This is the machine behind the memory wall.",
+          "show": "All internal subcomponents fade out. The full package returns at center, flanked by its memory stacks. A subtle coral energy field rises between memory and compute: 'the memory wall'."
+        },
+        {
+          "id": "b5",
+          "say": "Inside the G P U.",
+          "show": "The package dims into a soft background silhouette. In large white display type, the title writes on at the center of the frame: 'Inside the GPU', followed by a clean teal takeaway line below: 'the architecture of high-throughput inference'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Peak dense FP16 compute for H100 SXM is 989.4 TFLOP/s, quoted as 'close to a thousand trillion operations every single second'",
+      "python": "132 * 4 * 1024 * 1.83e9 / 1e12",
+      "result": "989.42976"
+    },
+    {
+      "claim": "The H100 die is 814 mm², roughly 28.5 mm on a side, quoted as '29 mm × 29 mm' or 'postage stamp'",
+      "python": "import math; math.sqrt(814)",
+      "result": "28.53068523537482"
+    },
+    {
+      "claim": "Arithmetic takes ~0.1 ms for 140 billion operations at 989.4 TFLOP/s, which is under 1% of a 30 ms token (0.47%)",
+      "python": "140e9 / 989.4e12 * 1e3, (140e9 / 989.4e12 * 1e3) / 30 * 100",
+      "result": "(0.14149989892864364, 0.47166632976214545)"
+    },
+    {
+      "claim": "H100 memory interface has 5 stacks × 1,024 wires = 5,120 wires, moving 3,352 GB/s",
+      "python": "5 * 1024, 5 * 1024 * 5.238e9 / 8 / 1e9",
+      "result": "(5120, 3352.32)"
+    },
+    {
+      "claim": "DRAM load latency measured on Hopper is ~273 ns, or ~479 ticks at 1.755 GHz, quoted as 'five hundred ticks'",
+      "python": "273e-9 * 1.755e9",
+      "result": "479.115"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "chapter": "ch04",
+  "title": "Two design philosophies",
+  "kicker": "04 · Two design philosophies",
+  "figs": [15, 16, 17, 18, 19, 20, 21, 22],
+  "scenes": [
+    {
+      "id": "ch04_s01",
+      "name": "anticipation against throughput",
+      "figs": [15, 16, 17],
+      "visual": "A side-by-side comparison of a CPU core and its silicon budget. The CPU dedicates most of its area to anticipation: branch predictor tables, prefetch trackers, and reorder buffers, leaving only a small fraction for arithmetic. A branching pipeline demonstrates speculative execution: guessing right saves time; guessing wrong discards work.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A general-purpose C P U core never knows what instruction is coming next. It could be arithmetic, a jump, or a decision based on data not yet computed.",
+          "show": "A large CPU core diagram appears on the left with a question mark over its incoming instruction queue: 'add, branch, fetch, or jump?'."
+        },
+        {
+          "id": "b2",
+          "say": "So it spends most of its silicon on anticipation: predicting which way branches will go, reordering instructions, and prefetching data before anyone asks.",
+          "show": "The CPU core subdivides into labeled blocks: 'Branch prediction', 'Out-of-order reorder buffer', and 'Hardware prefetcher', with a small amber block at the bottom labeled 'Math units'."
+        },
+        {
+          "id": "b3",
+          "say": "When code reaches a branch, the C P U guesses the outcome and runs ahead. Guess right, and the work was free. Guess wrong, and everything computed is thrown away.",
+          "show": "A pipeline animation splits at an 'if' branch. Green speculative instructions run ahead. On 'guess wrong', red cross marks flush the pipeline, and the processor restarts down the other branch."
+        },
+        {
+          "id": "b4",
+          "say": "All that machinery pays off when a single thread makes unpredictable turns. But on a matrix multiply, where every instruction is predictable, it is pure overhead.",
+          "show": "A matrix multiply loop displays: 'for i, for j, for k'. The CPU anticipation blocks turn grey and tag as 'unused overhead on regular loops'."
+        }
+      ]
+    },
+    {
+      "id": "ch04_s02",
+      "name": "the G P U trade: 132 identical copies",
+      "figs": [18, 20],
+      "visual": "The GPU multiprocessor strips away the anticipation machinery. The silicon budget is filled with arithmetic lanes and register files. Then the single multiprocessor multiplies across the die into 132 identical units, reaching over 270,000 concurrent threads.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The G P U makes the opposite trade. It strips away branch predictors and speculative execution, and fills the silicon with arithmetic lanes.",
+          "show": "A GPU multiprocessor diagram lands on the right: no speculative machinery, just rows of amber arithmetic lanes and a massive blue register file."
+        },
+        {
+          "id": "b2",
+          "say": "One multiprocessor holds up to two thousand and forty-eight threads. None of them is fast on its own, and none of them gets anticipation machinery.",
+          "show": "A thread density counter on the multiprocessor fills: 'up to 2,048 resident threads'. Individual thread lanes are narrow and simple."
+        },
+        {
+          "id": "b3",
+          "say": "The G P U does not try to avoid waiting. It simply arranges to always have another warp ready to run.",
+          "show": "When one thread lane stalls on a memory load, another lane immediately takes over the arithmetic unit in a single cycle."
+        },
+        {
+          "id": "b4",
+          "say": "And that single design is stamped one hundred and thirty-two times across the die: over two hundred and seventy thousand threads in flight at once.",
+          "show": "The single multiprocessor zooms out into a grid of 132 identical units filling the 814 mm² die. Counter hits '132 SMs × 2,048 = 270,336 threads in flight'. Takeaway: 'understand one multiprocessor, and you understand the whole chip'."
+        }
+      ]
+    },
+    {
+      "id": "ch04_s03",
+      "name": "architectures, chips and racks",
+      "figs": [19],
+      "visual": "A chronological hierarchy table separating three concepts that specification sheets mix freely: Architecture (the blueprint), Chip (the silicon product), and System (the interconnected box or rack).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To follow the hardware specifications, we must keep three kinds of names apart: the architecture, the chip, and the system.",
+          "show": "Three column headers appear: 'Architecture (design)', 'Chip (product)', and 'System (interconnect domain)'."
+        },
+        {
+          "id": "b2",
+          "say": "An architecture is the blueprint: Volta in twenty-seventeen, Ampere in twenty-twenty, Hopper in twenty-twenty-two, and Blackwell in twenty-twenty-four.",
+          "show": "Timeline rows populate: 'Volta (2017)', 'Ampere (2020)', 'Hopper (2022)' highlighted in gold, and 'Blackwell (2024)'."
+        },
+        {
+          "id": "b3",
+          "say": "A chip is one physical product built to that design: the H one hundred has one hundred and thirty-two multiprocessors, and the H two hundred adds faster memory.",
+          "show": "In the Chip column: 'H100 · 80 GB', 'H200 · 141 GB', 'B200 · 192 GB'. Gold bracket highlights H100 as the reference chip."
+        },
+        {
+          "id": "b4",
+          "say": "Systems are what get wired together: a D G X box joins eight G P Us with N V Link, while an N V L seventy-two rack joins seventy-two G P Us into one single domain.",
+          "show": "In the System column: 'DGX · 8 GPUs' and 'GB200 NVL72 · 72 GPUs in one rack'. Takeaway pill: 'architecture is the layout; chip is the part; system is the network domain'."
+        }
+      ]
+    },
+    {
+      "id": "ch04_s04",
+      "name": "why slow threads win, and where the bet fails",
+      "figs": [21, 22],
+      "visual": "A performance race comparison. First, millions of independent numbers processed by four fast cores versus 100,000 slow lanes. Second, a strict serial dependency chain where 999 lanes sit idle while one lane works.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When a workload is the same arithmetic over a billion numbers, one hundred thousand slow lanes in parallel beat a handful of fast cores by orders of magnitude.",
+          "show": "A comparison bar chart: CPU 4 fast cores finish a billion numbers in minutes; GPU 100,000 slow lanes finish in fractions of a second."
+        },
+        {
+          "id": "b2",
+          "say": "Where does this bet lose? On work that forms a serial chain, where every step needs the answer from the step before.",
+          "show": "A serial chain of dependencies draws: 'step 1 → step 2 → step 3'. All other lanes on the GPU turn grey and idle."
+        },
+        {
+          "id": "b3",
+          "say": "A chain runs at the speed of one lane, and one G P U lane is far slower than a C P U core.",
+          "show": "A speed race shows a single CPU core outrunning a single GPU lane five to ten times over on sequential arithmetic."
+        },
+        {
+          "id": "b4",
+          "say": "Generating tokens is a chain between tokens, but inside each token sits a matrix multiply millions of numbers wide. The lanes have plenty of parallel work.",
+          "show": "A sequence of tokens draws: 'token 1 → token 2'. But inside each token node, a massive 2D matrix multiply unfolds with millions of active lanes. Takeaway pill: 'the workload has vast parallelism; the challenge is keeping the lanes fed'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "132 multiprocessors times 2,048 threads equals 270,336 threads in flight",
+      "python": "132 * 2048",
+      "result": "270336"
+    },
+    {
+      "claim": "DGX system joins 8 GPUs",
+      "python": "8",
+      "result": "8"
+    },
+    {
+      "claim": "NVL72 rack joins 72 GPUs",
+      "python": "72",
+      "result": "72"
+    }
+  ]
+}

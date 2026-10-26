@@ -1,0 +1,134 @@
+{
+  "chapter": "ch07",
+  "title": "Schedulers, the copy engine, four quarters",
+  "kicker": "07 · Schedulers, the copy engine, four quarters",
+  "figs": [33, 34, 35, 36, 37],
+  "scenes": [
+    {
+      "id": "ch07_s01",
+      "name": "four warp schedulers",
+      "figs": [33, 34],
+      "visual": "A detailed layout of the four schedulers on one multiprocessor. Each scheduler manages a dedicated queue of 16 resident groups of threads. A high-speed hardware selector scans the 16 warps every tick, picking one ready group and firing its next instruction.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Every multiprocessor contains four independent hardware schedulers.",
+          "show": "Four scheduler units land in a column: 'Scheduler 1', 'Scheduler 2', 'Scheduler 3', 'Scheduler 4', outlined in structural blue."
+        },
+        {
+          "id": "b2",
+          "say": "The sixty-four groups of threads resident on the multiprocessor are divided equally: each scheduler owns sixteen of them.",
+          "show": "Rows of thread groups fan out from each scheduler. A bracket labels each row: '16 resident warps per scheduler'."
+        },
+        {
+          "id": "b3",
+          "say": "Every single cycle, each scheduler looks across its sixteen groups: whose data has arrived? Who is ready to calculate?",
+          "show": "A green status scanner evaluates the 16 warps: some show coral 'waiting for memory', some show amber 'ready to execute'."
+        },
+        {
+          "id": "b4",
+          "say": "In hardware, in a single tick, it picks one ready group and issues its next instruction across thirty-two lanes.",
+          "show": "The scheduler points to a ready warp and fires an instruction token across 32 parallel execution lanes simultaneously."
+        },
+        {
+          "id": "b5",
+          "say": "If none of its sixteen groups is ready, that scheduler's lanes sit idle for the cycle. That is the exact failure this chip is built to avoid.",
+          "show": "All 16 warps show stalled states. The execution lanes grey out with an 'idle' tag. Takeaway: 'keep enough warps resident so the scheduler's choice is never empty'."
+        }
+      ]
+    },
+    {
+      "id": "ch07_s02",
+      "name": "the tensor memory accelerator",
+      "figs": [35, 36],
+      "visual": "A comparison of memory transfer mechanisms. In older chips, threads waste hundreds of issue slots calculating addresses and loading words. With the TMA (Tensor Memory Accelerator), software provides a multidimensional tile descriptor, and the autonomous copy engine streams the entire tile directly into shared memory.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "On older chips, threads had to spend their own arithmetic instructions copying data from memory into shared scratchpads.",
+          "show": "An animated thread group executes a loop of copy instructions, blocking math units while calculating memory addresses."
+        },
+        {
+          "id": "b2",
+          "say": "For a sixty-four by sixty-four tile, that meant one hundred and twenty-eight threads issuing five hundred and twelve copy instructions: five hundred slots not spent on maths.",
+          "show": "Instruction counter piles up: '128 threads × 4 loads = 512 copy instructions'. Red tag: '512 issue slots lost from arithmetic'."
+        },
+        {
+          "id": "b3",
+          "say": "Hopper adds the T M A, the tensor memory accelerator: a dedicated hardware copy engine that runs independently of the execution lanes.",
+          "show": "A dedicated hardware unit lights up between HBM and SRAM: 'TMA · Tensor Memory Accelerator'."
+        },
+        {
+          "id": "b4",
+          "say": "The programmer gives it a descriptor: the start address, the shape of the tile, and the row stride. One single thread issues one single instruction.",
+          "show": "A compact card appears: 'Descriptor: base address, 64×64 tile, 2 bytes/element, 8,192 byte stride'. A single instruction token triggers the transfer."
+        },
+        {
+          "id": "b5",
+          "say": "The engine works out all sixty-four row addresses itself and streams the tile straight into shared memory in the background, while the threads carry on computing.",
+          "show": "The TMA autonomously streams all 64 rows of 128 bytes from HBM directly into shared memory. The arithmetic lanes remain 100% active on calculations. Takeaway: 'TMA overlaps memory staging with compute without spending thread instructions'."
+        }
+      ]
+    },
+    {
+      "id": "ch07_s03",
+      "name": "the floor plan: four identical quarters",
+      "figs": [37],
+      "visual": "A full floor plan of the Hopper multiprocessor. Four identical quarters sit side by side. Each quarter contains its scheduler, 32 FP32 lanes, one tensor core, and 16,384 registers. In the center, shared memory and the TMA engine serve all four quarters.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now we can see how the entire multiprocessor fits together: it is four identical quarters.",
+          "show": "The multiprocessor boundary divides cleanly into four quadrants: Quarter 1, Quarter 2, Quarter 3, and Quarter 4."
+        },
+        {
+          "id": "b2",
+          "say": "Each quarter owns its own scheduler, thirty-two scalar lanes, one tensor core, and sixteen thousand three hundred and eighty-four registers.",
+          "show": "Quarter 1 highlights: '1 scheduler', '32 FP32 lanes', '1 tensor core', and '16,384 registers (64 KB)'."
+        },
+        {
+          "id": "b3",
+          "say": "The two hundred and fifty-six kilobytes of shared memory and the T M A copy engine sit at the center, shared by all four quarters.",
+          "show": "The central shared SRAM bank (256 KB) and TMA unit highlight, with data channels feeding all four quarters."
+        },
+        {
+          "id": "b4",
+          "say": "Notice the arithmetic: one hundred and twenty-eight lanes divided by four schedulers is exactly thirty-two lanes per scheduler.",
+          "show": "Formula appears: '128 lanes ÷ 4 schedulers = 32 lanes per tick'. The 32 lanes glow in unison."
+        },
+        {
+          "id": "b5",
+          "say": "That thirty-two is the atomic group size of the machine. The warp.",
+          "show": "A bracket groups the 32 lanes: 'one warp = 32 threads'. Takeaway pill: 'four quarters, thirty-two lanes per scheduler: the hardware basis of the warp'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "64 resident warps / 4 schedulers = 16 warps per scheduler",
+      "python": "64 / 4",
+      "result": "16.0"
+    },
+    {
+      "claim": "Without TMA: 128 threads * 4 loads of 16 bytes = 512 copy instructions",
+      "python": "128 * 4",
+      "result": "512"
+    },
+    {
+      "claim": "64x64 tile of 2-byte numbers: 4,096 numbers * 2 bytes = 8,192 bytes. Matrix row stride for 4,096 width is 4,096 * 2 = 8,192 bytes",
+      "python": "64 * 64 * 2, 4096 * 2",
+      "result": "(8192, 8192)"
+    },
+    {
+      "claim": "128 scalar lanes / 4 schedulers = 32 lanes per scheduler",
+      "python": "128 / 4",
+      "result": "32.0"
+    },
+    {
+      "claim": "65,536 registers / 4 quarters = 16,384 registers per quarter (64 KB)",
+      "python": "65536 / 4, 16384 * 4 / 1024",
+      "result": "(16384.0, 64.0)"
+    }
+  ]
+}

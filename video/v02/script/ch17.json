@@ -1,0 +1,142 @@
+{
+  "chapter": "ch17",
+  "title": "The tensor core",
+  "kicker": "17 · The tensor core",
+  "figs": [88, 89, 90, 91, 92, 93, 94],
+  "scenes": [
+    {
+      "id": "ch17_s01",
+      "name": "matrix multiplication: every row meets every column",
+      "figs": [88],
+      "visual": "A visual step-by-step matrix multiplication of two 2x2 matrices A and B. Row 1 of A slides across column 1 of B to produce c11 = 19. The animation proves that for n x n matrices, every number is reused n times, contrasting matrix-vector decode (used once) with matrix-matrix prefill (used n times).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To multiply two matrices, every row of the first meets every column of the second.",
+          "show": "Two 2x2 matrices A and B appear at center. Row 1 of A [1, 2] highlights, and Column 1 of B [5, 7] highlights."
+        },
+        {
+          "id": "b2",
+          "say": "Multiply the pairs, add the products, and you get one entry of the result: one times five plus two times seven equals nineteen.",
+          "show": "Equation traces: '1 × 5 + 2 × 7 = 5 + 14 = 19'. The value 19 drops into entry c11 of matrix C."
+        },
+        {
+          "id": "b3",
+          "say": "For two matrices of size n, calculating the output takes n cubed operations from two n squared numbers. Every single number is reused n times.",
+          "show": "A scaling formula appears: 'n × n × n tile takes n³ multiply-adds: each number is reused n times'."
+        },
+        {
+          "id": "b4",
+          "say": "When matrix B has only one column, each weight is used once: that is decode. When B has many columns of tokens, every weight is reused: that is prefill.",
+          "show": "Matrix B collapses to 1 column: '1 column = decode (used once)'. Matrix B widens to 2,048 columns: '2,048 columns = prefill (used 2,048 times)'. Takeaway: 'matrix multiplication brings data reuse; matrix-vector multiplication does not'."
+        }
+      ]
+    },
+    {
+      "id": "ch17_s02",
+      "name": "scalar unit against matrix tile",
+      "figs": [89, 90, 91],
+      "visual": "A visual contrast between a scalar CUDA core and a Hopper tensor core. The CUDA core takes two numbers and adds a third. The tensor core executes D = A x B + C on whole matrix tiles, completing 512 multiply-adds in a single tick.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A scalar C U D A core multiplies two numbers and adds a third, producing one number per cycle.",
+          "show": "A CUDA core executes: 'a × b + c = d' on scalar inputs, producing 1 output per cycle."
+        },
+        {
+          "id": "b2",
+          "say": "A tensor core multiplies two small matrices and adds a third, producing a whole tile of outputs at once.",
+          "show": "A tensor core executes: 'D = A × B + C' on 2D tiles, illuminating a 2D matrix of outputs simultaneously."
+        },
+        {
+          "id": "b3",
+          "say": "Inside Hopper, a single tensor core finishes five hundred and twelve multiply-adds every single tick: over a thousand operations per cycle.",
+          "show": "A hardware animation reveals the dense inner systolic structure of one Hopper tensor core: '512 multiply-adds per tick = 1,024 ops/tick'."
+        },
+        {
+          "id": "b4",
+          "say": "One single warp instruction executes a sixteen by eight by sixteen step: two thousand and forty-eight multiply-adds, keeping one core busy for four ticks.",
+          "show": "A warp instruction packet (16×8×16) streams into the core: '2,048 multiply-adds · 4 ticks of execution'. Takeaway: 'one tensor instruction unleashes thousands of arithmetic operations'."
+        }
+      ]
+    },
+    {
+      "id": "ch17_s03",
+      "name": "tile scaling and arithmetic reuse",
+      "figs": [92],
+      "visual": "A logarithmic chart showing how increasing tile size multiplies data reuse. A 2x2 tile reuses numbers twice (1 op/byte); a 16x16 tile reuses numbers 16 times (8 ops/byte); a 128x128 tile reuses numbers 128 times (64 ops/byte).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Bigger tiles feed themselves: the larger the tile, the more times each fetched number is reused.",
+          "show": "Tiles of expanding sizes draw on: 2x2, 4x4, 16x16, and 128x128."
+        },
+        {
+          "id": "b2",
+          "say": "A two-by-two tile reuses each number twice, delivering one operation per byte.",
+          "show": "Bar at 2x2: '2 uses · 1 operation per byte'."
+        },
+        {
+          "id": "b3",
+          "say": "A sixteen-by-sixteen tile reuses each number sixteen times: eight operations per byte. A tile a hundred and twenty-eight wide reuses each number a hundred and twenty-eight times.",
+          "show": "Bars climb: '16×16 · 16 uses (8 ops/byte)' → '128×128 · 128 uses (64 ops/byte)'."
+        },
+        {
+          "id": "b4",
+          "say": "That is why tensor cores operate on tiles, why kernels stage large tiles in scratchpad memory, and why prefill saturates the hardware while decode cannot.",
+          "show": "A diagram shows a 128-wide tile staged in shared memory feeding tensor cores. Takeaway: 'data reuse grows with tile width: large tiles turn memory-bound workloads into compute-bound ones'."
+        }
+      ]
+    },
+    {
+      "id": "ch17_s04",
+      "name": "why one operation gets its own silicon",
+      "figs": [93, 94],
+      "visual": "A pie chart showing that transformers spend over 90% of their arithmetic on matrix multiplications. A bar comparison shows peak spec sheet performance (989.4 TFLOP/s) versus sustained performance in well-tuned kernels (50% to 80%).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why dedicate five hundred and twenty-eight specialized units to a single mathematical operation?",
+          "show": "An aerial diagram of the H100 die highlights all 528 tensor cores across the 132 multiprocessors."
+        },
+        {
+          "id": "b2",
+          "say": "Because modern transformers spend well over ninety percent of their arithmetic on matrix multiplication.",
+          "show": "A breakdown pie chart shows: 'Matrix Multiplications · 92%' in amber, with additions, layer norms, and activations taking the remaining 8%."
+        },
+        {
+          "id": "b3",
+          "say": "Peak performance assumes every single unit is fed with data every single cycle without a stall. Real code never reaches it.",
+          "show": "A performance bar shows 'Peak specification · 989.4 TFLOP/s'."
+        },
+        {
+          "id": "b4",
+          "say": "A superbly tuned kernel reaches fifty to eighty percent of peak. Compare chips on their peak; compare software on how close to peak it gets.",
+          "show": "A realistic performance band highlights: 'Well-tuned kernel · 50% to 80% of peak'. Takeaway pill: 'peak is a hardware ceiling; software quality is measured by what fraction of peak it sustains'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "2x2 matrix multiply: c11 = 1*5 + 2*7 = 19; c12 = 1*6 + 2*8 = 22; c21 = 3*5 + 4*7 = 43; c22 = 3*6 + 4*8 = 50",
+      "python": "1*5 + 2*7, 1*6 + 2*8, 3*5 + 4*7, 3*6 + 4*8",
+      "result": "(19, 22, 43, 50)"
+    },
+    {
+      "claim": "One warp MMA 16x8x16 instruction: 16 * 8 * 16 = 2,048 multiply-adds",
+      "python": "16 * 8 * 16",
+      "result": "2048"
+    },
+    {
+      "claim": "2,048 multiply-adds / 512 multiply-adds per tick = 4 ticks of execution",
+      "python": "2048 / 512",
+      "result": "4.0"
+    },
+    {
+      "claim": "Tile reuse formula: n^3 ops / (2 * n^2 * 2 bytes) = n / 4 ops per byte; for 128x128 tile at 2 bytes: 2 * 128^3 / (3 * 128^2 * 2) = 85.3, or nxnxn tile doing 2*n ops / 4 bytes = n/2 ops/byte",
+      "python": "128 / 2",
+      "result": "64.0"
+    }
+  ]
+}

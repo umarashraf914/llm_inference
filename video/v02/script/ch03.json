@@ -1,0 +1,157 @@
+{
+  "chapter": "ch03",
+  "title": "Almost three hundred",
+  "kicker": "03 · Almost three hundred",
+  "figs": [10, 11, 12, 13, 14],
+  "scenes": [
+    {
+      "id": "ch03_s01",
+      "name": "the ratio of two hundred and ninety-five",
+      "figs": [10],
+      "visual": "A dual log axis comparison showing one decode step of a 70B model on an H100. Top: time in milliseconds (arithmetic 0.141 ms vs reading weights 41.8 ms). Bottom: operations per byte (decode delivers 1 op/byte vs chip ridge of 295 ops/byte). The ratio in both cases is exactly 295.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Take one decode step of a seventy-billion-parameter model on an H one hundred. You can count the mismatch in time, or in work per byte.",
+          "show": "A title card appears: 'One decode step · 70B model on H100'. Below, two logarithmic axes land in parallel: one marked in milliseconds, one in operations per byte."
+        },
+        {
+          "id": "b2",
+          "say": "In time, reading a hundred and forty gigabytes of weights at three point three five terabytes a second takes forty-one point eight milliseconds.",
+          "show": "On the top axis, a coral bar spans to 41.8 ms: 'reading weights · 41.8 milliseconds'. Formula: '140 GB ÷ 3,352 GB/s = 41.8 ms'."
+        },
+        {
+          "id": "b3",
+          "say": "The arithmetic, a hundred and forty billion operations at nine hundred and eighty-nine trillion a second, takes zero point one four one milliseconds.",
+          "show": "An amber bar lands at 0.141 ms: 'arithmetic · 0.141 milliseconds'. Formula: '140 billion ops ÷ 989.4 TFLOP/s = 0.141 ms'."
+        },
+        {
+          "id": "b4",
+          "say": "Divide forty-one point eight by zero point one four one, and you get two hundred and ninety-five. The arithmetic units are busy zero point three four percent of the time.",
+          "show": "A bracket connects the bars: '41.8 ms ÷ 0.141 ms = 295× gap'. Tag: 'arithmetic active 0.34% of the time'."
+        },
+        {
+          "id": "b5",
+          "say": "In work, decode does one operation for every byte it reads, but the chip can do two hundred and ninety-five operations in the time one byte arrives.",
+          "show": "On the lower axis, 'decode intensity = 1 op/byte' is marked on the left, and 'chip ridge = 295 ops/byte' on the right. Both perspectives land on the exact same number: two hundred and ninety-five."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s02",
+      "name": "the energy cost of moving data",
+      "figs": [12],
+      "visual": "A vertical logarithmic bar chart of energy per operation in picojoules. Arithmetic operations (addition and multiplication) sit at the bottom in amber; on-chip SRAM sits in teal; off-chip DRAM towers above in coral at over 700 times the energy.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "This gap is not just about time. On a chip bounded by heat and power, moving data is also where the energy goes.",
+          "show": "A logarithmic energy chart draws with values in picojoules: 'Energy per operation at 45 nanometres'."
+        },
+        {
+          "id": "b2",
+          "say": "Adding two thirty-two-bit floating-point numbers costs about zero point nine picojoules. Multiplying them costs three point seven.",
+          "show": "Two amber bars draw at the bottom: '32-bit float add · 0.9 pJ' (1× baseline) and '32-bit float multiply · 3.7 pJ' (4.1×)."
+        },
+        {
+          "id": "b3",
+          "say": "Reading that same number from a fast on-chip cache costs five picojoules, roughly in line with the arithmetic.",
+          "show": "A teal bar lands at '32-bit read from SRAM cache · 5.0 pJ' (5.6×)."
+        },
+        {
+          "id": "b4",
+          "say": "Fetching that number from D RAM beside the chip costs six hundred and forty picojoules: more than seven hundred times the energy of adding it.",
+          "show": "A tall coral bar towers upward to 640 pJ: '32-bit read from DRAM · 640 pJ (711×)'. Takeaway pill: 'arithmetic is cheap; moving data across wires consumes the power'."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s03",
+      "name": "the bet: matrix multiplies and parallel independence",
+      "figs": [13, 14],
+      "visual": "A comparison of serial versus parallel execution. Four sequential jobs finish at time 4; four independent jobs finish at time 1. Then a matrix multiply structure appears, showing billions of independent multiplications ready for massive parallelism.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A G P U is built around one single bet about the workload: it is the same few operations, repeated across billions of numbers.",
+          "show": "A headline card appears: 'The Workload Bet: billions of numbers, identical operations'. A transformer architecture diagram highlights that over 90% of the work is matrix multiplications."
+        },
+        {
+          "id": "b2",
+          "say": "In sequence, one worker finishes four jobs in four units of time. In parallel, four workers finish all four jobs in one unit.",
+          "show": "Top timeline: one worker processes job 1, then job 2, job 3, job 4, finishing at time 4. Bottom timeline: four workers process jobs 1 through 4 simultaneously, finishing at time 1."
+        },
+        {
+          "id": "b3",
+          "say": "Parallelism only works when jobs do not depend on one another. If job two needs the output of job one, it cannot start early.",
+          "show": "A red dependency arrow connects job 1 to job 2. The other three workers are forced into idle grey states until job 1 completes."
+        },
+        {
+          "id": "b4",
+          "say": "A transformer generates tokens one at a time, but inside each token sits a matrix multiply of sixteen million independent operations.",
+          "show": "A single token decode step expands into a 4,096 by 4,096 matrix multiplied by a vector: '16,777,216 independent multiply-adds'. Takeaway: 'parallelism is vast within each token, but starved by memory delivery'."
+        }
+      ]
+    },
+    {
+      "id": "ch03_s04",
+      "name": "the three questions that guide the machine",
+      "figs": [11],
+      "visual": "Three foundational questions appear in sequence on cards, outlining the entire structure of the remaining film: 1) Why so different from a CPU? 2) Why is a byte so expensive? 3) What does the hardware do to fight back?",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Everything in this processor follows from answering three questions.",
+          "show": "Three large question cards animate into view: blue for question one, coral for question two, teal for question three."
+        },
+        {
+          "id": "b2",
+          "say": "First: why is this chip designed so differently from a laptop C P U? Because it trades clever prediction for thousands of parallel lanes.",
+          "show": "Card one illuminates in blue: 'Why so different from a CPU? · One bet: thousands of identical arithmetic lanes'."
+        },
+        {
+          "id": "b3",
+          "say": "Second: why is moving a byte so expensive next to computing an operation? Because of the physics of memory cells and the ladder of caches.",
+          "show": "Card two illuminates in coral: 'Why is a byte so expensive? · Capacitor physics and the memory hierarchy'."
+        },
+        {
+          "id": "b4",
+          "say": "And third: what can the hardware do to fight back? By hiding latency behind warps, packing bytes into sectors, and reusing data in tensor cores.",
+          "show": "Card three illuminates in teal: 'What can hardware do? · Latency hiding, coalescing, and tensor cores'. Takeaway pill: 'three questions that govern the entire GPU architecture'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "140 GB at 3,352 GB/s takes 41.766 ms, quoted as '41.8 milliseconds'",
+      "python": "140e9 / 3.352e12 * 1e3",
+      "result": "41.76610978520286"
+    },
+    {
+      "claim": "140 billion ops at 989.4 TFLOP/s takes 0.1415 ms, quoted as '0.141 milliseconds'",
+      "python": "140e9 / 989.4e12 * 1e3",
+      "result": "0.14149989892864365"
+    },
+    {
+      "claim": "Ratio 41.766 / 0.1415 = 295.17, quoted as 'two hundred and ninety-five'",
+      "python": "(140e9 / 3.352e12) / (140e9 / 989.4e12)",
+      "result": "295.1669868735083"
+    },
+    {
+      "claim": "Arithmetic active percentage: 0.1415 / 41.766 * 100 = 0.3387%, quoted as '0.34 percent'",
+      "python": "0.14149989892864365 / 41.76610978520286 * 100",
+      "result": "0.3387912349071018"
+    },
+    {
+      "claim": "DRAM energy multiple vs FP32 add: 640 pJ / 0.9 pJ = 711.1x, quoted as 'more than seven hundred times'",
+      "python": "640 / 0.9",
+      "result": "711.1111111111111"
+    },
+    {
+      "claim": "One 4,096 x 4,096 matrix times a vector has 4,096^2 = 16,777,216 multiply-adds",
+      "python": "4096 * 4096",
+      "result": "16777216"
+    }
+  ]
+}

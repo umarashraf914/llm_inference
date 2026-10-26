@@ -1,0 +1,137 @@
+{
+  "chapter": "ch13",
+  "title": "How the chip survives slow memory",
+  "kicker": "13 · How the chip survives slow memory",
+  "figs": [63, 64, 65, 66, 67, 68, 69],
+  "scenes": [
+    {
+      "id": "ch13_s01",
+      "name": "latency hiding and the kitchen analogy",
+      "figs": [63, 64, 65],
+      "visual": "A kitchen analogy transitioning to multiprocessor warp scheduling. A cook preparing multiple dishes while waiting on the oven. Below, warp zero initiates a memory load and stalls for 500 cycles; during that interval, the scheduler executes instructions for warps one through fifteen without interruption.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A cook preparing dinner does not stand in front of the oven watching it bake. While one dish cooks, the cook chops vegetables for the next.",
+          "show": "A split kitchen animation: Top shows a cook standing idle waiting for an oven timer; bottom shows an active cook moving between three prep stations."
+        },
+        {
+          "id": "b2",
+          "say": "The oven takes the exact same time either way. Nothing was made faster. The wait was covered with other work. That is latency hiding.",
+          "show": "A timeline comparison highlights: bake time is identical in both cases, but idle time drops to zero in the second."
+        },
+        {
+          "id": "b3",
+          "say": "When warp zero asks for a number from memory, it stalls for nearly five hundred clock cycles.",
+          "show": "Warp 0 executes a load and enters a grey stalled state: 'stalled on HBM · ~479 ticks'."
+        },
+        {
+          "id": "b4",
+          "say": "Instead of waiting, the scheduler immediately runs warp one, then warp two, then warp three. By the time warp zero's data arrives, dozens of other warps have computed.",
+          "show": "The scheduler cycles through warps 1 through 15 in amber. When warp 0's data returns, it seamlessly rejoins the queue. Takeaway: 'each warp waits the full latency; the multiprocessor never waits'."
+        }
+      ]
+    },
+    {
+      "id": "ch13_s02",
+      "name": "why context switching costs zero cycles",
+      "figs": [67],
+      "visual": "A comparison between CPU and GPU thread switching. The CPU has a single register file and must save/restore registers to memory, wasting dozens of cycles. The GPU keeps all resident threads allocated in its 256 KB register file, switching pointers in zero cycles.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "On an ordinary processor, switching between threads is expensive. The C P U must save one thread's registers to memory and reload another's.",
+          "show": "A CPU diagram shows a save-and-restore cycle: registers are written out to RAM and new registers read in, burning red wasted cycles."
+        },
+        {
+          "id": "b2",
+          "say": "On this chip, switching between resident warps costs zero cycles. Nothing is saved and nothing is restored.",
+          "show": "On the GPU diagram, the scheduler points from warp 0 to warp 1 in a single clock tick: 'switch cost = 0 cycles'."
+        },
+        {
+          "id": "b3",
+          "say": "Because the register file holds sixty-five thousand registers, every resident thread already owns its private slice of physical storage.",
+          "show": "The 256 KB register file shows dedicated, permanent partitions for all resident warps. No thread shares registers with another."
+        },
+        {
+          "id": "b4",
+          "say": "The hardware simply points its issue logic at a different warp next cycle. The chip pays in silicon area, once, instead of in cycles, constantly.",
+          "show": "A hardware pointer jumps instantly between warp register banks. Takeaway: 'zero-cycle switching is paid in massive register silicon'."
+        }
+      ]
+    },
+    {
+      "id": "ch13_s03",
+      "name": "how many warps it takes to cover a wait",
+      "figs": [66],
+      "visual": "A mathematical model of latency hiding. An equation shows warps needed equals (instructions + latency) divided by instructions. When work between loads is 32 instructions, 16 warps fully saturate the scheduler; when work drops to 8 instructions, the scheduler starves.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "How many warps does a scheduler need to hide a five-hundred-tick memory load? It depends on how much work each warp does between loads.",
+          "show": "A timeline formula appears: 'Warps needed = ⌈(instructions + latency) ÷ instructions⌉'."
+        },
+        {
+          "id": "b2",
+          "say": "If a warp computes thirty-two instructions between memory loads, the scheduler needs exactly sixteen warps: all sixteen it can hold.",
+          "show": "Timeline with c = 32 and L = 479: '⌈(32 + 479) ÷ 32⌉ = 16 warps'. All 16 slots fill in amber; scheduler busy rate is 100%."
+        },
+        {
+          "id": "b3",
+          "say": "If a warp computes only eight instructions between loads, it would need sixty-one warps. Even full occupancy leaves the scheduler idle three quarters of the time.",
+          "show": "Timeline with c = 8: '⌈(8 + 479) ÷ 8⌉ = 61 warps needed'. With only 16 warps available, the scheduler shows 74% idle grey gaps."
+        },
+        {
+          "id": "b4",
+          "say": "Occupancy cannot hide latency when there is too little arithmetic between loads: the ratio of compute to memory sets the pace.",
+          "show": "A warning badge highlights: 'insufficient arithmetic between loads causes unavoidable pipeline stalls'."
+        }
+      ]
+    },
+    {
+      "id": "ch13_s04",
+      "name": "what caps occupancy",
+      "figs": [68, 69],
+      "visual": "A resource allocation board showing the four limits that cap multiprocessor occupancy: registers, shared memory, warp limit (64), and block limit (32). Whichever constraint binds first steps down the number of resident blocks.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Four separate hardware limits govern how many warps can reside on a multiprocessor for any given kernel.",
+          "show": "Four resource gauges line up: 'Registers (256 KB)', 'Shared Memory (228 KB)', 'Max Warps (64)', 'Max Blocks (32)'."
+        },
+        {
+          "id": "b2",
+          "say": "A thread using more registers leaves room for fewer threads. A block claiming more shared memory leaves room for fewer blocks.",
+          "show": "Sliders adjust: increasing registers per thread from 32 to 64 cuts allowed warps in half. Increasing shared memory reservations drops allowed blocks."
+        },
+        {
+          "id": "b3",
+          "say": "Blocks are placed whole, so whichever resource runs out first sets the occupancy.",
+          "show": "A binding constraint indicator highlights the limiting resource in red: 'Occupancy capped by Shared Memory at 25%'."
+        },
+        {
+          "id": "b4",
+          "say": "Remember that occupancy is a latency-hiding metric, not a speed metric. A well-tuned kernel at fifty percent occupancy often beats a careless one at one hundred percent.",
+          "show": "A comparison card displays: 'Careless 100% occupancy with cache thrashing' vs 'Tuned 50% occupancy with clean access'. Takeaway pill: 'the goal is enough warps to hide memory latency, not maximum occupancy'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Warps needed for c=32 and L=479: (32 + 479) / 32 = 15.96875, ceiling is 16 warps",
+      "python": "import math; math.ceil((32 + 479) / 32)",
+      "result": "16"
+    },
+    {
+      "claim": "Warps needed for c=8 and L=479: (8 + 479) / 8 = 60.875, ceiling is 61 warps",
+      "python": "import math; math.ceil((8 + 479) / 8)",
+      "result": "61"
+    },
+    {
+      "claim": "With c=8 and 16 warps, scheduler is busy 16 * 8 / (8 + 479) = 26.28% of the time, idle 73.7% of the time, quoted as 'three quarters of the time'",
+      "python": "(16 * 8) / (8 + 479), 1 - (16 * 8) / (8 + 479)",
+      "result": "(0.2628336755646817, 0.7371663244353183)"
+    }
+  ]
+}

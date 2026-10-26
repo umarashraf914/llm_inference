@@ -1,0 +1,109 @@
+{
+  "chapter": "ch10",
+  "title": "The first sin: divergence",
+  "kicker": "10 · The first sin: divergence",
+  "figs": [49, 50, 51, 52],
+  "scenes": [
+    {
+      "id": "ch10_s01",
+      "name": "what a branch means in lockstep",
+      "figs": [49, 50],
+      "visual": "A thirty-two-lane warp encounters an if-else decision in code. Sixteen lanes want the 'if' path; sixteen want the 'else' path. The hardware cannot run both at once, so it executes them sequentially in two passes, masking out half the lanes in each pass.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "On an ordinary processor, a conditional branch is routine. One thread reaches a decision, takes one path, and carries on.",
+          "show": "A single CPU thread reaches a fork in code: 'if x > 0'. It takes the right path cleanly with zero wasted cycles."
+        },
+        {
+          "id": "b2",
+          "say": "On a G P U, thirty-two lanes reach that fork together sharing one instruction, but the numbers they are testing differ in every lane.",
+          "show": "A 32-lane warp approaches the fork. Half the lanes evaluate to true; the other half evaluate to false. Two conflicting instruction paths highlight in violet and amber."
+        },
+        {
+          "id": "b3",
+          "say": "There is only one instruction decoder, so the hardware cannot run both branches at once. It runs them back to back, masking off half the lanes in each pass.",
+          "show": "Pass 1: the 'if' path executes. Lanes 16 through 31 are greyed out as idle. Pass 2: the 'else' path executes. Lanes 0 through 15 are greyed out as idle."
+        },
+        {
+          "id": "b4",
+          "say": "Each lane sits completely idle through the half it skipped. A balanced if-else branch cuts throughput in half.",
+          "show": "A throughput meter drops from 100% to 50%. Takeaway: 'warp divergence: divergent paths are serialized, not parallelized'."
+        }
+      ]
+    },
+    {
+      "id": "ch10_s02",
+      "name": "the active mask and nested forks",
+      "figs": [51],
+      "visual": "The hardware active mask displayed as a 32-bit register. A bar chart demonstrates the exponential penalty of nested branches: each additional nested condition doubles the number of serial passes and halves efficiency.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The hardware enforces divergence using an active bitmask: one bit for each of the thirty-two lanes.",
+          "show": "A 32-bit register card displays: 'Active mask: 11110000...'. The ones execute; the zeros simply discard their outputs."
+        },
+        {
+          "id": "b2",
+          "say": "Inactive lanes still occupy their place in the execution slot. They simply discard the result.",
+          "show": "Instruction slots pulse across the lanes. Inactive lanes drop their results into a grey waste bin."
+        },
+        {
+          "id": "b3",
+          "say": "Each nested fork doubles the passes: one fork means two passes; two nested forks mean four passes; three nested forks mean eight passes.",
+          "show": "A tree of nested if-else blocks branches downward. Efficiency bars drop precipitously: 1 pass is 100%, 2 passes is 50%, 4 passes is 25%, 8 passes is 12.5%."
+        },
+        {
+          "id": "b4",
+          "say": "A branch costs nothing when all thirty-two lanes take the same path. Divergence only happens when lanes disagree.",
+          "show": "When all lanes evaluate true, the entire warp takes the branch in one pass at 100% efficiency. Takeaway pill: 'branching is free when warps agree; data-dependent splits destroy efficiency'."
+        }
+      ]
+    },
+    {
+      "id": "ch10_s03",
+      "name": "the two cardinal sins",
+      "figs": [52],
+      "visual": "A side-by-side conceptual comparison of the GPU's two cardinal sins: Divergence on the left, Uncoalesced Memory Access on the right. Both stem from the exact same structural cause: thirty-two lanes forced to act as one.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Divergence is the first of two cardinal sins in G P U programming. The second is uncoalesced memory access.",
+          "show": "Two large caution panels appear: left 'Divergence (Instruction mismatch)', right 'Uncoalesced access (Address mismatch)'."
+        },
+        {
+          "id": "b2",
+          "say": "Both sins have the exact same cause: thirty-two lanes that are bound together by hardware to act as one.",
+          "show": "A blue warp bracket binds 32 lanes at center. Arrows connect the bracket to both caution panels."
+        },
+        {
+          "id": "b3",
+          "say": "Divergence happens when lanes want different instructions, wasting arithmetic issue slots.",
+          "show": "In the left panel, lanes branch in different directions, leaving half the issue slots grey and wasted."
+        },
+        {
+          "id": "b4",
+          "say": "Uncoalesced access happens when lanes want scattered memory addresses, wasting memory bandwidth. And bandwidth is by far the scarcer resource.",
+          "show": "In the right panel, lanes point at scattered memory addresses, forcing multiple separate memory transactions. Takeaway: 'a group that acts as one must agree on instructions and on addresses alike'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "1 fork gives 2 passes = 1/2 = 50% useful efficiency",
+      "python": "1 / 2",
+      "result": "0.5"
+    },
+    {
+      "claim": "2 nested forks give 4 passes = 1/4 = 25% efficiency",
+      "python": "1 / 4",
+      "result": "0.25"
+    },
+    {
+      "claim": "3 nested forks give 8 passes = 1/8 = 12.5% efficiency",
+      "python": "1 / 8",
+      "result": "0.125"
+    }
+  ]
+}

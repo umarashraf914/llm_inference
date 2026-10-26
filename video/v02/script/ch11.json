@@ -1,0 +1,137 @@
+{
+  "chapter": "ch11",
+  "title": "Why memory is slow in the first place",
+  "kicker": "11 · Why memory is slow in the first place",
+  "figs": [53, 54, 55, 56],
+  "scenes": [
+    {
+      "id": "ch11_s01",
+      "name": "six transistors against one capacitor",
+      "figs": [53],
+      "visual": "A physical circuit comparison between an SRAM cell and a DRAM cell. On the left, an SRAM cell built from six transistors forming two stable cross-coupled feedback loops. On the right, a DRAM cell consisting of a single transistor and a tiny microscopic capacitor that visibly leaks electrical charge over time.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The memory hierarchy is not an arbitrary design choice. It follows directly from the physics of a memory cell.",
+          "show": "Two circuit diagrams appear side by side: left labeled 'SRAM cell (on-chip)', right labeled 'DRAM cell (off-chip)'."
+        },
+        {
+          "id": "b2",
+          "say": "An S RAM cell uses six transistors to form two loops that actively reinforce each other. It can be read in a single cycle without disturbing its state.",
+          "show": "In the left panel, six transistors illuminate with active feedback loops. A read probe measures the voltage instantly with zero signal degradation."
+        },
+        {
+          "id": "b3",
+          "say": "A D RAM cell uses just one transistor and one tiny capacitor. The bit is stored as a microscopic packet of electrical charge.",
+          "show": "In the right panel, a single transistor controls access to a tiny capacitor plate. A full charge represents '1'; an empty charge represents '0'."
+        },
+        {
+          "id": "b4",
+          "say": "Because it uses one transistor instead of six, D RAM is far denser and cheaper per bit: that is how eighty gigabytes fits beside the chip. But a capacitor leaks like a bucket with a hole.",
+          "show": "Density visual: six DRAM cells fit in the footprint of one SRAM cell. An animated gauge shows the capacitor voltage slowly leaking downward toward zero. Takeaway: 'SRAM is fast but bulky; DRAM is dense but physically leaky'."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s02",
+      "name": "destructive read and the refresh timer",
+      "figs": [54],
+      "visual": "A cycle diagram showing what happens during a DRAM read: measuring the charge drains the capacitor, forcing a mandatory rewrite cycle. A separate periodic timeline shows rows being refreshed every 64 milliseconds.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Reading a D RAM cell destroys the bit. The stored charge is so small that measuring it drains it completely.",
+          "show": "A read operation connects to the capacitor. The electrical charge flows out into the sense amplifier, leaving the capacitor completely empty."
+        },
+        {
+          "id": "b2",
+          "say": "Every read is therefore a read followed by an immediate rewrite, and that memory row is blocked until the rewrite finishes.",
+          "show": "A two-phase sequence executes: phase 1 'read & drain', phase 2 'rewrite & restore'. A lock icon seals the row during the rewrite."
+        },
+        {
+          "id": "b3",
+          "say": "Because the charge leaks away continuously, the memory controller must also rewrite every row on a timer: every sixty-four milliseconds.",
+          "show": "A circular refresh timer sweeps: '64 millisecond refresh window'. Rows across the DRAM array pulse green as they are refreshed sixteen times every second."
+        },
+        {
+          "id": "b4",
+          "say": "These physical constraints make D RAM slower to respond. But they do not limit bandwidth: bandwidth comes from wires.",
+          "show": "A summary card balances the trade: 'DRAM physics sets latency; wire count sets bandwidth'."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s03",
+      "name": "the two hundred and seventy nanosecond journey",
+      "figs": [55],
+      "visual": "A timeline breakdown of one 273-nanosecond HBM load. The actual capacitor readout takes only 27.5 nanoseconds; the other 90% is physical signal transit, cache checks, crossbar arbitration, and memory controller queues.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When a thread requests a number from high-bandwidth memory, the journey takes about two hundred and seventy-three nanoseconds.",
+          "show": "A full timeline bar draws to 273 nanoseconds, labeled 'One HBM memory load · ~273 ns (479 clock ticks)'."
+        },
+        {
+          "id": "b2",
+          "say": "The memory cell itself takes only twenty-seven point five nanoseconds to open a row and read a column: barely a tenth of the total time.",
+          "show": "A small sliver at the far right highlights: 'cell activation & column read · 27.5 ns (10% of total)'."
+        },
+        {
+          "id": "b3",
+          "say": "Most of the wait is the journey: checking local caches, crossing the chip to the memory controller, waiting in queues, and traveling across package traces.",
+          "show": "The remaining 90% of the timeline expands into transit stages: 'L1 check → crossbar transit → memory controller queue → PHY bus'."
+        },
+        {
+          "id": "b4",
+          "say": "Wider buses do not shorten that journey. More wires carry more bytes at once, but they do not make signals travel faster across silicon.",
+          "show": "A bus widens from 1,000 wires to 5,000 wires. The volume increases, but the transit latency remains fixed at 273 nanoseconds. Takeaway: 'bandwidth scales with wires; latency is bounded by physical transit distance'."
+        }
+      ]
+    },
+    {
+      "id": "ch11_s04",
+      "name": "why there must be a ladder",
+      "figs": [56],
+      "visual": "A 2D scatter plot of storage technologies: Speed on the vertical axis versus Capacity on the horizontal axis. Registers sit at top-left; DRAM sits at bottom-right. The top-right corner is physically empty.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "In every computer ever built, storage technologies face the exact same trade: speed against capacity.",
+          "show": "An XY chart draws: vertical axis 'Speed (latency)', horizontal axis 'Capacity (bytes)'. Storage technologies plot as points."
+        },
+        {
+          "id": "b2",
+          "say": "The top-right corner is completely empty. No technology exists that is both the fastest and the largest.",
+          "show": "A bright spotlight highlights the empty top-right corner: 'impossible: fast and vast'."
+        },
+        {
+          "id": "b3",
+          "say": "Speed requires physical proximity: to be fast, a memory must be microscopic and sit right next to the arithmetic.",
+          "show": "A diagram shows registers wrapped tightly around the math units: 'fast requires physical closeness'."
+        },
+        {
+          "id": "b4",
+          "say": "Large capacity requires surface area, which inevitably pushes memory further away across longer wires. The only possible solution is a ladder.",
+          "show": "A four-rung ladder draws upward connecting HBM to L2, L1, and registers. Takeaway pill: 'speed requires proximity, capacity requires area: memory must be a ladder'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Cell read time: row open 13.75 ns + column read 13.75 ns = 27.5 ns, which is about one tenth of 273 ns (10.07%)",
+      "python": "13.75 + 13.75, 27.5 / 273 * 100",
+      "result": "(27.5, 10.073260073260073)"
+    },
+    {
+      "claim": "Refresh interval: 64 ms / 8,192 commands = 7.8125 microseconds per command",
+      "python": "64e-3 / 8192 * 1e6",
+      "result": "7.8125"
+    },
+    {
+      "claim": "Full refresh rate: 1 / 64 ms = 15.625 full rewrites per second, quoted as 'sixteen times every second'",
+      "python": "1 / 64e-3",
+      "result": "15.625"
+    }
+  ]
+}

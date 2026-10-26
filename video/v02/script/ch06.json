@@ -1,0 +1,157 @@
+{
+  "chapter": "ch06",
+  "title": "Registers, scratchpads and tiles",
+  "kicker": "06 · Registers, scratchpads and tiles",
+  "figs": [26, 27, 28, 29, 30, 31, 32],
+  "scenes": [
+    {
+      "id": "ch06_s01",
+      "name": "the register file and the trade",
+      "figs": [26, 27, 28],
+      "visual": "A diagram of the register file. Arithmetic units connect directly to named register slots with single-cycle access. A partitioning chart illustrates the trade: 256 KB divided by 4 bytes yields 65,536 registers. Allocating 32 per thread allows 2,048 threads; allocating 64 halves occupancy to 1,024.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "An arithmetic unit cannot reach into memory. It can only read from a register and write to a register.",
+          "show": "A diagram shows memory on the far right and the math unit on the left. Between them sit named register slots 'r0', 'r1', 'r2'. An arrow shows the required path: memory into register, register into math unit."
+        },
+        {
+          "id": "b2",
+          "say": "The register step is not optional. Every number must land in a register before the maths can touch it.",
+          "show": "A direct path from memory to arithmetic flashes red with a prohibition icon, then redirects cleanly through register r0."
+        },
+        {
+          "id": "b3",
+          "say": "Each multiprocessor contains two hundred and fifty-six kilobytes of registers, giving sixty-five thousand five hundred and thirty-six slots.",
+          "show": "A large register bank lights up: '256 KB ÷ 4 bytes = 65,536 registers'. Access time highlights: 'single-cycle access'."
+        },
+        {
+          "id": "b4",
+          "say": "Those registers are partitioned across resident threads. Give each thread thirty-two registers, and all two thousand and forty-eight threads fit.",
+          "show": "A horizontal bar splits into 2,048 slices: '32 registers per thread · 100% occupancy (2,048 threads)'."
+        },
+        {
+          "id": "b5",
+          "say": "Double the registers to sixty-four, and only half as many threads fit. Hoarding registers buys speed per thread, but leaves fewer threads to hide memory waits.",
+          "show": "The allocation bar adjusts to 64 registers per thread: occupancy drops to 50% (1,024 threads). At 128 registers, it drops to 25%. Takeaway: 'registers per thread trade one-for-one with occupancy'."
+        }
+      ]
+    },
+    {
+      "id": "ch06_s02",
+      "name": "on-chip S RAM and the scratchpad",
+      "figs": [29],
+      "visual": "A schematic of the 256 KB SRAM block on the multiprocessor. A configurable slider splits the block between hardware L1 cache and software-managed shared memory (up to 228 KB).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Beside the registers sits another two hundred and fifty-six kilobytes of fast S RAM.",
+          "show": "A 256 KB memory block highlights on the multiprocessor die labeled '256 KB on-chip SRAM'."
+        },
+        {
+          "id": "b2",
+          "say": "The programmer can claim up to two hundred and twenty-eight kilobytes of this as shared memory, a scratchpad managed by software.",
+          "show": "A divider slides across the block: 228 KB fills in teal labeled 'shared memory scratchpad (explicit code control)'."
+        },
+        {
+          "id": "b3",
+          "say": "Whatever is not claimed serves as an automatic L one cache.",
+          "show": "The remaining portion fills in grey: 'automatic L1 cache (hardware managed)'. Takeaway: 'the split between cache and scratchpad is chosen by software'."
+        }
+      ]
+    },
+    {
+      "id": "ch06_s03",
+      "name": "tiling: why staging saves memory traffic",
+      "figs": [30],
+      "visual": "A matrix multiply of a 4x4 output tile (16 threads). Without staging, each thread reads its 8 inputs from HBM (128 total reads). With staging, the 16 numbers of A and 16 of B are copied into shared memory once (32 total reads), cutting HBM traffic fourfold.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Shared memory exists to enable tiling: staging data so cooperating threads can share it without hitting memory.",
+          "show": "A 4 by 4 output grid C appears (16 cells, 16 threads). Above it sits tile B; to its left sits tile A."
+        },
+        {
+          "id": "b2",
+          "say": "Each output cell needs four numbers from row A and four numbers from column B, eight numbers in all.",
+          "show": "Output cell c23 highlights, showing its dot product requiring row 2 of A (4 values) and column 3 of B (4 values)."
+        },
+        {
+          "id": "b3",
+          "say": "If all sixteen threads fetched their own eight numbers from memory, the block would make a hundred and twenty-eight reads.",
+          "show": "16 threads send independent arrows down to HBM. Read counter increments to '16 threads × 8 reads = 128 reads from HBM'."
+        },
+        {
+          "id": "b4",
+          "say": "Instead, the block copies the sixteen numbers of A and sixteen of B into shared memory once, making thirty-two reads in all.",
+          "show": "The block performs 32 collaborative reads from HBM into the shared memory scratchpad. Read counter drops: '32 reads from HBM'."
+        },
+        {
+          "id": "b5",
+          "say": "Every thread then reads from shared memory. That is four times fewer reads, exactly the width of the tile. A tile a hundred and twenty-eight wide saves a hundred and twenty-eight times.",
+          "show": "Threads read freely from the shared scratchpad. A comparison card shows: '128 reads unstaged vs 32 reads staged: 4× saving'. Takeaway: 'tiling trades on-chip scratchpad space for a massive reduction in memory traffic'."
+        }
+      ]
+    },
+    {
+      "id": "ch06_s04",
+      "name": "cache versus shared memory",
+      "figs": [31, 32],
+      "visual": "A side-by-side comparison of automatic cache versus explicit shared memory. A token generation stream shows weights passing through once, demonstrating why automatic caching fails for autoregressive decode.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A cache is simply a small, fast copy of something slow and far away. It works only when programs reuse data.",
+          "show": "A small cache box sits beside a large memory store. Repeated requests hit the cache in teal."
+        },
+        {
+          "id": "b2",
+          "say": "A program that touches every number exactly once gains nothing from any cache, however large. Generating one token touches every weight once.",
+          "show": "A stream of weights flows past the cache. Each weight is touched once and discarded; by the time it could be reused, thousands of other weights have evicted it."
+        },
+        {
+          "id": "b3",
+          "say": "Both cache and shared memory use the same physical silicon. The difference is who decides what is in them.",
+          "show": "Two cards appear: left 'Hardware cache · hardware guesses based on recency'; right 'Shared memory · software explicitly stages blocks'."
+        },
+        {
+          "id": "b4",
+          "say": "When streaming through weights, guessing is useless. Stating exactly which tiles to stage is everything.",
+          "show": "The shared memory card glows teal. Takeaway pill: 'caches rely on luck; shared memory relies on explicit engineering'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "256 KB register file / 4 bytes per register = 65,536 registers",
+      "python": "256 * 1024 / 4",
+      "result": "65536.0"
+    },
+    {
+      "claim": "65,536 / 32 registers per thread = 2,048 threads (100% occupancy)",
+      "python": "65536 / 32",
+      "result": "2048.0"
+    },
+    {
+      "claim": "65,536 / 64 = 1,024 threads (50% occupancy)",
+      "python": "65536 / 64",
+      "result": "1024.0"
+    },
+    {
+      "claim": "Unstaged 4x4 tile reads: 16 threads * 8 reads = 128 reads",
+      "python": "16 * 8",
+      "result": "128"
+    },
+    {
+      "claim": "Staged 4x4 tile reads: 16 of A + 16 of B = 32 reads",
+      "python": "16 + 16",
+      "result": "32"
+    },
+    {
+      "claim": "Tiling saving ratio: 128 / 32 = 4x saving (equal to tile width 4)",
+      "python": "128 / 32",
+      "result": "4.0"
+    }
+  ]
+}

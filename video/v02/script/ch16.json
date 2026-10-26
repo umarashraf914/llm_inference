@@ -1,0 +1,114 @@
+{
+  "chapter": "ch16",
+  "title": "The ridge",
+  "kicker": "16 · The ridge",
+  "figs": [84, 85, 86, 87],
+  "scenes": [
+    {
+      "id": "ch16_s01",
+      "name": "attainable performance and the roofline",
+      "figs": [84, 85],
+      "visual": "A log-log roofline plot for the H100. The horizontal axis represents arithmetic intensity in operations per byte; the vertical axis represents attainable throughput in operations per second. A slanted coral roof meets a flat amber ceiling at the ridge point: 295 operations per byte.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Attainable performance is the absolute ceiling this chip could reach on a given algorithm. It is not a prediction; it is an upper bound.",
+          "show": "A log-log coordinate grid draws: x-axis 'Arithmetic intensity (ops/byte)', y-axis 'Attainable rate (ops/sec)'."
+        },
+        {
+          "id": "b2",
+          "say": "Below the ridge, the slanted roof binds: the chip can do no more operations per second than memory bandwidth times arithmetic intensity.",
+          "show": "A slanted coral ceiling draws upward with slope equal to 3.35 TB/s: 'Memory-bound: rate = 3.35 TB/s × intensity'."
+        },
+        {
+          "id": "b3",
+          "say": "Above the ridge, the flat ceiling binds: the tensor cores' peak of nine hundred and eighty-nine trillion operations a second.",
+          "show": "A flat amber ceiling draws horizontally at 989.4 TFLOP/s: 'Compute-bound: 989.4 TFLOP/s peak'."
+        },
+        {
+          "id": "b4",
+          "say": "The inflection point where they meet is the ridge: nine hundred and eighty-nine trillion divided by three point three five trillion bytes, giving two hundred and ninety-five operations per byte.",
+          "show": "A vertical dashed line drops from the corner to 295 on the x-axis: 'Ridge = 295 ops/byte'. Takeaway: 'below 295 you wait on memory; above 295 you wait on arithmetic'."
+        }
+      ]
+    },
+    {
+      "id": "ch16_s02",
+      "name": "prefill versus decode on the roofline",
+      "figs": [86],
+      "visual": "The roofline diagram populated with prefill and decode phases. Decode lands far to the left at 1 op/byte in the memory-bound zone; prefill lands far to the right at 1,024 to 2,048 ops/byte in the compute-bound zone.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Now place the two phases of running a language model onto that roofline.",
+          "show": "The H100 roofline remains in view with the 295 ridge marked clearly at center."
+        },
+        {
+          "id": "b2",
+          "say": "Decode generates one token at a time, multiplying the token's vector by the weights. Each weight is read once, giving one operation per byte.",
+          "show": "A marker lands at 1.0 on the horizontal axis: 'Decode · 1 op/byte'. A vertical indicator shows it hitting the slanted memory roof, far below peak FLOPS."
+        },
+        {
+          "id": "b3",
+          "say": "Prefill processes a whole prompt of thousands of tokens at once, reusing each weight thousands of times: one to two thousand operations per byte.",
+          "show": "A marker lands at 2,048 on the horizontal axis: 'Prefill · ~2,000 ops/byte'. An indicator shows it sitting firmly against the flat compute ceiling."
+        },
+        {
+          "id": "b4",
+          "say": "The exact same model on the exact same hardware lives on opposite sides of the ridge: decode is starved for memory; prefill saturates the maths units.",
+          "show": "Arrows highlight the massive gulf between the two points. Takeaway pill: 'decode lives far left of the ridge; prefill lives far to the right'."
+        }
+      ]
+    },
+    {
+      "id": "ch16_s03",
+      "name": "two real operations: array add versus matrix multiply",
+      "figs": [87],
+      "visual": "A comparison of two fundamental mathematical operations against the H100 ridge: adding two arrays (0.17 ops/byte) versus multiplying two 1,024x1,024 matrices (341 ops/byte).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Look at two basic mathematical operations to see how arithmetic intensity is set.",
+          "show": "Two algorithm cards appear: left 'Vector Addition: c[i] = a[i] + b[i]', right 'Matrix Multiply: C = A × B (1,024 × 1,024)'."
+        },
+        {
+          "id": "b2",
+          "say": "Adding two arrays reads two numbers and writes one: six bytes of traffic for one addition, or zero point one seven operations per byte.",
+          "show": "Vector addition plots at 0.17 ops/byte on the roofline: deeply memory-bound, far below the ridge."
+        },
+        {
+          "id": "b3",
+          "say": "Multiplying two thousand-by-thousand matrices performs over two billion operations on six megabytes of data: three hundred and forty-one operations per byte.",
+          "show": "Matrix multiplication plots at 341 ops/byte: crossing just to the right of the 295 ridge into compute-bound territory."
+        },
+        {
+          "id": "b4",
+          "say": "They sit two thousand times apart, and neither number depends on the G P U. The chip sets the ridge; mathematics decides which side you land on.",
+          "show": "A bracket spans the 2,000× distance between the two algorithms. Takeaway pill: 'arithmetic intensity is a property of the algorithm, not the chip'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Ridge: 989.4 TFLOP/s / 3.352 TB/s = 295.17 ops/byte, quoted as '295 operations per byte'",
+      "python": "989.4e12 / 3.352e12",
+      "result": "295.1669868735083"
+    },
+    {
+      "claim": "Vector addition intensity: 1 op / (3 numbers * 2 bytes) = 1 / 6 = 0.1667 ops/byte, quoted as '0.17 operations per byte'",
+      "python": "1 / 6",
+      "result": "0.16666666666666666"
+    },
+    {
+      "claim": "1,024 x 1,024 matrix multiply intensity: 2 * 1,024^3 ops / (3 * 1,024^2 * 2 bytes) = 341.33 ops/byte, quoted as '341 operations per byte'",
+      "python": "(2 * 1024**3) / (3 * 1024**2 * 2)",
+      "result": "341.3333333333333"
+    },
+    {
+      "claim": "Ratio between matrix multiply and vector add intensity: 341.33 / 0.1667 = 2,048x, quoted as 'two thousand times apart'",
+      "python": "341.3333333333333 / (1/6)",
+      "result": "2048.0"
+    }
+  ]
+}

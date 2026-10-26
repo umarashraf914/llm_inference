@@ -1,0 +1,251 @@
+{
+  "chapter": "ch19",
+  "title": "Inside a floating-point number",
+  "kicker": "19 · Inside a floating-point number",
+  "figs": [99, 100, 101, 102, 103, 104, 105, 106, 107],
+  "scenes": [
+    {
+      "id": "ch19_s01",
+      "name": "scientific notation in base two",
+      "figs": [99],
+      "visual": "A 32-bit floating-point layout dissecting the number six. In binary, six is 110, which is written as 1.1 times two squared. The three fields light up: sign bit 0 (positive), 8-bit exponent biased by 127 storing 129, and 23-bit mantissa storing .1 followed by zeros, giving 24 significant bits with the implicit leading one.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Scientific notation writes a number as a few digits multiplied by a power of ten, where the power dictates where the decimal point lands.",
+          "show": "Decimal example displays: '1,500 = 1.5 × 10³'."
+        },
+        {
+          "id": "b2",
+          "say": "A floating-point number does the exact same thing in base two. Six is one one zero in binary, which is one point one times two squared.",
+          "show": "Binary conversion displays: '6 = 110 = 1.1 × 2²'."
+        },
+        {
+          "id": "b3",
+          "say": "In standard thirty-two-bit floating point, the sign bit is zero for positive. The exponent field holds the power plus a bias of one hundred and twenty-seven, so two squared is stored as one hundred and twenty-nine.",
+          "show": "The 32-bit fields highlight: 'Sign s: 0 (plus)', 'Exponent e (8 bits): 10000001 (129 = 2 + 127)'."
+        },
+        {
+          "id": "b4",
+          "say": "The fraction field holds the bits after the binary point. Because the bit before the point is always one, the hardware never stores it, gaining twenty-four significant bits of precision from twenty-three bits of storage.",
+          "show": "Fraction field highlights: 'Fraction f (23 bits): 1000...0 (.1 of 1.1)'. Formula: 'value = (-1)^s × 2^(e - 127) × 1.f'. Takeaway: 'an implicit leading one gives 24 significant bits from 23 stored bits'."
+        }
+      ]
+    },
+    {
+      "id": "ch19_s02",
+      "name": "the trade-off between range and precision",
+      "figs": [100, 101],
+      "visual": "Bit diagrams comparing FP32, FP16, and BF16 drawn to scale. Exponent bits (orange) buy dynamic range, while fraction bits (gold) buy precision. BF16 preserves FP32's 8 exponent bits while cutting the mantissa to 7 bits, whereas FP16 uses 5 exponent and 10 mantissa bits.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Range and precision are bought separately, and with a fixed budget of bits, every bit given to one is stolen from the other.",
+          "show": "A seesaw balance illustrates the trade-off: 'More exponent bits = greater range', 'More fraction bits = finer precision'."
+        },
+        {
+          "id": "b2",
+          "say": "More exponent bits allow a format to reach vastly larger and smaller magnitudes. More fraction bits allow it to distinguish tiny differences between nearby numbers.",
+          "show": "Scale comparison demonstrates coarse wide spans versus fine narrow spans."
+        },
+        {
+          "id": "b3",
+          "say": "Standard sixteen-bit floating point keeps ten fraction bits and five exponent bits, giving fine steps over a narrow range.",
+          "show": "FP16 bit layout displays: '1 sign | 5 exponent | 10 mantissa (fine steps, narrow range)'."
+        },
+        {
+          "id": "b4",
+          "say": "B float sixteen does the exact opposite. It preserves all eight exponent bits from thirty-two-bit float, keeping its immense range while trimming the fraction to seven bits. It is simply the top half of a thirty-two-bit number.",
+          "show": "BF16 bit layout displays: '1 sign | 8 exponent | 7 mantissa (FP32 range, coarse steps)'. Takeaway: 'BF16 trades precision for range by preserving all 8 exponent bits'."
+        }
+      ]
+    },
+    {
+      "id": "ch19_s03",
+      "name": "pi in b float sixteen",
+      "figs": [102],
+      "visual": "Field-by-field bit dissection of pi in BF16: sign 0 (+1), exponent 10000000 (128 - 127 = 1 -> 2^1 = 2), fraction 1001001 (73/128 = 0.5703125). Total value equals 2 × 1.5703125 = 3.140625, off by 0.031%.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Read field by field, pi in B float sixteen reveals the mechanics with complete clarity.",
+          "show": "The 16 bits of BF16 pi display: '0 | 10000000 | 1001001'."
+        },
+        {
+          "id": "b2",
+          "say": "The sign bit is zero, positive. The exponent is one zero zero zero zero zero zero zero, which is one hundred and twenty-eight. Subtracting the bias leaves one, so the power is two to the first power.",
+          "show": "Sign and exponent resolve: 'sign 0 -> +1', 'exponent 128 - 127 = 1 -> 2¹ = 2'."
+        },
+        {
+          "id": "b3",
+          "say": "The seven fraction bits spell out seventy-three over one hundred and twenty-eight. Adding the implicit leading one gives one point five seven zero three one two five.",
+          "show": "Fraction resolves: '1 + 73/128 = 1 + 0.5703125 = 1.5703125'."
+        },
+        {
+          "id": "b4",
+          "say": "Multiply by two, and the value is exactly three point one four zero six two five. Pi is three point one four one five nine, so B float sixteen is off by less than one thousandth, an error of barely zero point zero three percent.",
+          "show": "Final product: '2 × 1.5703125 = 3.140625'. Error note: 'Off by 0.00097 (0.031% error)'. Takeaway: 'seven fraction bits represent pi to within 0.031% accuracy'."
+        }
+      ]
+    },
+    {
+      "id": "ch19_s04",
+      "name": "range and precision across formats",
+      "figs": [103],
+      "visual": "Dual-axis comparison. Top: Logarithmic range showing FP32 and BF16 spanning 10^-38 to 10^38, while FP16 cuts off at 65,504. Bottom: Linear precision between 1.00 and 1.03 showing FP16 resolving every 0.00098 while BF16 steps every 0.0078 (8 times coarser).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Look at the reach: standard sixteen-bit float maxes out at sixty-five thousand five hundred and four, while B float sixteen reaches ten to the thirty-eighth power.",
+          "show": "Top log axis highlights dynamic range: 'FP16 max: 65,504' vs 'BF16 max: 3.4 × 10³⁸'."
+        },
+        {
+          "id": "b2",
+          "say": "B float sixteen reaches five times ten to the thirty-third power higher, completely banishing the numerical overflow that plagued early neural network training.",
+          "show": "Range gap callout: 'BF16 reaches 5 × 10³³ times higher than FP16'."
+        },
+        {
+          "id": "b3",
+          "say": "The price is precision: just above one, sixteen-bit float places numbers every zero point zero zero zero nine eight, while B float sixteen steps eight times coarser.",
+          "show": "Bottom linear axis zooms into 1.00 to 1.03: 'FP16 step: 0.00098' vs 'BF16 step: 0.0078 (8× coarser)'."
+        },
+        {
+          "id": "b4",
+          "say": "That is the whole bargain: deep learning forgives coarse rounding on individual weights, but requires enormous dynamic range across layers.",
+          "show": "Summary card balances the trade: 'Coarse 0.4% rounding tolerated; 80 decades of range required'. Takeaway: 'BF16 trades 8× coarser precision for 33 orders of magnitude in dynamic range'."
+        }
+      ]
+    },
+    {
+      "id": "ch19_s05",
+      "name": "multiplier area versus bit delivery",
+      "figs": [104],
+      "visual": "A comparison between significand multiplier area and real tensor core throughput. Multipliers scale with width squared: 24x24 (576) for FP32 down to 8x8 (64) for BF16, a ninth of the size. Yet on an H100, BF16 and FP16 run at the same 989.4 TFLOP/s, proving throughput is gated by operand delivery paths.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When multiplying two floating-point numbers, the exponents add, and the significands multiply.",
+          "show": "Floating point multiplication diagram shows exponent adder beside significand multiplier."
+        },
+        {
+          "id": "b2",
+          "say": "Because an eight-by-eight multiplier takes sixty-four gates versus five hundred and seventy-six for twenty-four bits, a B float sixteen multiplier is a ninth the size of a thirty-two-bit unit.",
+          "show": "Multiplier area boxes to scale: 'FP32: 24×24 = 576' vs 'BF16: 8×8 = 64 (1/9th the silicon)'."
+        },
+        {
+          "id": "b3",
+          "say": "Yet on an H one hundred, B float sixteen runs at the exact same rate as sixteen-bit float, nine hundred and eighty-nine trillion operations a second, even though its multiplier is half the size.",
+          "show": "H100 throughput bars display: 'FP16: 989.4 TFLOP/s' and 'BF16: 989.4 TFLOP/s' tied despite 121 vs 64 gate area."
+        },
+        {
+          "id": "b4",
+          "say": "Silicon area determines how many multipliers can fit on a die. But operand delivery wires determine how fast they can be fed numbers each tick.",
+          "show": "Data bus wire comparison illuminates delivery bottleneck: 'Both receive 16-bit operands over fixed buses'. Takeaway: 'operand delivery bandwidth, not multiplier area, governs tensor core speed'."
+        }
+      ]
+    },
+    {
+      "id": "ch19_s06",
+      "name": "the accumulation safeguard and the 256 wall",
+      "figs": [105, 106],
+      "visual": "The mixed precision accumulation safeguard: inputs multiply in low precision, but running sums accumulate in FP32. A graph shows what happens adding one repeatedly: BF16 freezes at 256, FP16 freezes at 2,048, while FP32 continues accurately past 16 million.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To preserve accuracy across millions of multiply-adds, modern hardware employs a crucial safeguard: low-precision multiplies accumulate into a thirty-two-bit floating-point total.",
+          "show": "Architecture diagram shows BF16 inputs feeding multipliers, whose outputs stream into an FP32 accumulator."
+        },
+        {
+          "id": "b2",
+          "say": "If you add one repeatedly in pure B float sixteen, the running total stops advancing completely at two hundred and fifty-six.",
+          "show": "A running total plot tracks additions of 1. The BF16 curve flattens completely at 256: 'BF16: stuck at 256'."
+        },
+        {
+          "id": "b3",
+          "say": "Above two hundred and fifty-six, the gap between consecutive B float numbers widens to two. Adding one lands on a midpoint that rounds right back down to two hundred and fifty-six, vanishing into thin air.",
+          "show": "Number line zoom at 256 shows points at 256 and 258. '256 + 1 = 257 rounds back to 256'."
+        },
+        {
+          "id": "b4",
+          "say": "Standard sixteen-bit float hits the same wall at two thousand and forty-eight. Accumulating in thirty-two-bit float counts past sixteen million with zero rounding loss, protecting dot products across deep layers.",
+          "show": "FP16 line flattens at 2,048, while FP32 ascends linearly: 'FP32 exact to 16,777,216'. Takeaway: 'FP32 accumulation prevents running sums from freezing at the 256 wall'."
+        }
+      ]
+    },
+    {
+      "id": "ch19_s07",
+      "name": "separating reality from marketing claims",
+      "figs": [107],
+      "visual": "A critical examination of generational marketing. Contrasts a '9x generational gain' headline with genuine silicon architectural speedups (2x to 4x on real dense workloads), breaking down the three distinct factors behind inflated claims.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When marketing announcements boast of nine-fold or eighteen-fold leaps between chip generations, look closely at what is being measured.",
+          "show": "A headline banner displays: '9× generational speed-up'."
+        },
+        {
+          "id": "b2",
+          "say": "Those headline multiples almost always blend reduced precision, structural sparsity, and clustered network fabrics together into a single theoretical number.",
+          "show": "Three component bars separate out: 'Narrower precision (2×)', 'Sparsity assumptions (2×)', 'System scaling (2.25×)'."
+        },
+        {
+          "id": "b3",
+          "say": "On identical precision and dense workloads, real silicon progress typically delivers a solid two to four times improvement per generation.",
+          "show": "An honest benchmark comparison reveals: 'Dense real-work speedup: 2× to 4× per generation'."
+        },
+        {
+          "id": "b4",
+          "say": "Understanding the three physical attacks on the memory wall lets you separate true architectural advances from marketing arithmetic.",
+          "show": "Summary card highlights the three pillars: 'Hiding latency, tiling reuse, and precision scaling'. Takeaway: 'always inspect precision and sparsity when evaluating generational claims'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Binary representation of 6: 110_2 = 1.1_2 * 2^2",
+      "python": "bin(6), 1.5 * 2**2",
+      "result": "('0b110', 6.0)"
+    },
+    {
+      "claim": "Exponent bias for power of 2: 2 + 127 = 129",
+      "python": "2 + 127",
+      "result": "129"
+    },
+    {
+      "claim": "Pi in BF16: 2 * (1 + 73/128) = 3.140625, off by 0.00097 (0.031% error)",
+      "python": "import math; v = 2 * (1 + 73/128); (v, round(abs(math.pi - v), 5), round(abs(math.pi - v)/math.pi * 100, 3))",
+      "result": "(3.140625, 0.00097, 0.031)"
+    },
+    {
+      "claim": "BF16 reaches 5e33 times higher than FP16",
+      "python": "round(((2 - 2**-7) * 2**127) / ((2 - 2**-10) * 2**15) / 1e33, 1)",
+      "result": "5.2"
+    },
+    {
+      "claim": "Precision step above 1: FP16 is 2^-10 = 0.0009765625 (~0.00098); BF16 is 2^-7 = 0.0078125 (~0.0078), 8x coarser",
+      "python": "2**-10, 2**-7, (2**-7) / (2**-10)",
+      "result": "(0.0009765625, 0.0078125, 8.0)"
+    },
+    {
+      "claim": "Significand multiplier area: 24^2 = 576, 8^2 = 64, 576 / 64 = 9x smaller",
+      "python": "24**2, 8**2, 24**2 / 8**2",
+      "result": "(576, 64, 9.0)"
+    },
+    {
+      "claim": "BF16 addition freezes at 256: at 256 (2^8), step size is 2^(8-7) = 2, so 256 + 1 rounds to 256",
+      "python": "2**(8 - 7)",
+      "result": "2"
+    },
+    {
+      "claim": "FP16 addition freezes at 2,048: at 2,048 (2^11), step size is 2^(11-10) = 2, so 2,048 + 1 rounds to 2,048",
+      "python": "2**(11 - 10)",
+      "result": "2"
+    },
+    {
+      "claim": "FP32 maintains exact integer addition up to 2^24 = 16,777,216",
+      "python": "2**24",
+      "result": "16777216"
+    }
+  ]
+}

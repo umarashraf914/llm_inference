@@ -1,0 +1,119 @@
+{
+  "chapter": "ch14",
+  "title": "Coalescing: the second sin",
+  "kicker": "14 · Coalescing: the second sin",
+  "figs": [70, 71, 72, 73, 74, 75],
+  "scenes": [
+    {
+      "id": "ch14_s01",
+      "name": "sectors, lines, and contiguous access",
+      "figs": [70, 71],
+      "visual": "A breakdown of memory transfer granularity: one 128-byte cache line composed of four 32-byte sectors. A coalesced warp access fills all 128 bytes cleanly in teal. A scattered access pulls 32 separate sectors, with 87.5% of the data marked red as wasted payload.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The memory system never hands over a single number. It moves data in thirty-two-byte sectors, four to a hundred-and-twenty-eight-byte line.",
+          "show": "A memory bar draws divided into four blocks: 'Sector 0', 'Sector 1', 'Sector 2', 'Sector 3', grouped as '128-byte cache line'."
+        },
+        {
+          "id": "b2",
+          "say": "A sector comes whole even if a thread only asked for one number in it.",
+          "show": "A thread asks for a single 4-byte float. The entire 32-byte sector travels across the bus: 4 bytes teal, 28 bytes grey."
+        },
+        {
+          "id": "b3",
+          "say": "Here is the perfect match: thirty-two threads in a warp, reading thirty-two neighbouring four-byte numbers, need exactly one hundred and twenty-eight bytes: one line, four sectors, every byte wanted.",
+          "show": "A coalesced warp accesses consecutive indices. Exactly four sectors light up 100% teal: '128 bytes moved for 128 bytes used (100% efficient)'."
+        },
+        {
+          "id": "b4",
+          "say": "Scatter those thirty-two lanes into different sectors, and thirty-two sectors come up across the bus: over a thousand bytes moved to use one hundred and twenty-eight. Eight times the memory traffic.",
+          "show": "Lanes scatter. 32 separate sectors travel across the bus: 1,024 bytes moved, with only a 12.5% teal sliver used and 87.5% coral waste. Takeaway: 'contiguous access uses 100% of fetched bytes; scattered access wastes seven-eighths'."
+        }
+      ]
+    },
+    {
+      "id": "ch14_s02",
+      "name": "why walking a column costs eight times more",
+      "figs": [72],
+      "visual": "A 2D matrix laid out in memory as a 1D row-major array. Walking along a row accesses adjacent elements 4 bytes apart. Walking down a column in a 4,096-wide matrix jumps 16,384 bytes per step, stranding each lane in a separate sector.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "In physical memory, a two-dimensional grid of numbers is stored as one long continuous line, row after row.",
+          "show": "A 2D matrix unrolls horizontally into a continuous 1D row-major memory strip: row 0, followed by row 1, followed by row 2."
+        },
+        {
+          "id": "b2",
+          "say": "Neighbours along a row sit right next to each other, four bytes apart. But neighbours down a column sit thousands of bytes apart.",
+          "show": "Row step shows a tiny 4-byte hop. Column step shows a massive leap across memory to the next row."
+        },
+        {
+          "id": "b3",
+          "say": "In a matrix four thousand numbers wide, one step down a column is sixteen thousand bytes. A warp walking a column puts every single lane in a separate sector.",
+          "show": "Formula appears: '4,096 elements × 4 bytes = 16,384 bytes stride'. Thirty-two lanes land across 32 separate cache sectors."
+        },
+        {
+          "id": "b4",
+          "say": "Walking a row is cheap; walking a column costs eight times the memory traffic, without changing a single mathematical operation.",
+          "show": "A traffic meter shows 128 bytes for row traversal versus 1,024 bytes for column traversal. Takeaway: 'loop indexing order is a hardware bandwidth decision, not a matter of style'."
+        }
+      ]
+    },
+    {
+      "id": "ch14_s03",
+      "name": "strides and the eightfold cliff",
+      "figs": [73, 74, 75],
+      "visual": "An interactive stride slider demonstration from stride 1 to stride 8. As stride increases from 1 to 2, 4, and 8, the number of fetched sectors doubles at each step, and useful efficiency plunges from 100% down to 12.5%.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Stride is the distance in memory between numbers requested by neighbouring threads.",
+          "show": "A stride slider appears at the top of the screen: 'Stride = 1'."
+        },
+        {
+          "id": "b2",
+          "say": "At stride one, the warp reads adjacent numbers: four sectors carry everything, and useful efficiency is one hundred percent.",
+          "show": "Slider at 1: four sectors illuminate fully in teal. Efficiency meter reads '100%'."
+        },
+        {
+          "id": "b3",
+          "say": "Double the stride to two, and it touches eight sectors: fifty percent efficiency. Double to four, and it touches sixteen: twenty-five percent.",
+          "show": "Slider moves to 2: 8 sectors fetched, 50% efficiency. Slider moves to 4: 16 sectors fetched, 25% efficiency."
+        },
+        {
+          "id": "b4",
+          "say": "At a stride of eight four-byte numbers, thirty-two bytes, every lane has a sector to itself. One thousand and twenty-four bytes are moved to use one hundred and twenty-eight.",
+          "show": "Slider reaches 8: all 32 sectors illuminate. Useful efficiency hits rock bottom at 12.5%. Only one-eighth of fetched data is used."
+        },
+        {
+          "id": "b5",
+          "say": "Beyond that, the waste cannot get worse; the lanes simply spread across more cache lines. This is why kernel optimisation is largely the art of making every fetched byte count.",
+          "show": "Slider moves past 8 to 16 and 32. Total sectors stay capped at 32. Takeaway pill: 'coalescing ensures every fetched byte is consumed; uncoalesced strides throw 87.5% away'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "32 threads * 4 bytes = 128 bytes (one 128-byte cache line = four 32-byte sectors)",
+      "python": "32 * 4, 128 / 32",
+      "result": "(128, 4.0)"
+    },
+    {
+      "claim": "32 separate sectors * 32 bytes = 1,024 bytes moved; useful ratio 128 / 1,024 = 12.5% (8x traffic)",
+      "python": "32 * 32, 128 / 1024, 1024 / 128",
+      "result": "(1024, 0.125, 8.0)"
+    },
+    {
+      "claim": "Matrix 4,096 wide * 4 bytes per float = 16,384 bytes column stride",
+      "python": "4096 * 4",
+      "result": "16384"
+    },
+    {
+      "claim": "Stride efficiency drop: stride 1 = 100%, stride 2 = 50%, stride 4 = 25%, stride 8 = 12.5%",
+      "python": "1/1, 1/2, 1/4, 1/8",
+      "result": "(1.0, 0.5, 0.25, 0.125)"
+    }
+  ]
+}

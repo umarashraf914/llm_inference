@@ -1,0 +1,279 @@
+{
+  "chapter": "ch20",
+  "title": "When one chip is not enough",
+  "kicker": "20 · When one chip is not enough",
+  "figs": [108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118],
+  "scenes": [
+    {
+      "id": "ch20_s01",
+      "name": "the capacity wall and the 405b model",
+      "figs": [108, 109],
+      "visual": "A physical memory capacity diagram comparing frontier model weights to single-chip capacities. Llama 3 405B at 16-bit takes 810 gigabytes. Against an 80 gigabyte H100, the model requires 11 GPUs. A DGX chassis of 8 GPUs holds 640 gigabytes, forcing the model to spill across two boxes.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Even if memory bandwidth were infinite, frontier models hit a hard wall before running a single calculation: capacity.",
+          "show": "A capacity comparison bar shows frontier weights in hundreds of gigabytes versus single-chip capacities."
+        },
+        {
+          "id": "b2",
+          "say": "An H one hundred holds eighty gigabytes, and an H two hundred holds one hundred and forty-one gigabytes. No amount of bandwidth helps if the model cannot physically fit.",
+          "show": "Memory capacity chips display: 'H100: 80 GB', 'H200: 141 GB'."
+        },
+        {
+          "id": "b3",
+          "say": "At sixteen bits, Llama three four hundred and five billion takes eight hundred and ten gigabytes of weights alone, requiring eleven H one hundreds before allocating a single byte for working memory.",
+          "show": "Weight calculation displays: '405 billion × 2 bytes = 810 GB (needs 11 × 80 GB GPUs)'."
+        },
+        {
+          "id": "b4",
+          "say": "A standard chassis of eight H one hundreds holds six hundred and forty gigabytes. At sixteen bits, the weights spill into a second chassis, forcing communication out onto the cluster network.",
+          "show": "Two DGX boxes appear: Box 1 (640 GB, full) and Box 2 (170 GB spillover). Takeaway: 'models exceeding 640 GB must span multiple chassis and cross external network links'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s02",
+      "name": "what an interconnect link is",
+      "figs": [110],
+      "visual": "A physical link schematic between two GPUs. Wires run across circuit boards and connectors. Emphasizes that link bandwidth obeys the exact same width-times-frequency law as on-chip buses, but across longer physical distances.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When a model is split across chips, they must communicate continuously. What joins them is an interconnect link.",
+          "show": "A diagram joins GPU A to GPU B via physical copper link lanes."
+        },
+        {
+          "id": "b2",
+          "say": "An interconnect link is simply a bundle of wires between chips, governed by the exact same width times frequency arithmetic as any internal bus.",
+          "show": "Bus formula highlights: 'bandwidth = wire count × bit rate per wire ÷ 8'."
+        },
+        {
+          "id": "b3",
+          "say": "The only difference is distance. Fewer wires stretching across longer physical space mean slower speeds and higher energy per bit.",
+          "show": "Physical comparison: thousands of micrometre-short wires on-package versus dozens of centimetre-long wires on board."
+        },
+        {
+          "id": "b4",
+          "say": "A chip has three distinct bandwidths: to its own memory, to a neighbouring chip, and out to the network. Each is several times slower than the last.",
+          "show": "Three tiers highlight: 'Local HBM', 'Neighbour NVLink', 'Network InfiniBand'. Takeaway: 'a GPU communicates across three tiers, each significantly slower than the last'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s03",
+      "name": "scale-up versus scale-out",
+      "figs": [111],
+      "visual": "Two architectural paradigms side by side. Scale-up: GPUs within a single box or rack linked via high-speed NVLink switches. Scale-out: separate server enclosures communicating across standard data-centre networking.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Clustering divides cleanly into two domains: scale up and scale out.",
+          "show": "Split screen introduces 'Scale-up (inside the box)' on the left and 'Scale-out (between boxes)' on the right."
+        },
+        {
+          "id": "b2",
+          "say": "Scale up connects graphics processors inside a single enclosure using high-speed proprietary links and crossbar switches.",
+          "show": "Scale-up box illuminates 8 GPUs joined by an internal NVSwitch crossbar fabric."
+        },
+        {
+          "id": "b3",
+          "say": "Scale out connects separate chassis across the room through conventional data-centre network cables.",
+          "show": "Scale-out diagram connects chassis A to chassis B via rack switches and cables."
+        },
+        {
+          "id": "b4",
+          "say": "The boundary between the two is the most critical line in a data centre: whatever data crosses that boundary pays a nine-fold penalty in speed.",
+          "show": "A bright dividing boundary highlights: 'Crossing the chassis boundary drops bandwidth by 9×'. Takeaway: 'the scale-up versus scale-out boundary is the defining bottleneck of distributed AI'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s04",
+      "name": "why crossbar switches beat pairwise meshes",
+      "figs": [112],
+      "visual": "Network topology comparison for eight GPUs. Left: Pairwise direct wiring requires 28 links, dividing each GPU's link budget seven ways. Right: A central switch where every GPU connects with full bandwidth, scaling linearly rather than quadratically.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Wiring every pair of graphics processors directly together quickly becomes impossible as clusters grow.",
+          "show": "A direct pairwise mesh connects eight GPUs with a dense tangle of 28 links."
+        },
+        {
+          "id": "b2",
+          "say": "Connecting every pair of n chips requires n times n minus one divided by two links: six links for four chips, twenty-eight for eight, and over two thousand five hundred for seventy-two chips.",
+          "show": "Pairwise scaling formula appears: 'Links = n(n - 1) / 2: 6 for 4 GPUs, 28 for 8, 2,556 for 72'."
+        },
+        {
+          "id": "b3",
+          "say": "Because an H one hundred has a fixed budget of eighteen links, direct wiring splits each chip's bandwidth seven ways, leaving most links idle during point-to-point transfers.",
+          "show": "An H100 with 18 links splits them 7 ways: ~2.5 links per peer."
+        },
+        {
+          "id": "b4",
+          "say": "A crossbar switch solves this completely. Every chip runs all its links straight to the switch, enabling any pair to communicate at maximum speed while connections scale linearly.",
+          "show": "A star topology converges onto central NVSwitch chips: every GPU enjoys full bandwidth. Takeaway: 'crossbar switches provide full-speed all-to-all communication without combinatorial wiring'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s05",
+      "name": "the generational interconnect gap",
+      "figs": [113],
+      "visual": "A generational timeline comparing local HBM bandwidth against bidirectional NVLink bandwidth across A100, H100, and B200. Local memory remains roughly seven to nine times faster than neighbour chip communication.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Interconnect bandwidth has grown rapidly across generations, yet the ratio to local memory remains stubbornly fixed.",
+          "show": "A timeline displays: A100 (2020), H100 (2022), and B200 (2024)."
+        },
+        {
+          "id": "b2",
+          "say": "On the A one hundred, local memory ran at two terabytes per second while neighbouring links provided three hundred gigabytes per second each way, a gap of nearly seven times.",
+          "show": "A100 bar comparison: 'HBM 2,039 GB/s vs NVLink 300 GB/s each way (6.8× gap)'."
+        },
+        {
+          "id": "b3",
+          "say": "On the H one hundred, memory grew to over three point three terabytes while links rose to four hundred and fifty gigabytes each way, maintaining a seven-point-four-fold gap.",
+          "show": "H100 bar comparison: 'HBM 3,352 GB/s vs NVLink 450 GB/s each way (7.4× gap)'."
+        },
+        {
+          "id": "b4",
+          "say": "Blackwell reaches eight terabytes per second of memory and nine hundred gigabytes of link bandwidth each way. Local memory is always roughly eight times faster than reaching across the board.",
+          "show": "B200 bar comparison: 'HBM 8,000 GB/s vs NVLink 900 GB/s each way (8.9× gap)'. Takeaway: 'local memory remains roughly 7 to 9 times faster than peer GPU communication across all generations'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s06",
+      "name": "geometry and the three bandwidth tiers",
+      "figs": [114, 115],
+      "visual": "A physical breakdown of the three bandwidth tiers. On package: 5,120 wires delivering 3,352 GB/s. Off package: 72 wire pairs delivering 450 GB/s each way (7.4x drop). Across the room: InfiniBand optical cable delivering 50 GB/s each way (9x drop again).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why is leaving the package so punishing? The answer is pure geometry.",
+          "show": "Physical diagram zooms from micro-bumps on silicon substrate out to optical transceiver cables."
+        },
+        {
+          "id": "b2",
+          "say": "Inside the package, silicon interposers pack five thousand one hundred and twenty microscopic wires running over mere millimetres, delivering three point three five terabytes per second.",
+          "show": "Tier 1: 'HBM on-package · 5,120 wires · 3,352 GB/s'."
+        },
+        {
+          "id": "b3",
+          "say": "Off the package, circuit boards accommodate only seventy-two wire pairs over centimetres, dropping bandwidth to four hundred and fifty gigabytes per second each way, over seven times slower.",
+          "show": "Tier 2: 'NVLink off-package · 72 wire pairs · 450 GB/s each way (7.4× drop)'."
+        },
+        {
+          "id": "b4",
+          "say": "Across the room, an InfiniBand cable provides fifty gigabytes per second each way, nine times slower again. Driving longer distances demands vastly more power, forcing fewer wires and lower throughput.",
+          "show": "Tier 3: 'InfiniBand network · 1 cable · 50 GB/s each way (9× drop again)'. Takeaway: 'distance dictates bandwidth: package to board drops 7×; board to cable drops 9×'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s07",
+      "name": "tensor parallelism and the all-reduce burden",
+      "figs": [116, 117],
+      "visual": "A worked example of tensor parallelism splitting an 8-term dot product across two GPUs. GPU A calculates 10, GPU B calculates 8. They exchange partial sums across the link so both finish with 18. An 80-layer model requires 160 all-reduces for every single generated token.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Tensor parallelism splits the weight matrices of each layer across multiple graphics processors.",
+          "show": "A weight matrix and input vector split horizontally across GPU A and GPU B."
+        },
+        {
+          "id": "b2",
+          "say": "To compute an output dot product, each chip multiplies its half of the inputs and weights, producing a partial sum.",
+          "show": "Calculations execute: 'GPU A produces partial sum 10', 'GPU B produces partial sum 8'."
+        },
+        {
+          "id": "b3",
+          "say": "Before the next layer can begin, the chips must exchange their partial sums in an operation called an all-reduce, so both arrive at the complete answer of eighteen.",
+          "show": "Link exchange animates: partial sums swap across the link, summing to 18 on both GPUs."
+        },
+        {
+          "id": "b4",
+          "say": "Modern architectures perform two all-reduces per layer. In an eighty-layer model, that means one hundred and sixty synchronization barriers for every single token generated. Inside a switch fabric that exchange is viable; across a network cable it is catastrophic.",
+          "show": "Token multiplication: '2 all-reduces/layer × 80 layers = 160 all-reduces per token'. Takeaway: '160 all-reduces per token make tensor parallelism viable only inside fast scale-up fabrics'."
+        }
+      ]
+    },
+    {
+      "id": "ch20_s08",
+      "name": "expanding the fast domain",
+      "figs": [118],
+      "visual": "Architectural evolution of the fast domain. DGX systems placed 8 GPUs in one NVLink domain. The GB200 NVL72 liquid-cooled rack integrates all 72 GPUs into a single massive NVLink domain holding 13.4 terabytes of memory.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Because crossing between scale up and scale out is so punishing, the primary hardware strategy is to make the fast domain as large as possible.",
+          "show": "Strategy summary card: 'Rather than speeding up the network, expand the fast domain'."
+        },
+        {
+          "id": "b2",
+          "say": "For years, the standard domain size was fixed at eight graphics processors in a single server chassis.",
+          "show": "Traditional 8-GPU chassis domain is highlighted."
+        },
+        {
+          "id": "b3",
+          "say": "The liquid-cooled rack unites seventy-two graphics processors into a single seamless switch domain, containing over thirteen terabytes of memory.",
+          "show": "The GB200 NVL72 rack illuminates: 72 GPUs and 13.4 TB memory unified by NVLink switches."
+        },
+        {
+          "id": "b4",
+          "say": "Any chip in the entire rack can reach any other at full link bandwidth, keeping even massive frontier models inside the fast neighbourhood and off the external network.",
+          "show": "Rack crossbar highlights full 1.8 TB/s peer bandwidth. Takeaway: 'rack-scale switch domains keep frontier models entirely within the fast neighbourhood'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Llama 3 405B weights at 16-bit: 405e9 * 2 bytes = 810 GB, requiring 11 H100s (80 GB each)",
+      "python": "405 * 2, (405 * 2) / 80",
+      "result": "(810, 10.125)"
+    },
+    {
+      "claim": "DGX chassis capacity: 8 * 80 = 640 GB, spillover = 810 - 640 = 170 GB",
+      "python": "8 * 80, 810 - (8 * 80)",
+      "result": "(640, 170)"
+    },
+    {
+      "claim": "Pairwise link formula n*(n-1)/2: 4->6, 8->28, 72->2556",
+      "python": "4*3//2, 8*7//2, 72*71//2",
+      "result": "(6, 28, 2556)"
+    },
+    {
+      "claim": "A100 bandwidth ratio: 2039 / 300 = 6.8x",
+      "python": "round(2039 / 300, 1)",
+      "result": "6.8"
+    },
+    {
+      "claim": "H100 bandwidth ratio: 3352 / 450 = 7.4x",
+      "python": "round(3352 / 450, 1)",
+      "result": "7.4"
+    },
+    {
+      "claim": "B200 bandwidth ratio: 8000 / 900 = 8.9x",
+      "python": "round(8000 / 900, 1)",
+      "result": "8.9"
+    },
+    {
+      "claim": "Interconnect bandwidth ratios per direction: HBM 3,352 to NVLink 450 is 7.4x; NVLink 450 to InfiniBand 50 is 9.0x",
+      "python": "round(3352 / 450, 1), 450 / 50",
+      "result": "(7.4, 9.0)"
+    },
+    {
+      "claim": "Tensor parallelism partial sum: 2*1 + 1*2 + 3*1 + 1*3 = 10, 1*2 + 2*1 + 2*1 + 1*2 = 8, sum = 18",
+      "python": "(2*1 + 1*2 + 3*1 + 1*3), (1*2 + 2*1 + 2*1 + 1*2), 10 + 8",
+      "result": "(10, 8, 18)"
+    },
+    {
+      "claim": "All-reduces per token: 2 per layer * 80 layers = 160",
+      "python": "2 * 80",
+      "result": "160"
+    }
+  ]
+}

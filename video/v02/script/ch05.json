@@ -1,0 +1,119 @@
+{
+  "chapter": "ch05",
+  "title": "The arithmetic units",
+  "kicker": "05 · The arithmetic units",
+  "figs": [23, 24, 25],
+  "scenes": [
+    {
+      "id": "ch05_s01",
+      "name": "scalar cores and tensor cores",
+      "figs": [23],
+      "visual": "A detailed layout of one multiprocessor's arithmetic engine. On the left, 128 individual CUDA cores lined up as tiny scalar units. On the right, four large tensor core units. Contrast animations show a CUDA core performing a single scalar multiply-add while a tensor core consumes a matrix tile.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Open up one multiprocessor, and you find two completely different kinds of maths units.",
+          "show": "The multiprocessor boundary draws on. Inside, two distinct zones highlight: a wide field of small amber blocks and four large gold units."
+        },
+        {
+          "id": "b2",
+          "say": "First, one hundred and twenty-eight C U D A cores. Each one is a scalar unit that performs one multiply-add every cycle.",
+          "show": "The left zone zooms in. 128 scalar units highlight in amber: '128 CUDA cores · scalar multiply-add'. Two numbers multiply, add a third, and output a single value."
+        },
+        {
+          "id": "b3",
+          "say": "Second, four tensor cores. These do not operate on single numbers; they calculate on whole matrix tiles at once.",
+          "show": "The right zone highlights the four large units in gold: '4 tensor cores · matrix tile multiply-accumulate'. Two small 2D grids slide in and produce a complete output grid."
+        },
+        {
+          "id": "b4",
+          "say": "Every other piece of silicon on the multiprocessor exists for one reason: to keep these two sets of units fed with data.",
+          "show": "The register files, schedulers, and cache structures illuminate around the arithmetic units. Takeaway: 'math units waiting on data do nothing: feeding them is the whole problem'."
+        }
+      ]
+    },
+    {
+      "id": "ch05_s02",
+      "name": "where the headline comes from",
+      "figs": [24],
+      "visual": "A horizontal bar chart comparing peak throughput across all 132 multiprocessors. 32-bit CUDA cores reach 66.9 trillion; 16-bit CUDA cores reach 133.8 trillion; 16-bit tensor cores tower at 989.4 trillion operations per second.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The headline number on the specification sheet comes almost entirely from the four tensor cores, not the one hundred and twenty-eight scalar cores.",
+          "show": "A bar chart title appears: 'Peak operations per second across all 132 multiprocessors'. Three bars begin drawing from the left."
+        },
+        {
+          "id": "b2",
+          "say": "At thirty-two bits, all sixteen thousand scalar cores across the chip deliver sixty-six point nine trillion operations a second.",
+          "show": "Top bar draws to 66.9 TFLOP/s in grey: '16,896 CUDA cores · 32-bit · 66.9 trillion ops/s'."
+        },
+        {
+          "id": "b3",
+          "say": "At sixteen bits, pairing numbers together, they reach one hundred and thirty-three point eight trillion.",
+          "show": "Middle bar draws to 133.8 TFLOP/s in amber: '16,896 CUDA cores · 16-bit paired · 133.8 trillion ops/s'."
+        },
+        {
+          "id": "b4",
+          "say": "At that same sixteen-bit precision, the five hundred and twenty-eight tensor cores deliver nine hundred and eighty-nine point four trillion: over seven times ahead.",
+          "show": "Bottom bar extends across the entire screen in bright gold to 989.4 TFLOP/s: '528 tensor cores · 16-bit · 989.4 trillion ops/s (7.4× ahead)'. Takeaway: 'code that ignores tensor cores leaves over eighty-five percent of the chip unused'."
+        }
+      ]
+    },
+    {
+      "id": "ch05_s03",
+      "name": "deriving nine hundred and eighty-nine trillion",
+      "figs": [25],
+      "visual": "A step-by-step arithmetic build of the 989.4 TFLOP/s headline, multiplying out each hardware factor: multiprocessors, tensor cores per unit, operations per tick, and clock rate.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "You can derive that headline number yourself by multiplying out four hardware factors.",
+          "show": "An equation template appears across the center: 'SMs × cores × ops/tick × clock frequency = Peak FLOPS'."
+        },
+        {
+          "id": "b2",
+          "say": "One hundred and thirty-two multiprocessors times four tensor cores gives five hundred and twenty-eight tensor cores across the chip.",
+          "show": "First factor lands: '132 multiprocessors × 4 tensor cores = 528 tensor cores'."
+        },
+        {
+          "id": "b3",
+          "say": "Each tensor core completes five hundred and twelve multiply-adds every single tick. That is one thousand and twenty-four operations per tick.",
+          "show": "Second factor multiplies in: '× 1,024 operations per tick each = 540,672 operations per tick across the chip'."
+        },
+        {
+          "id": "b4",
+          "say": "Multiply by one point eight three billion ticks a second, and you land on nine hundred and eighty-nine point four trillion operations every second.",
+          "show": "Final factor multiplies in: '× 1.83 billion ticks per second = 989.4 trillion operations per second'. A gold badge seals the proof: 'peak is just units × work per tick × ticks'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "132 SMs * 128 CUDA cores = 16,896 CUDA cores",
+      "python": "132 * 128",
+      "result": "16896"
+    },
+    {
+      "claim": "CUDA 32-bit peak: 16,896 * 2 ops * 1.98 GHz = 66.908 TFLOP/s",
+      "python": "16896 * 2 * 1.98e9 / 1e12",
+      "result": "66.90816"
+    },
+    {
+      "claim": "CUDA 16-bit peak: 16,896 * 4 ops * 1.98 GHz = 133.816 TFLOP/s",
+      "python": "16896 * 4 * 1.98e9 / 1e12",
+      "result": "133.81632"
+    },
+    {
+      "claim": "Tensor core multiple over CUDA at 16-bit: 989.429 / 133.816 = 7.394x, quoted as 'over seven times ahead' or '7.4x'",
+      "python": "989.42976 / 133.81632",
+      "result": "7.393939393939394"
+    },
+    {
+      "claim": "Derivation: 132 SMs * 4 cores * 1,024 ops * 1.83 GHz = 989.42976 TFLOP/s",
+      "python": "132 * 4 * 1024 * 1.83e9 / 1e12",
+      "result": "989.42976"
+    }
+  ]
+}

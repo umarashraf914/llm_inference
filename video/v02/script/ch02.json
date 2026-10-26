@@ -1,0 +1,180 @@
+{
+  "chapter": "ch02",
+  "title": "Two numbers and the words around them",
+  "kicker": "02 · Two numbers and the words around them",
+  "figs": [4, 5, 6, 7, 8, 9],
+  "scenes": [
+    {
+      "id": "ch02_s01",
+      "name": "two numbers and the confusion around them",
+      "figs": [4, 5],
+      "visual": "Two large hardware numbers appear on cards: Arithmetic Rate in amber and Memory Bandwidth in coral. An equation separates count from rate. Below, a water pipe analogy clarifies the difference between latency (the time water takes to travel) and bandwidth (the diameter of the pipe).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Two numbers on the specification sheet predict almost everything about inference speed: arithmetic rate, and memory bandwidth.",
+          "show": "Two large cards land side by side: left in amber 'Arithmetic rate · operations per second', right in coral 'Memory bandwidth · bytes per second'."
+        },
+        {
+          "id": "b2",
+          "say": "Yet performance claims constantly confuse count with rate, and latency with bandwidth. We need to keep them apart.",
+          "show": "A comparison table splits the terms: 'Count vs Rate' and 'Latency vs Bandwidth'. Amber and coral highlight cards underline the distinctions."
+        },
+        {
+          "id": "b3",
+          "say": "A flop is one single operation, a count with no time in it. Flops per second is a rate.",
+          "show": "In the left panel, '1 FLOP = 1 operation' appears as a discrete coin icon. Beside it, a speedometer needle points to 'FLOP/s = operations per second'."
+        },
+        {
+          "id": "b4",
+          "say": "Divide the count of operations by the rate, and you get seconds. A hundred and forty billion operations at nine hundred and eighty-nine trillion a second takes zero point one four milliseconds.",
+          "show": "An equation builds term by term: '140 billion ops ÷ 989.4 trillion ops/s = 0.14 milliseconds'. A checkmark confirms the units cancel cleanly."
+        },
+        {
+          "id": "b5",
+          "say": "Latency is how long one request takes to return. Bandwidth is how many bytes arrive per second when many requests travel together.",
+          "show": "On the right, a courier travels alone along a path: 'latency = round trip time'. Below, a wide multi-lane highway carries hundreds of trucks in parallel: 'bandwidth = volume per second'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s02",
+      "name": "throughput: high volume from slow lanes",
+      "figs": [6],
+      "visual": "A factory floor diagram showing items entering a processing facility and leaving finished. Individual items take a long time, but because thousands are being processed at once, the completion rate is massive.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Whenever a specification quotes operations per second or bytes per second, it is quoting throughput.",
+          "show": "A headline card displays 'Throughput = finished work per unit of time'. Work packages enter from the left and exit on the right through an inspection gate."
+        },
+        {
+          "id": "b2",
+          "say": "Throughput counts what leaves the machine every second. It says nothing about how long any single item spent inside.",
+          "show": "A counter at the exit gate increments rapidly. A single highlighted package takes a winding, leisurely path through the center."
+        },
+        {
+          "id": "b3",
+          "say": "That is the exact trade a G P U makes. It runs each thread slowly, but runs an enormous number of them, so the volume leaving per second is huge.",
+          "show": "Hundreds of parallel lanes appear, each advancing at a calm crawl. A summary banner appears below: 'slow individual threads, massive collective throughput'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s03",
+      "name": "bandwidth is wires times speed",
+      "figs": [7],
+      "visual": "A physical bus comparison drawn to scale: the RTX 4090 bus versus the H100 bus. The gaming card has few fast wires; the data-centre chip has thousands of slower wires.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A bus is simply a bundle of wires joining memory to the chip. Its bandwidth equals the number of wires, times how fast each wire runs.",
+          "show": "A bundle of parallel copper traces illuminates between a memory card and a processor die. Formula appears: 'bandwidth = wires × bit rate ÷ 8 bits per byte'."
+        },
+        {
+          "id": "b2",
+          "say": "Compare two real chips. A high-end gaming card, the R T X forty ninety, has three hundred and eighty-four wires running at twenty-one billion bits a second each.",
+          "show": "Top bar: 'RTX 4090 · 384 wires at 21.0 Gb/s'. The 384 wires are drawn as a tight, rapid stream. Counter reads '1,008 gigabytes per second'."
+        },
+        {
+          "id": "b3",
+          "say": "The H one hundred runs its wires four times slower, at only five point two four billion bits a second.",
+          "show": "Bottom bar: 'H100 · 5,120 wires at 5.24 Gb/s'. The speed of the particles along each trace slows visibly to one-fourth the gaming card's pace."
+        },
+        {
+          "id": "b4",
+          "say": "Yet the H one hundred moves more than three times as many bytes every second, because it has over thirteen times as many wires.",
+          "show": "The H100 wire bundle expands downward, filling thirteen times the vertical space. Its bandwidth counter hits '3,352 gigabytes per second', three point three times the gaming card. Takeaway: 'wide beats fast: bandwidth comes from wire count'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s04",
+      "name": "deriving the three point three five terabytes",
+      "figs": [8],
+      "visual": "Top-down view of the Hopper package. Five HBM3 memory stacks surround the central die. A formula breaks down the total bandwidth step by step: stacks, wires, clock, double data rate, and conversion to bytes.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "On the H one hundred, five stacks of high-bandwidth memory are placed directly beside the compute die.",
+          "show": "The package schematic appears from above. Five rectangular memory stacks highlight in coral around the central die, with one unused site dimmed."
+        },
+        {
+          "id": "b2",
+          "say": "Each stack connects through one thousand and twenty-four data wires. Five stacks give five thousand one hundred and twenty wires in all.",
+          "show": "Callout on one stack: '1,024 data wires'. An equation begins: '5 stacks × 1,024 wires = 5,120 wires'."
+        },
+        {
+          "id": "b3",
+          "say": "Each wire ticks two thousand six hundred and nineteen million times a second, transferring one bit on the rise and one on the fall.",
+          "show": "A square clock wave shows transfers on both rising and falling edges: '2,619 MHz × 2 = 5.238 billion bits per second per wire'."
+        },
+        {
+          "id": "b4",
+          "say": "Multiply by five thousand wires, divide by eight bits per byte, and you arrive at three thousand three hundred and fifty-two gigabytes per second: the three point three five terabytes on the box.",
+          "show": "The full calculation resolves: '5,120 wires × 5.238 Gb/s ÷ 8 = 3,352 GB/s'. A gold badge confirms: '3.35 TB/s specification'."
+        }
+      ]
+    },
+    {
+      "id": "ch02_s05",
+      "name": "three durations on a log axis",
+      "figs": [9],
+      "visual": "A logarithmic time axis spanning nine orders of magnitude from 0.1 nanoseconds to 100 milliseconds. Three markers place a clock tick, an HBM memory load, and one token generation.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To picture how time unfolds inside the machine, we need a logarithmic scale, where each equal step is ten times longer.",
+          "show": "A clean horizontal axis draws across the screen, with decade tick marks from '0.1 ns' through '1 ns', '10 ns', '100 ns', '1 µs', '10 µs', '100 µs', '1 ms', '10 ms', to '100 ms'."
+        },
+        {
+          "id": "b2",
+          "say": "At the left sits one clock tick: about zero point five five nanoseconds.",
+          "show": "A blue marker drops at 0.55 ns: 'one clock tick · 0.55 nanoseconds'. An arithmetic unit completes an operation."
+        },
+        {
+          "id": "b3",
+          "say": "A single load from memory takes about two hundred and seventy nanoseconds. That is nearly five hundred clock ticks.",
+          "show": "A coral marker drops at 273 ns: 'HBM load · ~273 ns (~479 ticks)'. A bracket between the tick and the load highlights the five-hundred-fold gap."
+        },
+        {
+          "id": "b4",
+          "say": "At the far right sits one generated token: about thirty milliseconds, or more than a hundred thousand memory loads.",
+          "show": "A teal marker drops at 30 ms: 'one token · ~30 milliseconds (~110,000 loads)'. Takeaway pill: 'a memory load takes five hundred ticks: latency hiding is essential'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "140 billion operations divided by 989.4 trillion operations per second equals 0.1415 milliseconds",
+      "python": "140e9 / 989.4e12 * 1e3",
+      "result": "0.14149989892864365"
+    },
+    {
+      "claim": "RTX 4090: 384 wires at 21.0 Gb/s = 1,008 GB/s",
+      "python": "384 * 21.0e9 / 8 / 1e9",
+      "result": "1008.0"
+    },
+    {
+      "claim": "H100: 5,120 wires at 5.238 Gb/s = 3,352.32 GB/s",
+      "python": "5120 * 5.238e9 / 8 / 1e9",
+      "result": "3352.32"
+    },
+    {
+      "claim": "Wire ratio H100 to 4090 is 5,120 / 384 = 13.33x; bit rate ratio is 21.0 / 5.238 = 4.01x; bandwidth ratio is 3,352 / 1,008 = 3.33x",
+      "python": "5120 / 384, 21.0 / 5.238, 3352.32 / 1008",
+      "result": "(13.333333333333334, 4.009163802978236, 3.325714285714286)"
+    },
+    {
+      "claim": "HBM load of 479 ticks at 1.755 GHz is 272.9 ns, quoted as 'about two hundred and seventy nanoseconds' or 'nearly five hundred clock ticks'",
+      "python": "479 / 1.755e9 * 1e9",
+      "result": "272.93447293447296"
+    },
+    {
+      "claim": "One token of 30 ms divided by a 273 ns load is about 110,000 loads",
+      "python": "30e-3 / 273e-9",
+      "result": "109890.10989010987"
+    }
+  ]
+}

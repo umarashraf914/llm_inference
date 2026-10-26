@@ -9,15 +9,50 @@ Exit status 1 if any error is found. Warnings do not fail.
 import json, re, sys
 from pathlib import Path
 
-PLAN = {
-    "ch00": [], "ch01": list(range(1, 11)), "ch02": list(range(11, 16)),
-    "ch03": list(range(16, 26)) + [27], "ch04": list(range(28, 33)) + list(range(57, 61)),
-    "ch05": list(range(61, 70)), "ch06": list(range(70, 84)), "ch07": list(range(84, 91)),
-    "ch08": list(range(91, 105)), "ch09": list(range(105, 109)), "ch10": list(range(109, 119)),
-    "ch11": list(range(119, 128)), "ch12": list(range(128, 131)), "ch13": list(range(131, 142)),
-    "ch14": list(range(37, 44)), "ch15": [33, 34, 35, 36, 44, 45, 46],
-    "ch16": [26] + list(range(47, 55)) + [56], "ch17": [142, 143, 144, 145, 55], "ch18": [146, 147],
+PLANS = {
+    "v01": {
+        "ch00": [], "ch01": list(range(1, 11)), "ch02": list(range(11, 16)),
+        "ch03": list(range(16, 26)) + [27], "ch04": list(range(28, 33)) + list(range(57, 61)),
+        "ch05": list(range(61, 70)), "ch06": list(range(70, 84)), "ch07": list(range(84, 91)),
+        "ch08": list(range(91, 105)), "ch09": list(range(105, 109)), "ch10": list(range(109, 119)),
+        "ch11": list(range(119, 128)), "ch12": list(range(128, 131)), "ch13": list(range(131, 142)),
+        "ch14": list(range(37, 44)), "ch15": [33, 34, 35, 36, 44, 45, 46],
+        "ch16": [26] + list(range(47, 55)) + [56], "ch17": [142, 143, 144, 145, 55], "ch18": [146, 147],
+    },
+    "v02": {
+        "ch00": [],
+        "ch01": list(range(1, 4)),
+        "ch02": list(range(4, 10)),
+        "ch03": list(range(10, 15)),
+        "ch04": list(range(15, 23)),
+        "ch05": list(range(23, 26)),
+        "ch06": list(range(26, 33)),
+        "ch07": list(range(33, 38)),
+        "ch08": list(range(38, 44)),
+        "ch09": list(range(44, 49)),
+        "ch10": list(range(49, 53)),
+        "ch11": list(range(53, 57)),
+        "ch12": list(range(57, 63)),
+        "ch13": list(range(63, 70)),
+        "ch14": list(range(70, 76)),
+        "ch15": list(range(76, 84)),
+        "ch16": list(range(84, 88)),
+        "ch17": list(range(88, 95)),
+        "ch18": list(range(95, 99)),
+        "ch19": list(range(99, 108)),
+        "ch20": list(range(108, 119)),
+        "ch21": list(range(119, 124)),
+    },
 }
+TOTAL_FIGS = {"v01": 147, "v02": 123}
+
+
+def get_film(p):
+    parts = Path(p).resolve().parts
+    for f in PLANS:
+        if f in parts:
+            return f
+    return "v01"
 
 BANNED = [r"\bthis figure\b", r"\bthe atlas\b", r"\bthe video (says|explains|shows)\b", r"\bpresenter\b",
           r"\bthis document\b", r"\bthe instructor\b", r"\badditional context\b"]
@@ -42,19 +77,21 @@ def words(s):
 
 def check(path, errors, warnings):
     p = Path(path)
+    film = get_film(p)
+    plan = PLANS.get(film, PLANS["v01"])
     try:
         d = json.loads(p.read_text())
     except Exception as e:
         errors.append(f"{p.name}: invalid JSON: {e}")
         return set(), 0
     ch = d.get("chapter")
-    if ch not in PLAN:
-        errors.append(f"{p.name}: unknown chapter id {ch!r}")
+    if ch not in plan:
+        errors.append(f"{p.name}: unknown chapter id {ch!r} for {film}")
         return set(), 0
     for k in ("title", "kicker", "figs", "scenes", "checks"):
         if k not in d:
             errors.append(f"{ch}: missing key {k!r}")
-    want = set(PLAN[ch])
+    want = set(plan[ch])
     if set(d.get("figs", [])) != want:
         errors.append(f"{ch}: chapter figs {sorted(d.get('figs', []))} != plan {sorted(want)}")
     covered, total_words = set(), 0
@@ -103,11 +140,16 @@ def check(path, errors, warnings):
 
 def main(argv):
     files = []
+    film = "v01"
     if argv and argv[0] == "--all":
-        root = Path(argv[1]) / "script"
+        film_dir = Path(argv[1])
+        film = get_film(film_dir)
+        root = film_dir / "script"
         files = sorted(root.glob("ch*.json"))
     else:
         files = [Path(a) for a in argv]
+        if files:
+            film = get_film(files[0])
     errors, warnings, allfigs, words_total = [], [], set(), 0
     for f in files:
         cov, n = check(f, errors, warnings)
@@ -115,7 +157,8 @@ def main(argv):
         words_total += n
         print(f"{f.name}: {n} words, about {n/150:.1f} min")
     if argv and argv[0] == "--all":
-        gaps = set(range(1, 148)) - allfigs
+        total_figs = TOTAL_FIGS.get(film, 147)
+        gaps = set(range(1, total_figs + 1)) - allfigs
         if gaps:
             errors.append(f"film: figures not covered anywhere: {sorted(gaps)}")
         print(f"TOTAL: {words_total} words, about {words_total/150:.0f} min of narration")

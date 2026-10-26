@@ -1,0 +1,119 @@
+{
+  "chapter": "ch01",
+  "title": "What a chip physically is",
+  "kicker": "01 · What a chip physically is",
+  "figs": [1, 2, 3],
+  "scenes": [
+    {
+      "id": "ch01_s01",
+      "name": "inside the package",
+      "figs": [1],
+      "visual": "A physical illustration of the GPU package from above. At the center sits the compute die, a square piece of silicon measuring 29 mm across. Beside it sit the memory stacks. A dimension bracket measures the die at 814 mm². A zoom overlay reveals millions of microscopic transistors printed in silicon.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Here is what you actually hold in your hand: a heavy metal package containing a square of polished silicon, surrounded by memory.",
+          "show": "The outer package outline draws on with its mounting holes and heat spreader boundary. Inside, the central compute die lights up in amber, flanked by coral memory stacks on either side."
+        },
+        {
+          "id": "b2",
+          "say": "That central square is the compute die, roughly twenty-nine millimetres on a side. It is printed with about eighty billion transistors.",
+          "show": "Dimension lines draw along the sides of the die: '29 mm × 29 mm', area tag '814 mm²'. A counter in the center of the die counts up to '80,000,000,000 transistors'."
+        },
+        {
+          "id": "b3",
+          "say": "That works out at roughly a hundred million switches packed into every single square millimetre.",
+          "show": "A one-millimetre square marker expands on the die surface. An inset card displays the density: '≈ 100,000,000 transistors per mm²'."
+        },
+        {
+          "id": "b4",
+          "say": "Nothing is assembled by hand. The entire pattern is printed with light, all at once, the way a photograph is exposed.",
+          "show": "A beam of ultraviolet light sweeps across the die surface, exposing the dense circuit patterns across all regions simultaneously."
+        },
+        {
+          "id": "b5",
+          "say": "This square is the chip's silicon budget. Every multiprocessor, every cache, and every wire is a slice of this one surface.",
+          "show": "The die subdivides into crisp grid regions showing the one hundred and thirty-two multiprocessors and cache areas. A takeaway pill appears below: 'silicon budget: how area on this square is spent'."
+        }
+      ]
+    },
+    {
+      "id": "ch01_s02",
+      "name": "a slab of switches",
+      "figs": [2],
+      "visual": "A schematic of a single transistor. A gate controls the flow between a source wire and a drain wire. The switch flips crisply between 0 (off) and 1 (on). A cluster of transistors then combines to form an adder circuit, and finally multiplies out to the full eighty billion.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Underneath the complexity, a chip is simply a slab of silicon covered in tiny switches.",
+          "show": "The view zooms into a clean schematic diagram of one transistor: a source wire on the left, a drain wire on the right, and a control gate above."
+        },
+        {
+          "id": "b2",
+          "say": "A transistor lets electrical current through, or blocks it, depending on a control voltage. It is a tap with no in-between position.",
+          "show": "A voltage pulse arrives at the gate. The switch snaps closed, and current flows across. The voltage drops, and the switch snaps open cleanly. Indicators show '1 · on' and '0 · off'."
+        },
+        {
+          "id": "b3",
+          "say": "Wire a handful of them together, and you have a circuit that adds two binary numbers.",
+          "show": "Four transistors link together into an arithmetic logic cell. Two inputs, '1' and '1', produce a sum bit '0' and a carry bit '1'."
+        },
+        {
+          "id": "b4",
+          "say": "Wire eighty billion of them together, and you have a modern G P U. Everything in this machine is made of nothing but these.",
+          "show": "The adder multiplies into a repeating grid of circuits, zooming back out until eighty billion switches form the complete processor die. Takeaway pill: 'transistor: the single building block of all logic'."
+        }
+      ]
+    },
+    {
+      "id": "ch01_s03",
+      "name": "instructions, cycles and threads",
+      "figs": [3],
+      "visual": "A three-part diagram explaining the foundational vocabulary: an instruction card, a pulsating clock cycle timeline showing sub-nanosecond ticks, and parallel thread tracks executing sequences of commands.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "To understand how those switches do work, we need three words: an instruction, a cycle, and a thread.",
+          "show": "Three panels appear side by side across the screen: 'Instruction', 'Clock cycle', and 'Thread', with structural blue borders."
+        },
+        {
+          "id": "b2",
+          "say": "An instruction is one single thing the chip is told to do: add two numbers, fetch a value from memory, or jump somewhere else.",
+          "show": "In the left panel, three small command cards animate: 'ADD R1, R2', 'FETCH [addr]', and 'JUMP label'."
+        },
+        {
+          "id": "b3",
+          "say": "A clock cycle is one tick of the chip's internal clock. A modern chip ticks well over a billion times a second.",
+          "show": "In the center panel, a rhythmic waveform pulses at high speed. A readout displays the frequency: '1.83 GHz · over 1.8 billion ticks a second'."
+        },
+        {
+          "id": "b4",
+          "say": "That means one cycle lasts about half a nanosecond, a billionth of a second. A cycle is the unit of time at this scale.",
+          "show": "A dimension bracket measures one single wave cycle: '0.55 nanoseconds per tick'. Tag: 'one tick = one heartbeat of logic'."
+        },
+        {
+          "id": "b5",
+          "say": "A thread is simply a sequence of instructions being executed one after another. A chip running many threads handles many sequences at the same time.",
+          "show": "In the right panel, a vertical thread lane advances step by step. Beside it, dozens of identical lanes light up in parallel, executing in lockstep. Takeaway pill: 'at this scale, time is counted in ticks, not seconds'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Transistor density: 80 billion transistors on an 814 mm² die is roughly 98.3 million per mm², quoted as 'roughly a hundred million'",
+      "python": "80e9 / 814 / 1e6",
+      "result": "98.28009828009828"
+    },
+    {
+      "claim": "Clock cycle duration at 1.83 GHz is 0.546 ns, quoted as 'about half a nanosecond, a billionth of a second'",
+      "python": "1 / 1.83e9 * 1e9",
+      "result": "0.5464480874316939"
+    },
+    {
+      "claim": "Clock cycle duration at 1.98 GHz is 0.505 ns",
+      "python": "1 / 1.98e9 * 1e9",
+      "result": "0.5050505050505051"
+    }
+  ]
+}

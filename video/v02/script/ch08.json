@@ -1,0 +1,147 @@
+{
+  "chapter": "ch08",
+  "title": "Warps and kernels",
+  "kicker": "08 · Warps and kernels",
+  "figs": [38, 39, 40, 41, 42, 43],
+  "scenes": [
+    {
+      "id": "ch08_s01",
+      "name": "the warp and S I M T",
+      "figs": [38, 41],
+      "visual": "Thirty-two individual thread lanes are grouped into a single unified block called a warp. A single instruction stream broadcasts to all 32 lanes simultaneously, each lane applying the instruction to its private register state.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Thirty-two threads make a warp. Threads on a G P U never move one at a time; they always move in warps of thirty-two.",
+          "show": "Thirty-two individual blue thread lanes line up horizontally. A solid bracket binds them together under the label: 'one warp = 32 threads'."
+        },
+        {
+          "id": "b2",
+          "say": "This model is called S I M T: single instruction, multiple threads.",
+          "show": "The label expands into 'SIMT: Single Instruction, Multiple Threads'. A single instruction card descends from the scheduler above."
+        },
+        {
+          "id": "b3",
+          "say": "The instruction is fetched once, decoded once, and fired across all thirty-two lanes in lockstep.",
+          "show": "A single instruction packet splits into 32 simultaneous signals, illuminating all 32 lanes at the exact same instant."
+        },
+        {
+          "id": "b4",
+          "say": "Every lane runs the exact same addition, but each lane points at its own data in its own registers.",
+          "show": "Under each lane, individual register slot indices show different values being added. Takeaway: 'the warp, not the thread, is the unit the hardware schedules'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s02",
+      "name": "writing a kernel",
+      "figs": [39],
+      "visual": "A two-line CUDA kernel code snippet. An animated index calculator maps block number and thread number to a global array offset, showing how adjacent threads naturally access adjacent memory addresses.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "A kernel is the program the G P U runs. It is written once, for a single thread, and launched across millions of threads.",
+          "show": "A clean code window displays two lines of C code: 'int i = blockIdx.x * 256 + threadIdx.x; c[i] = a[i] + b[i];'."
+        },
+        {
+          "id": "b2",
+          "say": "Every thread runs those identical lines. The only thing that differs is its number.",
+          "show": "The hardware hands each thread its unique IDs: block number and thread number inside the block."
+        },
+        {
+          "id": "b3",
+          "say": "Thread five of block three works out its index: three times two hundred and fifty-six plus five gives seven hundred and seventy-three.",
+          "show": "The formula evaluates step by step: 'i = 3 × 256 + 5 = 773'. An array pointer slides to element 773, at byte offset 3,092."
+        },
+        {
+          "id": "b4",
+          "say": "Neighbouring threads get neighbouring indices. A warp of thirty-two threads reads thirty-two numbers lying side by side in memory: one hundred and twenty-eight consecutive bytes.",
+          "show": "A warp of threads from 64 to 95 highlights, pointing to 32 consecutive numbers in the array. A dimension bracket measures: '32 floats × 4 bytes = 128 contiguous bytes'. Takeaway: 'index arithmetic naturally organizes warps into contiguous memory requests'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s03",
+      "name": "grids, blocks and cooperation",
+      "figs": [40],
+      "visual": "The full launch hierarchy: a grid of 4,096 blocks, zooming into one block of 1,024 threads (32 warps). The block lands whole on one multiprocessor, where its threads share a private shared memory scratchpad.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "When software launches a kernel, it requests a grid of blocks.",
+          "show": "A massive 2D grid appears showing 4,096 blocks: 'Launch Grid · 1,048,576 total elements'."
+        },
+        {
+          "id": "b2",
+          "say": "A block holds up to one thousand and twenty-four threads, which is thirty-two warps. The hardware places each block whole on one multiprocessor.",
+          "show": "One block expands to show its 32 warps (1,024 threads). It descends onto a multiprocessor tile, which keeps it until completion."
+        },
+        {
+          "id": "b3",
+          "say": "A multiprocessor holds up to two thousand and forty-eight threads: two full blocks of one thousand and twenty-four, or eight blocks of two hundred and fifty-six.",
+          "show": "The multiprocessor tile shows two 1,024-thread blocks resident side by side, reaching the 2,048 thread ceiling."
+        },
+        {
+          "id": "b4",
+          "say": "Shared memory belongs to a block. All its threads share the same scratchpad, which is why a block is the unit that cooperates.",
+          "show": "A shared memory scratchpad lights up inside the multiprocessor, accessible exclusively by threads within that block. Takeaway pill: 'blocks are the boundary of shared memory cooperation'."
+        }
+      ]
+    },
+    {
+      "id": "ch08_s04",
+      "name": "lockstep and the cost of instruction decode",
+      "figs": [42, 43],
+      "visual": "A comparison between lockstep execution and independent instruction streams. A 128-bit binary instruction word (FFMA) is displayed. Scalar cores pay decode overhead on every operation; a warp decodes once for 32 operations.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Thirty-two lanes moving in lockstep sounds rigid. Why not let every thread execute independently?",
+          "show": "A split view: Left shows 32 lanes moving in lockstep. Right shows 32 lanes jumping, branching, and fetching independently."
+        },
+        {
+          "id": "b2",
+          "say": "Because independent execution requires thirty-two independent instruction decoders, branch trackers, and instruction caches.",
+          "show": "The right panel floods with complex decoder circuits, instruction buffers, and tracking logic, consuming enormous area."
+        },
+        {
+          "id": "b3",
+          "say": "An instruction is itself a number, a hundred and twenty-eight bits of data stored in memory. Fetching and decoding it costs real energy and real silicon.",
+          "show": "A 128-bit binary instruction word displays: 'FFMA R140, R11, R4, R142'. Decoders split it into register fields and opcode logic."
+        },
+        {
+          "id": "b4",
+          "say": "A scalar C P U core pays that decode cost for every single operation. A G P U warp pays it once and spreads it across thirty-two lanes.",
+          "show": "A cost comparison bar shows 32 decode operations for the scalar core versus 1 decode operation for the warp. Takeaway: 'sharing one instruction across 32 lanes frees the silicon that becomes arithmetic'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "Block 3 thread 5 global index: 3 * 256 + 5 = 773; byte offset at 4 bytes each = 3,092 bytes",
+      "python": "3 * 256 + 5, (3 * 256 + 5) * 4",
+      "result": "(773, 3092)"
+    },
+    {
+      "claim": "32 consecutive float numbers * 4 bytes = 128 contiguous bytes",
+      "python": "32 * 4",
+      "result": "128"
+    },
+    {
+      "claim": "Array of 1,048,576 numbers with 256 threads per block requires 4,096 blocks",
+      "python": "1048576 / 256",
+      "result": "4096.0"
+    },
+    {
+      "claim": "1,024 threads per block is 1,024 / 32 = 32 warps",
+      "python": "1024 / 32",
+      "result": "32.0"
+    },
+    {
+      "claim": "Multiprocessor capacity of 2,048 threads holds 2 blocks of 1,024 or 8 blocks of 256",
+      "python": "2048 / 1024, 2048 / 256",
+      "result": "(2.0, 8.0)"
+    }
+  ]
+}

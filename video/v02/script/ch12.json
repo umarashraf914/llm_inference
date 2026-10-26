@@ -1,0 +1,114 @@
+{
+  "chapter": "ch12",
+  "title": "The memory ladder",
+  "kicker": "12 · The memory ladder",
+  "figs": [57, 58, 59, 60, 61, 62],
+  "scenes": [
+    {
+      "id": "ch12_s01",
+      "name": "the four rungs and their scope",
+      "figs": [57, 58, 59],
+      "visual": "A physical hierarchy diagram showing the four rungs of storage, nested by physical scope: registers and SRAM inside each multiprocessor, L2 cache spanning the die, and HBM stacks sitting off-die on the package. Callouts detail capacity and access scope.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "The hardware organizes memory into four rungs: registers, L one and shared memory, the L two cache, and H B M.",
+          "show": "A four-rung vertical ladder illuminates: bottom rung in coral 'HBM · 80 GB', middle rungs in teal 'L2 · 50 MB' and 'L1 & Shared · 256 KB', top rung in blue 'Registers · 256 KB'."
+        },
+        {
+          "id": "b2",
+          "say": "Counted across the whole chip, the registers hold thirty-four point six megabytes, while H B M holds eighty gigabytes: about twenty-five hundred times as much.",
+          "show": "Capacities multiply across all 132 SMs: Registers = 34.6 MB, L1/Shared = 34.6 MB, L2 = 52.4 MB, HBM = 80 GB (a 2,500× span on a log scale)."
+        },
+        {
+          "id": "b3",
+          "say": "Each rung is also defined by scope: who is allowed to see it. Registers belong to a single thread and nobody else.",
+          "show": "A boundary card highlights: 'Scope: Registers = 1 private thread'."
+        },
+        {
+          "id": "b4",
+          "say": "Shared memory is seen by all threads in one block. The L two cache is seen by all multiprocessors. H B M is seen by everything, including other chips.",
+          "show": "Expanding scope boundaries animate: Shared memory = 1 block; L2 = 132 SMs; HBM = entire package and system. Takeaway: 'to exchange data, threads must meet at a level they both see'."
+        }
+      ]
+    },
+    {
+      "id": "ch12_s02",
+      "name": "less than a thousandth of the model",
+      "figs": [60],
+      "visual": "A 2D area comparison drawn strictly to scale. A huge square represents the 140 gigabytes of a 70B model. Inside it, a tiny square representing all fast on-chip memory combined (121.6 megabytes) accounts for less than one-tenth of one percent.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Sum up every single byte of fast storage on the chip: all the registers, all the shared memory, and the entire L two cache.",
+          "show": "A tally card aggregates on-chip storage: '34.6 MB registers + 34.6 MB L1/shared + 52.4 MB L2 = 121.6 megabytes total'."
+        },
+        {
+          "id": "b2",
+          "say": "Together, they hold one hundred and twenty-one point six megabytes. A seventy-billion-parameter model takes a hundred and forty gigabytes.",
+          "show": "A massive 140 GB square draws across the screen. Beside it, the 121.6 MB on-chip total is placed to scale as a tiny square in the corner."
+        },
+        {
+          "id": "b3",
+          "say": "All the fast memory on the chip holds less than a thousandth of the model: zero point zero eight seven percent.",
+          "show": "A dimension bracket highlights the ratio: 'on-chip fast memory = 0.087% of the model (under 1/1,000th)'. The L2 alone holds only one part in twenty-six hundred."
+        },
+        {
+          "id": "b4",
+          "say": "Generating a token reads every weight once, so by the time a weight could be reused, thousands of others have evicted it. Every token's weights must come up from H B M.",
+          "show": "An eviction animation shows cache lines constantly overwriting each other. Takeaway: 'there is nowhere on-chip to keep the weights: each token must stream the entire model from HBM'."
+        }
+      ]
+    },
+    {
+      "id": "ch12_s03",
+      "name": "latencies and bandwidths on the ladder",
+      "figs": [61, 62],
+      "visual": "Dual horizontal log-axis charts for all four rungs. Top chart: latency in clock ticks (1 tick -> 29 -> 41 -> 263 -> 479 ticks). Bottom chart: bandwidth per multiprocessor per tick (1,536 bytes -> 128 -> 39 -> 12.8 bytes).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Measured on real hardware, latency climbs steeply with every step down the ladder.",
+          "show": "A latency chart plots values in ticks: 'Registers: 1 tick', 'Shared memory: 29 ticks', 'L1 cache: 41 ticks', 'L2 cache: 263 ticks', 'HBM: 479 ticks'."
+        },
+        {
+          "id": "b2",
+          "say": "Bandwidth falls just as fast in the other direction.",
+          "show": "A bandwidth chart plots bytes per SM per tick: 'Registers: 1,536 bytes', 'Shared memory: 128 bytes', 'L2: 39 bytes', 'HBM: 12.8 bytes'."
+        },
+        {
+          "id": "b3",
+          "say": "Top to bottom, latency grows nearly five hundred times, while bandwidth drops a hundred and twenty times.",
+          "show": "Two comparative ratio arrows span the charts: latency grows 479×; bandwidth falls 120×."
+        },
+        {
+          "id": "b4",
+          "say": "Reaching down to H B M for a byte is vastly more expensive than computing on a byte already at the top. G P U programming is the craft of staging data upward.",
+          "show": "A graphic shows data tiles moving upward from HBM into shared memory and registers, keeping the amber math units operating at peak. Takeaway pill: 'latency grows 500× and bandwidth drops 120×: stage data upward'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "All on-chip memory: 34.6 MB registers + 34.6 MB L1/shared + 52.4 MB L2 = 121.63 MB, which is 0.0869% of 140 GB, quoted as '121.6 megabytes' and '0.087 percent'",
+      "python": "(34.603e6 + 34.603e6 + 52.4288e6) / 1e6, (34.603e6 + 34.603e6 + 52.4288e6) / 140e9 * 100",
+      "result": "(121.6348, 0.08688201142857143)"
+    },
+    {
+      "claim": "L2 cache share: 140 GB / 52.4288 MB = 2,670.28, quoted as 'one part in twenty-six hundred'",
+      "python": "140e9 / 52.4288e6",
+      "result": "2670.2880859375"
+    },
+    {
+      "claim": "Latency ratio HBM to registers: 478.8 / 1 = 478.8x, quoted as 'nearly five hundred times'",
+      "python": "478.8 / 1",
+      "result": "478.8"
+    },
+    {
+      "claim": "Bandwidth ratio registers to HBM: 1,536 / 12.8 = 120.0x, quoted as 'a hundred and twenty times'",
+      "python": "1536 / 12.8",
+      "result": "120.0"
+    }
+  ]
+}

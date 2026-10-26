@@ -1,0 +1,147 @@
+{
+  "chapter": "ch15",
+  "title": "The memory wall",
+  "kicker": "15 · The memory wall",
+  "figs": [76, 77, 78, 79, 80, 81, 82, 83],
+  "scenes": [
+    {
+      "id": "ch15_s01",
+      "name": "generations and the diverging curves",
+      "figs": [76, 77, 78],
+      "visual": "A timeline of four GPU generations across seven years: Volta (2017), Ampere (2020), Hopper (2022), and Blackwell (2024). Two curves plot compute growth (18-fold) versus memory bandwidth growth (9-fold), showing the widening gap known as the memory wall.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Roughly every two years, a new G P U architecture arrives on a smaller manufacturing process.",
+          "show": "A generational timeline marks 2017 Volta, 2020 Ampere, 2022 Hopper, and 2024 Blackwell."
+        },
+        {
+          "id": "b2",
+          "say": "Over seven years, dense sixteen-bit arithmetic grew eighteen-fold: from a hundred and twenty-five trillion operations on the V one hundred to twenty-two hundred and fifty trillion on the B two hundred.",
+          "show": "An amber curve for compute shoots upward eighteen-fold: 125 TFLOP/s → 312 → 989 → 2,250 TFLOP/s."
+        },
+        {
+          "id": "b3",
+          "say": "Over that same period, memory bandwidth grew only nine-fold: from zero point nine terabytes a second to eight terabytes.",
+          "show": "A coral curve for bandwidth climbs at half the slope: 0.9 TB/s → 2.0 → 3.35 → 8.0 TB/s. The widening gap between the curves highlights in coral: 'The Memory Wall'."
+        },
+        {
+          "id": "b4",
+          "say": "The ridge, the ratio between them, doubled from a hundred and thirty-nine to nearly three hundred. Work that kept a V one hundred fully busy can sit memory-bound on an H one hundred without changing a single line of code.",
+          "show": "Ridge values annotate the points: 139 on V100, 153 on A100, 295 on H100, and 281 on B200. Takeaway: 'hardware improves, but arithmetic races ahead of bandwidth'."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s02",
+      "name": "why wires cannot keep pace with transistors",
+      "figs": [79],
+      "visual": "A physical explanation of wire constraints versus transistor scaling. Multipliers shrink with lithography, but bandwidth requires physical copper traces across distance: 1,024 wires across millimeters on package; 64 across centimeters on board; 4 down a cable.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Why could the two curves never keep pace? Because adding arithmetic requires area, and transistors have been shrinking for fifty years.",
+          "show": "A microscopic transistor diagram shows lithography shrinking from 12 nm down to 4 nm, fitting four times the multipliers in the same space."
+        },
+        {
+          "id": "b2",
+          "say": "Bandwidth requires physical wires, and wires take real space.",
+          "show": "A package edge diagram shows parallel copper traces crowding together along the die perimeter."
+        },
+        {
+          "id": "b3",
+          "say": "You can run a thousand parallel signals over millimetres on a package. You can run dozens over centimetres across a board. You can run four down a cable across a room.",
+          "show": "Three connection scales appear: 'On package: ~1,024 wires over mm'; 'Across board: ~64 wires over cm'; 'Across room: ~4 wires down a cable'."
+        },
+        {
+          "id": "b4",
+          "say": "One curve is limited by how small a transistor can be printed. The other is limited by how many wires will fit between two objects. They were never going to grow at the same rate.",
+          "show": "A comparison card contrasts: 'Lithography scaling vs Interconnect geometry'. Takeaway: 'the memory wall is rooted in physical connection geometry'."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s03",
+      "name": "the eightfold ridge climb at narrow precision",
+      "figs": [80],
+      "visual": "A bar chart of the ridge (operations per byte) comparing 16-bit precision against each generation's narrowest native floating-point format: V100 FP16 (139), A100 BF16 (153), H100 FP8 (590), and B200 FP4 (1,125).",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "At sixteen bits, the ridge doubled and leveled off. But look at each chip's narrowest number format, and the climb is dramatic.",
+          "show": "A dual-bar chart shows 16-bit ridges in blue alongside narrow-format ridges in amber across the four generations."
+        },
+        {
+          "id": "b2",
+          "say": "Every new generation introduces a narrower number: eight-bit floats on Hopper, four-bit floats on Blackwell.",
+          "show": "Bit width chips show: 'FP16 (16 bits)' → 'FP8 (8 bits)' → 'FP4 (4 bits)'."
+        },
+        {
+          "id": "b3",
+          "say": "Halving the bits doubles operations per second on the same silicon, while memory bandwidth gets no such multiplier.",
+          "show": "Arithmetic bars double at each format transition, while memory delivery bars stay fixed."
+        },
+        {
+          "id": "b4",
+          "say": "At each chip's narrowest format, the ridge shoots from a hundred and thirty-nine on the V one hundred to over eleven hundred on the B two hundred: an eightfold climb.",
+          "show": "The narrow-format ridge bar extends from 139 (V100) to 590 (H100) to 1,125 (B200), an 8.1× increase. Takeaway: 'narrower formats accelerate compute far faster than memory'."
+        }
+      ]
+    },
+    {
+      "id": "ch15_s04",
+      "name": "the H200 proof and the three attacks",
+      "figs": [81, 82, 83],
+      "visual": "The controlled experiment: H100 versus H200. Identical compute die, identical peak FLOPS, but memory bandwidth upgraded from 3.35 to 4.8 TB/s. Token rate on a 70B model jumps from 47.9 to 68.6 tokens/s (exactly +43%). Then three icons summarize the three attacks on the wall.",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "NVIDIA ran the controlled experiment themselves with the H two hundred.",
+          "show": "Two chips appear side by side: left 'H100', right 'H200'."
+        },
+        {
+          "id": "b2",
+          "say": "The compute die is completely identical: the same multiprocessors, the same peak operations per second. The only thing that changed is memory: four point eight terabytes a second, forty-three percent faster.",
+          "show": "The compute dies show matching amber ratings: '989.4 TFLOP/s'. The H200 memory stacks highlight: '4.8 TB/s vs 3.35 TB/s (+43%)'."
+        },
+        {
+          "id": "b3",
+          "say": "For a seventy-billion-parameter model at eight bits, the token rate jumps from forty-seven point nine to sixty-eight point six tokens a second: the exact same forty-three percent gain.",
+          "show": "Token counters display: H100 = 47.9 tokens/s; H200 = 68.6 tokens/s (a 1.43× speedup). Direct proof: 'zero added arithmetic = 43% faster inference'."
+        },
+        {
+          "id": "b4",
+          "say": "Every generation attacks the wall the same three ways: lower precision to shrink the bytes, faster memory to move more bytes, and wider links between chips.",
+          "show": "Three strategy cards appear: '1. Lower precision', '2. Faster HBM', '3. Wider interconnects'. Takeaway pill: 'inference is bandwidth-bound: faster memory directly accelerates generation'."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "claim": "16-bit compute growth: 2,250 TFLOP/s / 125 TFLOP/s = 18.0x",
+      "python": "2250 / 125",
+      "result": "18.0"
+    },
+    {
+      "claim": "Bandwidth growth: 8.0 TB/s / 0.9 TB/s = 8.89x, quoted as 'nine-fold'",
+      "python": "8.0 / 0.9",
+      "result": "8.88888888888889"
+    },
+    {
+      "claim": "Narrowest ridge climb: B200 FP4 ridge 1,125 / V100 FP16 ridge 139 = 8.093x, quoted as 'eightfold climb' (8.1x)",
+      "python": "1125 / 139",
+      "result": "8.093525179856115"
+    },
+    {
+      "claim": "H200 bandwidth speedup: 4.8 / 3.352 = 1.432x, quoted as 'forty-three percent faster'",
+      "python": "4.8 / 3.352",
+      "result": "1.431980906921241"
+    },
+    {
+      "claim": "70B model at 8-bit (70 GB): token rate on H100 = 3,352 / 70 = 47.886 t/s, on H200 = 4,800 / 70 = 68.571 t/s (1.432x)",
+      "python": "3352 / 70, 4800 / 70, (4800 / 70) / (3352 / 70)",
+      "result": "(47.885714285714286, 68.57142857142857, 1.4319809069212412)"
+    }
+  ]
+}
