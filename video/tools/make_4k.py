@@ -11,8 +11,9 @@ GitHub first, then run this. It works the same way on every computer and sets it
   bundled ffmpeg), GSAP from npm, and a check of the graphics card and hardware video encoder (NVIDIA NVENC, Apple
   VideoToolbox) against the software path. Whatever matches the software look and is faster is used from then on.
   The result stays on that computer: --recheck redoes it, --cpu renders in software for one run.
-- Narration: the film's narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home
-  folder; without it, it is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
+- Narration: from the repository (video/vNN/narration, kept up to date by git pull); failing that, the film's
+  narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home folder; failing that, it
+  is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
 - Rendering takes from under an hour on a big workstation to several hours on a small computer. Stop it at any time
   (Ctrl+C, or close the window) and run the same command again: finished scenes are kept.
 
@@ -20,7 +21,7 @@ GitHub first, then run this. It works the same way on every computer and sets it
   --workers N        scenes rendered at once (default: from CPU cores, memory and the encoder)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
   --recheck          check the graphics card and video encoder again
-  --narration ZIP    the narration pack, if it is somewhere else
+  --narration ZIP    use this narration pack instead of the repository's narration
   --preset P         x264 preset: slow (default), medium (faster, slightly larger file)
   --only ch18 ...    just these chapters, as a quick test (saved as ..._4K_ch18.mp4)
   --keep-segments    keep the per-scene 4K files after the film is assembled
@@ -266,6 +267,16 @@ def find_pack(given):
 
 
 def ensure_narration(given):
+    src, build = FILM / "narration", FILM / "build"
+    if (src / "timing.json").exists() and not given:
+        # the repository's narration is the reference: decode it again whenever it differs from what build/ holds
+        held = build / "timing.json"
+        fresh = held.exists() and held.read_bytes() == (src / "timing.json").read_bytes() and all(
+            (build / "audio" / f"{f.stem}.wav").exists() for f in src.glob("*.opus"))
+        if not fresh:
+            step(f"Narration: decoding it from the repository ({src.relative_to(VIDEO.parent).as_posix()})")
+            run([sys.executable, TOOLS / "narration_pack.py", "import", FILM])
+        return
     if have_narration():
         return
     pack = find_pack(given)

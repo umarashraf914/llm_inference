@@ -8,6 +8,7 @@ Writes, under video/v01/build/:
   audio/<scene>.wav     the scene's narration, 24 kHz mono, padded to whole frames
   timing.json           order of scenes (title cards included), durations, beat and word times
 Synthesis is cached per sentence in build/tts_cache, so re-running after an edit only redoes what changed.
+Once a film's narration is final, commit it so every computer renders with it: tools/narration_pack.py export.
 """
 import os, hashlib, json, math, re, sys, wave
 from pathlib import Path

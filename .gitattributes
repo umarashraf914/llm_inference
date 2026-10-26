@@ -2,3 +2,6 @@
 *.bat      text eol=crlf
 *.command  text eol=lf
 *.sh       text eol=lf
+# the films' narration (Opus audio) is binary
+*.opus     binary
+video/*/narration/timing.json -text

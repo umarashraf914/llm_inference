@@ -30,8 +30,9 @@ ready. From a terminal it is `python video/tools/make_4k.py [v01]` (Windows: `py
   they match its look and are faster. `--recheck` redoes the check; `--cpu` renders in software for one run;
 - as many scenes at once as its cores and memory allow.
 
-**Narration** comes from the film's narration pack (`V01_narration_pack.zip` for V01), found in Downloads, on
-the Desktop or in the home folder.
+**Narration** travels with the repository: `video/vNN/narration/` holds the film's timing and each scene's
+audio (Opus, about 50 MB a film), and a run decodes it again whenever `git pull` brings a change. A narration
+pack zip (`V01_narration_pack.zip`) in Downloads still works when there is none.
 
 The result, `Downloads/V01_The_Memory_Wall_4K.mp4` for V01 (about 2 GB), has two audio tracks (with and
 without the ambient music), soft English subtitles and chapter markers. A run prints a running estimate; stop
