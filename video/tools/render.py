@@ -15,6 +15,11 @@
   # --skip-existing resumes an interrupted run (each segment is written to a .partial file, then renamed)
   python3 video/tools/render.py video/v01 video all --scale 2 --out video/v01/build/segments_4k --skip-existing
 
+  # on the graphics card: Chromium draws on the GPU (--gpu shell|full) and NVIDIA's encoder compresses (--encoder
+  # nvenc). GPU drawing is not pixel-identical to the software look the audits were made with; make_4k.py --gpu
+  # checks it against software on the machine before using it.
+  python3 video/tools/render.py video/v01 video all --scale 2 --gpu shell --encoder nvenc --out ...
+
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
 Needs build/timing.json from tools/tts.py and scenes/<scene>.js (plus optional scenes/<chapter>_common.js).
 """
@@ -27,6 +32,43 @@ from ffbin import ffmpeg
 VIDEO = Path(__file__).resolve().parents[1]
 CRF = os.environ.get("CRF", "18")
 PRESET = os.environ.get("PRESET", "slow")
+NVENC_CQ = os.environ.get("NVENC_CQ", "19")
+SOFTWARE_GPUS = ("SwiftShader", "Basic Render", "WARP", "llvmpipe", "softpipe")
+
+
+def launch_options(gpu=None):
+    """Chromium launch options. Without gpu: software drawing, the look every audit was made against. With gpu:
+    draw on the graphics card, through the headless shell ('shell') or the full browser's new headless mode ('full'),
+    whichever this platform's Chromium accelerates; gpu_status() says whether it really did."""
+    args = ["--font-render-hinting=none", "--force-color-profile=srgb", "--disable-lcd-text", "--hide-scrollbars"]
+    if not gpu:
+        return {"args": ["--disable-gpu", *args]}
+    angle = os.environ.get("FILM_ANGLE") or {"win32": "d3d11", "darwin": "metal"}.get(sys.platform, "vulkan")
+    args += ["--enable-gpu", "--ignore-gpu-blocklist", "--enable-gpu-rasterization", f"--use-angle={angle}"]
+    if angle == "swiftshader":                  # a software stand-in for a graphics card, for testing this path
+        args.append("--enable-unsafe-swiftshader")
+    return {"args": args, **({"channel": "chromium"} if gpu == "full" else {})}
+
+
+def gpu_status(browser):
+    """(drawing on a real graphics card?, what Chromium reports) for a launched browser."""
+    g = browser.new_browser_cdp_session().send("SystemInfo.getInfo")["gpu"]
+    raster = g.get("featureStatus", {}).get("rasterization", "?")
+    name = next((d["deviceString"] for d in g.get("devices", []) if d.get("deviceString")), "unknown device")
+    hardware = raster.startswith("enabled") and not any(x in name for x in SOFTWARE_GPUS)
+    return hardware, f"{name}, rasterization {raster}"
+
+
+def encoder_args(encoder, scale):
+    if encoder == "nvenc":
+        # NVIDIA's hardware encoder: constant-quality VBR, slow preset, adaptive quantisation, B-frames
+        return ["-c:v", "h264_nvenc", "-preset", "p6", "-tune", "hq", "-rc", "vbr", "-cq", NVENC_CQ, "-b:v", "0",
+                "-spatial-aq", "1", "-temporal-aq", "1", "-bf", "3", "-rc-lookahead", "20", "-profile:v", "high",
+                "-pix_fmt", "yuv420p"]
+    # at 4K the capture (~5 fps) is the bottleneck, so two encoder threads keep up; a shorter look-ahead holds each
+    # encoder to ~1.8 GB instead of ~2.6 GB (SSIM 0.9971 vs 0.9977), so more scenes fit in memory at once
+    big = ["-threads", "2", "-rc-lookahead", "20"] if scale > 1 else []
+    return ["-c:v", "libx264", "-preset", PRESET, "-tune", "animation", "-crf", CRF, "-pix_fmt", "yuv420p", *big]
 
 
 # The stage's files are answered from disk inside the browser session (Playwright request routing), so there is
@@ -73,11 +115,10 @@ def select(timing, sel):
 
 
 class Stage:
-    def __init__(self, film, debug=False, scale=1):
+    def __init__(self, film, debug=False, scale=1, gpu=None):
         from playwright.sync_api import sync_playwright
         self.pw = sync_playwright().start()
-        self.browser = self.pw.chromium.launch(args=["--disable-gpu", "--font-render-hinting=none", "--force-color-profile=srgb",
-                                                      "--disable-lcd-text", "--hide-scrollbars"])
+        self.browser = self.pw.chromium.launch(**launch_options(gpu))
         # the stage is always laid out at 1920x1080; scale only sets how many pixels draw it (2 -> 3840x2160)
         self.page = self.browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
         serve_files(self.page)
@@ -193,18 +234,14 @@ def do_audit(film, timing, ids, step):
 
 
 def render_one(args):
-    film, entry, fps, outdir, scale = args
-    st = Stage(Path(film), scale=scale)
+    film, entry, fps, outdir, scale, gpu, encoder = args
+    st = Stage(Path(film), scale=scale, gpu=gpu)
     st.load(entry)
     n = round(entry["duration"] * fps)
     out = Path(outdir) / f"{entry['id']}.mp4"
     part = out.with_name(f"{entry['id']}.partial.mp4")       # renamed only once complete, so a resume never trusts half a file
-    # at 4K the capture (~5 fps) is the bottleneck, so two encoder threads keep up; a shorter look-ahead holds each
-    # encoder to ~1.8 GB instead of ~2.6 GB (SSIM 0.9971 vs 0.9977), so more scenes fit in memory at once
-    big = ["-threads", "2", "-rc-lookahead", "20"] if scale > 1 else []
     enc = subprocess.Popen([ffmpeg(), "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(fps), "-i", "-",
-                            "-c:v", "libx264", "-preset", PRESET, "-tune", "animation", "-crf", CRF, "-pix_fmt", "yuv420p", *big,
-                            "-r", str(fps), "-g", str(fps * 4), "-video_track_timescale", str(fps * 1000), str(part)], stdin=subprocess.PIPE)
+                            *encoder_args(encoder, scale), "-r", str(fps), "-g", str(fps * 4), "-video_track_timescale", str(fps * 1000), str(part)], stdin=subprocess.PIPE)
     t0 = time.time()
     for i in range(n):
         st.seek(i / fps)
@@ -224,13 +261,14 @@ def render_one(args):
     return entry["id"], n, time.time() - t0
 
 
-def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existing=False):
+def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existing=False, gpu=None, encoder="x264"):
     outdir = Path(outdir) if outdir else film / "build" / "segments"
     outdir.mkdir(parents=True, exist_ok=True)
     todo = [s for s in ids if not (skip_existing and (outdir / f"{s}.mp4").exists())]
     if len(todo) < len(ids):
         print(f"{len(ids) - len(todo)} of {len(ids)} scenes already rendered in {outdir}; rendering the other {len(todo)}", flush=True)
-    jobs = sorted([(str(film), timing["scenes"][s], fps, str(outdir), scale) for s in todo], key=lambda j: -j[1]["duration"])
+    jobs = sorted([(str(film), timing["scenes"][s], fps, str(outdir), scale, gpu, encoder) for s in todo],
+                  key=lambda j: -j[1]["duration"])
     total = sum(round(j[1]["duration"] * fps) for j in jobs)
     t0, frames = time.time(), 0
     with Pool(workers) as pool:
@@ -257,6 +295,8 @@ def main():
     ap.add_argument("--scale", type=float, default=1, help="pixel density: 1 -> 1920x1080, 2 -> 3840x2160")
     ap.add_argument("--out", help="folder for video segments (default build/segments)")
     ap.add_argument("--skip-existing", action="store_true", help="leave segments already in the folder alone (resume)")
+    ap.add_argument("--gpu", choices=["shell", "full"], help="draw on the graphics card (see launch_options)")
+    ap.add_argument("--encoder", choices=["x264", "nvenc"], default="x264")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     # keep the icon bundle in step with the scene files (cheap, and self-heals concurrent edits)
@@ -270,7 +310,7 @@ def main():
     elif a.mode == "audit":
         sys.exit(1 if do_audit(film, timing, ids, a.step) else 0)
     else:
-        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing)
+        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing, a.gpu, a.encoder)
 
 
 if __name__ == "__main__":
