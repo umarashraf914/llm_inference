@@ -19,6 +19,12 @@
       "date": "2026-10-26",
       "commit": "f4e5113d6cbaa29904d90981cc6dca412f0cc3b3",
       "notes": "Chapter 4: the 'each token goes three places' scene redrawn (20:19)"
+    },
+    {
+      "version": 3,
+      "date": "2026-10-26",
+      "commit": "80f9c6819c9121d5aa9390625c2949dfc5e9ff0b",
+      "notes": "Poppins in Title Case throughout; lines meet devices and cards at their centre (ch04_s06 and others); labels fitted and spaced film-wide"
     }
   ]
 }
