@@ -13,6 +13,12 @@
       "date": "2026-10-26",
       "commit": "e3b340752ac367d09d92e368604e9cf0a4ba3b36",
       "notes": "First release: 19 chapters, 92 minutes, from lecture 1"
+    },
+    {
+      "version": 2,
+      "date": "2026-10-26",
+      "commit": "f4e5113d6cbaa29904d90981cc6dca412f0cc3b3",
+      "notes": "Chapter 4: the 'each token goes three places' scene redrawn (20:19)"
     }
   ]
 }
