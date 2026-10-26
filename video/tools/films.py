@@ -47,6 +47,9 @@ def snapshot(commit):
     dest = VIDEO / ".versions" / commit[:12]
     if (dest / ".complete").exists():
         return dest / "video"
+    if not shutil.which("git"):
+        raise RuntimeError("rendering a released version needs git (git-scm.com); --working-copy renders the files "
+                           "as they are instead")
     shutil.rmtree(dest, ignore_errors=True)
     dest.mkdir(parents=True)
     p = subprocess.Popen(["git", "-C", str(REPO), "archive", "--format=tar", commit, "video"], stdout=subprocess.PIPE)

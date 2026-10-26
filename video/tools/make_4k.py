@@ -542,6 +542,8 @@ if __name__ == "__main__":
     except subprocess.CalledProcessError as e:
         sys.exit(f"\nA step failed (exit code {e.returncode}). Fix what it reports and run the same command again; "
                  f"finished work is kept.")
+    except RuntimeError as e:
+        sys.exit(f"\n{e}")
     except OSError as e:            # includes urllib's URLError
         sys.exit(f"\nA download or file operation failed: {e}. Check the internet connection and disk, then run the "
                  f"same command again; finished work is kept.")
