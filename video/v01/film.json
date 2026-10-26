@@ -7,5 +7,12 @@
     "atlas": "atlases/V01_The_Memory_Wall.html",
     "transcript": "transcripts/V01_The_Memory_Wall.srt"
   },
-  "versions": []
+  "versions": [
+    {
+      "version": 1,
+      "date": "2026-10-26",
+      "commit": "e3b340752ac367d09d92e368604e9cf0a4ba3b36",
+      "notes": "First release: 19 chapters, 92 minutes, from lecture 1"
+    }
+  ]
 }
