@@ -33,15 +33,16 @@ V.scene('ch06_s09', S => {
   S.add(fx.in(cardA, { from: 'scale', d: 0.6, scale: 0.86 }), 'b1~compute-0.15');
   S.add(fx.in(cardM, { from: 'scale', d: 0.6, scale: 0.86 }), 'b1~memory-0.15');
   // 'fetch': a coral arrow from the bandwidth card into the compute card; 'multiply': an amber loop
-  const fetch = S.arrow({ x1: CXM - 14, y1: CY + CH - 56, x2: CXA + CW + 14, y2: CY + CH - 56, color: 'bytes', sw: 5, head: 18 });
+  // through the cards' middle: the arrow joins the two cards, not their bottom rows
+  const fetch = S.arrow({ x1: CXM - 14, y1: CY + CH / 2, x2: CXA + CW + 14, y2: CY + CH / 2, color: 'bytes', sw: 5, head: 18 });
   S.set(fetch, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(fetch, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.1, immediateRender: false }), 'b1~fetch-0.1');
   S.add(fx.drawArrow(fetch, { d: 0.5 }), 'b1~fetch-0.1');
   const loopG = S.g(), loopIn = S.g(null, loopG);
-  S.icon('ph:arrows-clockwise-bold', { x: CXA + CW - 86, y: CY + CH - 74, size: 76, color: 'compute' }, loopIn);
+  S.icon('ph:arrows-clockwise-bold', { x: CXA + CW - 86, y: CY + CH / 2, size: 76, color: 'compute' }, loopIn);
   S.set(loopG, { autoAlpha: 0 }, 0);
   S.add(fx.in(loopG, { from: 'fade', d: 0.3 }), 'b1~multiply-0.1');
-  S.add(gsap.fromTo(loopIn, { rotation: 0, svgOrigin: `${CXA + CW - 86} ${CY + CH - 74}` }, { rotation: 360, svgOrigin: `${CXA + CW - 86} ${CY + CH - 74}`, duration: 1.0, ease: 'power2.inOut', immediateRender: false }), 'b1~multiply');
+  S.add(gsap.fromTo(loopIn, { rotation: 0, svgOrigin: `${CXA + CW - 86} ${CY + CH / 2}` }, { rotation: 360, svgOrigin: `${CXA + CW - 86} ${CY + CH / 2}`, duration: 1.0, ease: 'power2.inOut', immediateRender: false }), 'b1~multiply');
 
   // ================================================================ b2: one token, drawn to scale
   const lanes = S.g();

@@ -64,16 +64,17 @@ V.scene('ch02_s06', S => {
   const done = S.text('training: done', { x: L.x + L.w / 2, y: Y - H / 2 - 34, size: 26, anchor: 'middle', color: 'muted', weight: 550 });
   S.add(fx.in(done, { from: 'down', d: 0.4 }), 'b2~Training');
   S.add(gsap.to(done, { opacity: 0.5, duration: 0.4 }), 'b2~checkpoint');
-  const arrow = S.arrow({ x1: L.x + L.w + 14, y1: Y - 40, x2: R.x - 14, y2: Y - 40, color: 'ink', sw: 4, head: 18 });
+  // the arrow joins the two boxes through their middle; the 'inference' band takes the lower half of the gap
+  const arrow = S.arrow({ x1: L.x + L.w + 14, y1: Y, x2: R.x - 14, y2: Y, color: 'ink', sw: 4, head: 18 });
   S.set(arrow, { autoAlpha: 0 }, 0);
   S.add(gsap.set(arrow, { autoAlpha: 1 }), 'b2~Turning');
   S.add(fx.drawArrow(arrow, { d: 0.6 }), 'b2~Turning');
   S.add(fx.pulse(user, { scale: 1.2, d: 0.5 }), 'b2~talk');
-  const price = S.icon('ph:tag-duotone', { x: 960, y: Y - 92, size: 48, color: 'helps' });
+  const price = S.icon('ph:tag-duotone', { x: 960, y: Y - 52, size: 48, color: 'helps' });
   S.add(fx.pop(price), 'b2~a price');
 
   // ---------------------------------------------------------------- b3: the reading holds the gap at 30 ms; inference
-  S.flow({ d: `M${L.x + L.w + 20},${Y - 40} L${R.x - 30},${Y - 40}`, from: 'b3~the reading', to: 'end', speed: 260, every: 0.1, size: 6, color: 'bytes' });
+  S.flow({ d: `M${L.x + L.w + 20},${Y} L${R.x - 30},${Y}`, from: 'b3~the reading', to: 'end', speed: 260, every: 0.1, size: 6, color: 'bytes' });
   const ghost = S.text('0.1 ms?', { x: R.x + R.w / 2 + 210, y: Y - H / 2 + 94, size: 26, anchor: 'middle', color: 'compute', weight: 650 });
   S.set(ghost, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(ghost, { autoAlpha: 0 }, { autoAlpha: 0.8, duration: 0.15, yoyo: true, repeat: 3 }), 'b3~not');
@@ -84,7 +85,7 @@ V.scene('ch02_s06', S => {
   S.add(gsap.fromTo(right.sub, { filter: 'none' }, { filter: 'url(#glow-struct)', duration: 0.4, yoyo: true, repeat: 1 }), 'b3~thirty');
   S.add(fx.out(brk, { d: 0.4 }), 'b3~the rest');
   const bandG = S.g();
-  S.rect({ x: L.x + L.w + 16, y: Y - 6, w: R.x - L.x - L.w - 32, h: 120, r: 20, fill: 'ink', fillOpacity: 0.08, stroke: 'ink', strokeOpacity: 0.25, sw: 1.5 }, bandG);
-  S.text('inference', { x: 960, y: Y + 54, size: 62, anchor: 'middle', weight: 700, family: 'display', color: 'ink' }, bandG);
+  S.rect({ x: L.x + L.w + 16, y: Y + 36, w: R.x - L.x - L.w - 32, h: 104, r: 20, fill: 'ink', fillOpacity: 0.08, stroke: 'ink', strokeOpacity: 0.25, sw: 1.5 }, bandG);
+  S.text('inference', { x: 960, y: Y + 88, size: 58, anchor: 'middle', weight: 700, family: 'display', color: 'ink' }, bandG);
   S.add(fx.in(bandG, { from: 'fade', d: 0.6 }), 'b3~inference-0.1');
 });

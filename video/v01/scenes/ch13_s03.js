@@ -166,7 +166,8 @@ V.scene('ch13_s03', S => {
   hide([cnt, cntL]);
   fade([cnt, cntL], 0, 1, tK + 0.3, 0.3);
   whole(t => { cnt.textContent = Math.round(499500 * E('power2.out')(cl((t - tK - 0.4) / 1.5))).toLocaleString('en-US'); });
-  const would = S.text([{ t: 'vs ', c: 'muted' }, { t: '1,000', c: 'helps', w: 750 }, { t: ' would do', c: 'muted' }], { x: 1072, y: 928, size: 22, weight: 600 });
+  // continues 'Recomputations' on the same line: 'vs' stays small, and it starts a space after that word
+  const would = S.text([{ t: 'vs ', c: 'muted' }, { t: '1,000', c: 'helps', w: 750 }, { t: ' Would Do', c: 'muted' }], { x: 898 + S.measure('recomputations', { size: 22, weight: 600 }) + 7, y: 928, size: 22, weight: 600, case: 'keep' });
   hide(would);
   fade(would, 0, 1, T('b3~where') - 0.1, 0.35);
   fade([base, box, dimN, dimM, half, formula, qTag, cnt, cntL, would], 1, 0, tB4, 0.4);

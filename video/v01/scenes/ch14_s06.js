@@ -128,7 +128,7 @@ V.scene('ch14_s06', S => {
   void brk; void skip;
   // the K and V weights against the whole layer, to scale (1,380 px = 855.6 M)
   const wv = S.g(null, zoom);
-  S.text([{ t: 'W_K 8.4 M + W_V 8.4 M', c: 'helps' }], { x: 270, y: 880, size: 26, weight: 750 }, wv);
+  S.text(V.subs('W_K 8.4 M + W_V 8.4 M', 26, { c: 'helps' }), { x: 270, y: 880, size: 26, weight: 750 }, wv);
   S.text('855.6 M weights in the layer', { x: 1650, y: 880, size: 24, weight: 650, anchor: 'end', color: 'muted' }, wv);
   S.rect({ x: 270, y: 905, w: 1380, h: 30, r: 6, fill: GREY }, wv);
   S.rect({ x: 270, y: 905, w: 27, h: 30, r: 3, fill: TEAL }, wv);

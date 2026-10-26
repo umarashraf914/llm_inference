@@ -86,13 +86,18 @@
       // a phrase starts at the text's first word or number ('+ a few' -> '+ A Few'; '1 of 5' stays), or after : · →
       const first = !started || BREAK.test(prev);
       // the word ends a phrase: punctuation after it, or it is the text's last word
-      const end = /[:;!?]$/.test(x) || i === lastWord;
+      const end = /[:;!?,]$/.test(x) || i === lastWord;   // a particle before a comma is an adverb: "Text In, Keys Out"
       const y = letters ? caseWord(x, first, end, mode) : x;
       if (letters || /\p{N}/u.test(x)) started = true;
       prev = x;
       return y;
     }).join('');
     return out.length === s.length ? out : s;
+  }
+
+  /** segments for names with one-letter subscripts: subs('W_Q, W_K', 24) → W with a small, lowered Q, and so on */
+  function subs(str, size, o = {}) {
+    return String(str).split(/_(\w)/).map((t, i) => (i % 2 ? { t, s: Math.round(size * 0.68), b: +(size * 0.24).toFixed(1), ...o } : { t, ...o })).filter(x => x.t);
   }
 
   /** lines that make one phrase: cased as one text, split where they were ('Nothing Else About' / 'the Architecture') */
@@ -314,7 +319,8 @@
     }, p || S.main);
 
     /**
-     * Text. str may be a string or an array of segments {t, c, w, f, s, o}.
+     * Text. str may be a string or an array of segments {t, c, w, f, s, o, b} (b: lower by b px, a subscript;
+     * negative raises). V.subs('W_Q, W_K') gives the segments for names with one-letter subscripts.
      * o: {x, y, size, weight, color, anchor: start|middle|end, family: sans|display|mono,
      *     ls (em), opacity, maxW (shrinks to fit and warns), baseline: middle|alphabetic|hanging}
      */
@@ -350,6 +356,7 @@
             text: s.f === 'mono' ? s.t : piece, fill: s.c ? color(s.c) : undefined, 'font-weight': s.w,
             'font-size': s.s ? drawSize(s.s, s.f || fam) : undefined,
             'font-family': s.f ? familyCss(s.f) : undefined, opacity: s.o,
+            'baseline-shift': s.b ? `${-s.b}px` : undefined,
           }, t);
         }
       } else {
@@ -1202,6 +1209,15 @@
       }
       for (const { s, r } of shapes) {
         // a label set flush against a box beside it (a chip or bar after a word) reads as one blob
+        if (v.label.length > 2 && s.tagName === 'circle' && r.width >= 18 && !/pglow/.test(s.getAttribute('fill'))) {
+          // a disc: the true gap from its rim to the nearest point of the label
+          const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
+          const gap = Math.hypot(Math.max(a.left, Math.min(cx, a.right)) - cx, Math.max(a.top, Math.min(cy, a.bottom)) - cy) - r.width / 2;
+          if (gap > -3 && gap < 4) {
+            issues.push({ kind: 'text-touches-box', text: v.label, shape: 'circle' });
+            break;
+          }
+        }
         if (v.label.length > 2 && s.tagName === 'rect' && Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top) >= 0.5 * a.height) {
           const gR = r.left - a.right, gL = a.left - r.right;
           if ((gR > -3 && gR < 4) || (gL > -3 && gL < 4)) {
@@ -1228,21 +1244,21 @@
       const a = vis[i].ink, b = vis[j].ink;            // the glyphs themselves, not their line boxes
       const ix = Math.min(a.right, b.right) - Math.max(a.left, b.left);
       const iy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-      // two labels on one line that meet end to end ('Feed-Forward 1Feed-Forward 2'); punctuation and short marks may
-      if (ix > -3 && ix <= 2 && iy > 0.5 * Math.min(a.height, b.height) && vis[i].label.length > 2 && vis[j].label.length > 2) {
+      const small = Math.min(a.width * a.height, b.width * b.height), frac = ix > 0 && iy > 0 ? ix * iy / small : 0;
+      if (ix > 2 && iy > 2 && frac > 0.12) { issues.push({ kind: 'overlap', a: vis[i].label, b: vis[j].label, frac: +frac.toFixed(2) }); continue; }
+      // two labels on one line that meet or just overlap end to end ('Feed-Forward 1Feed-Forward 2'); punctuation,
+      // short marks and word pieces (a lower-case start) may
+      if (ix > -3 && iy > 0.5 * Math.min(a.height, b.height) && vis[i].label.length > 2 && vis[j].label.length > 2) {
         const [l, r] = a.left < b.left ? [vis[i].label, vis[j].label] : [vis[j].label, vis[i].label];
-        if (!/^[,.;:!?)%’'”·×÷=+−\-\p{Ll}]/u.test(r) && !/[(‘'“$]$/.test(l)) issues.push({ kind: 'text-touch', a: l, b: r });   // lower case: a word piece
+        if (!/^[,.;:!?)%’'”·×÷=+−\-\p{Ll}]/u.test(r) && !/[(‘'“$]$/.test(l)) issues.push({ kind: 'text-touch', a: l, b: r });
       }
-      if (ix <= 2 || iy <= 2) continue;
-      const area = ix * iy, small = Math.min(a.width * a.height, b.width * b.height);
-      if (area / small > 0.12) issues.push({ kind: 'overlap', a: vis[i].label, b: vis[j].label, frac: +(area / small).toFixed(2) });
     }
     return issues;
   }
 
   // ================================================================ public api
   const V = {
-    W, H, SAFE, TONE, fmt, scene, scenes, color, hexA, measure, rand, caseText, caseLines, familyCss, TYPE,
+    W, H, SAFE, TONE, fmt, scene, scenes, color, hexA, measure, rand, caseText, caseLines, subs, familyCss, TYPE,
     async load(id, timing, opts = {}) {
       await document.fonts.ready;
       const film = document.getElementById('film');

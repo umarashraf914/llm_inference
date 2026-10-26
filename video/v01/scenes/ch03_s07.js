@@ -106,9 +106,9 @@ V.scene('ch03_s07', S => {
   const laptop = libDevice(S, { x: IX, y: SHELF[0].y + 104, w: 104 }, shelfG[0]);
   const badgeIcon = (x, y, id, g) => { S.circle({ x, y, r: 17, fill: '#0c1326', stroke: 'struct', sw: 2 }, g); S.icon(id, { x, y, size: 24, color: 'struct' }, g); };
   const srvYou = libServer(S, { x: IX, y: SHELF[1].y + 104, w: 112, detail: 'min', seed: 4 }, shelfG[1]);
-  badgeIcon(IX + 50, SHELF[1].y + 80, 'ph:user-duotone', shelfG[1]);
+  badgeIcon(IX + 42, SHELF[1].y + 80, 'ph:user-duotone', shelfG[1]);   // on the server's corner, clear of the text column at x 236
   const srvAll = libServer(S, { x: IX, y: SHELF[2].y + 112, w: 112, detail: 'min', seed: 6 }, shelfG[2]);
-  badgeIcon(IX + 50, SHELF[2].y + 88, 'ph:globe-duotone', shelfG[2]);
+  badgeIcon(IX + 42, SHELF[2].y + 88, 'ph:globe-duotone', shelfG[2]);
   const titles = ['On your device', 'On the server, for you', 'On the server, for everyone'].map((t, i) =>
     S.text(t, { x: 236, y: SHELF[i].y + 44, size: 26, weight: 650, color: 'ink' }, shelfG[i]));
   const sub3 = S.text('one copy, shared by all', { x: 236, y: SHELF[2].y + 80, size: 24, weight: 550, color: 'muted' }, shelfG[2]);

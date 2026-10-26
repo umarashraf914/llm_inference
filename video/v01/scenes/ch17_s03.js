@@ -39,8 +39,8 @@ V.scene('ch17_s03', S => {
   const tag = ch17Tag(S, 'idealised: H100 at full speed, no network or queue');
   fade(tag, 0, 1, 1.0, 0.4);
   const wx = S.g();
-  S.icon('ph:cloud-sun-duotone', { x: 640, y: 160, size: 52, color: 'muted' }, wx);
-  S.text('the weather conversation', { x: 680, y: 161, size: 26, weight: 650, color: 'muted' }, wx);
+  S.icon('ph:cloud-sun-duotone', { x: 560, y: 160, size: 52, color: 'muted' }, wx);   // ends well before the verdict tick at x 1038
+  S.text('the weather conversation', { x: 600, y: 161, size: 26, weight: 650, color: 'muted' }, wx);
   rise(wx, 0.9, 6);
   fade(wx, 1, 0, tB2, 0.35);
   // the two strips of 1,032 hairline cells

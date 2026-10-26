@@ -213,14 +213,15 @@ V.scene('ch17_s04', S => {
   route.setAttribute('data-audit', 'ignore');
   K.draw(route, 1200, tHw, 0.5);
   const kvB = S.g();
-  S.rect({ x: -88, y: -22, w: 176, h: 44, r: 12, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, kvB);
+  const KVW = Math.round(S.measure('keys and values', { size: 24, weight: 750 }) + 36);
+  S.rect({ x: -KVW / 2, y: -22, w: KVW, h: 44, r: 12, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, kvB);
   S.text('keys and values', { x: 0, y: 1, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, kvB);
   kvB.setAttribute('data-audit', 'ignore');
   whole(t => {
     const u = EIO(cl((t - tHw - 0.3) / 1.1)), b = 1 - u;
     const x = b * b * b * 440 + 3 * b * b * u * 520 + 3 * b * u * u * 1400 + u * u * u * 1480, y = b * b * b * 750 + 3 * b * b * u * 840 + 3 * b * u * u * 840 + u * u * u * 750;
     kvB.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
-    setO(kvB, t > tHw + 0.3 ? 1 : 0);
+    setO(kvB, t > tHw + 0.3 ? 1 - cl((u - 0.82) / 0.18) : 0);   // delivered: it fades into the decode machines, never parks on their border
   });
   const kvT = S.pill('KV transfer', { x: 960, y: 868, tone: 'helps', size: 24, h: 40 });
   rise(kvT, tHw + 0.4, 6);

@@ -139,7 +139,7 @@ V.scene('ch13_s11', S => {
 
   // ================================================================ the ceiling readout (top right)
   const ro = S.g();
-  const r1 = S.text([{ t: 'tokens/s', c: 'struct' }, { t: ' ≤ ', c: 'muted' }, { t: 'bandwidth', c: 'bytes' }, { t: ' ÷ ', c: 'muted' }, { t: 'bytes per token', c: 'bytes' }], { x: 1400, y: 168, size: 30, weight: 700, anchor: 'middle' }, ro);
+  const r1 = S.text([{ t: 'Tokens/s', c: 'struct' }, { t: ' ≤ ', c: 'muted' }, { t: 'bandwidth', c: 'bytes' }, { t: ' ÷ ', c: 'muted' }, { t: 'bytes per token', c: 'bytes' }], { x: 1400, y: 168, size: 30, weight: 700, anchor: 'middle' }, ro);
   hide(r1);
   fade(r1, 0, 1, T('b1~ceiling') - 0.1, 0.4);
   // line 2, placed token by token: 3.35 TB/s ÷ [140 GB | 173 GB] ≈ [24 → 19] tokens/s
