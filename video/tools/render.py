@@ -269,6 +269,9 @@ def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existin
     outdir = Path(outdir) if outdir else film / "build" / "segments"
     outdir.mkdir(parents=True, exist_ok=True)
     todo = [s for s in ids if not (skip_existing and (outdir / f"{s}.mp4").exists())]
+    if not todo:
+        print(f"all {len(ids)} scenes are already rendered in {outdir}", flush=True)
+        return
     if len(todo) < len(ids):
         print(f"{len(ids) - len(todo)} of {len(ids)} scenes already rendered in {outdir}; rendering the other {len(todo)}", flush=True)
     jobs = sorted([(str(film), timing["scenes"][s], fps, str(outdir), scale, gpu, encoder) for s in todo],
