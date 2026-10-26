@@ -15,9 +15,9 @@
   # --skip-existing resumes an interrupted run (each segment is written to a .partial file, then renamed)
   python3 video/tools/render.py video/v01 video all --scale 2 --out video/v01/build/segments_4k --skip-existing
 
-  # on the graphics card: Chromium draws on the GPU (--gpu shell|full) and NVIDIA's encoder compresses (--encoder
-  # nvenc). GPU drawing is not pixel-identical to the software look the audits were made with; make_4k.py --gpu
-  # checks it against software on the machine before using it.
+  # on the graphics card: Chromium draws on the GPU (--gpu shell|full) and a hardware encoder compresses (--encoder
+  # nvenc on NVIDIA cards, videotoolbox on Apple silicon). Neither is pixel-identical to the software look the audits
+  # were made with; make_4k.py checks both against software on each computer before using them.
   python3 video/tools/render.py video/v01 video all --scale 2 --gpu shell --encoder nvenc --out ...
 
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
@@ -33,6 +33,7 @@ VIDEO = Path(__file__).resolve().parents[1]
 CRF = os.environ.get("CRF", "18")
 PRESET = os.environ.get("PRESET", "slow")
 NVENC_CQ = os.environ.get("NVENC_CQ", "19")
+VT_QUALITY = os.environ.get("VT_QUALITY", "80")
 SOFTWARE_GPUS = ("SwiftShader", "Basic Render", "WARP", "llvmpipe", "softpipe")
 
 
@@ -60,6 +61,9 @@ def gpu_status(browser):
 
 
 def encoder_args(encoder, scale):
+    if encoder == "videotoolbox":
+        # Apple's hardware encoder (constant quality needs Apple silicon); hardware only, never its software fallback
+        return ["-c:v", "h264_videotoolbox", "-q:v", VT_QUALITY, "-profile:v", "high", "-allow_sw", "0", "-pix_fmt", "yuv420p"]
     if encoder == "nvenc":
         # NVIDIA's hardware encoder: constant-quality VBR, slow preset, adaptive quantisation, B-frames
         return ["-c:v", "h264_nvenc", "-preset", "p6", "-tune", "hq", "-rc", "vbr", "-cq", NVENC_CQ, "-b:v", "0",
@@ -296,7 +300,7 @@ def main():
     ap.add_argument("--out", help="folder for video segments (default build/segments)")
     ap.add_argument("--skip-existing", action="store_true", help="leave segments already in the folder alone (resume)")
     ap.add_argument("--gpu", choices=["shell", "full"], help="draw on the graphics card (see launch_options)")
-    ap.add_argument("--encoder", choices=["x264", "nvenc"], default="x264")
+    ap.add_argument("--encoder", choices=["x264", "nvenc", "videotoolbox"], default="x264")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     # keep the icon bundle in step with the scene files (cheap, and self-heals concurrent edits)

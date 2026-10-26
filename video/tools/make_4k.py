@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
-"""Render the finished film in 4K on this computer and save it as one video file in Downloads.
+"""Render a finished film in 4K on this computer and save it as one video file in Downloads.
 
-  python video/tools/make_4k.py                    # -> Downloads/V01_The_Memory_Wall_4K.mp4
+  python video/tools/make_4k.py              # the newest finished film (asks which, if several are ready)
+  python video/tools/make_4k.py v01          # -> Downloads/V01_The_Memory_Wall_4K.mp4
 
-Everything runs here and nothing is uploaded anywhere. The first run sets up a private Python environment in
-video/.venv (Playwright with its own Chromium, numpy, a bundled ffmpeg) and fetches GSAP from npm. The narration
-comes from V01_narration_pack.zip if that is in Downloads, on the Desktop or in the home folder (the exact narration
-the film was cut to); without it, the narration is synthesised here with Kokoro, which first downloads a 350 MB voice
-model and needs Python 3.13 or older.
+Or double-click make_film.bat (Windows) or make_film.command (Mac) at the top of the repository: they update from
+GitHub first, then run this. It works the same way on every computer and sets itself up for each one:
 
-The render is long: 166,140 frames at 3840x2160, hours even on a fast machine. Stop it at any time (Ctrl+C, or
-close the window) and run the same command again: finished scenes are kept and it carries on from there.
+- First run on a computer: a private Python environment in video/.venv (Playwright with its own Chromium, numpy, a
+  bundled ffmpeg), GSAP from npm, and a check of the graphics card and hardware video encoder (NVIDIA NVENC, Apple
+  VideoToolbox) against the software path. Whatever matches the software look and is faster is used from then on.
+  The result stays on that computer: --recheck redoes it, --cpu renders in software for one run.
+- Narration: the film's narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home
+  folder; without it, it is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
+- Rendering takes from under an hour on a big workstation to several hours on a small computer. Stop it at any time
+  (Ctrl+C, or close the window) and run the same command again: finished scenes are kept.
 
-  --gpu              use the graphics card: Chromium draws on the GPU and NVIDIA's encoder compresses, each only if a
-                     check on this machine finds it matches the software look and is faster (--gpu-recheck redoes it)
   --out PATH         where to save the film (default: your Downloads folder)
-  --workers N        scenes rendered at once (default: chosen from CPU cores and memory)
-  --narration ZIP    the narration pack, if it is not in Downloads
-  --preset P         x264 preset: slow (default), medium (about 1.5x faster, slightly larger file)
+  --workers N        scenes rendered at once (default: from CPU cores, memory and the encoder)
+  --cpu              draw and encode in software this time (the reference look), whatever the check found
+  --recheck          check the graphics card and video encoder again
+  --narration ZIP    the narration pack, if it is somewhere else
+  --preset P         x264 preset: slow (default), medium (faster, slightly larger file)
   --only ch18 ...    just these chapters, as a quick test (saved as ..._4K_ch18.mp4)
   --keep-segments    keep the per-scene 4K files after the film is assembled
 """
-import argparse, base64, hashlib, io, json, os, shutil, subprocess, sys, tarfile, time
+import argparse, base64, hashlib, io, json, os, platform, re, shutil, subprocess, sys, tarfile, time
 from pathlib import Path
 
 TOOLS = Path(__file__).resolve().parent
 VIDEO = TOOLS.parent
-FILM = VIDEO / "v01"
-NAME = "V01_The_Memory_Wall_4K"
-PACK = "V01_narration_pack.zip"
+FILM = NAME = PACK = None             # the film being rendered: see use_film()
 VENV = VIDEO / ".venv"
 REQS = ["playwright==1.56.0", "numpy", "imageio-ffmpeg", "certifi"]
 TTS_REQS = ["kokoro-onnx==0.6.1"]
@@ -37,8 +39,9 @@ KOKORO_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/mode
 KOKORO = {"kokoro-v1.0.onnx": "7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5",
           "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"}
 # memory per scene rendering at once: Chromium at 3840x2160 (~0.6 GB) plus its encoder (x264 ~1.8 GB, measured;
-# NVENC keeps its buffers on the graphics card)
-GB_PER_WORKER = {"x264": 2.6, "nvenc": 1.0}
+# the hardware encoders keep their buffers on the graphics card or media engine)
+GB_PER_WORKER = {"x264": 2.6, "nvenc": 1.0, "videotoolbox": 1.0}
+ENCODERS = {"x264": "x264", "nvenc": "NVIDIA NVENC", "videotoolbox": "Apple VideoToolbox"}
 
 
 def step(msg):
@@ -62,6 +65,44 @@ def downloads():
 
 def venv_python():
     return VENV / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+# ---------------------------------------------------------------- which film
+def films():
+    """The films in this copy of the repository, oldest first: (folder, film.json) for each video/vNN."""
+    return [(d, json.loads((d / "film.json").read_text())) for d in sorted(VIDEO.glob("v[0-9][0-9]"))
+            if (d / "film.json").is_file()]
+
+
+def choose_film(arg):
+    have = films()
+    if arg:
+        want = "v" + arg.lower().lstrip("v").zfill(2)          # v01, V01, 01 and 1 all mean video/v01
+        for d, meta in have:
+            if d.name == want:
+                return d, meta
+        sys.exit(f"there is no film {arg!r} here (films: {', '.join(d.name for d, _ in have) or 'none'}); "
+                 f"git pull brings new ones")
+    ready = [(d, m) for d, m in have if m.get("ready")]
+    if not ready:
+        sys.exit("there is no finished film in this copy yet; git pull brings new ones")
+    if len(ready) == 1 or not sys.stdin.isatty():
+        return ready[-1]
+    print("\nFilms ready to render:")
+    for i, (d, m) in enumerate(ready, 1):
+        print(f"  {i}. {d.name.upper()}  {m['title']}")
+    pick = input(f"Which one? [{len(ready)}] ").strip()
+    n = int(pick) if pick.isdigit() else (len(ready) if not pick else 0)
+    if not 1 <= n <= len(ready):
+        sys.exit(f"{pick!r} is not one of 1-{len(ready)}")
+    return ready[n - 1]
+
+
+def use_film(folder, meta):
+    global FILM, NAME, PACK
+    FILM = folder
+    NAME = f"{folder.name.upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', meta['title']).strip('_')}_4K"
+    PACK = f"{folder.name.upper()}_narration_pack"
 
 
 # ---------------------------------------------------------------- setup
@@ -214,13 +255,13 @@ def have_narration():
 
 
 def find_pack(given):
-    """The narration pack: as given, else the newest V01_narration_pack*.zip (a browser names a second download
-    'V01_narration_pack (1).zip') in Downloads, on the Desktop, in the home folder or beside the repository."""
+    """The narration pack: as given, else the newest V01_narration_pack*.zip for V01 (a browser names a second
+    download 'V01_narration_pack (1).zip') in Downloads, on the Desktop, in the home folder or beside the repository."""
     if given:
         return Path(given).expanduser()
     home = Path.home()
     places = [downloads(), home / "Desktop", home / "OneDrive" / "Desktop", home / "OneDrive" / "Downloads", home, VIDEO.parent]
-    hits = [f for d in places for f in d.glob("V01_narration_pack*.zip") if f.is_file()]
+    hits = [f for d in places for f in d.glob(f"{PACK}*.zip") if f.is_file()]
     return max(hits, key=lambda f: f.stat().st_mtime) if hits else None
 
 
@@ -235,10 +276,10 @@ def ensure_narration(given):
     if given:
         sys.exit(f"{given} does not exist")
     if sys.version_info >= (3, 14):
-        sys.exit(f"\n{PACK} was not found (looked in Downloads, on the Desktop and in the home folder). Put it in your "
+        sys.exit(f"\n{PACK}.zip was not found (looked in Downloads, on the Desktop and in the home folder). Put it in your "
                  f"Downloads folder and run the same command again. (Without it the narration would be synthesised here, "
                  f"but the speech engine, kokoro-onnx, does not support Python {sys.version_info[0]}.{sys.version_info[1]} yet.)")
-    step(f"No {PACK} found (looked in Downloads, on the Desktop and in the home folder): synthesising the narration "
+    step(f"No {PACK}.zip found (looked in Downloads, on the Desktop and in the home folder): synthesising the narration "
          f"here instead")
     ensure_packages(TTS_REQS, "tts")
     kdir = Path.home() / ".cache" / "llm-inference-video" / "kokoro"
@@ -270,9 +311,15 @@ def memory_gb():
         return None
 
 
+def describe_machine():
+    mem = memory_gb()
+    system = {"Darwin": "macOS", "Windows": "Windows"}.get(platform.system(), platform.system())
+    return f"{system} ({platform.machine()}), {os.cpu_count()} logical CPUs" + (f", {mem:.0f} GB memory" if mem else "")
+
+
 def default_workers(encoder="x264"):
-    # a worker keeps about 1.3 cores busy (Chromium rasterising and JPEG-ing 8 MP frames, x264 behind it); the
-    # graphics card is not used, so a many-core workstation is what makes this fast
+    # a worker keeps about 1.3 cores busy (Chromium drawing and JPEG-ing 8 MP frames, less when the GPU draws; the
+    # encoder behind it), so cores and memory set how many scenes render at once
     cores = os.cpu_count() or 2
     w = max(1, round(cores * 0.75))
     mem = memory_gb()
@@ -290,22 +337,30 @@ def keep_awake():
         subprocess.Popen(["caffeinate", "-i", "-w", str(os.getpid())])
 
 
-def gpu_choice(recheck):
-    """How to use this machine's graphics card (gpu_check.check), worked out once and remembered, so a resumed run
-    renders the same way as the run it resumes."""
-    memo = VENV / "gpu-choice.json"
-    if memo.exists() and not recheck:
-        choice = json.loads(memo.read_text())
-        step("Graphics card: using the check from an earlier run (--gpu-recheck redoes it)")
-        for line in choice["report"]:
-            print("   " + line)
-        return choice
-    step("Checking the graphics card: drawing and encoding test frames both ways (a minute or two)")
+def render_profile(recheck):
+    """How this computer renders (gpu_check.check): worked out on its first run and remembered, so every later run,
+    and a resumed one above all, renders the same way."""
     import gpu_check
-    choice = gpu_check.check(json.loads((FILM / "build" / "timing.json").read_text()),
-                             say=lambda m: print("   " + m, flush=True), keep=FILM / "build" / "gpu_check")
-    memo.write_text(json.dumps(choice))
-    return choice
+    memo = VENV / "render-profile.json"
+    if memo.exists() and not recheck:
+        try:
+            prof = json.loads(memo.read_text())
+        except ValueError:
+            prof = {}
+        if prof.get("version") == gpu_check.VERSION:
+            step("This computer renders as its first-run check found (--recheck redoes it):")
+            for line in prof["report"]:
+                print("   " + line)
+            return prof
+    step("Checking this computer's graphics card and video encoder against software (a minute or two, once)")
+    try:
+        prof = gpu_check.check(FILM, json.loads((FILM / "build" / "timing.json").read_text()),
+                               say=lambda m: print("   " + m, flush=True), keep=FILM / "build" / "gpu_check")
+    except Exception as e:                      # the check must never stop a render: software always works
+        print(f"   the check failed ({e}); rendering in software this time")
+        return {"gpu": None, "encoder": "x264"}
+    memo.write_text(json.dumps(prof))
+    return prof
 
 
 def seg_dir(gpu, encoder):
@@ -316,7 +371,8 @@ def seg_dir(gpu, encoder):
 
 # ---------------------------------------------------------------- main
 def main(argv):
-    ap = argparse.ArgumentParser(description="Render the film in 4K and save it to Downloads.")
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("film", nargs="?", help="v01, v02, ... (default: the newest finished film)")
     ap.add_argument("--out")
     ap.add_argument("--workers", type=int)
     ap.add_argument("--narration")
@@ -324,12 +380,16 @@ def main(argv):
     ap.add_argument("--crf", default="18")
     ap.add_argument("--only", nargs="+", metavar="CHAPTER")
     ap.add_argument("--keep-segments", action="store_true")
-    ap.add_argument("--gpu", action="store_true")
-    ap.add_argument("--gpu-recheck", action="store_true")
+    ap.add_argument("--cpu", action="store_true")
+    ap.add_argument("--recheck", action="store_true")
+    ap.add_argument("--gpu", action="store_true", help=argparse.SUPPRESS)            # (the default now)
+    ap.add_argument("--gpu-recheck", action="store_true", help=argparse.SUPPRESS)    # (old name of --recheck)
     a = ap.parse_args(argv)
     bootstrap(argv)
 
+    use_film(*choose_film(a.film))
     t0 = time.time()
+    step(f"{FILM.name.upper()} in 4K on this computer: {describe_machine()}")
     ensure_packages(REQS, "base")
     install_browser()
     ensure_gsap()
@@ -337,10 +397,8 @@ def main(argv):
     sys.path.insert(0, str(TOOLS))
     from ffbin import frames_and_fps
 
-    gpu, encoder = None, "x264"
-    if a.gpu or a.gpu_recheck:
-        choice = gpu_choice(a.gpu_recheck)
-        gpu, encoder = choice["gpu"], choice["encoder"]
+    prof = {"gpu": None, "encoder": "x264"} if a.cpu else render_profile(a.recheck or a.gpu_recheck)
+    gpu, encoder = prof["gpu"], prof["encoder"]
     seg = seg_dir(gpu, encoder)
 
     name = NAME + ("_" + "_".join(a.only) if a.only else "")
@@ -358,7 +416,7 @@ def main(argv):
             print(f"warning: only {free:.0f} GB free on the drive holding {where}; about {need:.0f} GB is needed")
 
     keep_awake()
-    how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {'NVENC' if encoder == 'nvenc' else 'x264'}"
+    how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {ENCODERS[encoder]}"
     step(f"Rendering {len(order)} scenes ({frames:,} frames, {frames / 30 / 60:.0f} min of film) at 3840x2160, "
          f"{workers} at a time, {how}. Stop any time; run the same command to resume.")
     run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,

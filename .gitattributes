@@ -1,0 +1,4 @@
+# the double-click launchers need their platform's line endings on every checkout
+*.bat      text eol=crlf
+*.command  text eol=lf
+*.sh       text eol=lf
