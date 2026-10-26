@@ -18,6 +18,8 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | `.claude/skills/srt-figure-atlas/` | The workflow: `SKILL.md`, design reference, drawing library, checker |
 | `transcripts/` | Caption files, one per video (see below) |
 | `plans/depth_pass/` | The plan for deepening every atlas to high-school maths: one review per atlas, and a README |
+| `video/` | The motion-graphics films: `vNN/` per film (script, scenes, `narration/`, `film.json`), the engine, and `tools/` |
+| `make_film.bat`, `make_film.command` | Double-click launchers that render a finished film in 4K on the user's own computers |
 
 | # | Atlas | Figures | Video |
 |---|---|---|---|
@@ -50,6 +52,20 @@ rules that most often matter:
 - Never answer a timestamp question from memory; read the transcript window first.
 - Before deepening an atlas, read `plans/depth_pass/README.md` and that atlas's review. Recompute
   every number the review gives; it is a plan, not a source.
+
+## Films
+
+Each film is `video/vNN/`, built in a cloud session (narration with `video/tools/tts.py`, scenes, 1080p previews)
+and rendered in 4K on the user's own computers (a Mac and a Windows workstation) by `video/tools/make_4k.py`, which
+the launchers at the repository root run after a `git pull`. Each computer checks its own GPU and encoder on its
+first run and keeps the result in `video/.venv`. Rendered video never goes into git (`build/` is ignored).
+
+When a film is finished, so that every computer renders it with nothing copied by hand:
+
+- export its narration into git: `python3 video/tools/narration_pack.py export video/vNN` (Opus per scene and
+  `timing.json`, about 50 MB a film; re-export whenever the narration changes, and computers decode it again);
+- set `"ready": true` in `video/vNN/film.json` (`{"title": ..., "ready": true}`), which makes it the launchers' default;
+- commit both.
 
 ## Transcripts
 
