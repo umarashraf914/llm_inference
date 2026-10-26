@@ -27,6 +27,14 @@ version), then renders it into Downloads as, for example, `V01_The_Memory_Wall_4
 terminal: `python video/tools/make_4k.py` for the same questions, `make_4k.py v01` for V01's latest version,
 `make_4k.py v01 --version 1` for a particular one, `make_4k.py --list` to see them all.
 
+**Changing a film** costs only what changed. Note the moments you want different, with the film's timestamps
+("23:41: the arrow covers the label"), as many as you like, and send the list. Each timestamp maps to its scene
+and sentence; once the changes are made you get a short changes reel to approve, holding only the changed scenes,
+each after a slate with its place in the film. Then the next version is released. On your computer the next render
+reuses every scene it rendered before that has not changed and renders only the changed ones, and the narration,
+subtitles and chapters are rebuilt to match in a couple of minutes. (Each computer keeps its rendered scenes for
+this, about 2 to 3 GB a film, and deletes those unused for 90 days.)
+
 **Each computer sets itself up** on its first run, and remembers what it found:
 
 - a private Python environment in `video/.venv` with Playwright's Chromium, numpy and a bundled ffmpeg;

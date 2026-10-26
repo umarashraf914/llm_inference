@@ -460,7 +460,8 @@ def prune_cache():
                 g.unlink(missing_ok=True)
         else:
             kept += f.stat().st_size
-    print(f"(rendered scenes kept for the next version: {kept / 1e9:.1f} GB in {CACHE})")
+    size = f"{kept / 1e9:.1f} GB" if kept >= 1e9 else f"{kept / 1e6:.0f} MB"
+    print(f"(rendered scenes kept for the next version: {size} in {CACHE})")
 
 
 def seg_dir(gpu, encoder):

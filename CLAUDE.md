@@ -68,6 +68,20 @@ and library never changes a released version. Never edit a released version; rel
 between the tools and an old snapshot working: `engine/stage.html?film=&scene=`, `window.__chapterLoaded`,
 `V.load(id, entry, opts)`, `V.seek(t)`, `V.audit()`, `timing.json`, `narration/`.
 
+Rendering is incremental: each computer keeps the scenes it has rendered under a fingerprint of everything their
+frames depend on (`video/tools/scenekeys.py`) and renders a new version's scenes only where the fingerprint changed.
+So when changing a released film:
+
+- map the user's timestamps to scenes and sentences: `python3 video/tools/where.py vNN 23:41 45:10 ...`;
+- make fixes in the scene files or the chapter's `_common.js` where possible: a change to a `lib/` file re-renders
+  every scene that uses it, and a change to the engine core (`engine/stage.html`, `engine.js`, `theme.css`, the
+  fonts, GSAP) re-renders every scene of every film, on every computer;
+- re-narrate only what changed (tts.py caches by sentence) and keep scene lengths where possible: a longer scene
+  moves every later one, and those stay reusable only while the total shift is 10 s or less;
+- review with `python3 video/tools/reel.py vNN`, which renders at 1080p, with narration, only the scenes that differ
+  from the latest version, each after a slate with its place in the film, and send the reel to the user;
+- if capture or encoding ever changes how a segment looks, bump `FORMAT` in `scenekeys.py`.
+
 To release a film (first version, or a new one after changes):
 
 - export its narration into git: `python3 video/tools/narration_pack.py export video/vNN` (Opus per scene and
