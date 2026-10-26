@@ -43,6 +43,8 @@ TOOLS = Path(__file__).resolve().parent
 VIDEO = TOOLS.parent
 FILM = NAME = PACK = None             # the film being rendered: see use_film()
 VENV = VIDEO / ".venv"
+CACHE = VIDEO / ".cache" / "segments"   # rendered scenes by fingerprint, kept across versions (tools/scenekeys.py)
+CACHE_DAYS = 90                          # a cached scene unused this long is deleted
 REQS = ["playwright==1.56.0", "numpy", "imageio-ffmpeg", "certifi"]
 TTS_REQS = ["kokoro-onnx==0.6.1"]
 GSAP_FILES = ["gsap", "DrawSVGPlugin", "MorphSVGPlugin", "MotionPathPlugin", "CustomEase"]
@@ -448,6 +450,19 @@ def render_profile(recheck):
     return prof
 
 
+def prune_cache():
+    """Delete cached scenes no render has used for CACHE_DAYS, and say how much the cache holds."""
+    old = time.time() - CACHE_DAYS * 86400
+    kept = 0
+    for f in CACHE.glob("*.mp4"):
+        if f.stat().st_mtime < old:
+            for g in (f, f.with_suffix(".json")):
+                g.unlink(missing_ok=True)
+        else:
+            kept += f.stat().st_size
+    print(f"(rendered scenes kept for the next version: {kept / 1e9:.1f} GB in {CACHE})")
+
+
 def seg_dir(gpu, encoder):
     # one folder per way of rendering, so a resumed run never mixes scenes drawn or encoded differently
     profile = f"{gpu or 'cpu'}-{encoder}"
@@ -512,7 +527,7 @@ def main(argv):
     step(f"Rendering {len(order)} scenes ({frames:,} frames, {frames / 30 / 60:.0f} min of film) at 3840x2160, "
          f"{workers} at a time, {how}. Stop any time; run the same command to resume.")
     run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,
-         "--skip-existing", "--workers", workers, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
+         "--cache", CACHE, "--workers", workers, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
         env=dict(env(), PRESET=a.preset, CRF=str(a.crf)))
 
     step(f"Assembling the film: picture, narration (two audio tracks), subtitles, chapters -> {out}")
@@ -521,13 +536,10 @@ def main(argv):
     if n != frames:
         sys.exit(f"{out} has {n} frames, expected {frames}; the 4K scene files are kept in {seg}")
     if not a.keep_segments:
-        for s in order:
-            try:
-                (seg / f"{s}.mp4").unlink(missing_ok=True)
-            except OSError:                     # (a virus scanner holding it; a leftover file does no harm)
-                pass
+        shutil.rmtree(seg, ignore_errors=True)  # links into the cache; the rendered scenes themselves stay there
         if version:
             films.discard(version["commit"])    # the version's extracted files; the next render extracts them again
+    prune_cache()
     h = (time.time() - t0) / 3600
     print(f"\nDone in {h:.1f} h: {out}  ({out.stat().st_size / 1e9:.2f} GB, 3840x2160, {n:,} frames at {fps:g} fps, {how}; "
           f"{folder.name.upper()} {what})")

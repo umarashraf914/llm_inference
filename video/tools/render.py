@@ -15,6 +15,10 @@
   # --skip-existing resumes an interrupted run (each segment is written to a .partial file, then renamed)
   python3 video/tools/render.py video/v01 video all --scale 2 --out video/v01/build/segments_4k --skip-existing
 
+  # with a cache, every scene rendered is kept under its fingerprint (tools/scenekeys.py: everything its frames depend
+  # on), and a scene whose fingerprint is already there is reused instead of rendered; --out gets links to them
+  python3 video/tools/render.py video/v01 video all --scale 2 --cache video/.cache/segments --out ...
+
   # on the graphics card: Chromium draws on the GPU (--gpu shell|full) and a hardware encoder compresses (--encoder
   # nvenc on NVIDIA cards, videotoolbox on Apple silicon). Neither is pixel-identical to the software look the audits
   # were made with; make_4k.py checks both against software on each computer before using them.
@@ -23,7 +27,7 @@
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
 Needs build/timing.json from tools/tts.py and scenes/<scene>.js (plus optional scenes/<chapter>_common.js).
 """
-import argparse, base64, json, os, subprocess, sys, time, urllib.parse
+import argparse, base64, json, os, shutil, subprocess, sys, time, urllib.parse
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -240,12 +244,12 @@ def do_audit(film, timing, ids, step):
 
 
 def render_one(args):
-    film, entry, fps, outdir, scale, gpu, encoder = args
+    film, entry, fps, out, scale, gpu, encoder = args
     st = Stage(Path(film), scale=scale, gpu=gpu)
     st.load(entry)
     n = round(entry["duration"] * fps)
-    out = Path(outdir) / f"{entry['id']}.mp4"
-    part = out.with_name(f"{entry['id']}.partial.mp4")       # renamed only once complete, so a resume never trusts half a file
+    out = Path(out)
+    part = out.with_name(f"{out.stem}.partial.mp4")      # renamed only once complete, so a resume never trusts half a file
     enc = subprocess.Popen([ffmpeg(), "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(fps), "-i", "-",
                             *encoder_args(encoder, scale), "-r", str(fps), "-g", str(fps * 4), "-video_track_timescale", str(fps * 1000), str(part)], stdin=subprocess.PIPE)
     t0 = time.time()
@@ -267,21 +271,67 @@ def render_one(args):
     return entry["id"], n, time.time() - t0
 
 
-def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existing=False, gpu=None, encoder="x264"):
+def render_settings(scale, fps, gpu, encoder):
+    """What, besides a scene's own inputs, decides how its segment looks (part of its fingerprint)."""
+    from importlib.metadata import version
+    return {"scale": scale, "fps": fps, "gpu": gpu, "encoder": encoder_args(encoder, scale),
+            "browser": f"playwright {version('playwright')}"}
+
+
+def place(src, dst):
+    """dst becomes src: a hard link (no copy, no space), or a copy where links are not possible."""
+    dst.unlink(missing_ok=True)
+    try:
+        os.link(src, dst)
+    except OSError:
+        shutil.copy2(src, dst)
+
+
+def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existing=False, gpu=None, encoder="x264",
+             cache=None):
     outdir = Path(outdir) if outdir else film / "build" / "segments"
     outdir.mkdir(parents=True, exist_ok=True)
-    todo = [s for s in ids if not (skip_existing and (outdir / f"{s}.mp4").exists())]
-    if not todo:
-        print(f"all {len(ids)} scenes are already rendered in {outdir}", flush=True)
-        return
-    if len(todo) < len(ids):
-        print(f"{len(ids) - len(todo)} of {len(ids)} scenes already rendered in {outdir}; rendering the other {len(todo)}", flush=True)
-    jobs = sorted([(str(film), timing["scenes"][s], fps, str(outdir), scale, gpu, encoder) for s in todo],
+    if cache:
+        import scenekeys
+        cache = Path(cache)
+        cache.mkdir(parents=True, exist_ok=True)
+        keys = scenekeys.scene_keys(film, timing, render_settings(scale, fps, gpu, encoder), ids)
+        target = {s: cache / f"{keys[s]}.mp4" for s in ids}
+
+        def fresh(s):
+            meta = target[s].with_suffix(".json")
+            return (target[s].exists() and meta.exists() and abs(json.loads(meta.read_text())["globalStart"]
+                    - timing["scenes"][s].get("globalStart", 0)) <= scenekeys.AMBIENT_SLACK)
+        todo = [s for s in ids if not fresh(s)]
+        if len(todo) < len(ids):
+            print(f"{len(ids) - len(todo)} of {len(ids)} scenes are unchanged since an earlier render and are reused"
+                  + (f"; rendering the other {len(todo)}" if todo else ""), flush=True)
+    else:
+        target = {s: outdir / f"{s}.mp4" for s in ids}
+        todo = [s for s in ids if not (skip_existing and target[s].exists())]
+        if len(todo) < len(ids):
+            print(f"{len(ids) - len(todo)} of {len(ids)} scenes already rendered in {outdir}"
+                  + (f"; rendering the other {len(todo)}" if todo else ""), flush=True)
+    def done(s):                                # a scene is in the cache the moment it is rendered (resumable)
+        if cache:
+            target[s].with_suffix(".json").write_text(json.dumps(
+                {"scene": s, "film": film.name, "globalStart": timing["scenes"][s].get("globalStart", 0)}))
+    if todo:
+        render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done)
+    if cache:
+        for s in ids:
+            os.utime(target[s])                 # last used, for pruning
+            place(target[s], outdir / f"{s}.mp4")
+
+
+def render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done=lambda s: None):
+    jobs = sorted([(str(film), timing["scenes"][s], fps, str(target[s]), scale, gpu, encoder) for s in todo],
                   key=lambda j: -j[1]["duration"])
     total = sum(round(j[1]["duration"] * fps) for j in jobs)
     t0, frames = time.time(), 0
     with Pool(workers) as pool:
         for k, (sid, n, dt) in enumerate(pool.imap_unordered(render_one, jobs), 1):
+            done(sid)
             frames += n
             el = time.time() - t0
             eta = el / frames * (total - frames)
@@ -306,6 +356,7 @@ def main():
     ap.add_argument("--skip-existing", action="store_true", help="leave segments already in the folder alone (resume)")
     ap.add_argument("--gpu", choices=["shell", "full"], help="draw on the graphics card (see launch_options)")
     ap.add_argument("--encoder", choices=["x264", "nvenc", "videotoolbox"], default="x264")
+    ap.add_argument("--cache", help="keep and reuse rendered scenes here, by fingerprint (see tools/scenekeys.py)")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     # keep the icon bundle in step with the scene files (cheap, and self-heals concurrent edits)
@@ -319,7 +370,7 @@ def main():
     elif a.mode == "audit":
         sys.exit(1 if do_audit(film, timing, ids, a.step) else 0)
     else:
-        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing, a.gpu, a.encoder)
+        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing, a.gpu, a.encoder, a.cache)
 
 
 if __name__ == "__main__":
