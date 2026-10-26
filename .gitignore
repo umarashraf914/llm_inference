@@ -3,5 +3,6 @@ __pycache__/
 video/node_modules/
 video/engine/vendor/
 video/*/build/
+video/.venv/
 figures/*/.order.lock
 figures/*/order.tmp

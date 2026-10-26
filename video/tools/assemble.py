@@ -2,6 +2,7 @@
 """Join rendered scene segments and narration into the finished film, with subtitles and chapters.
 
   python3 video/tools/assemble.py video/v01 --name V01_The_Memory_Wall
+  python3 video/tools/assemble.py video/v01 --name V01_The_Memory_Wall_4K --segments video/v01/build/segments_4k --out ~/Downloads/V01_The_Memory_Wall_4K.mp4
 
 Needs build/timing.json (tools/tts.py), build/audio/*.wav and build/segments/*.mp4 (tools/render.py).
 Writes build/<name>.mp4 (H.264 + AAC, soft English subtitles, chapter markers) and build/<name>.srt.
@@ -11,15 +12,9 @@ from pathlib import Path
 
 import numpy as np
 
+from ffbin import ffmpeg, frames_and_fps
+
 SR = 24000
-
-
-def ffprobe_frames(path):
-    out = subprocess.run(["ffprobe", "-v", "error", "-count_packets", "-select_streams", "v:0", "-show_entries",
-                          "stream=nb_read_packets,r_frame_rate", "-of", "json", str(path)], capture_output=True, text=True, check=True)
-    s = json.loads(out.stdout)["streams"][0]
-    num, den = map(int, s["r_frame_rate"].split("/"))
-    return int(s["nb_read_packets"]), num / den
 
 
 def srt_time(t):
@@ -62,9 +57,12 @@ def main():
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--no-music", action="store_true", help="narration only, no ambient bed track")
     ap.add_argument("--only", nargs="+", help="assemble just these chapters (e.g. ch01), each with its title card")
+    ap.add_argument("--segments", help="folder of rendered segments (default build/segments)")
+    ap.add_argument("--out", help="where to write the film (default build/<name>.mp4)")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     build = film / "build"
+    segdir = Path(a.segments).expanduser().resolve() if a.segments else build / "segments"
     timing = json.loads((build / "timing.json").read_text())
     order = timing["order"]
     if a.only:
@@ -77,21 +75,19 @@ def main():
         if timing["scenes"][order[0]]["kind"] == "title":
             timing["scenes"][order[0]] = dict(timing["scenes"][order[0]], chapter=dict(timing["scenes"][order[0]]["chapter"]))
 
-    # 1. video: check every segment, then concatenate without re-encoding
+    # 1. video: check every segment; the final mux concatenates them without re-encoding
     lst = build / "concat.txt"
-    lines, t = [], 0.0
+    lines = []
     for sid in order:
-        seg = build / "segments" / f"{sid}.mp4"
+        seg = segdir / f"{sid}.mp4"
         if not seg.exists():
             sys.exit(f"missing segment {seg}")
-        n, fps = ffprobe_frames(seg)
+        n, fps = frames_and_fps(seg)
         want = round(timing["scenes"][sid]["duration"] * fps)
         if n != want:
             sys.exit(f"{sid}: {n} frames, expected {want}")
-        lines.append(f"file '{seg}'")
+        lines.append("file '" + seg.as_posix().replace("'", "'\\''") + "'")
     lst.write_text("\n".join(lines) + "\n")
-    video = build / "video_only.mp4"
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(video)], check=True)
 
     # 2. narration: scene wavs in order, silence under title cards
     narr = build / "narration.wav"
@@ -132,9 +128,10 @@ def main():
 
     # 4. final mux: video copied; track 1 = narration (normalised to -16 LUFS) over a quiet ducked ambient bed,
     #    track 2 = narration only; soft subtitles; chapters
-    final = build / f"{a.name}.mp4"
+    final = Path(a.out).expanduser().resolve() if a.out else build / f"{a.name}.mp4"
+    final.parent.mkdir(parents=True, exist_ok=True)
     music = build / ("music.wav" if not a.only else "music_cut.wav")
-    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(video), "-i", str(narr), "-i", str(srt), "-i", str(metaf)]
+    cmd = [ffmpeg(), "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", str(narr), "-i", str(srt), "-i", str(metaf)]
     if not a.no_music:
         if not music.exists():
             subprocess.run([sys.executable, str(Path(__file__).with_name("music.py")), str(music), "--seconds", str(timing["total"] + 1)], check=True)
@@ -150,7 +147,9 @@ def main():
         cmd += ["-filter_complex", "[1:a]highpass=f=60,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[n]", "-map", "0:v", "-map", "[n]", "-map", "2:s",
                 "-metadata:s:a:0", "language=eng"]
     cmd += ["-map_metadata", "3", "-map_chapters", "3", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
-            "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-movflags", "+faststart", "-shortest", str(final)]
+            "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-movflags", "+faststart", str(final)]
+    # (no -shortest: it counts the subtitle track, which ends at the last word, and so cut the film's final second;
+    #  amix duration=first already ends the mixed track with the narration, which is exactly as long as the picture)
     subprocess.run(cmd, check=True)
     size = final.stat().st_size / 1e6
     print(f"{final}  {timing['total']/60:.1f} min  {size:.0f} MB  {len(cues)} subtitle cues  {len(starts)} chapters")

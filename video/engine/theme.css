@@ -1,3 +1,5 @@
+@import url('fonts/fonts.css');   /* the bundled fonts (tools/build_fonts.py), so every machine sets text alike */
+
 /* House style for the motion-graphic films. Colour carries meaning:
    amber = arithmetic (cheap), coral = bytes (expensive), teal = what helps, blue = structure. */
 :root {

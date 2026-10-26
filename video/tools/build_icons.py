@@ -91,6 +91,9 @@ def main(argv):
             for h in search(t):
                 print(h)
         return 0
+    if not NM.is_dir():
+        print(f"no {NM.name}/ (run npm install): keeping the committed {OUT.name}")
+        return 0
     ids = set()
     for f in list(VIDEO.glob("*/scenes/*.js")) + list(VIDEO.glob("lib/*.js")) + [VIDEO / "engine" / "engine.js"]:
         ids |= set(ID_RE.findall(f.read_text()))
