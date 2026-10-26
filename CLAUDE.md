@@ -57,15 +57,24 @@ rules that most often matter:
 
 Each film is `video/vNN/`, built in a cloud session (narration with `video/tools/tts.py`, scenes, 1080p previews)
 and rendered in 4K on the user's own computers (a Mac and a Windows workstation) by `video/tools/make_4k.py`, which
-the launchers at the repository root run after a `git pull`. Each computer checks its own GPU and encoder on its
-first run and keeps the result in `video/.venv`. Rendered video never goes into git (`build/` is ignored).
+the launchers at the repository root run after a `git pull`. The user picks a film and a version from its menu.
+Each computer checks its own GPU and encoder on its first run and keeps the result in `video/.venv`. Rendered video
+never goes into git (`build/` is ignored).
 
-When a film is finished, so that every computer renders it with nothing copied by hand:
+Films keep every version. `video/vNN/film.json` holds the title, the source (lecture, length, YouTube id, atlas,
+transcript) and the versions, each a commit: make_4k renders a version from the repository as it was at that
+commit (`git archive` into `video/.versions/`), with today's tools, so work on another film or on the shared engine
+and library never changes a released version. Never edit a released version; release a new one. Keep the contract
+between the tools and an old snapshot working: `engine/stage.html?film=&scene=`, `window.__chapterLoaded`,
+`V.load(id, entry, opts)`, `V.seek(t)`, `V.audit()`, `timing.json`, `narration/`.
+
+To release a film (first version, or a new one after changes):
 
 - export its narration into git: `python3 video/tools/narration_pack.py export video/vNN` (Opus per scene and
-  `timing.json`, about 50 MB a film; re-export whenever the narration changes, and computers decode it again);
-- set `"ready": true` in `video/vNN/film.json` (`{"title": ..., "ready": true}`), which makes it the launchers' default;
-- commit both.
+  `timing.json`, about 50 MB a film; re-export whenever the narration changes);
+- commit everything the film renders from, then `python3 video/tools/release.py vNN "what this version is"`, which
+  checks the film is complete and committed and adds the version (that commit) to `film.json`;
+- commit `film.json` and push.
 
 ## Transcripts
 

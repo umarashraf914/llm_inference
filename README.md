@@ -14,13 +14,18 @@ version of the same brief, usable with any model, is in
 
 ## The films, in 4K on any of your computers
 
-`video/` holds the motion-graphics films as code (a GSAP scene per shot, rendered by headless Chromium);
-`video/v01/` is *The Memory Wall*, and each later film gets its own `video/vNN/`. Any computer with Python and
-this repository renders them at 3840x2160 and saves one file to its Downloads folder. Nothing is uploaded.
+`video/` holds the motion-graphics films as code (a GSAP scene per shot, rendered by headless Chromium). Each
+film has its own folder, `video/v01/` for lecture 1 and so on, so making one film never touches another, and
+each keeps every version it has been released in: `video/vNN/film.json` lists them with their dates and notes,
+beside the lecture, atlas and transcript the film was made from. A version renders from exactly the files it
+was released with, the shared engine included, so later work can never change it; changing a film means
+releasing a new version, and the old ones stay renderable.
 
-**To render**, double-click `make_film.bat` (Windows) or `make_film.command` (Mac) at the top of the
-repository. It updates from GitHub, then renders the newest finished film, asking which one if several are
-ready. From a terminal it is `python video/tools/make_4k.py [v01]` (Windows: `py video\tools\make_4k.py`).
+**To render**, double-click `make_film.bat` (Windows) or `make_film.command` (Mac) at the top of the repository.
+It updates from GitHub and asks which film and which version (press Enter for the newest film's latest
+version), then renders it into Downloads as, for example, `V01_The_Memory_Wall_4K_version1.mp4`. From a
+terminal: `python video/tools/make_4k.py` for the same questions, `make_4k.py v01` for V01's latest version,
+`make_4k.py v01 --version 1` for a particular one, `make_4k.py --list` to see them all.
 
 **Each computer sets itself up** on its first run, and remembers what it found:
 
