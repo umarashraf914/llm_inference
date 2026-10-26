@@ -128,7 +128,7 @@ V.scene('ch14_s04', S => {
     S.text(`layer ${l + 1}`, { x: 760, y, size: 30, weight: 750, color: 'ink' }, g);
     S.rect({ x: BX, y: y - 16, w: BW, h: 32, r: 6, stroke: '#ffffff', strokeOpacity: 0.1, sw: 1.5, dash: '5 6' }, g);
     rise(g, tTab + 0.3 + 0.08 * l, 10, 0.35);
-    const ro = S.text('', { x: 880, y, size: 32, weight: 700, family: 'mono', color: l ? 'ink' : 'helps' }, g);
+    const ro = S.text('', { x: 896, y, size: 32, weight: 700, family: 'mono', color: l ? 'ink' : 'helps' }, g);
     const bar = S.rect({ x: BX, y: y - 16, w: 0, h: 32, r: 6, fill: VIOLET }, g);
     const st = S.text(l ? 'different' : 'identical', { x: 1676, y, size: 28, weight: 750, color: l ? 'ink' : 'helps' }, g);
     hide(st);

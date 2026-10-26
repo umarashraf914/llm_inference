@@ -109,9 +109,9 @@ V.scene('ch08_s05', S => {
   const cnt = S.text('looks at: 0', { x: 1830, y: 600, size: 30, weight: 700, family: 'mono', anchor: 'end', color: 'compute' });
   ch08Hide(cnt);
   fade(cnt, 0, 1, tFan, 0.3);
-  const outTag = S.text('out of reach', { x: SX(1.5), y: SY + 146, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
+  const outTag = S.text('out of reach', { x: SX(1.5), y: SY + 206, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
   ch08Hide(outTag);
-  fade(outTag, 0, 1, ta[20] + 0.5, 0.4);
+  fade(outTag, 0, 1, ta[20] + 0.8, 0.4);
   const paint = t => {
     const n = nAt(t), w = Math.max(0, n - WIN);
     // the window slides a slot as each pill pushes in
@@ -122,10 +122,11 @@ V.scene('ch08_s05', S => {
     winLbl.setAttribute('x', (winX + 6).toFixed(1)); winSub.setAttribute('x', (winX + 6).toFixed(1));
     pills.forEach((g, i) => {
       const a = cl((t - ta[i]) / 0.25);
-      const drop = i < WIN - 0 + 4 && ta[i + WIN] !== undefined ? E('power2.in')(cl((t - ta[i + WIN]) / 0.45)) : 0;
+      // the oldest drops once the window (and its labels) has slid past it
+      const drop = i < WIN - 0 + 4 && ta[i + WIN] !== undefined ? E('power2.in')(cl((t - ta[i + WIN] - 0.3) / 0.45)) : 0;
       g.style.opacity = (a * (1 - 0.55 * drop)).toFixed(3);
       g.style.visibility = a > 0 ? 'inherit' : 'hidden';
-      g.setAttribute('transform', `translate(${(14 * (1 - a)).toFixed(1)},${(90 * drop).toFixed(1)})`);
+      g.setAttribute('transform', `translate(${(14 * (1 - a)).toFixed(1)},${(150 * drop).toFixed(1)})`);   // below the window's labels
       g.bg.setAttribute('stroke', drop > 0.5 ? S.tone('muted') : S.tone('struct'));
     });
     const nw = Math.max(0, n - 1);

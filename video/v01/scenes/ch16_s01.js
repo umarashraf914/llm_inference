@@ -9,14 +9,14 @@
        they glide into the HBM (warm: still resident); grey blocks push them out (cold: evicted).
    b4  the database with the text; the dashed outlines vanish; prefill rebuilds six blocks from the text.
    b5  everything dims; 'a vague sense of readiness' struck; 'how many arriving tokens are already held here?'
-   Layout: bars x 380-1780, y 250 / 430 (h 40), row labels x 70; plate y 342; after the tilt the upper tier is
+   Layout: bars x 396-1796, y 250 / 430 (h 40), row labels x 70; plate y 342; after the tilt the upper tier is
    scaled 0.8 about (960, 100). Lower tier: blocks row y 560, database (300, 720), gear (760, 720), package
    x 1196-1784, y 560-880 with two HBM stacks of 2 × 5 slots. */
 V.scene('ch16_s01', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
   const rise = (e, at, dy = 12, d = 0.4) => { hide(e); S.add(K.drive(d, k => { setO(e, k); e.setAttribute('transform', `translate(0,${(dy * (1 - E('power3.out')(k))).toFixed(1)})`); }), at); };
-  const BX = 380, BW = 1400, BH = 40, Y1 = 250, Y2 = 430, U = BW / 1032;
+  const BX = 396, BW = 1400, BH = 40, Y1 = 250, Y2 = 430, U = BW / 1032;
   const fmt = n => Math.round(n).toLocaleString('en-US');
 
   // ================================================================ b1: warm is a count

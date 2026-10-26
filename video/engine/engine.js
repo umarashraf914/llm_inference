@@ -1213,14 +1213,14 @@
           // a disc: the true gap from its rim to the nearest point of the label
           const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
           const gap = Math.hypot(Math.max(a.left, Math.min(cx, a.right)) - cx, Math.max(a.top, Math.min(cy, a.bottom)) - cy) - r.width / 2;
-          if (gap > -3 && gap < 4) {
+          if (gap > -3 && gap < (o.touchGap ?? 4)) {
             issues.push({ kind: 'text-touches-box', text: v.label, shape: 'circle' });
             break;
           }
         }
         if (v.label.length > 2 && s.tagName === 'rect' && Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top) >= 0.5 * a.height) {
           const gR = r.left - a.right, gL = a.left - r.right;
-          if ((gR > -3 && gR < 4) || (gL > -3 && gL < 4)) {
+          if ((gR > -3 && gR < (o.touchGap ?? 4)) || (gL > -3 && gL < (o.touchGap ?? 4))) {
             issues.push({ kind: 'text-touches-box', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
             break;
           }
@@ -1248,7 +1248,7 @@
       if (ix > 2 && iy > 2 && frac > 0.12) { issues.push({ kind: 'overlap', a: vis[i].label, b: vis[j].label, frac: +frac.toFixed(2) }); continue; }
       // two labels on one line that meet or just overlap end to end ('Feed-Forward 1Feed-Forward 2'); punctuation,
       // short marks and word pieces (a lower-case start) may
-      if (ix > -3 && iy > 0.5 * Math.min(a.height, b.height) && vis[i].label.length > 2 && vis[j].label.length > 2) {
+      if (ix > -(o.touchGap ?? 3) && iy > 0.5 * Math.min(a.height, b.height) && vis[i].label.length > 2 && vis[j].label.length > 2) {
         const [l, r] = a.left < b.left ? [vis[i].label, vis[j].label] : [vis[j].label, vis[i].label];
         if (!/^[,.;:!?)%’'”·×÷=+−\-\p{Ll}]/u.test(r) && !/[(‘'“$]$/.test(l)) issues.push({ kind: 'text-touch', a: l, b: r });
       }

@@ -89,7 +89,7 @@ V.scene('ch14_s02', S => {
   S.circle({ x: 1084, y: 560, r: 21, fill: CH14.BASE, stroke: 'ink', sw: 2 }, rot);
   S.icon('ph:arrows-clockwise-bold', { x: 1084, y: 560, size: 26, color: 'ink' }, rot);
   K.track(rot, [K.K(tPos, { s: 1.8, o: 0 }), K.K(tPos + 0.3, { s: 1, o: 1, e: 'power4.in' })], 1084, 560);
-  const posL = S.text('position 5', { x: 1084, y: 606, size: 24, weight: 650, anchor: 'middle', color: 'muted' }, pipe);
+  const posL = S.text('position 5', { x: 1092, y: 608, size: 22, weight: 650, anchor: 'middle', color: 'muted' }, pipe);   // clear of the W_K tile
   hide(posL);
   fade(posL, 0, 1, tPos + 0.3, 0.3);
   const key = ch14Bar(S, { x: 1262, y: 560, n: 8, cw: 24, ch: 46, seed: 11, label: 'key', labelGap: 40 }, pipe);

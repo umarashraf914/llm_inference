@@ -93,7 +93,7 @@ V.scene('ch08_s03', S => {
     const g = S.g();
     S.icon(icon, { x: OX[i] - S.measure(r, { size: 32, weight: 700 }) / 2 - 22, y: BASE + 40, size: 30, color: 'struct' }, g);
     S.text(r, { x: OX[i] + 6, y: BASE + 41, size: 32, weight: 700, anchor: 'middle', color: 'ink' }, g);
-    S.text(sub, { x: OX[i], y: BASE + 80, size: 24, weight: 550, anchor: 'middle', color: 'muted' }, g);
+    S.text(sub, { x: OX[i], y: BASE + 80, size: 22, weight: 550, anchor: 'middle', color: 'muted' }, g);   // 22: the three subtitles keep apart
     ch08Hide(g);
     return g;
   });

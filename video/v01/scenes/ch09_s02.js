@@ -169,7 +169,7 @@ V.scene('ch09_s02', S => {
   fade(el, 0, 1, tSits + 0.3, 0.6);
   const dim = S.g(null, el);
   S.path({ d: `M${STX + STW + 4},580 H${DX - 4} M${STX + STW + 14},572 L${STX + STW + 4},580 L${STX + STW + 14},588 M${DX - 14},572 L${DX - 4},580 L${DX - 14},588`, stroke: 'ink', sw: 2 }, dim);
-  S.text('millimetres', { x: (STX + STW + DX) / 2, y: 552, size: 24, weight: 650, anchor: 'middle', color: 'ink' }, dim);
+  S.text('millimetres', { x: (STX + STW + DX) / 2, y: 552, size: 21, weight: 650, anchor: 'middle', color: 'ink' }, dim);   // 21: clear of the stack
   hide(dim);
   fade(dim, 0, 1, T('b3~millimetres') - 0.1, 0.4);
   // the fan: 48 hair-thin wires stand for 5,120; recomputed each frame so the stack can be dragged in b4

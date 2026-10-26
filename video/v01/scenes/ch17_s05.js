@@ -10,8 +10,8 @@
    b3  a push in on the bin; 1,000 tokens/s × 70% in time = 700 tokens/s, the goodput bar at 70%, 300 grey
        tokens in the bin.
    b4  'Goodput' large in teal at the centre, 'Throughput' small and grey above it; a crowd and a test bench.
-   Layout: GPU (200, 560); pipe y 560 from x 290; gate x 760 (stopwatch above, bin below at y 700); bars x 440-1180
-   at y 200 (throughput) and 300 (goodput), counters at x 1200; targets card x 1480-1860, y 196; crowd y 930. */
+   Layout: GPU (200, 560); pipe y 560 from x 290; gate x 760 (stopwatch above, bin below at y 700); bars x 440-1120
+   at y 200 (throughput) and 300 (goodput), counters at x 1140; targets card x 1480-1860, y 196; crowd y 930. */
 V.scene('ch17_s05', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1;
@@ -54,7 +54,7 @@ V.scene('ch17_s05', S => {
   fade(pile, 0, 1, tArr, 0.5);
 
   // ================================================================ the two bars, their counters, the targets card
-  const BX = 440, BW = 740;
+  const BX = 440, BW = 680;   // the counters end by x 1410 even at '22,000 tokens/s', clear of the targets card
   const thL = S.text('Throughput · all tokens per second', { x: BX, y: 164, size: 26, weight: 750, color: 'struct' }, W);
   const thB = S.rect({ x: BX, y: 182, w: 0, h: 36, r: 8, fill: 'url(#card-struct)', stroke: 'struct', sw: 2.5 }, W);
   const thG = S.rect({ x: BX - 10, y: 172, w: BW + 20, h: 56, r: 16, fill: 'url(#pglow-struct)', opacity: 0 }, W);
