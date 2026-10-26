@@ -166,7 +166,7 @@ V.scene('ch10_s07', S => {
   const rowEls = ROWS.map(([lab, gb, val, cue], i) => {
     const g = S.g();
     const t0 = T(cue) - 0.1 + (i === 2 ? -0.5 : 0);
-    S.text(lab, { x: 160, y: RY[i], size: 26, weight: 700, color: 'struct' }, g);
+    S.text(lab, { x: 160, y: RY[i], size: 24, weight: 700, color: 'struct' }, g);
     const bar = S.rect({ x: BX, y: RY[i] - RH / 2, w: 0, h: RH, r: 4, fill: 'url(#solid-bytes)' }, g);
     const w = Math.max(1.5, BW * gb / 140);
     whole(t => bar.setAttribute('width', (w * EIO(cl((t - t0 - 0.1) / 0.6))).toFixed(2)));
@@ -179,7 +179,7 @@ V.scene('ch10_s07', S => {
   });
   // the identical read on every row, and the ÷ 10 steps
   const tNev = T('b5~never') - 0.1;
-  const chips = RY.map(y => { const c = S.pill('140 GB', { x: 390, y, tone: 'bytes', size: 20, h: 34, mono: true }); hide(c); return c; });
+  const chips = RY.map(y => { const c = S.pill('140 GB', { x: 396, y, tone: 'bytes', size: 20, h: 34, mono: true }); hide(c); return c; });   // clear of '2,000 tokens'
   fade(chips, 0, 1, tNev, 0.3, 0.08);
   const div10 = [[0, 1], [2, 3]].map(([a, b]) => {
     const g = S.g();

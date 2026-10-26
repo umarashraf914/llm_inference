@@ -155,7 +155,7 @@ V.scene('ch13_s05', S => {
     glow.setAttribute('data-audit', 'ignore');
     panel.insertBefore(glow, on);
     const tx = S.g(null, panel);
-    txt.forEach((line, j) => S.text(line, { x: x + 125, y: 290 + 30 * j, size: 24, weight: 700, anchor: 'middle', color: tone }, tx));
+    V.caseLines(txt).forEach((line, j) => S.text(line, { x: x + 125, y: 290 + 30 * j, size: 24, weight: 700, anchor: 'middle', color: tone, case: 'keep' }, tx));   // one phrase over two lines
     return { on, glow, tx };
   });
   S.path({ d: 'M1266,304 H1294 M1286,297 L1295,304 L1286,311 M1561,304 H1589 M1581,297 L1590,304 L1581,311', stroke: 'muted', sw: 2.5 }, panel);

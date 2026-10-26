@@ -50,7 +50,7 @@
   const MINOR = new Set('a an the and as but for if nor or yet at by in of on per to via vs vs.'.split(' '));
   // a joining word that ends a phrase is a particle and takes a capital ('read the prompt in', 'always on'); not
   // 'of' or 'the': a label set on two lines can end its first line with those
-  const PARTICLE = new Set('in on to for at by via'.split(' '));
+  const PARTICLE = new Set('in on to for at by via yet'.split(' '));
   const UNIT = new Set(('ms ns µs μs ps s min hr h kb mb gb tb kib mib gib tib kbps mbps gbps flop flops tok toks '
     + 'hz khz mhz ghz w kw mw nm mm cm km px pt fps rpm etc').split(' '));
   const BREAK = /[:;!?.—–·→←|=]$/;          // a word after one of these starts a new phrase
@@ -93,6 +93,13 @@
       return y;
     }).join('');
     return out.length === s.length ? out : s;
+  }
+
+  /** lines that make one phrase: cased as one text, split where they were ('Nothing Else About' / 'the Architecture') */
+  function caseLines(lines, o = {}) {
+    const words = caseText(lines.join(' '), o).split(' ');
+    let k = 0;
+    return lines.map(l => { const n = l.trim().split(/\s+/).length, s = words.slice(k, k + n).join(' '); k += n; return s; });
   }
 
   function hexA(hex, a) {
@@ -1194,6 +1201,14 @@
         }
       }
       for (const { s, r } of shapes) {
+        // a label set flush against a box beside it (a chip or bar after a word) reads as one blob
+        if (v.label.length > 2 && s.tagName === 'rect' && Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top) >= 0.5 * a.height) {
+          const gR = r.left - a.right, gL = a.left - r.right;
+          if ((gR > -3 && gR < 4) || (gL > -3 && gL < 4)) {
+            issues.push({ kind: 'text-touches-box', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
+            break;
+          }
+        }
         const ix = Math.min(core.right, r.right) - Math.max(core.left, r.left);
         const iy = Math.min(core.bottom, r.bottom) - Math.max(core.top, r.top);
         if (ix <= 1 || iy <= 1) continue;
@@ -1213,6 +1228,11 @@
       const a = vis[i].ink, b = vis[j].ink;            // the glyphs themselves, not their line boxes
       const ix = Math.min(a.right, b.right) - Math.max(a.left, b.left);
       const iy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+      // two labels on one line that meet end to end ('Feed-Forward 1Feed-Forward 2'); punctuation and short marks may
+      if (ix > -3 && ix <= 2 && iy > 0.5 * Math.min(a.height, b.height) && vis[i].label.length > 2 && vis[j].label.length > 2) {
+        const [l, r] = a.left < b.left ? [vis[i].label, vis[j].label] : [vis[j].label, vis[i].label];
+        if (!/^[,.;:!?)%’'”·×÷=+−\-\p{Ll}]/u.test(r) && !/[(‘'“$]$/.test(l)) issues.push({ kind: 'text-touch', a: l, b: r });   // lower case: a word piece
+      }
       if (ix <= 2 || iy <= 2) continue;
       const area = ix * iy, small = Math.min(a.width * a.height, b.width * b.height);
       if (area / small > 0.12) issues.push({ kind: 'overlap', a: vis[i].label, b: vis[j].label, frac: +(area / small).toFixed(2) });
@@ -1222,7 +1242,7 @@
 
   // ================================================================ public api
   const V = {
-    W, H, SAFE, TONE, fmt, scene, scenes, color, hexA, measure, rand, caseText, familyCss, TYPE,
+    W, H, SAFE, TONE, fmt, scene, scenes, color, hexA, measure, rand, caseText, caseLines, familyCss, TYPE,
     async load(id, timing, opts = {}) {
       await document.fonts.ready;
       const film = document.getElementById('film');

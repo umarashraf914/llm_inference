@@ -72,7 +72,7 @@ function ch12Ceiling(S, o = {}, parent) {
     return t;
   };
   const T = g.terms = {
-    rate: term('rate', 400, 'max tokens per second', 'struct'),
+    rate: term('rate', 380, 'max tokens per second', 'struct'),   // clear of the '=' even when the terms swell
     eq: term('eq', 640, '=', 'ink'),
     bw: term('bw', 790, 'bandwidth', 'bytes', '3.35 TB/s'),
     div: term('div', 930, '÷', 'ink'),
@@ -107,7 +107,7 @@ function ch12Ceiling(S, o = {}, parent) {
     return c;
   });
   // a soft white halo behind the equation, for .glow()
-  g.halo = S.rect({ x: 170, y: y - 46, w: 1490, h: 92, r: 46, fill: '#ffffff', fillOpacity: 0.10, filter: 'url(#soft)' }, g);
+  g.halo = S.rect({ x: 145, y: y - 46, w: 1515, h: 92, r: 46, fill: '#ffffff', fillOpacity: 0.10, filter: 'url(#soft)' }, g);
   g.insertBefore(g.halo, g.firstChild);
   g.halo.setAttribute('data-audit', 'ignore');
   hide(g.halo);

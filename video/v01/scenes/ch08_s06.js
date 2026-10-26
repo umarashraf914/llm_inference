@@ -150,7 +150,7 @@ V.scene('ch08_s06', S => {
   const mul = S.g();
   const mulN = S.text('0', { x: 1760, y: 560, size: 64, weight: 750, family: 'mono', anchor: 'middle', color: 'compute' }, mul);
   S.text('multiplies', { x: 1760, y: 620, size: 26, weight: 600, anchor: 'middle', color: 'compute' }, mul);
-  S.text('per token', { x: 1760, y: 654, size: 26, weight: 600, anchor: 'middle', color: 'compute' }, mul);
+  S.text('per Token', { x: 1760, y: 654, size: 26, weight: 600, anchor: 'middle', color: 'compute', case: 'keep' }, mul);   // continues 'Multiplies'
   ch08Hide(mul);
   fade(mul, 0, 1, tClimb, 0.35);
   clock(tClimb, tClimbE + 0.4, t => {

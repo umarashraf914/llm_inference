@@ -37,8 +37,8 @@ V.scene('ch06_s07', S => {
   const barR = S.line({ x1: 960 + 54, y1: FY, x2: 960 + 150, y2: FY, stroke: 'ink', sw: 4 }, frac);
   const bar = [barL, barR];
   const perG = S.g(null, frac);
-  S.rect({ x: 960 - 46, y: FY - 22, w: 92, h: 44, r: 12, fill: '#0b1124' }, perG);
-  S.text('per', { x: 960, y: FY + 1, size: 34, weight: 650, anchor: 'middle', color: 'bytes', italic: true }, perG);
+  S.rect({ x: 960 - 46, y: FY - 24, w: 92, h: 48, r: 12, fill: '#0b1124' }, perG);
+  S.text('per', { x: 960, y: FY - 1, size: 34, weight: 650, anchor: 'middle', color: 'bytes', italic: true, case: 'keep' }, perG);   // the operator on the bar: lowercase
   [bBytes, bSec, perG].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
   S.add(fx.in(bBytes, { from: 'down', d: 0.5, dist: 16 }), 'b1~bytes-0.15');
   S.add(fx.draw(bar, { d: 0.4 }), 'b1~bytes');

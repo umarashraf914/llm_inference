@@ -80,7 +80,10 @@ single-letter quantities as written. Text that is data rather than a label must 
 tokens, example sentences, chat messages, quoted answers, code. Draw it with `case: 'keep'` (and
 measure it with the same option); `libToken`, the chat window and mono text already do. A `libToken`
 chip that names something ('your question') takes `case: 'label'`. Counters and typing effects are cased
-like the text they write into, so a scene never capitalises a string itself.
+like the text they write into, so a scene never capitalises a string itself. A phrase broken over lines of
+the same style is still one phrase: draw `V.caseLines(['nothing else about', 'the architecture'])` with
+`case: 'keep'` ('Nothing Else About' / 'the Architecture'), or use `S.para`. A second line in a smaller or
+muted style is a caption of its own and starts with a capital.
 
 **Components**
 - `S.heading(title,{y,size,sub})` → `.titleEl .subEl` — scene title band (y≈130–160).

@@ -86,7 +86,7 @@ V.scene('ch08_s09', S => {
   const row = (name, val, y) => {
     const g = S.g(null, card);
     if (name.length === 1) ch08W(S, name, { x: NX, y, size: 34, anchor: 'start' }, g);
-    else S.text(name, { x: NX, y, size: 26, weight: 650, color: 'ink' }, g);
+    else S.text(name, { x: NX, y, size: 24, weight: 650, color: 'ink' }, g);   // 24: 'feed-forward, per layer' clears its value
     g.val = S.text(val, { x: VX, y, size: 30, weight: 650, family: 'mono', anchor: 'end', color: 'compute' }, g);
     ch08Hide(g);
     return g;

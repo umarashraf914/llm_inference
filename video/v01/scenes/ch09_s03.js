@@ -63,7 +63,7 @@ V.scene('ch09_s03', S => {
   const rArr = S.arrow({ x1: 250, y1: 438, x2: 250, y2: 352, color: 'bytes', sw: 4 }, world);
   hide(rArr);
   fade(rArr, 0, 1, tRead + 0.1, 0.4);
-  const rLab = S.text('read = copy out', { x: 250, y: 268, size: 28, weight: 700, anchor: 'middle', color: 'bytes' }, world);
+  const rLab = S.text('read = copy out', { x: 250, y: 268, size: 25, weight: 700, anchor: 'middle', color: 'bytes' }, world);
   hide(rLab);
   fade(rLab, 0, 1, T('b1~copied') - 0.1, 0.4);
   const pen = S.g(null, world);
@@ -75,7 +75,7 @@ V.scene('ch09_s03', S => {
   hide(pen);
   whole(t => { const k = cl((t - tWr) / 0.4); setO(pen, k * (1 - 0.6 * cl((t - tCh - 0.3) / 0.4)) * (1 - cl((t - T('b2') + 0.15) / 0.35))); pen.setAttribute('transform', `translate(0,${(-6 * Math.sin(t * 4) * k).toFixed(1)})`); });
   whole(t => penX.setAttribute('stroke-dashoffset', (90 * (1 - EIO(cl((t - tCh - 0.1) / 0.35)))).toFixed(1)));
-  const wLab = S.text('write = change', { x: 480, y: 268, size: 28, weight: 700, anchor: 'middle', color: 'ink' }, world);
+  const wLab = S.text('write = change', { x: 480, y: 268, size: 25, weight: 700, anchor: 'middle', color: 'ink' }, world);
   hide(wLab);
   fade(wLab, 0, 1, tCh, 0.4);
   fade(lockO, 1, 0, tCh + 0.4, 0.15);

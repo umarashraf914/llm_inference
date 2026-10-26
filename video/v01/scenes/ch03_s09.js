@@ -193,7 +193,7 @@ V.scene('ch03_s09', S => {
   const R2 = 850;
   const chat = S.rect({ x: BX, y: R2 - 12, w: 0, h: 24, fill: 'struct', fillOpacity: 0.9 });
   const chatLbl = S.text('ten turns of chat: 2,000 tokens', { x: BX + 36, y: R2 + 1, size: 28, weight: 600, color: 'ink' });
-  const illus = S.pill('illustrative', { x: BX + 36 + S.measure('ten turns of chat: 2,000 tokens', { size: 28, weight: 600 }) + 80, y: R2, h: 36, size: 22, tone: 'neutral', style: 'outline' });
+  const illus = S.pill('illustrative', { x: BX + 36 + S.measure('ten turns of chat: 2,000 tokens', { size: 28, weight: 600 }) + 18, y: R2, h: 36, size: 22, tone: 'neutral', style: 'outline', anchor: 'start' });
   S.set([chat, chatLbl, illus], { autoAlpha: 0 }, 0);
   const CONV = T('b5~than') - 0.1;
   S.add(gsap.set(chat, { autoAlpha: 1 }), CONV);

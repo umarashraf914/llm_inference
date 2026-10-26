@@ -120,7 +120,7 @@ V.scene('ch13_s08', S => {
   // the per-layer line, with room on the right for '= 4 KB' (b3)
   placeLine([['2', 'ink', T('b2~Two')], ['×', 'muted', tE], ['8', 'ink', tE], ['×', 'muted', tT], ['128', 'ink', tT], ['×', 'muted', t2], ['2', 'ink', t2],
     ['=', 'muted', t4], ['4,096', 'ink', t4], ['bytes', 'ink', t4], ['=', 'muted', tKB + 0.3], ['4 KB', 'helps', tKB + 0.3]], 1200, 470, perLayer);
-  const perL = S.text('per layer, per token', { x: 1200, y: 526, size: 26, weight: 650, anchor: 'middle', color: 'muted' });
+  const perL = S.text('Per Layer, Per Token', { x: 1200, y: 526, size: 26, weight: 650, anchor: 'middle', color: 'muted', case: 'keep' });   // two parallel halves
   hide(perL);
   fade(perL, 0, 1, T('b2~per') - 0.1, 0.35);
   const tot = S.g();
@@ -153,8 +153,7 @@ V.scene('ch13_s08', S => {
   pulse(colGlow, tAll, 0.9, 1.4);
   fade(hdr, 1, 0, tAll, 0.3);
   const hdr2 = S.g(null, colG);
-  S.text('a key and a value', { x: 230, y: 382, size: 24, weight: 700, anchor: 'middle', color: 'bytes' }, hdr2);
-  S.text('at every one of the eighty', { x: 230, y: 414, size: 24, weight: 700, anchor: 'middle', color: 'bytes' }, hdr2);
+  V.caseLines(['a key and a value', 'at every one of the eighty']).forEach((ln, j) => S.text(ln, { x: 230, y: 382 + 32 * j, size: 24, weight: 700, anchor: 'middle', color: 'bytes', case: 'keep' }, hdr2));
   hide(hdr2);
   fade(hdr2, 0, 1, tAll + 0.3, 0.4);
   void tB2; void lerp; void EIO;

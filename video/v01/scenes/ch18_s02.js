@@ -29,7 +29,7 @@ V.scene('ch18_s02', S => {
     S.rect({ x: 120, y: y - 64, w: 1380, h: 128, r: 18, fill: '#0c1326', fillOpacity: 0.8, stroke: 'struct', strokeOpacity: 0.7, sw: 2 }, g);
     S.circle({ x: 172, y, r: 24, fill: '#1d3566', stroke: 'struct', sw: 2 }, g);
     S.text(String(i + 1), { x: 172, y: y + 1, size: 26, weight: 800, anchor: 'middle', color: 'ink' }, g);
-    const tt = S.text('', { x: 360, y: y + 1, size: 30, weight: 750, color: 'ink' }, g);
+    const tt = S.text('', { x: 360, y: y + 1, size: 28, weight: 750, color: 'ink' }, g);   // 28: the longest title clears its chip
     whole(t => { tt.textContent = title.slice(0, Math.round(title.length * cl((t - tTitle[i]) / 0.7))); });
     rise(h, 0.8 + 0.18 * i, 10, 0.4);
     // the card being spoken about is bright; finished cards dim to 60%; all return for the closing beat
@@ -66,7 +66,7 @@ V.scene('ch18_s02', S => {
   };
   ar(250, 120, 'compute', T('b1~eighty') - 0.1);
   ar(300, 26, 'bytes', T('b1~seventeen') - 0.1);
-  const chip = (i, o, at) => { const c = ch18Chip(S, { x: 950, y: CY(i), anchor: 'start', ...o }, cards[i]); S.set(c, { autoAlpha: 0 }, 0); S.add(c.write(), at); return c; };
+  const chip = (i, o, at) => { const c = ch18Chip(S, { x: 966, y: CY(i), anchor: 'start', ...o }, cards[i]); S.set(c, { autoAlpha: 0 }, 0); S.add(c.write(), at); return c; };
   const c1 = chip(0, { parts: ['80', '÷', '17', '≈', '4.7'] }, T('b1~ridge') - 0.1);
   // card 2: a GPU with a coral stream on its bus
   ch18Gpu(S, { x: 262, y: CY(1), size: 34 }, cards[1].icon);

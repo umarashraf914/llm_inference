@@ -146,7 +146,7 @@ V.scene('ch15_s03', S => {
   const brL2 = S.text('valid while these are unchanged', { x: (PX(0) + PX(4)) / 2, y: 492, size: 26, weight: 750, anchor: 'middle', color: 'helps' }, brG);
   rise(brL2, tEv + 0.3, 8);
   [0, 1, 2, 3, 4].forEach(i => {
-    const e = S.text('=', { x: PX(i) - 66, y: 300, size: 28, weight: 800, anchor: 'middle', color: 'helps' });
+    const e = S.text('=', { x: PX(i) - 76, y: 300, size: 28, weight: 800, anchor: 'middle', color: 'helps' });
     hide(e);
     fade(e, 0, 1, tEv + 0.06 * i, 0.2);
     fade(e, 1, 0, tEv + 1.4, 0.4);
