@@ -140,6 +140,66 @@ def ensure_gsap():
             (vendor / f"{f}.min.js").write_bytes(t.extractfile(f"package/dist/{f}.min.js").read())
 
 
+def system_certificates():
+    """The certificate authorities this computer trusts, as one PEM file (or None).
+
+    Playwright downloads its browser with Node.js, which trusts only its own built-in list. On a network that
+    inspects HTTPS with its own authority (common at companies and institutes) that download fails with
+    'self-signed certificate in certificate chain' while pip and Python, which use the system store, work.
+    Node takes extra authorities from NODE_EXTRA_CA_CERTS, so hand it the system's."""
+    import re, ssl
+    ders = []
+    if os.name == "nt":
+        for store in ("ROOT", "CA"):
+            try:
+                ders += [der for der, enc, trust in ssl.enum_certificates(store)
+                         if enc == "x509_asn" and (trust is True or "1.3.6.1.5.5.7.3.1" in trust)]   # server auth
+            except OSError:
+                pass
+    elif sys.platform == "darwin":
+        for kc in ("/Library/Keychains/System.keychain", "/System/Library/Keychains/SystemRootCertificates.keychain"):
+            try:
+                out = subprocess.run(["security", "find-certificate", "-a", "-p", kc], capture_output=True, text=True).stdout
+            except OSError:
+                continue
+            ders += [ssl.PEM_cert_to_DER_cert(m) for m in re.findall(r"-----BEGIN CERTIFICATE-----.+?-----END CERTIFICATE-----", out, re.S)]
+    else:
+        f = ssl.get_default_verify_paths().cafile
+        return Path(f) if f and os.path.isfile(f) else None
+    return write_certificates(ders, VENV / "system-certificates.pem")
+
+
+def write_certificates(ders, path):
+    # keep only certificates OpenSSL can parse, so one odd store entry cannot spoil the file
+    import ssl
+    good = []
+    for der in dict.fromkeys(ders):
+        try:
+            ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT).load_verify_locations(cadata=der)
+            good.append(ssl.DER_cert_to_PEM_cert(der))
+        except (ValueError, OSError):           # ssl.SSLError is an OSError
+            pass
+    if not good:
+        return None
+    path.write_text("".join(good))
+    return path
+
+
+def install_browser():
+    step("Checking the browser (Playwright's Chromium)")
+    e = env()
+    if not e.get("NODE_EXTRA_CA_CERTS"):
+        ca = system_certificates()
+        if ca:
+            e["NODE_EXTRA_CA_CERTS"] = str(ca)
+    try:
+        run([sys.executable, "-m", "playwright", "install", "chromium"], env=e)
+    except subprocess.CalledProcessError:
+        sys.exit("\nCould not download Playwright's Chromium (see above). If this network inspects HTTPS, ask for its root "
+                 "certificate as a .pem file, point NODE_EXTRA_CA_CERTS at it (Windows: set NODE_EXTRA_CA_CERTS=C:\\path\\root.pem; "
+                 "macOS/Linux: export NODE_EXTRA_CA_CERTS=/path/root.pem) and run the same command again.")
+
+
 def have_narration():
     build = FILM / "build"
     try:
@@ -189,13 +249,14 @@ def memory_gb():
 
 
 def default_workers():
-    # a worker keeps about 1.3 cores busy (Chromium rasterising and JPEG-ing 8 MP frames, x264 behind it)
+    # a worker keeps about 1.3 cores busy (Chromium rasterising and JPEG-ing 8 MP frames, x264 behind it); the
+    # graphics card is not used, so a many-core workstation is what makes this fast
     cores = os.cpu_count() or 2
     w = max(1, round(cores * 0.75))
     mem = memory_gb()
     if mem:
         w = min(w, max(1, int((mem - 3) // GB_PER_WORKER)))
-    return min(w, 12)
+    return min(w, 32)
 
 
 def keep_awake():
@@ -222,8 +283,7 @@ def main(argv):
 
     t0 = time.time()
     ensure_packages(REQS, "base")
-    step("Checking the browser (Playwright's Chromium)")
-    run([sys.executable, "-m", "playwright", "install", "chromium"])
+    install_browser()
     ensure_gsap()
     ensure_narration(a.narration)
     sys.path.insert(0, str(TOOLS))
@@ -256,7 +316,10 @@ def main(argv):
         sys.exit(f"{out} has {n} frames, expected {frames}; the 4K scene files are kept in {SEG}")
     if not a.keep_segments:
         for s in order:
-            (SEG / f"{s}.mp4").unlink(missing_ok=True)
+            try:
+                (SEG / f"{s}.mp4").unlink(missing_ok=True)
+            except OSError:                     # (a virus scanner holding it; a leftover file does no harm)
+                pass
     h = (time.time() - t0) / 3600
     print(f"\nDone in {h:.1f} h: {out}  ({out.stat().st_size / 1e9:.2f} GB, 3840x2160, {n:,} frames at {fps:g} fps)")
 

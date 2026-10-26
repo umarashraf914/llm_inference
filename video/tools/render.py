@@ -213,7 +213,14 @@ def render_one(args):
     if enc.wait():
         raise RuntimeError(f"{entry['id']}: ffmpeg failed")
     st.close()
-    os.replace(part, out)
+    for k in range(20):                     # on Windows a virus scanner may hold a fresh file for a moment
+        try:
+            os.replace(part, out)
+            break
+        except PermissionError:
+            if k == 19:
+                raise
+            time.sleep(0.5)
     return entry["id"], n, time.time() - t0
 
 
