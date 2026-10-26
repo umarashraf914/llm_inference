@@ -186,8 +186,8 @@ V.scene('ch08_s03', S => {
   fade(score, 1, 0, tDropS + 0.75, 0.3);
   S.add(gsap.fromTo(ms, { x: 0, y: 0 }, { x: G.x + G.n * G.cw / 2 - (score.r + 70) - S.measure('match score', { size: 26, weight: 650 }) / 2, y: G.y - 34 - 700, duration: 0.6, ease: 'power3.inOut', immediateRender: false }), tDropS + 0.5);
   ignore([ms], tDropS + 0.5, tDropS + 1.15);
-  const rowL = toks.map((w, r) => S.text(w, { x: G.x - 16, y: G.y + r * G.ch + G.ch / 2, size: 26, weight: 600, anchor: 'end', color: 'ink' }));
-  const colL = toks.map((w, c) => S.text(w, { x: G.x + c * G.cw + G.cw / 2, y: G.y - 18, size: 24, weight: 600, anchor: 'middle', color: 'ink' }));
+  const rowL = toks.map((w, r) => S.text(w, { x: G.x - 16, y: G.y + r * G.ch + G.ch / 2, size: 26, weight: 600, anchor: 'end', color: 'ink', case: 'keep' }));
+  const colL = toks.map((w, c) => S.text(w, { x: G.x + c * G.cw + G.cw / 2, y: G.y - 18, size: 24, weight: 600, anchor: 'middle', color: 'ink', case: 'keep' }));
   const rowIc = S.icon('ph:magnifying-glass-bold', { x: G.x - 150, y: G.y + 2.5 * G.ch, size: 34, color: 'struct' });
   const colIc = S.icon('ph:key-bold', { x: G.x + G.n * G.cw + 34, y: G.y - 18, size: 30, color: 'struct' });
   ch08Hide([...rowL, ...colL, rowIc, colIc]);

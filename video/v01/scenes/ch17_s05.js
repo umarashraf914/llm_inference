@@ -92,11 +92,11 @@ V.scene('ch17_s05', S => {
     setO(gdC, t > tZero ? 1 : 0);
   });
   const card = S.g(null, W);
-  S.rect({ x: 1480, y: 170, w: 380, h: 52, r: 14, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.3, sw: 2 }, card);
-  const cA = S.text('first token ≤ 1 s', { x: 1500, y: 197, size: 24, weight: 750, color: 'ink' }, card);
-  const cAw = S.measure('first token ≤ 1 s', { size: 24, weight: 750 });
-  S.text('·', { x: 1500 + cAw + 10, y: 197, size: 24, weight: 750, color: 'muted' }, card);
-  S.text('next ≤ 50 ms', { x: 1500 + cAw + 28, y: 197, size: 24, weight: 750, color: 'ink' }, card);
+  S.rect({ x: 1476, y: 170, w: 380, h: 52, r: 14, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.3, sw: 2 }, card);
+  const cA = S.text('first token ≤ 1 s', { x: 1490, y: 197, size: 22, weight: 750, color: 'ink' }, card);
+  const cAw = S.measure('first token ≤ 1 s', { size: 22, weight: 750 });
+  S.text('·', { x: 1490 + cAw + 10, y: 197, size: 22, weight: 750, color: 'muted' }, card);
+  S.text('next ≤ 50 ms', { x: 1490 + cAw + 26, y: 197, size: 22, weight: 750, color: 'ink' }, card);
   whole(t => cA.setAttribute('fill', S.tone(t > tLate1s ? 'muted' : 'ink')));
   K.track(card, [K.K(tTarg, { x: 120, o: 0 }), K.K(tTarg + 0.5, { x: 0, o: 1, e: 'power3.out' })]);
   const ill = ch17Tag(S, 'illustrative', { x: 1860, y: 252 }, W);

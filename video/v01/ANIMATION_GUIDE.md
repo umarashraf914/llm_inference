@@ -70,9 +70,17 @@ the beat start: check the warnings printed by `stills`.
 
 **Primitives** — `S.rect({x,y,w,h,r,fill,stroke,sw,dash,opacity,filter})`, `S.circle({x,y,r,…})`,
 `S.line({x1,y1,x2,y2,stroke,sw,dash})`, `S.path({d,stroke,sw,fill})`, `S.g()`,
-`S.text(str | [{t,c,w,f,s}], {x,y,size,weight,color,anchor,family:'sans'|'display'|'mono',ls,maxW})`
+`S.text(str | [{t,c,w,f,s}], {x,y,size,weight,color,anchor,family:'sans'|'display'|'mono',ls,maxW,case})`
 (vertically centred on y), `S.para(str,{x,y,w,size,lh})` (wrapped), `S.icon(id,{x,y,size,color})`
-(centred), `S.measure(str,{size,weight,family})`.
+(centred), `S.measure(str,{size,weight,family,case})`.
+
+**Case.** Write every string as you would say it, in lower case; the engine sets labels in Title Case
+('run the whole model' → 'Run the Whole Model'), and keeps capitals, units (ms, GB/s), acronyms and
+single-letter quantities as written. Text that is data rather than a label must stay as written:
+tokens, example sentences, chat messages, quoted answers, code. Draw it with `case: 'keep'` (and
+measure it with the same option); `libToken`, the chat window and mono text already do. A `libToken`
+chip that names something ('your question') takes `case: 'label'`. Counters and typing effects are cased
+like the text they write into, so a scene never capitalises a string itself.
 
 **Components**
 - `S.heading(title,{y,size,sub})` → `.titleEl .subEl` — scene title band (y≈130–160).
@@ -125,7 +133,8 @@ wrap the element in a `S.g()` holder and xform the holder instead (ch01_s01 does
 ## Art direction
 
 **The look.** Dark, deep navy stage with a soft moving light (already there). Crisp, generous
-typography (Inter; JetBrains Mono for numbers). Opaque cards with a tinted gradient and soft shadow.
+typography (Poppins, labels in Title Case; JetBrains Mono for numbers). Opaque cards with a tinted
+gradient and soft shadow.
 Colour only where it means something. Calm, confident motion. Think Apple keynote meets
 3Blue1Brown: every frame is clean enough to pause on.
 

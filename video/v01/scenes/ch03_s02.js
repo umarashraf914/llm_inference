@@ -62,7 +62,7 @@ V.scene('ch03_s02', S => {
 
   // ---------------------------------------------------------------- b1: the request waits; Router picks the machine
   const RY = 670;
-  const req = ignore(libToken(S, { text: 'request', x: 270, y: RY, size: 24, hidden: true }));
+  const req = ignore(libToken(S, { text: 'request', x: 270, y: RY, size: 24, hidden: true, case: 'label' }));
   S.add(req.pop({ d: 0.5 }), 'b1~request');
   light(0, 'b1~router-0.1');
   const SVX = 470, SVY = [RY - 76, RY, RY + 76];

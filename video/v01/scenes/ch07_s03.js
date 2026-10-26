@@ -96,7 +96,7 @@ V.scene('ch07_s03', S => {
   S.add(fx.drawArrow(arrowG[1].arrow, { d: 0.5 }), 'b1~text+0.1');
 
   // the sentence, two lines, left-aligned in the Text card; it types on with a caret
-  const TS = { size: 36, weight: 500 };
+  const TS = { size: 36, weight: 500, case: 'keep' };   // the sentence being typed, as written
   const LINES = [['the', 'quick', 'brown'], ['fox', 'jumps']];
   const LINE_Y = [CY - 26, CY + 26];
   const lineStr = LINES.map(l => l.join(' '));

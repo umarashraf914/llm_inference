@@ -79,13 +79,13 @@ V.scene('ch08_s11', S => {
   LINES.forEach((ws, li) => {
     let x = PX0;
     ws.forEach(w => {
-      const tw = S.measure(w, { size: FS, weight: 600 }) + PADX * 2;
+      const tw = S.measure(w, { size: FS, weight: 600, case: 'keep' }) + PADX * 2;
       const g = S.g();
       const hot = w === 'it';
       S.rect({ x, y: PY[li] - PH / 2, w: tw, h: PH, r: 12, fill: '#0f1730', stroke: hot ? 'struct' : 'white', strokeOpacity: hot ? 0.9 : 0.14, sw: hot ? 2.5 : 1.5 }, g);
       const tint = S.rect({ x, y: PY[li] - PH / 2, w: tw, h: PH, r: 12, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.7, sw: 2, opacity: 0 }, g);
       if (hot) S.rect({ x, y: PY[li] - PH / 2, w: tw, h: PH, r: 12, fill: 'url(#solid-struct)', opacity: 0.85 }, g);
-      S.text(w, { x: x + tw / 2, y: PY[li] + 1, size: FS, weight: hot ? 750 : 600, anchor: 'middle', color: hot ? '#0a0f1e' : 'muted' }, g);
+      S.text(w, { x: x + tw / 2, y: PY[li] + 1, size: FS, weight: hot ? 750 : 600, anchor: 'middle', color: hot ? '#0a0f1e' : 'muted', case: 'keep' }, g);
       toks.push({ g, tint, li, l: x, r: x + tw, hot });
       x += tw + GAPX;
     });

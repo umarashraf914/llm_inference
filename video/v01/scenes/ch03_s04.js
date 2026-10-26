@@ -146,7 +146,7 @@ V.scene('ch03_s04', S => {
   }
   const axis = S.g(null, lanes);
   S.arrow({ x1: X0 - 12, y1: AXY, x2: 1610, y2: AXY, color: 'muted', sw: 2.5, head: 12 }, axis);
-  const axisLbl = S.text('time', { x: 1610, y: AXY + 28, size: 24, anchor: 'end', weight: 600, color: 'muted' }, axis);
+  const axisLbl = S.text('time', { x: 1600, y: AXY - 24, size: 24, anchor: 'end', weight: 600, color: 'muted' }, axis);   // above the axis, clear of the panel's edge
   // the tray grows into the panel
   S.xset(lanes, { x: 960 - (LP.x + LP.w / 2), y: SL.y - (LP.y + LP.h / 2), s: 0.2, ox: LP.x + LP.w / 2, oy: LP.y + LP.h / 2 });
   S.set(lanes, { autoAlpha: 0 }, 0);

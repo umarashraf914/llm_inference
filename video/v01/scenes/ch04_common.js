@@ -182,7 +182,7 @@ function ch04Parcel(S, o = {}, parent) {
   const W = segs.reduce((a, s) => a + s.w, 0) + gap * (segs.length - 1);
   let cx = x;
   g.segs = segs.map(s => {
-    const t = libToken(S, { text: s.label || '', x: cx, y, anchor: 'start', w: s.w, h, size, state: s.state || 'token', minW: 8 }, g);
+    const t = libToken(S, { text: s.label || '', x: cx, y, anchor: 'start', w: s.w, h, size, state: s.state || 'token', minW: 8, case: 'label' }, g);
     t.__x = cx;
     cx += s.w + gap;
     return t;

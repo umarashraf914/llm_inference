@@ -99,7 +99,7 @@ V.scene('ch03_s05', S => {
   ignore(spin);
   const pointer = S.path({ d: `M${W.x - 13},${W.y - W.r - 28} L${W.x + 13},${W.y - W.r - 28} L${W.x},${W.y - W.r + 4} Z`, fill: 'ink', stroke: '#0c1326', sw: 2 }, spin);
   const legend = S.g();
-  const legRow = (y, icon, txt) => { const g = S.g(null, legend); S.icon(icon, { x: W.x + W.r + 46, y, size: 32 }, g); g.t = S.text(txt, { x: W.x + W.r + 72, y: y + 1, size: 26, weight: 650, color: 'ink' }, g); return g; };
+  const legRow = (y, icon, txt) => { const g = S.g(null, legend); S.icon(icon, { x: W.x + W.r + 46, y, size: 32 }, g); g.t = S.text(txt, { x: W.x + W.r + 72, y: y + 1, size: 26, weight: 650, color: 'ink', case: 'keep' }, g); return g; };
   const legCat = legRow(W.y - 26, 'fluent:cat-face', 'cat 74.5%'), legDog = legRow(W.y + 26, 'fluent:dog-face', 'dog 24.8%');
   S.set([spin, legend], { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(spin, { autoAlpha: 0, x: -60 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: 'power3.out' }), 'b1~how random-0.1');

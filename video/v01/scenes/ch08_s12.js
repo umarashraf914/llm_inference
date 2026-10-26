@@ -58,7 +58,7 @@ V.scene('ch08_s12', S => {
   let rx = 140;
   const row = S.g();
   const pills = WORDS.map(w => {
-    const pw = S.measure(w, { size: 24, weight: 600 }) + 44, p = S.pill(w, { x: rx + pw / 2, y: RY, tone: 'struct', size: 24, h: 40 }, row);
+    const pw = S.measure(w, { size: 24, weight: 600, case: 'keep' }) + 44, p = S.pill(w, { x: rx + pw / 2, y: RY, tone: 'struct', size: 24, h: 40, case: 'keep' }, row);
     p.cxx = rx + pw / 2; rx += pw + 10;
     return p;
   });
@@ -179,8 +179,8 @@ V.scene('ch08_s12', S => {
   whole(t => barEls.forEach((b, i) => { const h = HS[i] * E('power3.out')(cl((t - tSm - 0.2 - 0.04 * i) / 0.6)); b.setAttribute('y', (BB - h).toFixed(1)); b.setAttribute('height', h.toFixed(1)); }));
   fade(bars, 1, 0, tB3, 0.35);
   // the pick: from the tall bar to 'pick one'; b3 to the path's last station, then round to the input row
-  const PICK = 'purred', pkW = S.measure(PICK, { size: 24, weight: 600 }) + 44;
-  const pk = S.pill(PICK, { x: 0, y: 0, tone: 'struct', size: 24, h: 40, style: 'solid' });
+  const PICK = 'purred', pkW = S.measure(PICK, { size: 24, weight: 600, case: 'keep' }) + 44;
+  const pk = S.pill(PICK, { x: 0, y: 0, tone: 'struct', size: 24, h: 40, style: 'solid', case: 'keep' });
   const tPk = T('b2~one') - 0.1, tApp = T('b3~appended') - 0.1;
   const slotX = rowEnd + pkW / 2;
   const P0 = [1040, 640], P1 = [1260, 700], P2 = [1240, RY], P3 = [slotX, RY];

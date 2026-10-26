@@ -58,7 +58,7 @@ V.scene('ch01_s05', S => {
   // ---------------------------------------------------------------- the text so far, as pills
   const WORDS = ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'];
   const PS = 24, PH = 40, GAPX = 8, INNER = B.text.w - 36;
-  const pw = WORDS.map(w => S.measure(w, { size: PS, weight: 600 }) + 24);
+  const pw = WORDS.map(w => S.measure(w, { size: PS, weight: 600, case: 'keep' }) + 24);
   const slots = [];
   let x = 0, row = 0;
   pw.forEach((w, i) => {
@@ -66,9 +66,9 @@ V.scene('ch01_s05', S => {
     slots.push({ x: B.text.x + 18 + x + w / 2, y: BY - 32 + row * 58 });
     x += w + GAPX;
   });
-  const pill = (w, i, tone = 'struct') => S.pill(w, { x: slots[i].x, y: slots[i].y, h: PH, w: pw[i], size: PS, tone });
+  const pill = (w, i, tone = 'struct') => S.pill(w, { x: slots[i].x, y: slots[i].y, h: PH, w: pw[i], size: PS, tone, case: 'keep' });
   // the five from the previous scene drop in from the top band
-  const top = WORDS.slice(0, 5).map((w, i) => S.pill(w, { x: 360 + i * 130, y: 200, h: 56, size: 32, tone: 'struct' }));
+  const top = WORDS.slice(0, 5).map((w, i) => S.pill(w, { x: 360 + i * 130, y: 200, h: 56, size: 32, tone: 'struct', case: 'keep' }));
   S.add(gsap.to(top, { autoAlpha: 0, y: 40, duration: 0.4, stagger: 0.05, ease: 'power2.in' }), 0.9);
   const row0 = WORDS.slice(0, 5).map((w, i) => pill(w, i));
   S.add(gsap.fromTo(row0, { autoAlpha: 0, y: -40 }, { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power3.out' }), 1.15);

@@ -13,7 +13,7 @@ V.scene('ch03_s01', S => {
   const LX = 340, SX = 1580, Y = 470, SW = 440;          // laptop centre x, server centre x, the line's y, server width
   const hide = el => { el.style.opacity = 0; el.style.visibility = 'hidden'; };
   // width of a libToken chip before it is placed (so a chip can sit flush against something on its right)
-  const chipW = (text, size) => { const t = libToken(S, { text, size }); const w = t.w; t.remove(); return w; };
+  const chipW = (text, size) => { const t = libToken(S, { text, size, case: 'label' }); const w = t.w; t.remove(); return w; };
   // a chip sinks into the thing it reached: shrinks and fades (its pop is long finished, so .body is free)
   const sink = (tok, d = 0.3) => gsap.timeline()
     .fromTo(tok.body, { scale: 1, transformOrigin: '50% 50%' }, { scale: 0.35, duration: d, ease: 'power2.in', transformOrigin: '50% 50%', immediateRender: false }, 0)
@@ -41,7 +41,7 @@ V.scene('ch03_s01', S => {
   // glass, right-aligned; the pill is centred on the glass so it stays inside it), rides the line through the
   // globe and is taken in by the server
   const G = lap.glass, scr = lap.port('screen');
-  const q = libToken(S, { text: 'your question', x: G.x + G.w / 2, y: G.y + G.h * 0.216, size: 26 });
+  const q = libToken(S, { text: 'your question', x: G.x + G.w / 2, y: G.y + G.h * 0.216, size: 26, case: 'label' });
   const qEnd = srv.l - 14 - q.w / 2;
   S.add(q.pop({ d: 0.5, from: 0.45 }), 'b1~question-0.3');
   S.add(q.travel(`M${q.cx},${q.cy} L${wire.x1 + q.w / 2 + 6},${Y} L${qEnd},${Y}`, { d: 1.45, ease: 'power1.inOut' }), 'b1~crosses-0.15');
@@ -51,7 +51,7 @@ V.scene('ch03_s01', S => {
   S.add(srv.activity({ d: 1.0, rate: 7, seed: 3 }), 'b1~server');
   // a smaller "answer" leaves the server's front and comes back into the screen
   const AW = chipW('answer', 24);
-  const ans = libToken(S, { text: 'answer', x: srv.l - 14 - AW / 2, y: Y, size: 24 });
+  const ans = libToken(S, { text: 'answer', x: srv.l - 14 - AW / 2, y: Y, size: 24, case: 'label' });
   hide(ans);
   S.add(ans.pop({ d: 0.4 }), 'b1~answer-0.25');
   S.add(ans.travel(`M${ans.cx},${ans.cy} L${wire.x1 + ans.w / 2 + 6},${Y} L${scr.x},${scr.y}`, { d: 0.75, ease: 'power2.inOut' }), 'b1~answer-0.05');
@@ -173,7 +173,7 @@ V.scene('ch03_s01', S => {
   S.add(mw.drawOn({ d: 0.6 }), 'b3~one+0.15');
   // ('b3~in a' would match "sits in a data centre": time everything here from 'fraction')
   const tF = T('b3~fraction');
-  const q2 = libToken(S, { text: 'your question', x: 326, y: sv.y, size: 24, anchor: 'start' }, S.hud);
+  const q2 = libToken(S, { text: 'your question', x: 326, y: sv.y, size: 24, anchor: 'start', case: 'label' }, S.hud);
   hide(q2);
   const q2End = sL - 12 - q2.w / 2;
   S.add(q2.travel(`M${q2.cx},${q2.cy} L${q2End},${sv.y}`, { d: 0.6, ease: 'power2.inOut', appear: true }), tF - 0.6);
@@ -188,7 +188,7 @@ V.scene('ch03_s01', S => {
   S.add(srv.activity({ d: 0.6, rate: 9, seed: 12 }), tF);
   S.add(fx.in(swLabel, { from: 'up', d: 0.5 }), tF + 0.1);
   // and the answer goes back into the small screen
-  const a2 = libToken(S, { text: 'answer', x: sL - 14 - AW / 2, y: sv.y, size: 24 }, S.hud);
+  const a2 = libToken(S, { text: 'answer', x: sL - 14 - AW / 2, y: sv.y, size: 24, case: 'label' }, S.hud);
   hide(a2);
   const ms = ml.port('screen');
   S.add(a2.travel(`M${a2.cx},${a2.cy} L${W1 + a2.w / 2 + 4},${sv.y} L${ms.x},${ms.y}`, { d: 0.65, ease: 'power2.inOut', appear: true }), 'b3~second-0.4');

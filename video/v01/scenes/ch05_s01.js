@@ -235,7 +235,7 @@ V.scene('ch05_s01', S => {
   // 'FLoating-point OPeration' writes on; the amber F, L, O, P slide together into FLOP
   const flopG = S.g(null, S.hud);                 // in the HUD: it stays put when the camera moves in b4
   const phrase = S.g(null, flopG);
-  const PS = 68, FS = 184, FY = 650, DISP = { weight: 700, family: 'display' };
+  const PS = 68, FS = 184, FY = 650, DISP = { weight: 700, family: 'display', case: 'keep' };   // the letters spell FLOP: as written
   const pieces = [['F', 1], ['L', 1], ['oating-point', 0, true], ['O', 1], ['P', 1], ['eration', 0]];
   const pw = pieces.map(([t, , sp]) => S.measure(t, { size: PS, ...DISP }) + (sp ? S.measure(' ', { size: PS, ...DISP }) : 0));
   const lw = ['F', 'L', 'O', 'P'].map(t => S.measure(t, { size: FS, ...DISP }));

@@ -27,7 +27,7 @@ html, body {
   overflow: hidden;
   background: var(--bg0);
   color: var(--ink);
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Poppins, Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -50,7 +50,7 @@ html, body {
 
 #film text { font-kerning: normal; }
 #film .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-#film .display { font-family: 'Inter Display', Inter, sans-serif; }
+#film .display { font-family: Poppins, Inter, sans-serif; }
 #film .tnum { font-variant-numeric: tabular-nums; }
 
 /* debug overlay used by previews */

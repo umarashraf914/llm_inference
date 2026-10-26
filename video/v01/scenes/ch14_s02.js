@@ -32,7 +32,7 @@ V.scene('ch14_s02', S => {
   hide(tab);
   fade(tab, 0, 1, 0.7, 0.6);
   const chip = S.g();
-  libToken(S, { text: "token 5's ID", x: TX + 130, y: 262, size: 24, state: 'token' }, chip);
+  libToken(S, { text: "token 5's ID", x: TX + 130, y: 262, size: 24, state: 'token', case: 'label' }, chip);
   rise(chip, 1.1);
   // the pointer runs down the right edge to the row; the row lights
   const tFind = T('b1~starts') - 0.1, rowY = TY + RH * ROW;

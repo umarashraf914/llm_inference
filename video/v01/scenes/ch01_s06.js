@@ -23,7 +23,7 @@ V.scene('ch01_s06', S => {
   const WORDS = ['curled', 'up', 'asleep', 'on', 'the', 'sofa', 'was', 'a'];
   const TY = 190;
   let x = 470;
-  const pills = WORDS.map(w => { const p = S.pill(w, { x, y: TY, h: 56, size: 30, tone: 'struct', anchor: 'start' }); x += p.w + 12; return p; });
+  const pills = WORDS.map(w => { const p = S.pill(w, { x, y: TY, h: 56, size: 30, tone: 'struct', anchor: 'start', case: 'keep' }); x += p.w + 12; return p; });
   const slot = S.g();
   S.rect({ x, y: TY - 28, w: 110, h: 56, r: 16, fill: 'none', stroke: 'ink', sw: 2.5, dash: '8 7' }, slot);
   S.text('?', { x: x + 55, y: TY + 1, size: 34, anchor: 'middle', weight: 700, color: 'ink' }, slot);
@@ -46,7 +46,7 @@ V.scene('ch01_s06', S => {
   const rows = C.map((c, i) => {
     const g = S.g(null, chart);
     if (c.icon) g.icon = S.icon(c.icon, { x: 420, y: ROW(i), size: 52 }, g);
-    g.label = S.text(c.label, { x: 460, y: ROW(i), size: 34, weight: 600, color: 'ink' }, g);
+    g.label = S.text(c.label, { x: 460, y: ROW(i), size: 34, weight: 600, color: 'ink', case: 'keep' }, g);
     g.bar = S.bar({ x: BX, y: ROW(i) - 24, w: c.v * U, h: 48, frac: 1, tone: 'struct', track: false }, g);
     g.val = S.text(c.v.toFixed(1).replace(/^0/, '0'), { x: BX + c.v * U + 18, y: ROW(i) + 1, size: 34, family: 'mono', weight: 600, color: 'struct' }, g);
     S.add(fx.in([g.icon, g.label].filter(Boolean), { from: 'left', d: 0.35 }), `${c.at}-0.15`);

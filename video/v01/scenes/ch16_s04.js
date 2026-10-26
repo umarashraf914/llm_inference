@@ -16,7 +16,7 @@ V.scene('ch16_s04', S => {
   const rise = (e, at, dy = 12, d = 0.4) => { hide(e); S.add(K.drive(d, k => { setO(e, k); e.setAttribute('transform', `translate(0,${(dy * (1 - E('power3.out')(k))).toFixed(1)})`); }), at); };
   const AY = 450, CY = 580, H = 68, SZ = 32, GAP = 10;
   const CW = ['770', 'What', 'is', 'the', 'capital', 'of', 'France', '?'], AW = ['770', 'What', 'is', 'the', 'capital', 'of', 'Japan', '?'];
-  const colW = CW.map((w, i) => (i === 0 ? 130 : Math.max(76, Math.round(Math.max(S.measure(w, { size: SZ, weight: 650 }), S.measure(AW[i], { size: SZ, weight: 650 })) + 44))));
+  const colW = CW.map((w, i) => (i === 0 ? 130 : Math.max(76, Math.round(Math.max(S.measure(w, { size: SZ, weight: 650, case: 'keep' }), S.measure(AW[i], { size: SZ, weight: 650, case: 'keep' })) + 44))));
   const total = colW.reduce((a, b) => a + b, 0) + GAP * 7, X0 = Math.round(960 - total / 2 + 60);
   const COLX = colW.map((w, i) => X0 + colW.slice(0, i).reduce((a, b) => a + b, 0) + GAP * i);
   const COLR = i => COLX[i] + colW[i], COLC = i => COLX[i] + colW[i] / 2;
@@ -50,7 +50,7 @@ V.scene('ch16_s04', S => {
   wordAt.push(wordAt[5] + 0.3);
   const arr = AW.map((w, i) => {
     const plan = i <= 5 ? [[0, 'blue'], [passAt(i), 'teal', 0.25]] : [[0, 'blue'], [tHit + 0.1 * (i - 6), 'amber']];
-    const c = ch16Cell(S, { x: COLX[i], y: AY, w: colW[i], h: H, r: 18, label: w, size: i === 0 ? 30 : SZ, plan }, rowA);
+    const c = ch16Cell(S, { x: COLX[i], y: AY, w: colW[i], h: H, r: 18, label: w, case: 'keep', size: i === 0 ? 30 : SZ, plan }, rowA);
     const at = i === 0 ? 0.7 : wordAt[i - 1];
     K.track(c, [K.K(at, { x: 30, o: 0 }), K.K(at + 0.35, { x: 0, o: 1, e: 'power3.out' })]);
     if (i <= 5) c.check(passAt(i));
@@ -58,7 +58,7 @@ V.scene('ch16_s04', S => {
   });
   const cache = CW.map((w, i) => {
     const plan = i <= 5 ? [[0, 'blue'], [passAt(i), 'teal', 0.25]] : [[0, 'blue']];
-    const c = ch16Cell(S, { x: COLX[i], y: CY, w: colW[i], h: H, r: 18, label: w, size: i === 0 ? 30 : SZ, plan }, rowC);
+    const c = ch16Cell(S, { x: COLX[i], y: CY, w: colW[i], h: H, r: 18, label: w, case: 'keep', size: i === 0 ? 30 : SZ, plan }, rowC);
     rise(c, 0.7 + 0.06 * i, 8, 0.35);
     return c;
   });
@@ -98,7 +98,7 @@ V.scene('ch16_s04', S => {
       const lbl = i === 6 ? w : ww;
       S.rect({ x: COLX[i], y: y - 26, w: colW[i], h: 52, r: 14, fill: CH16.BASE }, g);
       S.rect({ x: COLX[i], y: y - 26, w: colW[i], h: 52, r: 14, fill: '#1d3566', stroke: 'struct', strokeOpacity: 0.7, sw: 2 }, g);
-      S.text(lbl, { x: COLC(i), y: y + 1, size: 24, weight: 650, anchor: 'middle', color: 'ink' }, g);
+      S.text(lbl, { x: COLC(i), y: y + 1, size: 24, weight: 650, anchor: 'middle', color: 'ink', case: 'keep' }, g);
     });
     ghosts.insertBefore(g, ghosts.firstChild);
     whole(t => {

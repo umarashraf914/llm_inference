@@ -31,10 +31,10 @@ V.scene('ch17_s03', S => {
   }
   rise(axis, 0.6, 8, 0.5);
   const labG = S.g();
-  S.text('cold', { x: 70, y: LY[0] + 1, size: 28, weight: 750, color: 'ink' }, labG);
-  S.rect({ x: 138, y: LY[0] - 17, w: 50, h: 34, r: 8, stroke: '#8b95ad', sw: 2, dash: '5 4' }, labG);
-  S.text('warm', { x: 70, y: LY[1] + 1, size: 28, weight: 750, color: 'ink' }, labG);
-  S.rect({ x: 152, y: LY[1] - 17, w: 40, h: 34, r: 8, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, labG);
+  S.text('cold', { x: 58, y: LY[0] + 1, size: 28, weight: 750, color: 'ink' }, labG);
+  S.rect({ x: 144, y: LY[0] - 17, w: 50, h: 34, r: 8, stroke: '#8b95ad', sw: 2, dash: '5 4' }, labG);
+  S.text('warm', { x: 58, y: LY[1] + 1, size: 28, weight: 750, color: 'ink' }, labG);
+  S.rect({ x: 158, y: LY[1] - 17, w: 40, h: 34, r: 8, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, labG);
   rise(labG, 0.7, 0, 0.4);
   const tag = ch17Tag(S, 'idealised: H100 at full speed, no network or queue');
   fade(tag, 0, 1, 1.0, 0.4);

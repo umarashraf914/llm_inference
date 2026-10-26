@@ -63,7 +63,7 @@ V.scene('ch16_s02', S => {
   const wordAt = ['What', 'is', 'the', 'capital', 'of', 'France'].map(w => T(`b2~${w}`) - 0.1);
   wordAt.push(wordAt[5] + 0.3);
   const pills = WORDS.map((w, i) => {
-    const c = ch16Cell(S, { x: PX(i), y: AY, w: PW, label: w, plan: [[0, 'blue'], [tFill + 0.3 + 0.1 * i, 'amber']] }, rowA);
+    const c = ch16Cell(S, { x: PX(i), y: AY, w: PW, label: w, case: 'keep', plan: [[0, 'blue'], [tFill + 0.3 + 0.1 * i, 'amber']] }, rowA);
     K.track(c, [K.K(wordAt[i], { x: 30, o: 0 }), K.K(wordAt[i] + 0.35, { x: 0, o: 1, e: 'power3.out' })]);
     return c;
   });

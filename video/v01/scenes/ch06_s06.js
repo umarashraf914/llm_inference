@@ -34,7 +34,7 @@ V.scene('ch06_s06', S => {
   wait.setAttribute('data-audit', 'ignore');
   const waitLbl = S.text('wait', { x: (X0 + X1) / 2, y: LY + 36, size: 26, weight: 550, anchor: 'middle', color: 'muted' }, top);
   const arrive = S.pill('arrive', { x: X1 + 85, y: LY, tone: 'struct', size: 26, h: 46 }, top);
-  const sw = libStopwatch(S, { x: (X0 + X1) / 2, y: LY - 86, size: 92, readout: 'none', span: 4000, buttons: true }, top);
+  const sw = libStopwatch(S, { x: (X0 + X1) / 2 + 110, y: LY - 86, size: 92, readout: 'none', span: 4000, buttons: true }, top);   // clear of the heading's end
   const fixedTag = S.text('fixed by distance', { x: (X0 + X1) / 2, y: LY + 36, size: 26, weight: 600, anchor: 'middle', color: 'muted' }, top);
   const dot = S.circle({ x: X0, y: LY, r: 10, fill: 'struct', opacity: 0 }, top);
   [headT, chip, ask, waitLbl, arrive, fixedTag].forEach(e => S.set(e, { autoAlpha: 0 }, 0));

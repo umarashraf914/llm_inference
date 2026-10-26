@@ -73,13 +73,13 @@ V.scene('ch03_s08', S => {
   S.rect({ x: 120, y: SY - 34, w: 1080, h: 68, r: 18, fill: '#0c1326' }, strip);
   S.rect({ x: 120, y: SY - 34, w: 1080, h: 68, r: 18, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.5, sw: 2 }, strip);
   S.text('context', { x: 124, y: SY - 58, size: 26, weight: 650, color: 'struct' }, strip);
-  const sysP = libToken(S, { text: 'system prompt', x: SX0, y: SY, size: 24, anchor: 'start' }, strip);
+  const sysP = libToken(S, { text: 'system prompt', x: SX0, y: SY, size: 24, anchor: 'start', case: 'label' }, strip);
   const model = libMemBlock(S, { x: 1222, y: SY - 38, w: 150, h: 76, label: 'model', family: 'sans', size: 28, tone: 'bytes', style: 'solid', shadow: false });
   S.set([strip, model], { autoAlpha: 0 }, 0);
   S.add(fx.in(strip, { from: 'up', d: 0.5, dist: 20 }), 'b1~text-0.6');
   S.add(fx.in(model, { from: 'right', d: 0.5, dist: 20 }), 'b1~text-0.5');
   // 'text in the context': the card shrinks into a pill and drops into the strip
-  const descP = libToken(S, { text: 'tool description', x: sysP.r + 10, y: SY, size: 24, anchor: 'start' });
+  const descP = libToken(S, { text: 'tool description', x: sysP.r + 10, y: SY, size: 24, anchor: 'start', case: 'label' });
   S.set(descP, { autoAlpha: 0 }, 0);
   const TIC = T('b1~text') - 0.05;
   S.xset(desc, { x: 0, y: 0, s: 1, ox: DC.x + DC.w / 2, oy: DC.y + DC.h / 2 });
@@ -127,7 +127,7 @@ V.scene('ch03_s08', S => {
   S.add(gsap.fromTo(gearIc, { rotation: 0, svgOrigin: `${WX} 640` }, { rotation: 360, svgOrigin: `${WX} 640`, duration: 3.6, ease: 'power1.inOut', immediateRender: false }), 'b2~spots');
   // 'runs the code': a copy of the call crosses the wall to the code, whose lines scroll
   const RUNT = T('b2~runs') - 0.25;
-  const callCopy = ignore(libToken(S, { text: 'call', x: callP.cx, y: SY, size: 24, hidden: true }));
+  const callCopy = ignore(libToken(S, { text: 'call', x: callP.cx, y: SY, size: 24, hidden: true, case: 'label' }));
   S.add(callCopy.travel(`M${callP.cx},${SY} C${callP.cx},660 ${WX - 120},560 ${WX},600 S${IC.x + 120},${IC.y + IC.h + 60} ${IC.x + IC.w / 2},${IC.y + IC.h - 20}`, { d: 0.9, ease: 'power1.inOut', appear: true }), RUNT);
   S.add(callCopy.out({ d: 0.2 }), RUNT + 0.85);
   const glowImpl = ignore(S.rect({ x: IC.x, y: IC.y, w: IC.w, h: IC.h, r: 24, stroke: 'ink', sw: 3 }));

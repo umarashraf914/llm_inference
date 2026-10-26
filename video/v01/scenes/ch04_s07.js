@@ -44,7 +44,7 @@ V.scene('ch04_s07', S => {
     return g;
   });
   // the token, and the stop at each card
-  const tok = libToken(S, { text: 'token', x: 150, y: PATHY, size: 24, hidden: true }, world);
+  const tok = libToken(S, { text: 'token', x: 150, y: PATHY, size: 24, hidden: true, case: 'label' }, world);
   S.add(tok.pop({ d: 0.4 }), 'b1~token-0.2');
   const visit = (i, at) => {
     S.add(tok.moveTo([cx(i), PATHY], { d: 0.55, ease: 'power2.inOut' }), at - 0.2);

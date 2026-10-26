@@ -120,7 +120,7 @@ V.scene('ch14_s05', S => {
   // ================================================================ b3: how the model tells them apart
   const probe = S.g();
   const later = S.g(null, probe);
-  libToken(S, { text: 'a later word', x: 1620, y: 520, size: 28, state: 'token', icon: 'ph:magnifying-glass-duotone' }, later);
+  libToken(S, { text: 'a later word', x: 1620, y: 520, size: 28, state: 'token', icon: 'ph:magnifying-glass-duotone', case: 'label' }, later);
   K.track(later, [K.K(tB3 + 0.2, { x: 220, o: 0 }), K.K(tB3 + 0.7, { x: 0, o: 1, e: 'power3.out' })]);
   const look = ch14Tag(S, 'looking for water', { x: 1620, y: 584, size: 22 }, probe);
   rise(look, tB3 + 0.7, 10);

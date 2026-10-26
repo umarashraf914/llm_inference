@@ -89,10 +89,10 @@ V.scene('ch16_s08', S => {
     });
   });
   const db = S.g(null, W);
-  S.icon('ph:database-duotone', { x: 140, y: 700, size: 84, color: 'struct' }, db);
-  S.icon('ph:file-text-duotone', { x: 140, y: 712, size: 28, color: '#a9cbff' }, db);
+  S.icon('ph:database-duotone', { x: 200, y: 700, size: 84, color: 'struct' }, db);
+  S.icon('ph:file-text-duotone', { x: 200, y: 712, size: 28, color: '#a9cbff' }, db);
   rise(db, T('b1~text') - 0.5, 8);
-  const dbT = S.text('the text was kept', { x: 140, y: 772, size: 22, weight: 700, anchor: 'middle', color: 'struct' }, W);
+  const dbT = S.text('the text was kept', { x: 200, y: 772, size: 22, weight: 700, anchor: 'middle', color: 'struct' }, W);
   rise(dbT, T('b1~text') - 0.2, 6);
 
   // ================================================================ b2: the most shared text in the system (top band, world y < 120)

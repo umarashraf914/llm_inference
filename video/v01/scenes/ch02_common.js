@@ -47,7 +47,7 @@ function ch02Loop(S, o = {}) {
   // the text so far
   const WORDS = o.words || ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', '.'];
   const PS = 24, PH = 40, GAPX = 8, INNER = B.text.w - 36;
-  const pw = WORDS.map(w => S.measure(w, { size: PS, weight: 600 }) + 24);
+  const pw = WORDS.map(w => S.measure(w, { size: PS, weight: 600, case: 'keep' }) + 24);
   const slots = [];
   let x = 0, row = 0;
   pw.forEach((w, i) => {
@@ -57,7 +57,7 @@ function ch02Loop(S, o = {}) {
   });
   const shown = o.shown ?? 9;
   const pills = WORDS.map((w, i) => {
-    const p = S.pill(w, { x: slots[i].x, y: slots[i].y, h: PH, w: pw[i], size: PS, tone: 'struct' }, g);
+    const p = S.pill(w, { x: slots[i].x, y: slots[i].y, h: PH, w: pw[i], size: PS, tone: 'struct', case: 'keep' }, g);
     if (i >= shown) S.set(p, { autoAlpha: 0 }, 0);
     return p;
   });

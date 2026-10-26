@@ -24,7 +24,7 @@ V.scene('ch07_s07', S => {
 
   // pills, and under each pill a holder with the token's strip
   const mk = (words, xs, row) => words.map((w, k) => {
-    const pill = S.pill(w, { x: xs[k], y: PY, tone: 'struct', size: 30, h: 54 });
+    const pill = S.pill(w, { x: xs[k], y: PY, tone: 'struct', size: 30, h: 54, case: 'keep' });
     const hold = S.g();
     const inner = S.g(null, hold);
     ch07Vec(S, { token: w, n: SN, cw: SCW, ch: SH, gap: 3, anchor: 'start', x: xs[k] - SW / 2, y: SY }, inner);
@@ -138,8 +138,9 @@ V.scene('ch07_s07', S => {
 
   // ================================================================ b4: ours does the second; no order alone
   const tick = S.g();
-  S.path({ d: `M${1440},${770} l12,13 l22,-26`, stroke: 'helps', sw: 4.5 }, tick);
-  S.text('70B example', { x: 1486, y: 772, size: 22, weight: 700, color: 'helps' }, tick);
+  // under the second card, at its left: its own row, clear of the card's text and the glyph
+  S.path({ d: `M${1112},${862} l10,11 l19,-23`, stroke: 'helps', sw: 4 }, tick);
+  S.text('70B example', { x: 1148, y: 866, size: 22, weight: 700, color: 'helps' }, tick);
   ch07Hide(tick);
   S.add(ch07Fade(tick, 0, 1, { d: 0.4 }), 'b4~Our-0.1');
   const tE = T('b4~Easy') - 0.1;

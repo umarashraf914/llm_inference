@@ -9,7 +9,7 @@ V.scene('ch01_s08', S => {
   const TY = 190;
   const row = S.g();
   let x = 470;
-  WORDS.forEach(w => { const p = S.pill(w, { x, y: TY, h: 56, size: 30, tone: 'struct', anchor: 'start' }, row); x += p.w + 12; });
+  WORDS.forEach(w => { const p = S.pill(w, { x, y: TY, h: 56, size: 30, tone: 'struct', anchor: 'start', case: 'keep' }, row); x += p.w + 12; });
   const slot = S.g(null, row);
   const SL = { x, w: 110 };
   S.rect({ x, y: TY - 28, w: 110, h: 56, r: 16, fill: 'none', stroke: 'ink', sw: 2.5, dash: '8 7' }, slot);
@@ -87,8 +87,8 @@ V.scene('ch01_s08', S => {
   S.call(() => paint(0), 0);
   // the winners drop into the slot
   const slotC = SL.x + SL.w / 2;
-  const catPill = S.pill('cat', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct' }, row);
-  const dogPill = S.pill('dog', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct' }, row);
+  const catPill = S.pill('cat', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct', case: 'keep' }, row);
+  const dogPill = S.pill('dog', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct', case: 'keep' }, row);
   S.set([catPill, dogPill], { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(catPill, { autoAlpha: 0, y: -50 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power3.out' }), T.s1 + 1.15);
   S.add(gsap.to(catPill, { autoAlpha: 0, y: -50, duration: 0.3, ease: 'power2.in' }), T.s2 - 0.15);
@@ -105,7 +105,7 @@ V.scene('ch01_s08', S => {
     const g = S.g();
     const path = S.path({ d: `M${endX + 6},${TY} C${endX + 30},${TY} ${endX + 20},${y} ${endX + 48},${y}`, stroke: 'struct', sw: 2.5, strokeOpacity: 0.7 }, g);
     let bx = endX + 56;
-    const ps = words.map(w => { const p = S.pill(w, { x: bx, y, h: 46, size: 26, tone: 'struct', anchor: 'start' }, g); bx += p.w + 10; return p; });
+    const ps = words.map(w => { const p = S.pill(w, { x: bx, y, h: 46, size: 26, tone: 'struct', anchor: 'start', case: 'keep' }, g); bx += p.w + 10; return p; });
     S.set(path, { autoAlpha: 0 }, 0);
     S.add(gsap.set(path, { autoAlpha: 1 }), at);
     S.add(fx.draw(path, { d: 0.35 }), at);

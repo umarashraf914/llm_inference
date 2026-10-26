@@ -105,7 +105,7 @@ V.scene('ch05_s05', S => {
   S.add(ch05Wipe(S, head, { d: 0.8 }), 'b2~subtracting-0.1');
 
   // ---------------------------------------------------------------- b3: the ladder: 10^(11−15) = 10⁻⁴ s = 0.0001 s = 0.1 ms
-  const LX = 1200, LY = [300, 470, 590];
+  const LX = 1300, LY = [300, 470, 590];
   const line = (exp, unit, y) => {
     const g = S.g();
     const eq = S.text('=', { x: LX, y, size: 48, weight: 700, color: 'muted' }, g);
@@ -187,8 +187,8 @@ V.scene('ch05_s05', S => {
 
   // ---------------------------------------------------------------- b5: multiply instead: operations² per second, not anything
   const B5 = T('b5') - 0.15;
-  S.add(gsap.to([lc, l2, l3, note], { x: 600, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }), B5);
-  const WP = { x: 1180, y: 250, w: 620, h: 330 };
+  S.add(gsap.to([lc, l2, l3, note], { x: 300, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }), B5);
+  const WP = { x: 1296, y: 250, w: 560, h: 330 };
   const wrong = S.g();
   S.rect({ x: WP.x, y: WP.y, w: WP.w, h: WP.h, r: 22, fill: '#0c1326', stroke: 'muted', strokeOpacity: 0.6, sw: 2 }, wrong);
   S.text('the wrong way', { x: WP.x + 28, y: WP.y + 46, size: 30, weight: 700, color: 'muted' }, wrong);
@@ -201,11 +201,12 @@ V.scene('ch05_s05', S => {
   S.add(gsap.to([w1, w1b], { autoAlpha: 0, scale: 0.85, transformOrigin: `${WP.x + WP.w / 2}px ${WP.y + 166}px`, duration: 0.35 }), SQ);
   S.add(gsap.to(w2, { autoAlpha: 1, duration: 0.35 }), SQ + 0.2);
   const xs = S.g();
-  S.path({ d: `M${WP.x + 200},${WP.y + 110} L${WP.x + 420},${WP.y + 230} M${WP.x + 420},${WP.y + 110} L${WP.x + 200},${WP.y + 230}`, stroke: 'muted', sw: 8, cap: 'round' }, xs);
+  const XC = WP.x + WP.w / 2;
+  S.path({ d: `M${XC - 110},${WP.y + 110} L${XC + 110},${WP.y + 230} M${XC + 110},${WP.y + 110} L${XC - 110},${WP.y + 230}`, stroke: 'muted', sw: 8, cap: 'round' }, xs);
   ignore(xs);
   S.set(xs, { autoAlpha: 0 }, 0);
   S.add(fx.pop(xs, { d: 0.35, from: 1.6 }), 'b5~duration-0.1');
-  S.add(gsap.to(wrong, { opacity: 0.55, scale: 0.94, transformOrigin: `${WP.x + WP.w / 2}px ${WP.y + WP.h / 2}px`, duration: 0.5 }), 'b5~Something');
+  S.add(gsap.to(wrong, { opacity: 0.55, scale: 0.94, svgOrigin: `${WP.x + WP.w / 2} ${WP.y + WP.h / 2}`, duration: 0.5 }), 'b5~Something');   // shrinks about its own centre
 
   // ---------------------------------------------------------------- b6: three cards under one banner: check the units
   const B6 = T('b6') - 0.15;

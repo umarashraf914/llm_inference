@@ -193,7 +193,7 @@ V.scene('ch13_s03', S => {
   }
   const yName = S.text('total work', { x: OX + 12, y: OY - PH - 18, size: 22, weight: 650, color: 'muted' }, chart);
   const xName = S.text('tokens', { x: OX + PW / 2, y: OY + 54, size: 22, weight: 650, anchor: 'middle', color: 'muted' }, chart);
-  const sch = S.pill('schematic', { x: 1690, y: 130, tone: 'neutral', size: 20, h: 30 }, chart);
+  const sch = S.pill('schematic', { x: 1716, y: 130, tone: 'neutral', size: 20, h: 30 }, chart);
   hide([grid, yName, xName, sch]);
   fade([grid, yName, xName], 0, 1, tB4 + 0.9, 0.4);
   fade(sch, 0, 1, tB4 + 1.2, 0.4);

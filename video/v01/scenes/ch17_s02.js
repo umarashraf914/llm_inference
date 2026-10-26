@@ -45,10 +45,10 @@ V.scene('ch17_s02', S => {
   const chat = S.g();
   S.rect({ x: 480, y: 130, w: 960, h: 290, r: 22, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 }, chat);
   const bub = S.g(null, chat);
-  const qs = 'What is the capital of France?', qw = S.measure(qs, { size: 26, weight: 600 });
+  const qs = 'What is the capital of France?', qw = S.measure(qs, { size: 26, weight: 600, case: 'keep' });
   S.rect({ x: 1410 - qw - 40, y: 160, w: qw + 40, h: 52, r: 18, fill: '#1d3566', stroke: 'struct', sw: 2 }, bub);
-  S.text(qs, { x: 1390 - qw, y: 187, size: 26, weight: 600, color: 'ink' }, bub);
-  const reply = S.text('', { x: 520, y: 300, size: 30, weight: 600, color: 'ink' }, chat);
+  S.text(qs, { x: 1390 - qw, y: 187, size: 26, weight: 600, color: 'ink', case: 'keep' }, bub);
+  const reply = S.text('', { x: 520, y: 300, size: 30, weight: 600, color: 'ink', case: 'keep' }, chat);
   const caret = S.rect({ x: 520, y: 282, w: 3, h: 36, r: 1, fill: 'ink' }, chat);
   caret.setAttribute('data-audit', 'ignore');
   const sendI = S.g(null, chat);

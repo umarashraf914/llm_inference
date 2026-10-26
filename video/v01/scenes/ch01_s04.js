@@ -10,7 +10,7 @@ V.scene('ch01_s04', S => {
   S.add(fx.pop(bubble, { from: 0.6, d: 0.6 }), 0.15);
   const echo = S.g();
   echo.setAttribute('data-audit', 'ignore');
-  const echoPills = [0, 1, 2, 3, 4, 5].map(i => S.pill(['Why', 'is', 'the', 'sky', 'blue', '?'][i], { x: 420 + i * 110, y: 150, h: 40, size: 22, tone: 'struct' }, echo));
+  const echoPills = [0, 1, 2, 3, 4, 5].map(i => S.pill(['Why', 'is', 'the', 'sky', 'blue', '?'][i], { x: 420 + i * 110, y: 150, h: 40, size: 22, tone: 'struct', case: 'keep' }, echo));
   S.set(echoPills, { autoAlpha: 0 }, 0);
   echoPills.forEach((p, i) => {
     const at = S.t('b1~Remember') + i * 0.12;
@@ -20,7 +20,7 @@ V.scene('ch01_s04', S => {
 
   // the sentence bar, then five pills
   const WORDS = ['the', 'quick', 'brown', 'fox', 'jumps'];
-  const ww = WORDS.map(w => S.measure(w, { size: SIZE, weight: 600 }));
+  const ww = WORDS.map(w => S.measure(w, { size: SIZE, weight: 600, case: 'keep' }));
   const sp = S.measure(' ', { size: SIZE, weight: 600 }) + 6;
   const barW = ww.reduce((a, b) => a + b, 0) + sp * (WORDS.length - 1) + 2 * PADX;
   const BX = 300;
@@ -36,7 +36,7 @@ V.scene('ch01_s04', S => {
     g.box = S.rect({ x: inRow[i] - (ww[i] + 2 * PADX) / 2, y: TY - 34, w: ww[i] + 2 * PADX, h: 68, r: 16, fill: 'url(#card-struct)', stroke: 'struct', sw: 2, strokeOpacity: 0.85 }, g);
     g.base = S.rect({ x: inRow[i] - (ww[i] + 2 * PADX) / 2, y: TY - 34, w: ww[i] + 2 * PADX, h: 68, r: 16, fill: '#0c1326' }, g);
     g.insertBefore(g.base, g.box);
-    g.word = S.text(w, { x: inRow[i], y: TY + 1, size: SIZE, anchor: 'middle', weight: 600, color: 'ink' }, g);
+    g.word = S.text(w, { x: inRow[i], y: TY + 1, size: SIZE, anchor: 'middle', weight: 600, color: 'ink', case: 'keep' }, g);
     g.dx = inBar[i] - inRow[i];
     return g;
   });
@@ -77,16 +77,16 @@ V.scene('ch01_s04', S => {
   S.add(fx.out([five, counter], { d: 0.3 }), 'b2~Rarer-0.2');
   const EX = { cx: 1500, y: 470 };
   const exWord = S.g();
-  const parts = ['un', 'believ', 'ably'], pw = parts.map(p => S.measure(p, { size: 34, weight: 600 }));
+  const parts = ['un', 'believ', 'ably'], pw = parts.map(p => S.measure(p, { size: 34, weight: 600, case: 'keep' }));
   const exBarW = pw.reduce((a, b) => a + b, 0) + 2 * PADX;
   S.rect({ x: EX.cx - exBarW / 2, y: EX.y - 32, w: exBarW, h: 64, r: 16, fill: 'url(#card-struct)', stroke: 'struct', sw: 2, strokeOpacity: 0.8 }, exWord);
-  S.text('unbelievably', { x: EX.cx, y: EX.y + 1, size: 34, anchor: 'middle', weight: 600 }, exWord);
+  S.text('unbelievably', { x: EX.cx, y: EX.y + 1, size: 34, anchor: 'middle', weight: 600, case: 'keep' }, exWord);
   S.add(fx.in(exWord, { from: 'up', d: 0.4 }), 'b2~Rarer');
   const exPills = [];
   let ex = EX.cx - (pw.reduce((a, b) => a + b, 0) + parts.length * 2 * 18 + 2 * 14) / 2;
   parts.forEach((p, i) => {
     const w = pw[i] + 36;
-    exPills.push(S.pill(p, { x: ex + w / 2, y: EX.y, h: 60, w, size: 34, tone: 'struct' }));
+    exPills.push(S.pill(p, { x: ex + w / 2, y: EX.y, h: 60, w, size: 34, tone: 'struct', case: 'keep' }));
     ex += w + 14;
   });
   S.set(exPills, { autoAlpha: 0 }, 0);

@@ -37,9 +37,9 @@ V.scene('ch13_s08', S => {
 
   // ================================================================ left third: one token, eighty layers deep
   const colG = S.g();
-  const hdr = S.text('One token, eighty layers deep', { x: 230, y: 400, size: 26, weight: 750, anchor: 'middle', color: 'ink' }, colG);
+  const hdr = S.text('One token, eighty layers deep', { x: 252, y: 400, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, colG);
   const tok = S.g(null, colG);
-  libToken(S, { text: 'token', x: 218, y: 930, size: 24, w: 110, state: 'token' }, tok);
+  libToken(S, { text: 'token', x: 218, y: 930, size: 24, w: 110, state: 'token', case: 'label' }, tok);
   const ROWS = [...Array.from({ length: 10 }, (_, k) => [`L${k + 1}`, 870 - 38 * k]), ['…', 490], ['L80', 452]];
   const slots = ROWS.map(([name, y]) => {
     const g = S.g(null, colG);

@@ -58,7 +58,7 @@ V.scene('ch08_s05', S => {
   const pills = WORDS.map((w, i) => {
     const g = S.g();
     const bg = S.rect({ x: SX(i) - PW / 2, y: SY - PH / 2, w: PW, h: PH, r: 10, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.7, sw: 1.8 }, g);
-    S.text(w, { x: SX(i), y: SY + 1, size: 20, weight: 600, anchor: 'middle', color: 'ink' }, g);
+    S.text(w, { x: SX(i), y: SY + 1, size: 20, weight: 600, anchor: 'middle', color: 'ink', case: 'keep' }, g);
     g.bg = bg;
     g.style.opacity = 0; g.style.visibility = 'hidden';
     return g;

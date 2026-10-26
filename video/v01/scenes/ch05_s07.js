@@ -40,11 +40,11 @@ V.scene('ch05_s07', S => {
   // ---------------------------------------------------------------- b2: not the chip, not the model; the clue: bytes ÷ bytes per second
   const card = (x, icon, text) => {
     const g = S.g();
-    S.rect({ x, y: 640, w: 380, h: 84, r: 18, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.2, sw: 2 }, g);
+    S.rect({ x, y: 640, w: 420, h: 84, r: 18, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.2, sw: 2 }, g);
     S.icon(icon, { x: x + 44, y: 682, size: 42, color: 'ink' }, g);
     S.text(text, { x: x + 80, y: 683, size: 28, weight: 650, color: 'ink' }, g);
-    S.circle({ x: x + 346, y: 682, r: 18, fill: '#0c1326' }, g);
-    S.icon('ph:check-circle-duotone', { x: x + 346, y: 682, size: 40, color: 'helps' }, g);
+    S.circle({ x: x + 386, y: 682, r: 18, fill: '#0c1326' }, g);
+    S.icon('ph:check-circle-duotone', { x: x + 386, y: 682, size: 40, color: 'helps' }, g);
     S.set(g, { autoAlpha: 0 }, 0);
     return g;
   };

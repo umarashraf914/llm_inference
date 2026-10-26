@@ -19,7 +19,7 @@ V.scene('ch01_s07', S => {
     const g = S.g();
     g.lab = S.g(null, g);
     if (c.icon) S.icon(c.icon, { x: 420, y: ROW(i), size: 52 }, g.lab);
-    S.text(c.label, { x: 460, y: ROW(i), size: 34, weight: 600, color: 'ink' }, g.lab);
+    S.text(c.label, { x: 460, y: ROW(i), size: 34, weight: 600, color: 'ink', case: 'keep' }, g.lab);
     g.bar = S.rect({ x: 640, y: ROW(i) - 24, w: c.v * 100, h: 48, r: 6, fill: 'url(#bar-struct)' }, g);
     g.score = S.text(c.v.toFixed(1), { x: 640 + c.v * 100 + 18, y: ROW(i) + 1, size: 34, family: 'mono', weight: 600, color: 'struct' }, g);
     return g;

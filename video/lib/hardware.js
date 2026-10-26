@@ -161,7 +161,7 @@ var _libHW = (function () {
     if (unit) {
       const b = document.createElementNS(NS, 'tspan');
       b.textContent = '\u2009' + unit;
-      b.setAttribute('font-family', "'Inter'"); b.setAttribute('font-size', o.unitSize); b.setAttribute('font-weight', 550);
+      b.setAttribute('font-family', V.familyCss('sans')); b.setAttribute('font-size', o.unitSize); b.setAttribute('font-weight', 550);
       if (o.unitColor) b.setAttribute('fill', o.unitColor);
       el.appendChild(b);
     }
@@ -170,7 +170,7 @@ var _libHW = (function () {
   /** width of a value written by setValueText */
   function valueWidth(S, v, o) {
     const [num, unit] = o.unit != null ? [String(v), o.unit] : splitUnit(v);
-    return S.measure(num, { size: o.size, weight: 600, family: 'mono' }) + (unit ? S.measure('\u2009' + unit, { size: o.unitSize, weight: 550 }) : 0);
+    return S.measure(num, { size: o.size, weight: 600, family: 'mono' }) + (unit ? S.measure('\u2009' + unit, { size: o.unitSize, weight: 550, case: 'keep' }) : 0);
   }
   /** a seeded permutation rank: rank[i] in 0..n-1 */
   function ranks(S, n, seed) {

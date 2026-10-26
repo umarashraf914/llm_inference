@@ -180,7 +180,7 @@ V.scene('ch13_s05', S => {
   const tMade = T('b3~made') - 0.1, tQuad = T('b3~quadratic') - 0.1, tEvery = T('b3~Every') - 0.1;
   const cnt = S.g();
   const cA = S.text('K and V computed:', { x: 1010, y: 520, size: 30, weight: 700, color: 'helps' }, cnt);
-  const cN = S.text('0', { x: 1300, y: 520, size: 34, weight: 800, family: 'mono', color: 'helps' }, cnt);
+  const cN = S.text('0', { x: 1010 + S.measure('K and V computed:', { size: 30, weight: 700 }) + 16, y: 520, size: 34, weight: 800, family: 'mono', color: 'helps' }, cnt);
   const old = S.text('499,500', { x: 1560, y: 520, size: 34, weight: 800, family: 'mono', color: 'compute' }, cnt);
   const strike = S.path({ d: 'M1550,522 H1720', stroke: 'compute', sw: 4 }, cnt);
   strike.setAttribute('data-audit', 'ignore');

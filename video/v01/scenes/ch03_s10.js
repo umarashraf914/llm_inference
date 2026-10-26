@@ -15,7 +15,7 @@ V.scene('ch03_s10', S => {
     { label: 'your custom instructions', tok: 300, badge: 'ph:user-duotone' },
     { label: 'one loaded skill', tok: 2000 },
   ];
-  const RY = [300, 380, 460, 540], RX = 420, SX = 140, SY = 470;
+  const RY = [300, 380, 460, 540], RX = 460, SX = 140, SY = 470;
   let acc = 0;
   ROWS.forEach(r => { r.w = r.tok * PX; r.sx = SX + acc * PX; acc += r.tok; });
   const TOTAL = acc;                                       // 4,750 → 1,187.5 px, ends at x 1,327.5

@@ -140,7 +140,7 @@ const __TOK = (() => {
     const weight = o.weight || 600, fam = o.mono ? 'mono' : 'sans';
     const padX = o.padX ?? Math.round(size * 0.62);
     const text = String(o.text ?? '').trim();
-    const tw = text ? S.measure(text, { size, weight, family: fam }) : 0;
+    const tw = text ? S.measure(text, { size, weight, family: fam, case: o.case || 'keep' }) : 0;   // a token is shown as written
     const iconS = o.icon ? Math.round(size * 1.1) : 0;
     const iconGap = o.icon && text ? Math.round(size * 0.3) : 0;
     const contentW = iconS + iconGap + tw;
@@ -238,7 +238,8 @@ function libTokenize(text, o = {}) {
  *    narrow, showing only the text, and .showId() widens it), icon (icon id, drawn before the text),
  *    iconColor (the state's tone), frame false (true: a thin rectangular packet frame round the chip, as a
  *    token travels the wire), frameTone 'struct', hidden false, decorative false (size < 24: marks it
- *    data-audit="ignore").
+ *    data-audit="ignore"), case 'keep' (a token's text is shown exactly as written; 'label' for a chip that
+ *    names something, 'your question', so it is cased like the film's other labels).
  * Returns <g> with .body (scaled by pop/pulse), .skin (current skin), .label, .iconEl, .idEl, .idG (inline),
  *    .frameEl, and geometry as drawn: .x .y (top) .w .h .l .r .t .b .cx .cy .rad .wNarrow, .text, .state.
  *    .__dx/.__dy is the planned offset (where helpers have moved it).
@@ -287,7 +288,7 @@ function libToken(S, o = {}, parent) {
   if (o.icon) g.iconEl = S.icon(o.icon, { x: c0 + iconS / 2, y: cy, size: iconS, color: o.iconColor || (st.text === T.DARK ? T.DARK : T.toneOf(o.state)) }, body);
   if (text) {
     g.label = S.text(text, { x: c0 + iconS + iconGap + tw / 2, y: cy + 1, size, weight: M.weight, family: M.fam, anchor: 'middle', color: st.text,
-      maxW: o.w ? Math.max(10, w - padX) : undefined }, body);
+      maxW: o.w ? Math.max(10, w - padX) : undefined, case: o.case || 'keep' }, body);
     if (st.noText) g.label.style.opacity = 0;
   }
   if (inline) {
@@ -370,7 +371,7 @@ function libToken(S, o = {}, parent) {
     const now = g.label ? (g.__text ?? text) : '';
     const nt = String(txt).trim();
     if (g.label) {
-      if (S.measure(nt, { size, weight: M.weight, family: M.fam }) > g.__w - padX * 0.6) S.warn(`libToken.swap: '${nt}' is wider than its chip`);
+      if (S.measure(nt, { size, weight: M.weight, family: M.fam, case: o.case || 'keep' }) > g.__w - padX * 0.6) S.warn(`libToken.swap: '${nt}' is wider than its chip`);
       tl.add(T.retext(g.label, now, nt, so.d ?? 0.35), 0);
       g.__text = nt;
     }
@@ -604,7 +605,7 @@ function libTokenStrip(S, o = {}, parent) {
   // ---- joined sentence bar (one line): chips start as plain words in a bar; .cut() parts them
   if (o.joined && root.tokens.length) {
     const sp = S.measure(' ', { size, weight, family: fam });
-    const tws = root.tokens.map(c => S.measure(c.text, { size, weight, family: fam }));
+    const tws = root.tokens.map(c => S.measure(c.text, { size, weight, family: fam, case: 'keep' }));
     const lead = root.tokens.map((c, i) => (i > 0 && /^\s/.test(c.raw) ? sp : 0));
     const total = tws.reduce((a, b) => a + b, 0) + lead.reduce((a, b) => a + b, 0);
     const first = root.tokens[0], last = root.tokens[root.tokens.length - 1];
@@ -890,13 +891,13 @@ function libTokenStrip(S, o = {}, parent) {
     ws2.splice(at, 1, ...sps2.map(widthOf));
     const P = T.layout(ws2, L);
     // where the original label's letters are now
-    const fullW = S.measure(tok.text, { size, weight, family: fam });
+    const fullW = S.measure(tok.text, { size, weight, family: fam, case: 'keep' });
     const q = geom(tok);
     let jx = q.cx - fullW / 2;
     const madeP = sps2.map((sp, k) => {
       const pc = make(sp, P[at + k]);
       pc.raw = (k === 0 && /^\s/.test(tok.raw || '') ? ' ' : '') + sp.raw;
-      const pw = S.measure(sp.text, { size, weight, family: fam });
+      const pw = S.measure(sp.text, { size, weight, family: fam, case: 'keep' });
       pc.__dx = jx + pw / 2 - (pc.x0 + pc.w / 2);
       pc.__dy = q.cy - pc.cy0;
       gsap.set(pc, { x: pc.__dx, y: pc.__dy });
@@ -1001,7 +1002,7 @@ function libChatWindow(S, o = {}, parent) {
   if (o.composer) {
     root.composer = S.g(null, chrome);
     S.rect({ x: X + pad, y: compY, w: W - 2 * pad, h: compH, r: compH / 2, fill: '#ffffff', fillOpacity: 0.045, stroke: '#ffffff', strokeOpacity: 0.12, sw: 1.5 }, root.composer);
-    root.placeholder = S.text(o.placeholder ?? 'Message', { x: X + pad + 28, y: compY + compH / 2 + 1, size: 24, weight: 450, color: 'faint' }, root.composer);
+    root.placeholder = S.text(o.placeholder ?? 'Message', { x: X + pad + 28, y: compY + compH / 2 + 1, size: 24, weight: 450, color: 'faint', case: 'keep' }, root.composer);
     root.sendBtn = S.g(null, root.composer);
     const br = compH / 2 - 8, bx = X + W - pad - 8 - br, by = compY + compH / 2;
     S.circle({ x: bx, y: by, r: br, fill: tone }, root.sendBtn);
@@ -1014,11 +1015,11 @@ function libChatWindow(S, o = {}, parent) {
   const qPadX = Math.round(qSize * 0.72), bubH = Math.round(qSize * 1.8);
   const qy = o.qy ?? (Y + tbH + Math.round(pad * 0.75) + bubH / 2);
   const q = String(o.question ?? '');
-  const qW = q ? S.measure(q, { size: qSize, weight: 500 }) : 0;
+  const qW = q ? S.measure(q, { size: qSize, weight: 500, case: 'keep' }) : 0;      // what people type stays as typed
   root.bubbleG = S.g(null, root);
   const bubbleIn = S.g(null, root.bubbleG);
   if (q) root.bubble = S.rect({ x: qRight - qW - 2 * qPadX, y: qy - bubH / 2, w: qW + 2 * qPadX, h: bubH, r: Math.min(bubH / 2, 24), fill: '#ffffff', fillOpacity: 0.085, stroke: '#ffffff', strokeOpacity: 0.12, sw: 1.5 }, bubbleIn);
-  if (q) root.questionEl = S.text(q, { x: qRight - qPadX, y: qy + 1, size: qSize, weight: 500, anchor: 'end', color: 'ink' }, bubbleIn);
+  if (q) root.questionEl = S.text(q, { x: qRight - qPadX, y: qy + 1, size: qSize, weight: 500, anchor: 'end', color: 'ink', case: 'keep' }, bubbleIn);
   if (q && o.avatar !== false) root.avatar = S.icon('ph:user-circle-duotone', { x: qRight + 16 + avSize / 2, y: qy, size: avSize, color: 'muted' }, root.bubbleG);
   // ---- answer area
   const icon = Math.round(size * 1.1);
@@ -1037,7 +1038,7 @@ function libChatWindow(S, o = {}, parent) {
   const spW = S.measure(' ', { size, weight });
   const words = [];
   toks.forEach((t, k) => { if (!words.length || /^\s/.test(t)) words.push([k]); else words[words.length - 1].push(k); });
-  const tw = toks.map(t => S.measure(t.trim(), { size, weight }));
+  const tw = toks.map(t => S.measure(t.trim(), { size, weight, case: 'keep' }));
   const pos = [];
   let cx = 0, line = 0;
   words.forEach((wd, wi) => {
@@ -1059,7 +1060,7 @@ function libChatWindow(S, o = {}, parent) {
     flash.setAttribute('opacity', 0);
     const stand = S.rect({ ...box, fill: tone, fillOpacity: 0.2, stroke: tone, strokeOpacity: 0.85, sw: 2 }, inner);
     stand.style.opacity = 0;
-    const text = S.text(t.trim() || ' ', { x: p.x, y: ly + 1, size, weight, color: 'ink' }, inner);
+    const text = S.text(t.trim() || ' ', { x: p.x, y: ly + 1, size, weight, color: 'ink', case: 'keep' }, inner);
     return { g: outer, mid, inner, flash, stand, box, text, raw: t, i: k, line: p.line, word: p.word, x: p.x, w: p.w, y: ly, __sx: 0, __a: 0, __f: 0, __dim: 1 };
   });
   root.lines = toks.length ? pos[toks.length - 1].line + 1 : 0;
@@ -1138,7 +1139,7 @@ function libChatWindow(S, o = {}, parent) {
     const render = () => {
       const s = q.slice(0, Math.round(proxy.n));
       root.questionEl.textContent = s;
-      const w = Math.max(bubH, (s ? S.measure(s, { size: qSize, weight: 500 }) : 0) + 2 * qPadX);
+      const w = Math.max(bubH, (s ? S.measure(s, { size: qSize, weight: 500, case: 'keep' }) : 0) + 2 * qPadX);
       root.bubble.setAttribute('x', qRight - w); root.bubble.setAttribute('width', w);
     };
     const tl = gsap.timeline();
@@ -1306,10 +1307,10 @@ function libBubble(S, o = {}, parent) {
   let ln = '';
   for (const w of words) {
     const t = ln ? ln + ' ' + w : w;
-    if (o.maxW && ln && S.measure(t, { size, weight }) > o.maxW - 2 * padX) { lines.push(ln); ln = w; } else ln = t;
+    if (o.maxW && ln && S.measure(t, { size, weight, case: 'keep' }) > o.maxW - 2 * padX) { lines.push(ln); ln = w; } else ln = t;
   }
   if (ln || !lines.length) lines.push(ln);
-  const tw = Math.max(...lines.map(l => S.measure(l, { size, weight })), size);
+  const tw = Math.max(...lines.map(l => S.measure(l, { size, weight, case: 'keep' })), size);   // a chat message stays as typed
   const w = tw + 2 * padX, h = Math.round(lines.length * lh + size * 0.85);
   const anchor = o.anchor || 'middle';
   const cx0 = o.x ?? 960;
@@ -1333,7 +1334,7 @@ function libBubble(S, o = {}, parent) {
   const fill = tone === 'neutral' ? '#ffffff' : S.tone(tone);
   S.path({ d, fill: T.BASE }, body);
   g.bg = S.path({ d, fill, fillOpacity: tone === 'neutral' ? 0.09 : 0.18, stroke: tone === 'neutral' ? '#ffffff' : tone, strokeOpacity: tone === 'neutral' ? 0.16 : 0.7, sw: 1.5 }, body);
-  g.lines = lines.map((l, i) => S.text(l, { x: x + padX, y: y + h / 2 + (i - (lines.length - 1) / 2) * lh + 1, size, weight, color: 'ink' }, body));
+  g.lines = lines.map((l, i) => S.text(l, { x: x + padX, y: y + h / 2 + (i - (lines.length - 1) / 2) * lh + 1, size, weight, color: 'ink', case: 'keep' }, body));
   if (o.avatar) {
     const as = o.avatarSize || Math.round(size * 1.4);
     const ax = side === 'left' ? x - 14 - as / 2 : x + w + 14 + as / 2;

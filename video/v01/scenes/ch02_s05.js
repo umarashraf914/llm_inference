@@ -3,7 +3,7 @@
    bars to scale at 20 px per ms. 24 tokens/s vs 33 is the same division on a different chip. */
 V.scene('ch02_s05', S => {
   const { fx } = S;
-  const ROWS = [390, 530, 670], BX = 540, PXMS = 20;
+  const ROWS = [390, 530, 670], BX = 580, PXMS = 20;
   const CH = [
     { name: 'H100', bw: '3.35 TB/s', ms: 41.8, tps: '23.9', tag: ['holds 80 GB: model won’t fit', 'a what-if'], band: '140 GB ÷ 3,350 GB/s = 0.0418 s' },
     { name: 'H200', bw: '4.8 TB/s', ms: 29.17, tps: '34.3', tag: ['holds 141 GB: a tight squeeze'], band: '140 GB ÷ 4,800 GB/s = 0.0292 s' },
@@ -22,8 +22,8 @@ V.scene('ch02_s05', S => {
   const cards = CH.map((c, i) => {
     const g = S.g();
     const y = ROWS[i];
-    S.rect({ x: 120, y: y - 58, w: 390, h: 116, r: 16, fill: '#0c1326' }, g);
-    g.bg = S.rect({ x: 120, y: y - 58, w: 390, h: 116, r: 16, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 }, g);
+    S.rect({ x: 120, y: y - 58, w: 440, h: 116, r: 16, fill: '#0c1326' }, g);
+    g.bg = S.rect({ x: 120, y: y - 58, w: 440, h: 116, r: 16, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 }, g);
     S.icon('ph:cpu-duotone', { x: 162, y: y - 22, size: 44, color: 'compute' }, g);
     g.name = S.text([{ t: c.name, c: 'ink', w: 700 }, { t: '  ·  ', c: 'muted', w: 500 }, { t: c.bw, c: 'bytes', w: 650 }], { x: 196, y: y - 22, size: 32 }, g);
     g.tags = c.tag.map((t, k) => S.text(t, { x: 196, y: y + 16 + k * 28, size: 22, color: 'muted', weight: 550 }, g));
@@ -39,7 +39,7 @@ V.scene('ch02_s05', S => {
   S.add(fx.draw(line30, { d: 0.6 }), "b1~Nvidia's+0.4");
   S.add(fx.in([lbl30, scaleTag], { from: 'fade', d: 0.4 }), "b1~Nvidia's+0.6");
   const bars = CH.map((c, i) => S.rect({ x: BX, y: ROWS[i] - 22, w: c.ms * PXMS, h: 44, r: 6, fill: 'url(#bar-bytes)' }));
-  const vals = CH.map((c, i) => S.text(`${c.ms.toFixed(1)} ms`, { x: i === 1 ? 1160 : BX + c.ms * PXMS + 16, y: ROWS[i] + 1, size: 30, family: 'mono', weight: 650, color: 'bytes' }));
+  const vals = CH.map((c, i) => S.text(`${c.ms.toFixed(1)} ms`, { x: i === 1 ? BX + 30 * PXMS + 20 : BX + c.ms * PXMS + 16, y: ROWS[i] + 1, size: 30, family: 'mono', weight: 650, color: 'bytes' }));
   const grow = (i, at) => {
     S.add(gsap.fromTo(bars[i], { attr: { width: 0 } }, { attr: { width: CH[i].ms * PXMS }, duration: 0.8, ease: 'power3.out' }), at);
     S.add(fx.in(vals[i], { from: 'left', d: 0.35 }), S.t(at) + 0.6);

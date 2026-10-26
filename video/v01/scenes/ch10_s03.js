@@ -62,7 +62,7 @@ V.scene('ch10_s03', S => {
   const tIn = T('b2~six') - 0.1;
   inputs.forEach((g, c) => K.track(g, [K.K(tIn + 0.06 * c, { y: -40, o: 0 }), K.K(tIn + 0.06 * c + 0.4, { y: 0, o: 1, e: 'power3.out' })]));
   const lTok = S.text('the token', { x: MX - 24, y: 380, size: 24, weight: 650, anchor: 'end', color: 'struct' });
-  const lCol = S.text('columns = inputs', { x: MX + 6 * P + 12, y: 380, size: 24, weight: 600, color: 'muted' });
+  const lCol = S.text('columns = inputs', { x: MX + 6 * P - 8, y: 380, size: 24, weight: 600, color: 'muted' });
   const lRow = S.text('rows = outputs', { x: MX - 24, y: MY + 2 * P - 4, size: 24, weight: 600, anchor: 'end', color: 'muted' });
   hide([lTok, lCol, lRow]);
   fade([lTok, lCol, lRow], 0, 1, tIn + 0.4, 0.4, 0.15);

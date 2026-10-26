@@ -190,7 +190,7 @@ V.scene('ch13_s11', S => {
     const g = S.g(), x = 100 + 440 * i;
     S.rect({ x, y: 846, w: 400, h: 96, r: 18, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, g);
     S.icon(ic, { x: x + 52, y: 894, size: 50, color: 'helps' }, g);
-    S.text(txt, { x: x + 92, y: 895, size: 26, weight: 750, color: 'ink' }, g);
+    S.text(txt, { x: x + 90, y: 895, size: 24, weight: 750, color: 'ink' }, g);
     const at = T(cue) - 0.1;
     K.track(g, [K.K(at, { y: 60, o: 0 }), K.K(at + 0.5, { y: 0, o: 1, e: 'power3.out' }), K.K(tB5, { o: 1 }), K.K(tB5 + 0.4, { o: 0 })]);
     return g;

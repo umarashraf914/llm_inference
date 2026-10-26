@@ -28,8 +28,8 @@ V.scene('ch02_s06', S => {
   // a chat bubble streaming words at a true 30 ms beat
   const BUB = { x: R.x + 40, y: Y + 26, w: R.w - 80, h: 90 };
   S.rect({ x: BUB.x, y: BUB.y, w: BUB.w, h: BUB.h, r: 18, fill: '#0c1326', stroke: 'struct', sw: 1.5, strokeOpacity: 0.6 }, right);
-  const line1 = S.text('', { x: BUB.x + 22, y: BUB.y + 30, size: 22, color: 'ink', weight: 500 }, right);
-  const line2 = S.text('', { x: BUB.x + 22, y: BUB.y + 62, size: 22, color: 'ink', weight: 500 }, right);
+  const line1 = S.text('', { x: BUB.x + 22, y: BUB.y + 30, size: 22, color: 'ink', weight: 500, case: 'keep' }, right);   // the service's answers, as written
+  const line2 = S.text('', { x: BUB.x + 22, y: BUB.y + 62, size: 22, color: 'ink', weight: 500, case: 'keep' }, right);
   S.add(fx.in(right, { from: 'up', d: 0.6 }), 'b1~a service-0.1');
   const user = S.icon('ph:user-circle-duotone', { x: 1800, y: Y, size: 60, color: 'struct' });
   S.add(fx.in(user, { from: 'fade', d: 0.4 }), 'b1~responds');

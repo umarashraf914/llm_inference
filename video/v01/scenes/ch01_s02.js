@@ -78,7 +78,7 @@ V.scene('ch01_s02', S => {
   S.add(gsap.to(box, { autoAlpha: 0, y: -90, duration: 0.6, ease: 'power2.in' }), 'b1~Hide-0.25');
 
   // the loop: three stations round a ring, right
-  const cyc = S.cycle({ x: 1440, y: 620, r: 225, cardW: 360, cardH: 64, size: 26, tone: 'struct', start: -90,
+  const cyc = S.cycle({ x: 1440, y: 620, r: 250, cardW: 400, cardH: 64, size: 24, tone: 'struct', start: -90,
     stations: [{ label: 'guess the next word' }, { label: 'compare with the real one' }, { label: 'nudge every weight' }] });
   cyc.ring.setAttribute('stroke-opacity', 0.45);
   cyc.dot.setAttribute('data-audit', 'ignore');   // runs behind the opaque station cards
@@ -101,7 +101,7 @@ V.scene('ch01_s02', S => {
   const sentence = (words, x0, parent) => {
     let x = x0;
     const pills = words.map(w => {
-      const p = S.pill(w, { x, y: SY, h: 52, size: 28, tone: 'struct', anchor: 'start' }, parent);
+      const p = S.pill(w, { x, y: SY, h: 52, size: 28, tone: 'struct', anchor: 'start', case: 'keep' }, parent);
       x += p.w + 12;
       return p;
     });
@@ -117,13 +117,13 @@ V.scene('ch01_s02', S => {
 
   // 'guess': station 1, and 'sofa' pops into the blank
   light(0, 'b1~guess-0.2');
-  const sofa = S.pill('sofa', { x: slotX + slotW / 2, y: SY, h: 52, size: 28, tone: 'struct' }, s1);
+  const sofa = S.pill('sofa', { x: slotX + slotW / 2, y: SY, h: 52, size: 28, tone: 'struct', case: 'keep' }, s1);
   S.add(fx.pop(sofa), 'b1~guess+0.1');
 
   // ---------------------------------------------------------------- b2: compare, then nudge
   light(1, 'b2');
   const mat = S.g(null, s1);
-  const matPill = S.pill('mat', { x: slotX + slotW / 2, y: SY + 72, h: 52, size: 28, tone: 'helps' }, mat);
+  const matPill = S.pill('mat', { x: slotX + slotW / 2, y: SY + 72, h: 52, size: 28, tone: 'helps', case: 'keep' }, mat);
   S.icon('ph:check-circle-duotone', { x: slotX + slotW / 2 + matPill.w / 2 + 28, y: SY + 72, size: 40, color: 'helps' }, mat);
   S.add(fx.in(mat, { from: 'up', d: 0.45 }), 'b2~mat-0.15');
   const cross = S.icon('ph:x-circle-duotone', { x: slotX + slotW / 2 + sofa.w / 2 + 28, y: SY, size: 40, color: 'muted' }, s1);

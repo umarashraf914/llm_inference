@@ -115,7 +115,7 @@ V.scene('ch09_s03', S => {
   const tUsers = tB2 + 0.5;
   users.forEach((u, i) => S.add(drive(0.6, k => { const e = E('power3.out')(k); u.setAttribute('transform', `translate(${lerp(160, 0, e).toFixed(1)},0)`); setO(u, k); }), tUsers + 0.15 * i));
   users.forEach(u => setO(u, 0));
-  const bubbles = ['weather tomorrow?', 'fix my code'].map((q, i) => { const b = S.pill(q, { x: U[i][0], y: U[i][1] - 74, tone: 'struct', size: 24, h: 44 }, world); hide(b); return b; });
+  const bubbles = ['weather tomorrow?', 'fix my code'].map((q, i) => { const b = S.pill(q, { x: U[i][0], y: U[i][1] - 74, tone: 'struct', size: 24, h: 44, case: 'keep' }, world); hide(b); return b; });
   fade(bubbles, 0, 1, tUsers + 0.4, 0.35, 0.2);
   // questions in as pills, a coral stream, answers back out
   const tQ = T('b2~questions') - 0.1;

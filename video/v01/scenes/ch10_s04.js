@@ -105,7 +105,7 @@ V.scene('ch10_s04', S => {
   hide(params);
   fade(params, 0, 1, T('b2~projection') + 0.3, 0.4);
   // the formula
-  const FY = 860, FS = 40;
+  const FY = 860, FS = 36;
   const parts = [['operations per token', 'ink', 'b2~operations'], ['=', 'ink', 'b2~are'], ['2', 'compute', 'b2~twice'], ['×', 'ink', 'b2~the#3'], ['parameter count', 'struct', 'b2~parameter']];
   const widths = parts.map(([s]) => S.measure(s, { size: FS, weight: 750 })), gap = 18;
   let fx = 505 - (widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1)) / 2;

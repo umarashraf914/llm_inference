@@ -67,7 +67,7 @@ function ch16Cell(S, o, parent) {
     hatchEl = S.path({ d: ch16Hatch(x + 3, y + 3, w - 6, h - 6, 12), stroke: 'helps', strokeOpacity: 0.75, sw: 3, cap: 'butt' }, g);
     hatchEl.setAttribute('data-audit', 'ignore');
   }
-  if (o.label != null) g.lab = S.text(o.label, { x: x + w / 2, y: o.y + 1, size: o.size ?? 26, weight: 650, anchor: 'middle', color: o.labelTone || 'ink', family: o.mono ? 'mono' : undefined }, g);
+  if (o.label != null) g.lab = S.text(o.label, { x: x + w / 2, y: o.y + 1, size: o.size ?? 26, weight: 650, anchor: 'middle', color: o.labelTone || 'ink', family: o.mono ? 'mono' : undefined, case: o.case }, g);
   K.whole(t => {
     const op = ch16PlanOp(plan, t, K.cl);
     for (const st in tints) K.setO(tints[st], op[st] || 0);
@@ -202,8 +202,8 @@ function ch16Lay(S, items, o = {}) {
   const x0 = o.x0 ?? 260, gap = o.gap ?? 6, size = o.size ?? 24, pad = o.pad ?? 24, minW = o.minW ?? 48;
   let x = x0;
   const out = items.map(it => {
-    const w = it.w ?? Math.max(minW, Math.round(S.measure(it.label, { size, weight: 650 }) + pad));
-    const c = { x, w, r: x + w, cx: x + w / 2, label: it.label };
+    const w = it.w ?? Math.max(minW, Math.round(S.measure(it.label, { size, weight: 650, case: it.case }) + pad));
+    const c = { x, w, r: x + w, cx: x + w / 2, label: it.label, case: it.case };
     x += w + gap;
     return c;
   });

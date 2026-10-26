@@ -137,12 +137,12 @@ V.scene('ch08_s07', S => {
     const gid = `ch08s07-nb-${word}`, lg = S.el('linearGradient', { id: gid, gradientUnits: 'userSpaceOnUse', x1: 0, y1: 150, x2: 0, y2: 380 }, nbDefs);
     [[0, 0], [1, 1]].forEach(([off, op]) => S.el('stop', { offset: off, 'stop-color': col, 'stop-opacity': op }, lg));
     S.rect({ x: x - 22, y: 150, w: 44, h: BBOT - 150, fill: `url(#${gid})`, fillOpacity: 0.28, stroke: `url(#${gid})`, strokeOpacity: 0.7, sw: 1.5 }, g);
-    S.text(word, { x, y: 1040, size: 26, weight: 700, anchor: 'middle', color: col }, g);
+    S.text(word, { x, y: 1040, size: 26, weight: 700, anchor: 'middle', color: col, case: 'keep' }, g);
     ch08Hide(g);
     return g;
   };
   const nbThe = nb(640, VIOLET, 'the'), nbCat = nb(750, PINK, 'cat');
-  const satL = S.text('sat', { x: BXC, y: 1040, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, world);
+  const satL = S.text('sat', { x: BXC, y: 1040, size: 26, weight: 700, anchor: 'middle', color: 'ink', case: 'keep' }, world);
   ch08Hide(satL);
   fade([nbThe, nbCat, satL], 0, 1, t4 + 0.2, 0.5);
   const fromEmb = S.text('from the embedding', { x: BX0 + BW + 22, y: 918, size: 24, weight: 600, color: 'muted' }, world);
