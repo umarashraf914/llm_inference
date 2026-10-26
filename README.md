@@ -1,9 +1,9 @@
 # The Engineering Behind LLM Inference — figure atlases
 
-Nine self-contained HTML figure atlases (551 figures) and two interactive animations that teach a
-lecture series on LLM inference from the ground up: the memory wall, GPU internals, kernels,
-quantization, parallelism, mixture of experts, production serving, speculative decoding and long
-context, and the whole stack.
+Nine self-contained HTML figure atlases (939 figures, 50 of them interactive widgets) and two
+interactive animations that teach a lecture series on LLM inference from the ground up, down to
+high-school maths: the memory wall, GPU internals, kernels, quantization, parallelism, mixture of
+experts, production serving, speculative decoding and long context, and the whole stack.
 
 Open [`atlases/index.html`](atlases/index.html) in a browser to start. Every file works offline.
 
