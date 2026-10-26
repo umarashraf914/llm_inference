@@ -8,3 +8,5 @@ figures/*/.order.lock
 figures/*/order.tmp
 video/.versions/
 video/.cache/
+.DS_Store
+*.DS_Store
