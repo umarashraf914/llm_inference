@@ -83,18 +83,23 @@ sys.path.insert(0, str(TOOLS))
 import films  # noqa: E402  (standard library only: the menu works before the environment exists)
 
 
-def ask(title, options, default):
-    """The index of the option picked on a terminal; with one option, or no terminal to ask on, the default."""
+def ask(question, options, default):
+    """The number picked on a terminal from options [(number, label)] (a film's number, or a version's); with one
+    option, or no terminal to ask on, the default. Answers like 2, 02, v2 and V02 all mean 2."""
     if len(options) == 1 or not sys.stdin.isatty():
         return default
-    print(f"\n{title}")
-    for i, o in enumerate(options, 1):
-        print(f"  {i}. {o}")
-    pick = input(f"Which one? [{default + 1}] ").strip()
-    n = int(pick) if pick.isdigit() else (default + 1 if not pick else 0)
-    if not 1 <= n <= len(options):
-        sys.exit(f"{pick!r} is not one of 1-{len(options)}")
-    return n - 1
+    print()
+    for n, label in options:
+        print(f"  {n}. {label}")
+    numbers = [n for n, _ in options]
+    while True:
+        try:
+            pick = input(f"{question} [{default}] ").strip().lower().lstrip("v").lstrip("0") or str(default)
+        except EOFError:
+            sys.exit("\nnothing chosen")
+        if pick.isdigit() and int(pick) in numbers:
+            return int(pick)
+        print(f"  Type {', '.join(map(str, numbers[:-1]))} or {numbers[-1]}, or press Enter for {default}.")
 
 
 def version_line(v, latest):
@@ -124,9 +129,12 @@ def choose(a):
         released = [(d, m) for d, m in films.films() if m.get("versions")]
         if not released:
             sys.exit("there is no released film in this copy yet; git pull brings new ones")
-        lines = [f"{films.describe(d, m)}   [latest: version {m['versions'][-1]['version']}, {m['versions'][-1]['date']}"
-                 + (f"; {len(m['versions'])} versions]" if len(m["versions"]) > 1 else "]") for d, m in released]
-        folder, meta = released[ask("Films:", lines, len(released) - 1)]
+        number = lambda d: int(d.name[1:])
+        lines = [(number(d), f"{films.describe(d, m)}   [latest: version {m['versions'][-1]['version']}, "
+                             f"{m['versions'][-1]['date']}" + (f"; {len(m['versions'])} versions]" if len(m["versions"]) > 1 else "]"))
+                 for d, m in released]
+        pick = ask("Which film?", lines, number(released[-1][0]))
+        folder, meta = next((d, m) for d, m in released if number(d) == pick)
     if a.working_copy:
         return folder, meta, None
     vs = meta.get("versions") or []
@@ -139,9 +147,9 @@ def choose(a):
         return folder, meta, v
     if a.film:                                  # a film named on the command line means its latest version
         return folder, meta, vs[-1]
-    newest_first = vs[::-1]
-    return folder, meta, newest_first[ask(f"{folder.name.upper()} versions:", [version_line(v, i == 0) for i, v in
-                                                                               enumerate(newest_first)], 0)]
+    pick = ask(f"Which version of {folder.name.upper()}?", [(v["version"], version_line(v, v is vs[-1])) for v in vs[::-1]],
+               vs[-1]["version"])
+    return folder, meta, next(v for v in vs if v["version"] == pick)
 
 
 def inner_argv(a, folder, version):
