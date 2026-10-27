@@ -8,8 +8,12 @@ way, this asks Chromium whether a real graphics card is drawing, renders the sam
 (the look every audit was made against), compares them pixel by pixel and times both. It also encodes the probe
 frames with this computer's hardware encoder (NVIDIA NVENC, or Apple VideoToolbox on a Mac) and with x264, and
 compares both after decoding. The GPU is used only where it matches software closely and is faster.
+
+Each GPU drawing test runs in a process of its own with a time limit: a graphics driver that never answers would
+otherwise hold the whole check (Chromium's calls to it have no time-out of their own). A test that runs out of time
+is stopped with its browser, its last step is reported, and that way of drawing is not used.
 """
-import argparse, json, re, subprocess, sys, tempfile, time
+import argparse, json, os, re, signal, subprocess, sys, tempfile, time
 from pathlib import Path
 
 import numpy as np
@@ -23,6 +27,7 @@ FRAMES = 8                      # consecutive frames timed per probe
 FAR = 64                        # a pixel is "far off" if a channel differs by more than this (of 255)
 MIN_PSNR, MAX_FAR = 36.0, 0.002  # GPU drawing passes if every probe frame is at least this close
 MAX_LOSS = 1.5                  # dB a hardware encoder may give up against x264
+GPU_TIMEOUT = 150               # s a GPU drawing test may take (software drawing needs about 30 s for the same frames)
 HARDWARE_ENCODERS = ["videotoolbox"] if sys.platform == "darwin" else ["nvenc"]
 NAMES = {"x264": "x264", "nvenc": "NVIDIA NVENC", "videotoolbox": "Apple VideoToolbox"}
 
@@ -36,18 +41,23 @@ def probes(timing, n=6):
     return [(s, 0.55) for s in dict.fromkeys(picks)]
 
 
-def capture(film, timing, picks, gpu, scale=2):
-    """Per probe, a run of FRAMES consecutive frames (JPEG bytes) drawn with this gpu mode, and seconds per frame."""
+def capture(film, timing, picks, gpu, scale=2, note=lambda m: None):
+    """Per probe, a run of FRAMES consecutive frames (JPEG bytes) drawn with this gpu mode, and seconds per frame.
+    note(step) is told each step as it starts, so a test that stalls can say where."""
+    note("starting the browser")
     st = render.Stage(film, scale=scale, gpu=gpu)
     try:
+        note("asking the browser which graphics device draws")
         hardware, what = render.gpu_status(st.browser)
         runs, spent, n = [], 0.0, 0
         for sid, frac in picks:
             entry = timing["scenes"][sid]
+            note(f"loading {sid}")
             st.load(entry)
             t0 = round(entry["duration"] * frac * 30) / 30
             run = []
             for i in range(FRAMES):
+                note(f"drawing {sid}, frame {i + 1} of {FRAMES}")
                 a = time.perf_counter()
                 st.seek(t0 + i / 30)
                 run.append(st.jpeg())
@@ -57,6 +67,76 @@ def capture(film, timing, picks, gpu, scale=2):
         return runs, spent / n, hardware, what
     finally:
         st.close()
+
+
+def descendants(pid):
+    """Every process started, directly or not, by pid (POSIX; the browser runs in a process group of its own)."""
+    kids = {}
+    for ln in subprocess.run(["ps", "-A", "-o", "pid=,ppid="], capture_output=True, text=True).stdout.splitlines():
+        a, _, b = ln.strip().partition(" ")
+        if a.isdigit() and b.strip().isdigit():
+            kids.setdefault(int(b), []).append(int(a))
+    found, todo = [], [pid]
+    while todo:
+        for k in kids.get(todo.pop(), []):
+            found.append(k); todo.append(k)
+    return found
+
+
+def kill_tree(p):
+    """Stop a process and everything it started (Playwright's driver and the browser's own processes)."""
+    if sys.platform == "win32":
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+    else:
+        for pid in [*descendants(p.pid), p.pid]:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+    try:
+        p.wait(timeout=20)
+    except subprocess.TimeoutExpired:
+        pass
+
+
+def capture_limited(film, timing, picks, gpu, timeout=GPU_TIMEOUT):
+    """capture() in a process of its own, stopped with its browser if it is not done within timeout seconds."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp)
+        (out / "timing.json").write_text(json.dumps(timing))
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--capture", gpu, "--film", str(Path(film).resolve()),
+               "--picks", json.dumps(picks), "--out", str(out)]
+        p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        try:
+            _, err = p.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            kill_tree(p)
+            last = (out / "progress.txt").read_text().strip().splitlines() if (out / "progress.txt").exists() else []
+            raise TimeoutError(f"no answer within {timeout} s, stuck at: {last[-1] if last else 'the start'}")
+        except BaseException:                   # Ctrl+C: take the browser down too
+            kill_tree(p)
+            raise
+        done = out / "result.json"
+        if p.returncode != 0 or not done.exists():
+            lines = [ln for ln in err.decode("utf-8", "replace").splitlines() if ln.strip()]
+            raise RuntimeError(lines[-1] if lines else f"stopped with exit code {p.returncode}")
+        res = json.loads(done.read_text())
+        runs = [[(out / f"{i}_{j}.jpg").read_bytes() for j in range(FRAMES)] for i in range(len(picks))]
+        return runs, res["spent"], res["hardware"], res["what"]
+
+
+def capture_child(a):
+    """The far side of capture_limited: capture, writing each step to progress.txt and the frames to files."""
+    out = Path(a.out)
+    progress = open(out / "progress.txt", "a", encoding="utf-8")
+    note = lambda m: (progress.write(m + "\n"), progress.flush())
+    timing = json.loads((out / "timing.json").read_text())
+    picks = [tuple(x) for x in json.loads(a.picks)]
+    runs, spent, hardware, what = capture(Path(a.film), timing, picks, a.capture, note=note)
+    for i, run in enumerate(runs):
+        for j, f in enumerate(run):
+            (out / f"{i}_{j}.jpg").write_bytes(f)
+    (out / "result.json").write_text(json.dumps({"spent": spent, "hardware": hardware, "what": what}))
 
 
 def pixels(jpg):
@@ -134,8 +214,12 @@ def check(film, timing, say=print, modes=("shell", "full"), allow_software=False
 
     best_s = None
     for mode in modes:
+        say(f"GPU drawing ({mode}): testing (at most {GPU_TIMEOUT // 60} min {GPU_TIMEOUT % 60} s)")
         try:
-            shots, gpu_s, hardware, what = capture(film, timing, picks, mode)
+            shots, gpu_s, hardware, what = capture_limited(film, timing, picks, mode)
+        except TimeoutError as e:
+            log(f"GPU drawing ({mode}): {e}; not used")
+            continue
         except Exception as e:
             log(f"GPU drawing ({mode}): could not start ({str(e).splitlines()[0][:160]})")
             continue
@@ -164,7 +248,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("film", nargs="?", default="v01")
     ap.add_argument("--allow-software", action="store_true", help="test the GPU path on a software GPU (no speed-up)")
+    for internal in ("--capture", "--film", "--picks", "--out"):     # capture_limited's child process
+        ap.add_argument(internal, help=argparse.SUPPRESS)
     a = ap.parse_args()
+    if a.capture:
+        return capture_child(a)
     film = render.VIDEO / a.film
     timing = json.loads((film / "build" / "timing.json").read_text())
     res = check(film, timing, allow_software=a.allow_software, keep=film / "build" / "gpu_check")
