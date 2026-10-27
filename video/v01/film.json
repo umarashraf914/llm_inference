@@ -25,6 +25,12 @@
       "date": "2026-10-26",
       "commit": "80f9c6819c9121d5aa9390625c2949dfc5e9ff0b",
       "notes": "Poppins in Title Case throughout; lines meet devices and cards at their centre (ch04_s06 and others); labels fitted and spaced film-wide"
+    },
+    {
+      "version": 4,
+      "date": "2026-10-27",
+      "commit": "ce49476720381ec9ab6d7053bf28c6f9ba905aab",
+      "notes": "Pictures centred under their cards and in line (ch03 'Inside a production request' and two more in ch03); labels placed from measurements in ch02, ch04, ch11, ch13 and ch16"
     }
   ]
 }
