@@ -83,7 +83,8 @@ chip that names something ('your question') takes `case: 'label'`. Counters and 
 like the text they write into, so a scene never capitalises a string itself. A phrase broken over lines of
 the same style is still one phrase: draw `V.caseLines(['nothing else about', 'the architecture'])` with
 `case: 'keep'` ('Nothing Else About' / 'the Architecture'), or use `S.para`. A second line in a smaller or
-muted style is a caption of its own and starts with a capital.
+muted style is a caption of its own and starts with a capital. A name with a one-letter subscript is drawn
+with a real subscript: `S.text(V.subs('W_K', 30), { x, y, size: 30 })`.
 
 **Components**
 - `S.heading(title,{y,size,sub})` → `.titleEl .subEl` — scene title band (y≈130–160).
@@ -177,6 +178,19 @@ stopwatch, money-bag, gear, light-bulb. `ph:*-duotone` for symbols in UI style: 
 memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids with
 `python3 tools/build_icons.py --search <word>`, then run `build_icons.py` (no args) to bundle.
 
+**Joining pictures.** The user spotted these faults in V01 and the audit cannot see them, so plan
+them and check them in a `--debug` still.
+- A line meets each picture at the centre of the *whole* picture: a server with its cache stacked on it,
+  a laptop with its base, a card with its badge, an icon by its middle. Lay it out as ch04_s06 does: fix
+  one centre line first (`LY`), work out each whole picture's height from its parts, centre every
+  picture on that line and run the wire along it. A device's `.port()` is the edge of the device alone;
+  once parts are added to it, take the centre from the whole.
+- A wire always meets something. If its target arrives later, draw the target's place from the start
+  (ch04_s06: the cache's place is a dotted outline until the notes arrive).
+- Arrows that fan out leave one point and run straight, level where they can, and each lands on
+  something drawn, never in empty space. A badge sits on its arrow with its label beside it, not across
+  the line. When a loop ends, its arrows, badges and labels dim together (ch04_s05).
+
 ## Technical rules (these bite)
 
 - `fx.in`/`fx.pop` use `fromTo` with `autoAlpha` and reset x/y to 0, so anything with an entrance
@@ -193,7 +207,15 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
   it (`text-touches-box`). Mark deliberate exceptions with `el.setAttribute('data-audit','ignore')`; for
   things in flight, only while they move. `V.audit({ touchGap: 8 })` sweeps for near-misses.
 - A line that joins two pictures meets each at its visual centre: the centre of the whole composite
-  (a server with its cache stack, a laptop with its base, a card), not of one part of it.
+  (a server with its cache stack, a laptop with its base, a card), not of one part of it (see "Joining
+  pictures").
+- Make room for the largest value a counter reaches, not its first (22,000 tokens/s once reached the
+  card beside it), and let a label inside a growing bar wait until the bar can hold it.
+- A label belongs to the picture it is on: a stopwatch on the H100's chart shows the H100's time.
+- After any change of face, size or case, audit every scene again: a wider face moves every label.
+  Before a release, sweep for near misses with `python3 tools/render.py v01 audit all --touch-gap 8`, and
+  widen the gap wherever a viewer would see two things nearly touching (one sample in mid-motion is
+  usually not that).
 - `S.text(..., {maxW})` shrinks text to fit and warns: if it shrinks more than ~15%, make the box
   bigger or the words shorter.
 - Many particles cost render time: keep `S.flow` to ≤ 8 simultaneous paths and `every ≥ 0.06`.
@@ -216,6 +238,7 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
    narration that the storyboard puts on screen is on screen and correct.
 2. Contact sheet reads as a story: you can follow the argument from the stills alone.
 3. Full-size stills: nothing overlaps, nothing clips, nothing is tiny, alignment is clean,
-   spacing is even, colour means what it should.
+   spacing is even, colour means what it should. Lines meet whole pictures at their centres and arrows
+   land on something (a `--debug` still shows it; the audit cannot).
 4. `python3 tools/render.py v01 audit <chapter>` → `AUDIT CLEAN`, and no warnings from `stills`.
 5. It looks designed, not assembled: consistent margins, a clear focal point, deliberate motion.

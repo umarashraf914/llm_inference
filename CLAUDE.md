@@ -15,7 +15,8 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | `atlases/V0N_Title.html` | One atlas per video (the deliverables), built from `figures/V0N/` |
 | `figures/V0N/` | Each atlas's source: one file per figure and part heading, their order, and the Python that drew the new ones |
 | `atlases/*_animation.html` | Interactive companions, linked from the index |
-| `.claude/skills/srt-figure-atlas/` | The workflow: `SKILL.md`, design reference, drawing library, checker |
+| `.claude/skills/srt-figure-atlas/` | The atlas workflow: `SKILL.md`, design reference, drawing library, checker |
+| `.claude/skills/lecture-film/` | The film workflow and the rules learned from V01's faults (`SKILL.md`) |
 | `transcripts/` | Caption files, one per video (see below) |
 | `plans/depth_pass/` | The plan for deepening every atlas to high-school maths: one review per atlas, and a README |
 | `video/` | The motion-graphics films: `vNN/` per film (script, scenes, `narration/`, `film.json`), the engine, and `tools/` |
@@ -52,8 +53,14 @@ rules that most often matter:
 - Never answer a timestamp question from memory; read the transcript window first.
 - Before deepening an atlas, read `plans/depth_pass/README.md` and that atlas's review. Recompute
   every number the review gives; it is a plan, not a source.
+- Do the work yourself, in the session: no sub-agents or multi-agent workflows. They used up the
+  user's usage limit while V01 was made, and the user has asked for this twice.
 
 ## Films
+
+Use the `lecture-film` skill for anything touching a film, and read its `SKILL.md` first: it holds the rules
+learned from V01 (lines meet whole pictures at their centres, labels in Title Case, room around every label)
+and the checks that enforce them. The scene guide is `video/v01/ANIMATION_GUIDE.md`, for every film.
 
 Each film is `video/vNN/`, built in a cloud session (narration with `video/tools/tts.py`, scenes, 1080p previews)
 and rendered in 4K on the user's own computers (a Mac and a Windows workstation) by `video/tools/make_4k.py`, which

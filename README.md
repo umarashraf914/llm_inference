@@ -19,7 +19,9 @@ film has its own folder, `video/v01/` for lecture 1 and so on, so making one fil
 each keeps every version it has been released in: `video/vNN/film.json` lists them with their dates and notes,
 beside the lecture, atlas and transcript the film was made from. A version renders from exactly the files it
 was released with, the shared engine included, so later work can never change it; changing a film means
-releasing a new version, and the old ones stay renderable.
+releasing a new version, and the old ones stay renderable. How a film is made, and the rules learned from
+V01's faults so that none of them happens again, are in
+[`.claude/skills/lecture-film/SKILL.md`](.claude/skills/lecture-film/SKILL.md).
 
 **To render**, double-click `make_film.bat` (Windows) or `make_film.command` (Mac) at the top of the repository.
 It updates from GitHub and asks which film and which version (press Enter for the newest film's latest

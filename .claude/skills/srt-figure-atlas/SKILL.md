@@ -122,7 +122,7 @@ drawing, body prose beneath it, and a caption outside. `references/design.md` de
 one is for. The split that matters most is the last two: **body prose explains, the caption judges.**
 A reader should be able to read only the captions and still come away with the argument.
 
-## Two failure modes the checker cannot see
+## Failure modes the checker cannot see
 
 **Redundancy between neighbours.** Before shipping, read the figure titles and captions in order.
 If two figures near each other make the same point, or share a caption, that is a design fault
@@ -141,6 +141,12 @@ Two that reliably replace it:
 - to *compare* summaries of a distribution, draw them as separate bars on one scale. Median against
   average against p99 as four bars says more than any annotation on a histogram, because the
   comparison becomes a length the reader can see.
+
+**A connector that misses the middle.** A line between two drawings meets each at the centre of the
+whole drawing: a box with smaller boxes stacked on it is one picture, and so is an icon with its
+plate. Arrows that fan out leave one point and each lands on something drawn. The checker does not
+know which shapes make one picture, so look; `references/design.md` ("Lines between pictures") has
+the method.
 
 ## Naming and versioning
 

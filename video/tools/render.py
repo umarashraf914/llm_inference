@@ -7,6 +7,7 @@
 
   # automated layout audit (overlapping / off-screen / tiny text), sampled through each scene
   python3 video/tools/render.py video/v01 audit ch05
+  python3 video/tools/render.py video/v01 audit all --touch-gap 8      # also labels within 8 px of a neighbour
 
   # video segments (silent), one mp4 per scene, in parallel
   python3 video/tools/render.py video/v01 video all --fps 30 --workers 3
@@ -230,7 +231,8 @@ def do_stills(film, timing, ids, at, debug, scale=1):
     st.close()
 
 
-def do_audit(film, timing, ids, step):
+def do_audit(film, timing, ids, step, touch_gap=None):
+    opts = {"touchGap": touch_gap} if touch_gap is not None else {}   # a wider gap sweeps for near misses
     st = Stage(film)
     total = 0
     for sid in ids:
@@ -241,7 +243,7 @@ def do_audit(film, timing, ids, step):
         found = {}
         for t in sorted(ts):
             st.seek(t)
-            for iss in st.page.evaluate("V.audit()"):
+            for iss in st.page.evaluate("o => V.audit(o)", opts):
                 key = json.dumps({k: v for k, v in iss.items() if k not in ("box", "frac", "px")}, sort_keys=True)
                 found.setdefault(key, []).append(t)
         w = res.get("warnings") or []
@@ -475,6 +477,8 @@ def main():
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--workers", type=int, default=3)
     ap.add_argument("--step", type=float, default=0.5, help="audit sampling step, seconds")
+    ap.add_argument("--touch-gap", type=float, help="audit: flag labels closer than this many px to a neighbour "
+                    "(default 3-4; 8 sweeps for near misses before a release)")
     ap.add_argument("--scale", type=float, default=1, help="pixel density: 1 -> 1920x1080, 2 -> 3840x2160")
     ap.add_argument("--out", help="folder for video segments (default build/segments)")
     ap.add_argument("--skip-existing", action="store_true", help="leave segments already in the folder alone (resume)")
@@ -492,7 +496,7 @@ def main():
     if a.mode == "stills":
         do_stills(film, timing, ids, a.at, a.debug, a.scale)
     elif a.mode == "audit":
-        sys.exit(1 if do_audit(film, timing, ids, a.step) else 0)
+        sys.exit(1 if do_audit(film, timing, ids, a.step, a.touch_gap) else 0)
     else:
         do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing, a.gpu, a.encoder, a.cache)
 

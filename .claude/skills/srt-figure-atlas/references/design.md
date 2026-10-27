@@ -211,6 +211,10 @@ fit, shorten them — do not shrink the padding.
 When a bar is too narrow to hold its own value, put the value outside to the right rather than
 squeezing it in.
 
+A label needs room *beside* it too. Two labels on one line never meet end to end, and a label never
+sits flush against the box or circle next to it: leave at least 6px, as inside a box. Labels that touch
+read as one word, or as a label stuck to the wrong shape.
+
 ## Lines across boxes
 
 A line drawn over a filled box is almost always a mistake: an arrow that starts inside the shape it
@@ -223,6 +227,21 @@ Two cases are genuine and get `class="... xok"`, which the `over-box` check skip
 - a reference marker that must span several bars to show where a value falls
 
 Both are annotations *about* the boxes rather than accidents on top of them.
+
+## Lines between pictures
+
+A connector between two drawings meets each at the centre of the *whole* drawing, not of one part of
+it. A box with a stack of smaller boxes on it, an icon with its plate, a package with its memory
+beside it: the line aims at the middle of everything that reads as one picture. Lay the figure out
+from the connector: choose its line first, then centre each picture on it. (The V1 film once drew a
+wire to a server's chassis, below the cache stacked on top of it: it missed the middle of the picture.)
+
+Arrows that fan out from one thing leave from one point and run straight, level where they can.
+Each lands on something drawn, never in empty space, and its label sits beside the line, not across
+it. If the target only appears later in a build-up, draw its outline from the start.
+
+The checker cannot see either fault, because it does not know which shapes make one picture: look at
+the figure.
 
 ## Captions
 
