@@ -10,7 +10,8 @@
    b3  a white marker in each pill row at the first divergence; 'usually reported', 'the part you control';
        'two ways to quote the same hits'.
    Layout: table x 230-1810, y 250-690 (header 250-330; rows A, B, C 120 high, centres 390 / 510 / 630); columns
-   case 230-720, whole prompt 720-1150, your 7 tokens 1150-1810; bar y 800; tags y 742; bottom line y 850. */
+   case 230-720, whole prompt 720-1150, your 7 tokens 1150-1810; bar y 800; tags y 742; bottom line y 850. The
+   table and everything on and around it is drawn at x 230-1810 and moved 60 left, centred; the b1 bar is centred. */
 V.scene('ch16_s06', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1;
@@ -20,7 +21,7 @@ V.scene('ch16_s06', S => {
   // ================================================================ b1: against the whole prompt
   // the corner scoreboard flies to the centre and hands over to the table
   const score = ch16Score(S, { rows: [{ case: 'time t', hit: 0, pre: 777 }, { case: 'A', hit: 784, pre: 4 }, { case: 'B', hit: 775, pre: 2 }, { case: 'C', hit: 770, pre: 7 }] });
-  K.track(score, [K.K(0.5, { x: 0, y: 0, s: 1, o: 1 }), K.K(1.3, { x: -560, y: 260, s: 1.6, o: 0, e: 'power3.inOut' })], 1870, 40);
+  K.track(score, [K.K(0.5, { x: 0, y: 0, s: 1, o: 1 }), K.K(1.3, { x: -620, y: 260, s: 1.6, o: 0, e: 'power3.inOut' })], 1870, 40);   // onto the table (moved 60 left)
   K.ignore(score, 0.5, 0.9);
   const table = S.g();
   S.rect({ x: 230, y: 250, w: 1580, h: 440, r: 20, fill: CH16.BASE, fillOpacity: 0.92, stroke: '#ffffff', strokeOpacity: 0.18, sw: 1.5 }, table);
@@ -116,4 +117,8 @@ V.scene('ch16_s06', S => {
   rise(ctl, tCtl, 6);
   const two = S.text('two ways to quote the same hits', { x: 1020, y: 850, size: 32, weight: 750, anchor: 'middle', color: 'ink' });
   rise(two, T('b3~usually') - 0.1, 8);
+  // the table and what is written in and around it, centred (see the header)
+  const tableG = S.g();
+  [...S.main.children].filter(e => e !== tableG && e !== score && e !== bar).forEach(e => tableG.appendChild(e));
+  tableG.setAttribute('transform', 'translate(-60,0)');
 });

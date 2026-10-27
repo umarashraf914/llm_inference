@@ -9,7 +9,8 @@
    b4  a dashed ceiling drops over each card on its phrase, each with its reason drawn in the card.
    b5  the arrow keeps climbing; the cards press up against their ceilings; '1 lever' vs '3 constrained levers'.
    Checks: 5 × 1,024 = 5,120; 5.23e9 × 5,120 = 2.68e13 bits/s; ÷ 8 = 3.35e12 B/s.
-   Layout: top-left x 120-1220, y 100-330; package / close-up x 1110-1810, y 150-510; cards y 600-860. */
+   Layout: top-left x 120-1220, y 100-330; package / close-up x 1110-1810, y 150-510; cards y 600-860. Until
+   the cards come (b2) the top band is alone, so it sits BDY lower, centred, and moves up for them. */
 V.scene('ch06_s10', S => {
   const { fx } = S;
   const T = s => S.t(s);
@@ -20,7 +21,10 @@ V.scene('ch06_s10', S => {
   const ignoreIn = (els, a, b) => ch06Clock(S, a, b, t => els.forEach(e => (t > a && t < b ? e.setAttribute('data-audit', 'ignore') : e.removeAttribute('data-audit'))));
 
   // ================================================================ b1: compute, one lever
-  const comp = S.g();
+  const band = S.g(), BDY = 240;
+  S.set(band, { y: BDY }, 0);
+  S.add(gsap.fromTo(band, { y: BDY }, { y: 0, duration: 0.65, ease: 'power2.inOut', immediateRender: false }), T('b2~rate') - 0.75);
+  const comp = S.g(null, band);
   const cTop = S.g(null, comp);
   S.card({ x: 140, y: 118, w: 560, h: 84, tone: 'compute', r: 20 }, cTop);
   S.text('Compute scales with one thing', { x: 420, y: 161, size: 31, weight: 700, anchor: 'middle', color: 'compute' }, cTop);
@@ -31,7 +35,7 @@ V.scene('ch06_s10', S => {
   S.add(fx.in(cDen, { from: 'up', d: 0.6, dist: 16 }), 'b1~Transistors+0.2');
   // the inset: 6 x 4 amber squares; one subdivides into 4, then 16, in the same area
   const IN = { x: 646, y: 220, p: 22, q: 18 };
-  const inset = S.g();
+  const inset = S.g(null, band);
   S.rect({ x: IN.x - 10, y: IN.y - 10, w: 6 * IN.p + 16, h: 4 * IN.p + 16, r: 10, fill: '#0c1326', stroke: 'compute', strokeOpacity: 0.35, sw: 1.5 }, inset);
   const SR = 1, SC = 3;
   let base = '';
@@ -48,8 +52,8 @@ V.scene('ch06_s10', S => {
   S.add(gsap.to(s2, { autoAlpha: 0, duration: 0.15 }), tSplit + 0.5);
   S.add(gsap.fromTo(s4, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15, immediateRender: false }), tSplit + 0.5);
   S.add(fx.out(inset, { d: 0.45 }), T('b1~yet') + 0.1);
-  // the arrow climbing up and off the top of the frame
-  const ARR = 'M706,150 C790,140 830,70 860,-60';
+  // the arrow climbing up and off the top of the frame (wherever the band is)
+  const ARR = 'M706,150 C790,140 830,70 860,-60 L926,-346';
   const climb = S.path({ d: ARR, stroke: 'compute', sw: 7 }, comp);
   climb.setAttribute('stroke-linecap', 'round');
   const climbFlow = S.path({ d: ARR, stroke: '#fff3d6', sw: 3, opacity: 0 }, comp);
@@ -64,7 +68,7 @@ V.scene('ch06_s10', S => {
   // ================================================================ b2: the package, its stacks and pins
   S.add(fx.dim(noCeil, { to: 0.35 }), T('b2') - 0.05);
   const PK0 = { x: 1500, y: 300, s: 0.45 }, PK1 = { x: 1460, y: 316, s: 0.7 };
-  const pkHold = S.g();
+  const pkHold = S.g(null, band);
   const pkg = ch06Package(S, { x: 0, y: 0, s: 1, side: 'both', stacks: 3, grey: [5], wires: 14, tagSize: 24 / PK0.s * PK0.s }, pkHold);
   pkg.tagEl.setAttribute('font-size', 24 / PK0.s);
   const pkXf = (x, y, s) => `translate(${x.toFixed(2)},${y.toFixed(2)}) scale(${s.toFixed(4)})`;
@@ -79,17 +83,17 @@ V.scene('ch06_s10', S => {
   });
   // the tag swaps: grey 'generic GPU' → blue 'H100 · 80 GB'
   const BX = PK1.x + PK1.s * (-150 - 300 - 46 + 26), BY = PK1.y + PK1.s * (236 - 26);
-  const h100 = S.text('H100 · 80 GB', { x: BX, y: BY, size: 26, weight: 700, color: 'struct' });
+  const h100 = S.text('H100 · 80 GB', { x: BX, y: BY, size: 26, weight: 700, color: 'struct' }, band);
   S.set(h100, { autoAlpha: 0 }, 0);
   S.add(gsap.to(pkg.tagEl, { autoAlpha: 0, duration: 0.3 }), tZ + 0.9);
   S.add(fx.in(h100, { from: 'fade', d: 0.4 }), tZ + 1.1);
   // a pointer names one tower 'stack'; the grey count of active stacks
   const stX = PK1.x + PK1.s * (150 + 170 + 65), stY = PK1.y + PK1.s * -150;
-  const stackLbl = S.g();
+  const stackLbl = S.g(null, band);
   S.text('stack', { x: stX, y: stY - 64, size: 28, weight: 650, anchor: 'middle', color: 'bytes' }, stackLbl);
   const stPtr = S.line({ x1: stX, y1: stY - 46, x2: stX, y2: stY - 6, stroke: 'bytes', sw: 2.5 }, stackLbl);
   stPtr.setAttribute('data-audit', 'ignore');
-  const active = S.text('H100: 5 active stacks', { x: PK1.x, y: PK1.y + PK1.s * 236 + 34, size: 26, weight: 550, anchor: 'middle', color: 'muted' });
+  const active = S.text('H100: 5 active stacks', { x: PK1.x, y: PK1.y + PK1.s * 236 + 34, size: 26, weight: 550, anchor: 'middle', color: 'muted' }, band);
   [stackLbl, active].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
   S.add(fx.in(stackLbl, { from: 'down', d: 0.45, dist: 12 }), 'b2~stacks-0.1');
   S.add(fx.in(active, { from: 'fade', d: 0.45 }), T('b2~stacks') + 0.4);
@@ -98,7 +102,7 @@ V.scene('ch06_s10', S => {
   const tPins = T('b2~pins') - 0.15;
   S.add(gsap.to([pkHold, h100, stackLbl], { opacity: 0, duration: 0.4 }), tPins);
   ignoreIn([pkHold, h100, stackLbl], tPins, S.duration);
-  const close = S.g();
+  const close = S.g(null, band);
   const TW = { x: 1170, y: 180, w: 230 };
   for (let l = 0; l < 8; l++) S.rect({ x: TW.x, y: TW.y + l * 25, w: TW.w, h: 20, r: 4, fill: '#2a1218', stroke: 'bytes', strokeOpacity: 0.9, sw: 2 }, close);
   S.rect({ x: TW.x - 30, y: TW.y + 8 * 25 + 12, w: TW.w + 60, h: 12, r: 3, fill: '#1f2a48' }, close);

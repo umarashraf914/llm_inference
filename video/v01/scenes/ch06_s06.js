@@ -19,11 +19,13 @@ V.scene('ch06_s06', S => {
   const X0 = 350, X1 = 1470, LEN = X1 - X0;
 
   // ================================================================ the lanes (they sink in b2, return in b3)
-  const lanes = S.g();
+  // the lanes, chip to counter, span 163-1650: LDX centres them; the headings are centred over them
+  const lanes = S.g(), LDX = 54, HX = 960 - LDX;
+  S.set(lanes, { x: LDX }, 0);
   const top = S.g(null, lanes), bot = S.g(null, lanes);
   // ---------------------------------------------------------------- top lane: latency
-  const LY = 300;
-  const headT = S.text([{ t: 'Latency: ', c: 'ink', w: 700 }, { t: 'how long one request takes', c: 'muted' }], { x: 150, y: 168, size: 40, weight: 600, family: 'display' }, top);
+  const LY = 320;
+  const headT = S.text([{ t: 'Latency: ', c: 'ink', w: 700 }, { t: 'how long one request takes', c: 'muted' }], { x: HX, y: 150, size: 40, weight: 600, family: 'display', anchor: 'middle' }, top);
   const chip = S.g(null, top);
   S.rect({ x: 163, y: LY - 27, w: 54, h: 54, r: 8, fill: '#1a1408', stroke: 'compute', sw: 3 }, chip);
   let cf = '';
@@ -34,7 +36,7 @@ V.scene('ch06_s06', S => {
   wait.setAttribute('data-audit', 'ignore');
   const waitLbl = S.text('wait', { x: (X0 + X1) / 2, y: LY + 36, size: 26, weight: 550, anchor: 'middle', color: 'muted' }, top);
   const arrive = S.pill('arrive', { x: X1 + 85, y: LY, tone: 'struct', size: 26, h: 46 }, top);
-  const sw = libStopwatch(S, { x: (X0 + X1) / 2 + 110, y: LY - 86, size: 92, readout: 'none', span: 4000, buttons: true }, top);   // clear of the heading's end
+  const sw = libStopwatch(S, { x: (X0 + X1) / 2, y: LY - 86, size: 92, readout: 'none', span: 4000, buttons: true }, top);   // over the wait, under the heading
   const fixedTag = S.text('fixed by distance', { x: (X0 + X1) / 2, y: LY + 36, size: 26, weight: 600, anchor: 'middle', color: 'muted' }, top);
   const dot = S.circle({ x: X0, y: LY, r: 10, fill: 'struct', opacity: 0 }, top);
   [headT, chip, ask, waitLbl, arrive, fixedTag].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
@@ -50,7 +52,7 @@ V.scene('ch06_s06', S => {
 
   // ---------------------------------------------------------------- bottom lane: bandwidth
   const TY0 = 600, TH = 260;
-  const headB = S.text([{ t: 'Bandwidth: ', c: 'bytes', w: 700 }, { t: 'how much travels at once', c: 'muted' }], { x: 150, y: 538, size: 40, weight: 600, family: 'display' }, bot);
+  const headB = S.text([{ t: 'Bandwidth: ', c: 'bytes', w: 700 }, { t: 'how much travels at once', c: 'muted' }], { x: HX, y: 538, size: 40, weight: 600, family: 'display', anchor: 'middle' }, bot);
   const trackLines = [...Array(12)].map(() => S.line({ x1: X0, y1: 0, x2: X1, y2: 0, stroke: 'bytes', strokeOpacity: 0.28, sw: 2, cap: 'butt' }, bot));
   const pk = S.path({ d: '', fill: 'bytes' }, bot);
   [pk, ...trackLines].forEach(e => e.setAttribute('data-audit', 'ignore'));
@@ -121,26 +123,32 @@ V.scene('ch06_s06', S => {
   S.add(gsap.fromTo(lanes, { y: 0, opacity: 1 }, { y: 680, opacity: 0.12, duration: 0.9, ease: 'power3.inOut', immediateRender: false }), tSink);
   S.add(fx.out(arrG, { d: 0.3 }), tSink);
   ignoreIn([lanes], tSink, tBack + 0.9);
-  const ships = S.g();
-  const ship2 = S.icon('fluent:ship', { x: 400, y: 372, size: 290 }, ships);
-  const ship1 = S.icon('fluent:ship', { x: 560, y: 410, size: 290 }, ships);
-  const latW = S.text('latency: weeks', { x: 560, y: 610, size: 32, weight: 600, anchor: 'middle', color: 'muted' }, ships);
-  const bwHuge = S.text('bandwidth: huge', { x: 560, y: 658, size: 32, weight: 650, anchor: 'middle', color: 'bytes' }, ships);
-  const bwX2 = S.text('bandwidth: ×2', { x: 560, y: 658, size: 32, weight: 650, anchor: 'middle', color: 'bytes' }, ships);
+  // the ships' column is alone until the courier comes: `ships` holds it centred (SX px right) until then
+  const ships = S.g(), SX = 960 - 590;
+  S.set(ships, { x: SX }, 0);
+  // ships (left) and courier (right), the pair centred; the first ship moves aside as the second comes in
+  // behind it, so the two stay centred over their tags
+  const ship2 = S.icon('fluent:ship', { x: 510, y: 372, size: 290 }, ships);
+  const ship1 = S.icon('fluent:ship', { x: 590, y: 410, size: 290 }, ships);
+  const latW = S.text('latency: weeks', { x: 590, y: 610, size: 32, weight: 600, anchor: 'middle', color: 'muted' }, ships);
+  const bwHuge = S.text('bandwidth: huge', { x: 590, y: 658, size: 32, weight: 650, anchor: 'middle', color: 'bytes' }, ships);
+  const bwX2 = S.text('bandwidth: ×2', { x: 590, y: 658, size: 32, weight: 650, anchor: 'middle', color: 'bytes' }, ships);
   [ship1, ship2, latW, bwHuge, bwX2].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
   S.add(fx.in(ship1, { from: 'right', d: 0.7, dist: 60 }), 'b2~container-0.15');
   S.add(fx.in(latW, { from: 'up', d: 0.45, dist: 12 }), 'b2~weeks-0.1');
   S.add(fx.in(bwHuge, { from: 'up', d: 0.45, dist: 12 }), 'b2~goods-0.15');
   S.add(fx.in(ship2, { from: 'left', d: 0.6, dist: 80 }), 'b2~second-0.1');
+  S.add(gsap.fromTo(ship1, { x: 0 }, { x: 80, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), 'b2~second-0.1');
   S.add(gsap.to(bwHuge, { autoAlpha: 0, duration: 0.25 }), 'b2~doubles-0.05');
   S.add(fx.in(bwX2, { from: 'up', d: 0.4, dist: 10 }), T('b2~doubles') + 0.15);
   S.add(gsap.fromTo(latW, { scale: 1, transformOrigin: '50% 50%' }, { scale: 1.14, duration: 0.25, yoyo: true, repeat: 1, ease: 'sine.inOut', transformOrigin: '50% 50%', immediateRender: false }), 'b2~not-0.05');
   const bike = S.g();
-  const scooter = S.icon('fluent:motor-scooter', { x: 1400, y: 420, size: 250 }, bike);
-  const parcel = S.icon('fluent:package', { x: 1466, y: 396, size: 56 }, bike);
-  const latM = S.text('latency: minutes', { x: 1400, y: 610, size: 32, weight: 600, anchor: 'middle', color: 'muted' }, bike);
-  const bwTiny = S.text('bandwidth: tiny', { x: 1400, y: 658, size: 32, weight: 650, anchor: 'middle', color: 'bytes' }, bike);
+  const scooter = S.icon('fluent:motor-scooter', { x: 1430, y: 420, size: 250 }, bike);
+  const parcel = S.icon('fluent:package', { x: 1496, y: 396, size: 56 }, bike);
+  const latM = S.text('latency: minutes', { x: 1430, y: 610, size: 32, weight: 600, anchor: 'middle', color: 'muted' }, bike);
+  const bwTiny = S.text('bandwidth: tiny', { x: 1430, y: 658, size: 32, weight: 650, anchor: 'middle', color: 'bytes' }, bike);
   [scooter, parcel, latM, bwTiny].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
+  S.add(gsap.fromTo(ships, { x: SX }, { x: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), T('b2~motorbike') - 0.5);
   S.add(fx.in([scooter, parcel], { from: 'right', d: 0.6, dist: 60, stagger: 0.12 }), 'b2~motorbike-0.15');
   S.add(fx.in(latM, { from: 'up', d: 0.45, dist: 12 }), 'b2~courier-0.1');
   S.add(fx.in(bwTiny, { from: 'up', d: 0.45, dist: 12 }), 'b2~is-0.05');

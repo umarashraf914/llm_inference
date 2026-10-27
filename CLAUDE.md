@@ -60,8 +60,8 @@ rules that most often matter:
 ## Films
 
 Use the `lecture-film` skill for anything touching a film, and read its `SKILL.md` first: it holds the rules
-learned from V01 (lines meet whole pictures at their centres, labels in Title Case, room around every label)
-and the checks that enforce them. The scene guide is `video/v01/ANIMATION_GUIDE.md`, for every film.
+learned from V01 (lines meet whole pictures at their centres, every frame composed like a slide from the centre
+out, labels in Title Case, room around every label) and the checks that enforce them. The scene guide is `video/v01/ANIMATION_GUIDE.md`, for every film.
 
 Each film is `video/vNN/`, built in a cloud session (narration with `video/tools/tts.py`, scenes, 1080p previews)
 and rendered in 4K on the user's own computers (a Mac and a Windows workstation) by `video/tools/make_4k.py`, which

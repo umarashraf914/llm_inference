@@ -12,6 +12,9 @@ V.scene('ch11_s02', S => {
   const K = ch11Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
   // ================================================================ b1: the formula
+  // the formula card (y 150-330) is alone through b1: the camera holds it on the screen's middle, 300 px down;
+  // with the rows and pills under it (b2-b3) the whole sits 105 px down
+  S.xset(S.camera, { x: 0, y: 300, s: 1 });
   const card = S.g();
   // the fraction measured from its words: the bar spans the numerator, the card holds both with room
   const wAi = S.measure('arithmetic intensity =', { size: 36, weight: 750 }), wNum = S.measure('operations performed', { size: 30, weight: 750 });
@@ -47,6 +50,7 @@ V.scene('ch11_s02', S => {
 
   // ================================================================ b2: high and low intensity
   const tB2 = T('b2') - 0.1;
+  S.add(S.fx.cam({ x: 960, y: 435, scale: 1, d: 0.8, ease: 'power2.inOut' }), tB2 - 0.2);
   fade(chipQ, 1, 0, tB2, 0.3);
   const LY = [520, 720];
   const lanes = LY.map(y => {

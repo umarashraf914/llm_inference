@@ -15,7 +15,7 @@ V.scene('ch10_s04', S => {
   // ================================================================ b1: one layer's matrices
   const panel = S.g();
   S.rect({ x: 110, y: 220, w: 790, h: 500, r: 22, fill: '#0b1224', stroke: 'struct', strokeOpacity: 0.55, sw: 2 }, panel);
-  S.text('one layer: all matrix multiplies', { x: 140, y: 262, size: 28, weight: 700, color: 'ink' }, panel);
+  S.text('one layer: all matrix multiplies', { x: 505, y: 262, size: 28, weight: 700, anchor: 'middle', color: 'ink' }, panel);   // centred in the panel
   hide(panel);
   fade(panel, 0, 1, 0.4, 0.5);
   const TW = 160, TH = 100;
@@ -137,4 +137,11 @@ V.scene('ch10_s04', S => {
   hide(own);
   fade(own, 0, 1, T('b3~on#2') - 0.1, 0.4);
   void qE; void lerp;
+
+  // ================================================================ the pane: everything
+  // The panel (x 110-900, y 220-720) is alone through b1: the pane holds it centred, and moves to the full layout
+  // (panel left, stack right, formula under them) just before the tiles merge (b2)
+  const pane = S.g();
+  [...S.layers.main.children].filter(e => e !== pane).forEach(e => pane.appendChild(e));
+  whole(t => { const k = 1 - EIO(cl((t - tAdd + 0.9) / 0.8)); pane.setAttribute('transform', `translate(${(455 * k).toFixed(1)},${(70 * k).toFixed(1)})`); });
 });

@@ -11,8 +11,10 @@
        every row; teal '÷ 10' arrows.
    b6  'prefill: spread across thousands' on the 2,000 row; 'decode, one request' and a padlock on the 1 row;
        a spotlight on it: 'nobody to share it with'.
-   Layout: lanes x 110-1810 (prefill y 150-260, decode y 320-430); title band y 330; formula y 425; rows y 520 /
-   605 / 690 / 775, bars from x 470 (1,200 px = 140 GB). */
+   Layout: lanes x 110-1810 (prefill y 150-260, decode y 320-430), drawn there and moved as one picture: centred
+   alone (+250), up to +108 when the thought bubble comes under them (b3), then shrunk into a strip. b4: the
+   strip, the band (y 416) and the formula (y 512) centred as one block (+168.5); b5: the block back up and the
+   rows (y 607 / 692 / 777 / 862, bars from x 508, 1,200 px = 140 GB) under it, the whole frame centred. */
 V.scene('ch10_s07', S => {
   const K = ch10Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
@@ -91,7 +93,7 @@ V.scene('ch10_s07', S => {
   const tMac = T('b1~multiply') - 0.1;
   pulse(flD, tMac, 0.9, 0.5);
   whole(t => { dec.cnt.textContent = t >= tMac + 0.25 ? '1' : '0'; });
-  const inV = S.text('1 input vector', { x: TX0, y: 462, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
+  const inV = S.text('1 input vector', { x: TX0, y: 462, size: 24, weight: 600, anchor: 'middle', color: 'muted' }, lanesG);
   hide(inV);
   fade(inV, 0, 1, tMac + 0.2, 0.3);
   fade(inV, 1, 0, tPre, 0.3);
@@ -104,7 +106,7 @@ V.scene('ch10_s07', S => {
   // ================================================================ b2: the same toll; payoff × 2,000
   const tToll = T('b2~toll') - 0.1;
   [pre, dec].forEach(l => S.add(K.drive(1.4, k => { const s = k < 0.2 ? lerp(1.6, 1, E('back.out(2)')(k / 0.2)) : 1; setO(l.stamp, k < 0.85 ? Math.min(1, k * 8) : (1 - k) / 0.15); l.stamp.setAttribute('transform', `translate(${GX - GX * s},${l.cy - l.cy * s}) scale(${s})`); }), tToll));
-  const x2k = S.pill('× 2,000', { x: 1650, y: 290, tone: 'compute', size: 26, h: 44, style: 'solid', mono: true });
+  const x2k = S.pill('× 2,000', { x: 1650, y: 290, tone: 'compute', size: 26, h: 44, style: 'solid', mono: true }, lanesG);
   hide(x2k);
   const tTh = T('b2~thousands') - 0.1;
   fade(x2k, 0, 1, tTh, 0.35);
@@ -113,13 +115,14 @@ V.scene('ch10_s07', S => {
 
   // ================================================================ b3: true, but beside the point
   const tBub = T('b3~because') - 0.1;
+  // the lanes (moved +108 by now) and the bubble under them, centred as one block
   const bub = S.g();
-  S.rect({ x: 600, y: 560, w: 720, h: 90, r: 45, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.35, sw: 2 }, bub);
-  S.circle({ x: 640, y: 676, r: 12, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.35, sw: 2 }, bub);
-  S.circle({ x: 618, y: 704, r: 7, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.35, sw: 2 }, bub);
-  S.text('slow because the model is large', { x: 930, y: 606, size: 32, weight: 650, anchor: 'middle', color: 'ink' }, bub);
-  const bTick = S.icon('ph:check-bold', { x: 1270, y: 604, size: 36, color: 'helps' }, bub);
-  const miss = S.text('misses the point', { x: 960, y: 700, size: 28, weight: 650, anchor: 'middle', color: 'muted' });
+  S.rect({ x: 600, y: 668, w: 720, h: 90, r: 45, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.35, sw: 2 }, bub);
+  S.circle({ x: 640, y: 784, r: 12, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.35, sw: 2 }, bub);
+  S.circle({ x: 618, y: 812, r: 7, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.35, sw: 2 }, bub);
+  S.text('slow because the model is large', { x: 930, y: 714, size: 32, weight: 650, anchor: 'middle', color: 'ink' }, bub);
+  const bTick = S.icon('ph:check-bold', { x: 1270, y: 712, size: 36, color: 'helps' }, bub);
+  const miss = S.text('misses the point', { x: 960, y: 808, size: 28, weight: 650, anchor: 'middle', color: 'muted' });
   hide([bub, bTick, miss]);
   S.add(K.drive(0.6, k => { setO(bub, k); bub.setAttribute('transform', `translate(0,${(30 * (1 - E('power3.out')(k))).toFixed(1)})`); }), tBub);
   fade(bTick, 0, 1, T('b3~True') - 0.1, 0.3);
@@ -129,36 +132,44 @@ V.scene('ch10_s07', S => {
   // ================================================================ b4: amortise = divide
   const tB4 = T('b4') - 0.1;
   fade(x2k, 1, 0, tB4, 0.3);
+  // the lanes as one picture: centred alone (+250), up for the bubble (+108), then shrunk into a strip at the top of
+  // the b4 block (+302.5), which moves up with it in b5 (+134)
+  const tUp = T('b5') - 0.7, up = t => EIO(cl((t - tUp) / 0.7));
   whole(t => {
-    const k = EIO(cl((t - tB4) / 0.8)), s = lerp(1, 0.42, k);
-    lanesG.setAttribute('transform', `translate(${(960 - 960 * s).toFixed(1)},${(150 - 150 * s - 40 * k).toFixed(1)}) scale(${s.toFixed(4)})`);
+    const pre = lerp(250, 108, EIO(cl((t - tBub) / 0.7))), k = EIO(cl((t - tB4) / 0.8)), s = lerp(1, 0.42, k);
+    lanesG.setAttribute('transform', `translate(${(960 - 960 * s).toFixed(1)},${lerp(pre, lerp(302.5, 134, up(t)), k).toFixed(1)}) scale(${s.toFixed(4)})`);
   });
   fade(lanesG, 1, 0.16, tB4, 0.8);
   K.ignore(lanesG, tB4, S.duration - tB4);
-  const band = S.g();
-  S.rect({ x: 110, y: 300, w: 1700, h: 58, r: 14, fill: '#0c1326', stroke: 'helps', strokeOpacity: 0.5, sw: 2 }, band);
-  S.text([{ t: 'amortise: ', c: 'helps' }, { t: 'spread a fixed cost over more work', c: 'ink' }], { x: 140, y: 330, size: 30, weight: 700 }, band);
+  const fG = S.g();             // the band and the formula: centred under the strip in b4, up 168.5 in b5
+  whole(t => fG.setAttribute('transform', `translate(0,${(168.5 * (1 - up(t))).toFixed(1)})`));
+  const band = S.g(null, fG);
+  S.rect({ x: 110, y: 387, w: 1700, h: 58, r: 14, fill: '#0c1326', stroke: 'helps', strokeOpacity: 0.5, sw: 2 }, band);
+  S.text([{ t: 'amortise: ', c: 'helps' }, { t: 'spread a fixed cost over more work', c: 'ink' }], { x: 960, y: 417, size: 30, weight: 700, anchor: 'middle' }, band);
   hide(band);
   fade(band, 0, 1, tB4 + 0.4, 0.4);
-  const callb = S.text('earlier: the start-up load', { x: 1780, y: 330, size: 22, weight: 600, anchor: 'end', color: 'muted' });
+  const callb = S.text('earlier: the start-up load', { x: 1780, y: 417, size: 22, weight: 600, anchor: 'end', color: 'muted' }, fG);
   hide(callb);
   fade(callb, 0, 1, T('b4~startup') - 0.1, 0.3);
   fade(callb, 1, 0, T('b4~startup') + 1.8, 0.4);
-  const FY = 425, FS = 34;
+  // the formula in its box, and its tag beside it, centred as a pair
+  const FY = 512, FS = 34;
   const fparts = [['cost per token', 'ink', 'b4~division'], ['=', 'ink', 'b4~division'], ['140 GB', 'bytes', 'b4~hundred'], ['÷', 'ink', 'b4~over#2'], ['tokens sharing the read', 'struct', 'b4~tokens']];
   const fw = fparts.map(([s]) => S.measure(s, { size: FS, weight: 750 }));
-  let fx = 140;
-  const fEls = fparts.map(([s, c, cue], i) => { const e = S.text(s, { x: fx, y: FY, size: FS, weight: 750, color: c }); fx += fw[i] + 18; hide(e); fade(e, 0, 1, T(cue) - 0.1 + (i === 1 ? 0.2 : 0), 0.3); return e; });
-  const fBox = S.rect({ x: 120, y: FY - 34, w: fx - 120, h: 68, r: 14, fill: 'none', stroke: 'white', strokeOpacity: 0.25, sw: 2 });
+  const FX0 = 960 - (20 + fw.reduce((a, b) => a + b + 18, 0) + 20 + S.measure('amortise = divide', { size: 24, weight: 600 })) / 2;
+  let fx = FX0 + 20;
+  const fEls = fparts.map(([s, c, cue], i) => { const e = S.text(s, { x: fx, y: FY, size: FS, weight: 750, color: c }, fG); fx += fw[i] + 18; hide(e); fade(e, 0, 1, T(cue) - 0.1 + (i === 1 ? 0.2 : 0), 0.3); return e; });
+  const fBox = S.rect({ x: FX0, y: FY - 34, w: fx - FX0, h: 68, r: 14, fill: 'none', stroke: 'white', strokeOpacity: 0.25, sw: 2 }, fG);
   hide(fBox);
   fade(fBox, 0, 1, T('b4~division') - 0.1, 0.3);
-  const divT = S.text('amortise = divide', { x: fx + 20, y: FY, size: 24, weight: 600, color: 'muted' });
+  const divT = S.text('amortise = divide', { x: fx + 20, y: FY, size: 24, weight: 600, color: 'muted' }, fG);
   hide(divT);
   fade(divT, 0, 1, T('b4~read') - 0.1, 0.35);
   void fEls;
 
   // ================================================================ b5: the share falls in exact proportion
-  const RY = [520, 605, 690, 775], BX = 470, BW = 1200, RH = 44;
+  // the rows, from the '÷ 10' tags at the left to the '140 GB' value at the right, centred (OX)
+  const RY = [607, 692, 777, 862], OX = 38, BX = 470 + OX, BW = 1200, RH = 44;
   const ROWS = [['1 token', 140, '140 GB', 'b5~One'], ['10 tokens', 14, '14 GB', 'b5~Ten'], ['200 tokens', 0.7, '0.7 GB', 'b5~each'], ['2,000 tokens', 0.07, '0.07 GB', 'b5~Two']];
   const note = S.text('bars to scale', { x: BX + BW, y: RY[0] - 46, size: 22, weight: 600, anchor: 'end', color: 'muted' });
   hide(note);
@@ -166,7 +177,7 @@ V.scene('ch10_s07', S => {
   const rowEls = ROWS.map(([lab, gb, val, cue], i) => {
     const g = S.g();
     const t0 = T(cue) - 0.1 + (i === 2 ? -0.5 : 0);
-    S.text(lab, { x: 160, y: RY[i], size: 24, weight: 700, color: 'struct' }, g);
+    S.text(lab, { x: 160 + OX, y: RY[i], size: 24, weight: 700, color: 'struct' }, g);
     const bar = S.rect({ x: BX, y: RY[i] - RH / 2, w: 0, h: RH, r: 4, fill: 'url(#solid-bytes)' }, g);
     const w = Math.max(1.5, BW * gb / 140);
     whole(t => bar.setAttribute('width', (w * EIO(cl((t - t0 - 0.1) / 0.6))).toFixed(2)));
@@ -179,14 +190,14 @@ V.scene('ch10_s07', S => {
   });
   // the identical read on every row, and the ÷ 10 steps
   const tNev = T('b5~never') - 0.1;
-  const chips = RY.map(y => { const c = S.pill('140 GB', { x: 396, y, tone: 'bytes', size: 20, h: 34, mono: true }); hide(c); return c; });   // clear of '2,000 tokens'
+  const chips = RY.map(y => { const c = S.pill('140 GB', { x: 396 + OX, y, tone: 'bytes', size: 20, h: 34, mono: true }); hide(c); return c; });   // clear of '2,000 tokens'
   fade(chips, 0, 1, tNev, 0.3, 0.08);
   const div10 = [[0, 1], [2, 3]].map(([a, b]) => {
     const g = S.g();
-    const p = S.path({ d: `M136,${RY[a] + 8} C112,${RY[a] + 30} 112,${RY[b] - 30} 136,${RY[b] - 8}`, stroke: 'helps', sw: 2.5 }, g);
-    S.path({ d: `M126,${RY[b] - 18} L136,${RY[b] - 8} L140,${RY[b] - 22}`, stroke: 'helps', sw: 2.5 }, g);
+    const p = S.path({ d: `M${136 + OX},${RY[a] + 8} C${112 + OX},${RY[a] + 30} ${112 + OX},${RY[b] - 30} ${136 + OX},${RY[b] - 8}`, stroke: 'helps', sw: 2.5 }, g);
+    S.path({ d: `M${126 + OX},${RY[b] - 18} L${136 + OX},${RY[b] - 8} L${140 + OX},${RY[b] - 22}`, stroke: 'helps', sw: 2.5 }, g);
     p.setAttribute('data-audit', 'ignore');
-    S.text('÷ 10', { x: 106, y: (RY[a] + RY[b]) / 2, size: 22, weight: 700, anchor: 'end', color: 'helps' }, g);
+    S.text('÷ 10', { x: 106 + OX, y: (RY[a] + RY[b]) / 2, size: 22, weight: 700, anchor: 'end', color: 'helps' }, g);
     hide(g);
     return g;
   });
@@ -194,12 +205,12 @@ V.scene('ch10_s07', S => {
 
   // ================================================================ b6: decode has nobody to share with
   const tPf = T('b6~Prefill') - 0.1;
-  const pTag = S.pill('prefill: spread across thousands', { x: 980, y: RY[3], tone: 'helps', size: 24, h: 42, anchor: 'start' });
+  const pTag = S.pill('prefill: spread across thousands', { x: 980 + OX, y: RY[3], tone: 'helps', size: 24, h: 42, anchor: 'start' });
   hide(pTag);
   S.add(K.drive(0.5, k => { setO(pTag, k); pTag.setAttribute('transform', `translate(${(80 * (1 - E('power3.out')(k))).toFixed(1)},0)`); }), tPf);
   const tSt = T('b6~stuck') - 0.1;
-  const dTag = S.pill('decode, one request', { x: 900, y: RY[0], tone: 'bytes', size: 24, h: 36, color: 'ink' });
-  const lock = S.icon('ph:lock-simple-duotone', { x: 900 + dTag.w / 2 + 30, y: RY[0], size: 34, color: 'ink' });
+  const dTag = S.pill('decode, one request', { x: 900 + OX, y: RY[0], tone: 'bytes', size: 24, h: 36, color: 'ink' });
+  const lock = S.icon('ph:lock-simple-duotone', { x: 900 + OX + dTag.w / 2 + 30, y: RY[0], size: 34, color: 'ink' });
   hide([dTag, lock]);
   S.add(K.drive(0.5, k => { setO(dTag, k); dTag.setAttribute('transform', `translate(${(-80 * (1 - E('power3.out')(k))).toFixed(1)},0)`); }), tSt);
   fade(lock, 0, 1, tSt + 0.45, 0.2);

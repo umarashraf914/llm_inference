@@ -13,13 +13,18 @@
    b4  the rows condense; amber brackets (different) and coral brackets (the same); 'Prefill skipped → TTFT
        shorter', 'Decode identical → TPOT unchanged'.
    b5  'makes the model faster' struck, 'makes it start sooner'; the warm pills slide under the cold ones.
-   Layout: axis 0-500 ms at x 210-1710 (3 px per ms), y 740; lanes: cold y 480, warm y 640; verdict rows at
-   x 1040, y 170 / 228; the caveat tag bottom right. */
+   Layout: axis 0-500 ms at x 210-1710 (3 px per ms), y 740; lanes: cold y 480, warm y 640. The lanes, their labels
+   and the axis are one block, drawn from x 58 and moved 54 px right so it is centred (the axis then runs x 264-1764).
+   Verdict rows y 170 / 228, their ticks at x VX, centred at the top as a block; in b1 the weather conversation and
+   the first row centre as a pair. The caveat tag bottom right. */
 V.scene('ch17_s03', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
   const rise = (e, at, dy = 12, d = 0.4) => { hide(e); S.add(K.drive(d, k => { setO(e, k); e.setAttribute('transform', `translate(0,${(dy * (1 - E('power3.out')(k))).toFixed(1)})`); }), at); };
   const X = ms => 210 + 3 * ms, LY = [480, 640], SH = 40, COLD = 147.5, TOK = 41.9, CELL = 1500 / 1032;
+  // the verdict rows' tick column: centred with the widest row (b3's decode row); in b1, beside the weather conversation
+  const VX = 675, VX1 = 942;
+  const tickAt = (vx, parent) => { S.circle({ x: vx, y: 170, r: 14, fill: 'helps' }, parent); S.path({ d: `M${vx - 7},170 L${vx - 2},176 L${vx + 8},164`, stroke: '#0a0f1e', sw: 3 }, parent); };
 
   // ================================================================ b1: the lanes, and what a hit skips
   const lanes = S.g();
@@ -39,8 +44,8 @@ V.scene('ch17_s03', S => {
   const tag = ch17Tag(S, 'idealised: H100 at full speed, no network or queue');
   fade(tag, 0, 1, 1.0, 0.4);
   const wx = S.g();
-  S.icon('ph:cloud-sun-duotone', { x: 560, y: 160, size: 52, color: 'muted' }, wx);   // ends well before the verdict tick at x 1038
-  S.text('the weather conversation', { x: 600, y: 161, size: 26, weight: 650, color: 'muted' }, wx);
+  S.icon('ph:cloud-sun-duotone', { x: 470, y: 160, size: 52, color: 'muted' }, wx);   // ends 60 px before the verdict tick
+  S.text('the weather conversation', { x: 510, y: 161, size: 26, weight: 650, color: 'muted' }, wx);
   rise(wx, 0.9, 6);
   fade(wx, 1, 0, tB2, 0.35);
   // the two strips of 1,032 hairline cells
@@ -82,14 +87,13 @@ V.scene('ch17_s03', S => {
   fade([mag, n1032], 1, 0, tB2, 0.3);
   // the verdict rows, top right
   const tick = S.g();
-  S.circle({ x: 1052, y: 170, r: 14, fill: 'helps' }, tick);
-  S.path({ d: 'M1045,170 L1050,176 L1060,164', stroke: '#0a0f1e', sw: 3 }, tick);
+  tickAt(VX1, tick);
   rise(tick, T('b1~skips') - 0.1, 0);
-  const row = (txt, y, tone, at, out) => { const e = S.text(txt, { x: 1078, y: y + 1, size: 28, weight: 750, color: tone }); rise(e, at, 6); if (out != null) fade(e, 1, 0, out, 0.25); return e; };
+  const top = [tick];  // the top band: it stays put while the lanes' block moves
+  const row = (txt, y, tone, at, out, vx = VX) => { const e = S.text(txt, { x: vx + 26, y: y + 1, size: 28, weight: 750, color: tone }); rise(e, at, 6); if (out != null) fade(e, 1, 0, out, 0.25); top.push(e); return e; };
   const tCond = T('b4~purely') - 0.1, tOnly = T('b4~only') - 0.1;
-  const p1 = row('Prefill: skipped for matched tokens', 170, 'helps', T('b1~skips') - 0.1, tB2 + 0.1);
+  row('Prefill: skipped for matched tokens', 170, 'helps', T('b1~skips') - 0.1, tB2 + 0.1, VX1);
   fade(tick, 1, 0, tB2 + 0.1, 0.25);
-  void p1;
 
   // ================================================================ b2: 206× less work, 3.5× less wait
   const tCol = T('b2~Two') - 0.1, tHalfW = T('b2~three') - 0.1, tRead = T('b2~one') - 0.1;
@@ -144,13 +148,12 @@ V.scene('ch17_s03', S => {
   fade([ratio1, ratio2, brW, longer], 1, 0, tB3, 0.3);
 
   // ================================================================ b3: decode is untouched
-  const p1b = row('Prefill: skipped for matched tokens', 170, 'helps', tB3 + 0.3, tCond);
+  row('Prefill: skipped for matched tokens', 170, 'helps', tB3 + 0.3, tCond);
   const tickB = S.g();
-  S.circle({ x: 1052, y: 170, r: 14, fill: 'helps' }, tickB);
-  S.path({ d: 'M1045,170 L1050,176 L1060,164', stroke: '#0a0f1e', sw: 3 }, tickB);
+  tickAt(VX, tickB);
   rise(tickB, tB3 + 0.3, 0);
-  const d1 = row('Decode: identical, still reads all 140 GB', 228, 'bytes', tDec + 0.6, tCond);
-  void p1b; void d1;
+  top.push(tickB);
+  row('Decode: identical, still reads all 140 GB', 228, 'bytes', tDec + 0.6, tCond);
   // coral brackets of the same width under one gap in each lane
   const gapBr = [0, 1].map(l => {
     const g = S.g(), base = l === 0 ? COLD + TOK : 3 * TOK, y = LY[l] + 24;
@@ -179,16 +182,16 @@ V.scene('ch17_s03', S => {
   });
   void kv;
   fade(m148, 1, 0, tAsm - 0.3, 0.25);
-  const kvL = S.text('1,032 tokens of keys and values', { x: 430, y: 560, size: 26, weight: 750, color: 'helps' });
+  const kvL = S.text('1,032 tokens of keys and values', { x: 430, y: 570, size: 26, weight: 750, color: 'helps' });   // clear of the cold lane's '≈ 42 ms'
   rise(kvL, tAsm + 1.2, 0, 0.3);
   fade(kvL, 1, 0, tAsm + 2.3, 0.3);
 
   // ================================================================ b4: purely a prefill optimisation
-  const p2 = row('Prefill', 170, 'helps', tCond + 0.3, tOnly);
-  const d2 = row('Decode', 228, 'bytes', tCond + 0.3, tOnly);
-  void p2; void d2;
+  row('Prefill', 170, 'helps', tCond + 0.3, tOnly);
+  row('Decode', 228, 'bytes', tCond + 0.3, tOnly);
   fade(tickB, 1, 0, tCond, 0.25);
-  const glowP = S.rect({ x: 1030, y: 146, w: 420, h: 50, r: 18, fill: 'url(#pglow-helps)', opacity: 0 });
+  const glowP = S.rect({ x: VX - 22, y: 146, w: 420, h: 50, r: 18, fill: 'url(#pglow-helps)', opacity: 0 });
+  top.push(glowP);
   glowP.setAttribute('data-audit', 'ignore');
   K.pulse(glowP, tCond + 0.3, 1, 1.2);
   fade([m42c, ...gapBr.map(g => g.lab)], 1, 0, tCond, 0.3);
@@ -202,9 +205,10 @@ V.scene('ch17_s03', S => {
   });
   ambBr.forEach(p => { const gl = p.cloneNode(); gl.setAttribute('stroke-width', '9'); gl.setAttribute('stroke-opacity', '0.35'); p.parentNode.insertBefore(gl, p); gl.setAttribute('data-audit', 'ignore'); setO(gl, 0); S.add(K.drive(0.8, k => setO(gl, Math.sin(Math.PI * k))), tOnly + 0.3); });
   const arrowD = S.g();
-  S.path({ d: 'M1052,152 V186 M1040,174 L1052,188 L1064,174', stroke: 'helps', sw: 3.5 }, arrowD);
+  S.path({ d: `M${VX},152 V186 M${VX - 12},174 L${VX},188 L${VX + 12},174`, stroke: 'helps', sw: 3.5 }, arrowD);
   arrowD.setAttribute('data-audit', 'ignore');
   rise(arrowD, tOnly + 0.25, 0);
+  top.push(arrowD);
   row('Prefill skipped → TTFT shorter', 170, 'helps', tOnly + 0.25, null);
   row('Decode identical → TPOT unchanged', 228, 'bytes', tOnly + 0.4, null);
 
@@ -225,4 +229,12 @@ V.scene('ch17_s03', S => {
   rise(f2, tSoon, 6);
   fade([back, f1, fx, f2], 1, 0, tSlide - 0.3, 0.3);
   void tB4;
+
+  // the lanes' block (labels, lanes, axis and everything on them) moves 54 px right, so it is centred; the top band,
+  // the caveat tag and b5's centred card stay where they are, above it
+  const keep = new Set([tag, wx, ...top, back, f1, fx, f2]);
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && !keep.has(e)).forEach(e => pane.appendChild(e));
+  S.main.insertBefore(pane, S.main.firstChild);
+  pane.setAttribute('transform', 'translate(54,0)');
 });

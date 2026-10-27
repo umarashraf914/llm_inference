@@ -16,13 +16,15 @@
        'counted, never multiplied') and softmax + normalisation (up-arrow 'uncounted: adds a little').
    b6  'operations = 2 × parameters' / 'short contexts only'; then all dims but 'the rule prices the weights' /
        'the whole story only while context is short'.
-   Layout: close-up y 240-700 (q at x 220, rows from x 360, 92 apart); chart rows y 380-660 from x 420
-   (4.173 px per billion, so 335.5 bn = 1,400 px); chips y 800-900. */
+   Layout: header centred. The close-up (q at x 220, rows from x 360, 92 apart; the cards on one axis, COL) is
+   one picture, centred below the header by a pane: (75, 227) while it is alone, up 99 at b3 to make room for the
+   equation, which is centred under it. Chart rows y 380-660 from x 367, labels and bars centred (4.173 px per
+   billion, so 335.5 bn = 1,400 px); two equal chips y 790-910 under it, each with its contents centred. */
 V.scene('ch10_s05', S => {
   const K = ch10Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
-  const hd = S.text('What the rule does not count', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
-  const sub = S.text('real work, never counted', { x: 110, y: 186, size: 30, weight: 650, color: 'compute' });
+  const hd = S.text('What the rule does not count', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  const sub = S.text('real work, never counted', { x: 960, y: 186, size: 30, weight: 650, anchor: 'middle', color: 'compute' });
   hide([hd, sub]);
   fade(hd, 0, 1, 0.3, 0.5);
   const close = S.g();          // the attention close-up (b1-b3)
@@ -75,8 +77,9 @@ V.scene('ch10_s05', S => {
   });
   fade(blArr, 0, 1, tBl + 0.5, 0.3);
   fade(blended, 0, 1, tBl + 0.9, 0.3);
-  const cardQK = S.pill('query × keys', { x: 1260, y: KY, tone: 'compute', size: 26, h: 50, anchor: 'start' });
-  const cardSV = S.pill('shares × values', { x: 1260, y: VY, tone: 'compute', size: 26, h: 50, anchor: 'start' });
+  const COL = 1388;             // the cards' axis: each card, the merged card and 'no parameter involved' centre on it
+  const cardQK = S.pill('query × keys', { x: COL, y: KY, tone: 'compute', size: 26, h: 50 });
+  const cardSV = S.pill('shares × values', { x: COL, y: VY, tone: 'compute', size: 26, h: 50 });
   hide([cardQK, cardSV]);
   fade(cardQK, 0, 1, tEv + 0.6, 0.35);
   fade(cardSV, 0, 1, tBl + 0.6, 0.35);
@@ -84,14 +87,14 @@ V.scene('ch10_s05', S => {
   // ================================================================ b2: activations, not weights
   const tB2 = T('b2') - 0.1;
   fade([softT, ...shares], 1, 0, tB2, 0.3);
-  const br = S.bracket({ x1: 190, x2: RX(5) + 46, y: 446, label: 'made from your tokens', tone: 'muted', size: 26 });
+  const br = S.bracket({ x1: q.l, x2: vs[5].r, y: 446, label: 'made from your tokens', tone: 'muted', size: 26 });
   hide(br);
   fade(br, 0, 1, T('b2~made') - 0.1, 0.4);
   const tAct = T('b2~activations') - 0.1;
   K.track(cardQK, [K.K(tAct, { y: 0 }), K.K(tAct + 0.4, { y: 50 })]);
   K.track(cardSV, [K.K(tAct, { y: 0 }), K.K(tAct + 0.4, { y: -50 })]);
   fade([cardQK, cardSV], 1, 0, tAct + 0.1, 0.3);
-  const merged = S.pill('activation × activation', { x: 1260, y: 350, tone: 'compute', size: 28, h: 56, anchor: 'start' });
+  const merged = S.pill('activation × activation', { x: COL, y: 350, tone: 'compute', size: 28, h: 56 });
   const mGlow = S.rect({ x: merged.l - 10, y: merged.t - 10, w: merged.w + 20, h: merged.h + 20, r: 36, fill: 'compute', opacity: 0 });
   mGlow.setAttribute('data-audit', 'ignore');
   hide(merged);
@@ -102,6 +105,7 @@ V.scene('ch10_s05', S => {
   [0, 1, 2].forEach(r => [0, 1, 2].forEach(c => S.rect({ x: 1308 + c * 16, y: 438 + r * 16, w: 10, h: 10, r: 2, fill: 'struct', fillOpacity: (r + c) % 2 ? 0.3 : 0.7 }, wt)));
   S.path({ d: 'M1292,422 L1364,494 M1364,422 L1292,494', stroke: 'muted', sw: 4 }, noW).setAttribute('data-audit', 'ignore');
   S.text('no parameter involved', { x: 1380, y: 458, size: 26, weight: 650, color: 'muted' }, noW);
+  noW.setAttribute('transform', `translate(${(COL - (1292 + 1380 + S.measure('no parameter involved', { size: 26, weight: 650 })) / 2).toFixed(1)},0)`);
   hide(noW);
   fade(noW, 0, 1, T('b2~not') - 0.1, 0.4);
   const tReal = T('b2~real') - 0.1;
@@ -114,11 +118,12 @@ V.scene('ch10_s05', S => {
   const tLen = T('b3~context') - 0.1;
   const more = [];
   for (let i = 6; i < 14; i++) { const pair = addPair(i); hide(pair); fade(pair, 0, 1, tLen + 0.1 * (i - 6), 0.2); more.push(...pair); }
-  const grows = S.text('grows with context, not model size', { x: 360, y: 236, size: 26, weight: 650, color: 'muted' });
+  const GC = (q.l + more[more.length - 1].r) / 2;   // the centre of the whole close-up once the rows have grown
+  const grows = S.text('grows with context, not model size', { x: GC, y: 236, size: 26, weight: 650, anchor: 'middle', color: 'muted' });
   hide(grows);
   fade(grows, 0, 1, tLen + 0.5, 0.4);
-  // the equation, one term per spoken number
-  const EX = 360, EY = 520, ES = 32;
+  // the equation, one term per spoken number, its lines left-aligned in a block centred under the close-up
+  const ES = 32, EX = GC - S.measure('= 2.6 million per context token', { size: ES, weight: 700, family: 'mono' }) / 2, EY = 520;
   const eq = (txt, y, cue, off = 0) => { const e = S.text(txt, { x: EX, y, size: ES, weight: 700, family: 'mono', color: 'compute' }); hide(e); fade(e, 0, 1, T(cue) - 0.1 + off, 0.35); return e; };
   const e1a = eq('64 heads', EY, 'b3~sixty');
   const e1b = S.text('scores 64 × 128 = 8,192', { x: EX, y: EY, size: ES, weight: 700, family: 'mono', color: 'compute' });
@@ -131,11 +136,15 @@ V.scene('ch10_s05', S => {
   const e4 = eq('× 80 layers', EY + 138, 'b3~eighty');
   const e5 = eq('= 2.6 million per context token', EY + 184, 'b3~two#2');
   e5.setAttribute('fill', S.tone('ink'));
+  // b1-b3 as one picture, centred below the header: lower while the close-up is alone, up 99 when the equation comes
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && e !== hd && e !== sub).forEach(e => pane.appendChild(e));
+  whole(t => pane.setAttribute('transform', `translate(75,${(227 - 99 * EIO(cl((t - tB3 - 0.1) / 0.7))).toFixed(1)})`));
 
   // ================================================================ b4: against the weights, to scale
   const tB4 = T('b4') - 0.1;
   fade([close, ...more, grows, e1b, e2, e3, e4, e5, sub], 1, 0, tB4, 0.4);
-  const CX0 = 420, PXB = 1400 / 335.54, CR = [380, 480, 570, 660], BH = 38;
+  const CX0 = 367, PXB = 1400 / 335.54, CR = [380, 480, 570, 660], BH = 38;   // labels (195 px) + bars (1,400 px) centred
   const chart = S.g();
   S.text('bars to scale', { x: CX0 + 1400, y: 316, size: 22, weight: 600, anchor: 'end', color: 'muted' }, chart);
   S.path({ d: `M${CX0},340 V${CR[3] + 30}`, stroke: 'white', strokeOpacity: 0.3, sw: 2 }, chart);
@@ -173,17 +182,22 @@ V.scene('ch10_s05', S => {
   fade(refL, 1, 0.35, T('b4~stops') - 0.1, 0.4);
 
   // ================================================================ b5: two small corrections
+  // two equal chips, centred as a pair, each with its contents centred in it
   const tE = T('b5~embedding') - 0.1;
+  const CW = 760, C1 = 960 - 20 - CW, C2 = 960 + 20;
   const chip1 = S.g();
-  S.rect({ x: 120, y: 790, w: 760, h: 120, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.18, sw: 2 }, chip1);
-  S.rect({ x: 150, y: 822, w: 140, h: 12, r: 4, fill: 'url(#solid-struct)' }, chip1);
-  S.text('embedding table ≈ 1.5% of parameters', { x: 310, y: 829, size: 26, weight: 650, color: 'ink' }, chip1);
-  const qm = S.text('?', { x: 220, y: 868, size: 26, weight: 800, anchor: 'middle', color: 'muted' }, chip1);
-  const zero = S.text('0 multiplies', { x: 220, y: 868, size: 22, weight: 650, family: 'mono', anchor: 'middle', color: 'ink' }, chip1);
+  S.rect({ x: C1, y: 790, w: CW, h: 120, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.18, sw: 2 }, chip1);
+  // the slab (140) and its title (from +160), and under them '0 multiplies' (centred on the slab) and the arrow tag
+  const e1 = 160 + S.measure('embedding table ≈ 1.5% of parameters', { size: 26, weight: 650 }), z0 = 70 - S.measure('0 multiplies', { size: 22, weight: 650, family: 'mono' }) / 2;
+  const SX = Math.round(C1 + CW / 2 - (z0 + e1) / 2);
+  S.rect({ x: SX, y: 822, w: 140, h: 12, r: 4, fill: 'url(#solid-struct)' }, chip1);
+  S.text('embedding table ≈ 1.5% of parameters', { x: SX + 160, y: 829, size: 26, weight: 650, color: 'ink' }, chip1);
+  const qm = S.text('?', { x: SX + 70, y: 868, size: 26, weight: 800, anchor: 'middle', color: 'muted' }, chip1);
+  const zero = S.text('0 multiplies', { x: SX + 70, y: 868, size: 22, weight: 650, family: 'mono', anchor: 'middle', color: 'ink' }, chip1);
   hide(zero);
   const down = S.g(null, chip1);
-  S.icon('ph:arrow-down-bold', { x: 330, y: 872, size: 30, color: 'muted' }, down);
-  S.text('counted, never multiplied', { x: 352, y: 872, size: 24, weight: 600, color: 'muted' }, down);
+  S.icon('ph:arrow-down-bold', { x: SX + 180, y: 872, size: 30, color: 'muted' }, down);
+  S.text('counted, never multiplied', { x: SX + 202, y: 872, size: 24, weight: 600, color: 'muted' }, down);
   hide([chip1, down]);
   fade(chip1, 0, 1, tE, 0.4);
   const tLook = T('b5~lookup') - 0.1;
@@ -191,11 +205,13 @@ V.scene('ch10_s05', S => {
   fade(zero, 0, 1, tLook + 0.2, 0.3);
   fade(down, 0, 1, T('b5~overcount') - 0.1, 0.35);
   const chip2 = S.g();
-  S.rect({ x: 1000, y: 790, w: 800, h: 120, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.18, sw: 2 }, chip2);
-  S.text('softmax + normalisation', { x: 1030, y: 829, size: 26, weight: 650, color: 'ink' }, chip2);
+  S.rect({ x: C2, y: 790, w: CW, h: 120, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.18, sw: 2 }, chip2);
+  const e2w = Math.max(S.measure('softmax + normalisation', { size: 26, weight: 650 }), 36 + S.measure('uncounted: adds a little', { size: 24, weight: 650 }));
+  const SX2 = Math.round(C2 + CW / 2 - e2w / 2);
+  S.text('softmax + normalisation', { x: SX2, y: 829, size: 26, weight: 650, color: 'ink' }, chip2);
   const up = S.g(null, chip2);
-  S.icon('ph:arrow-up-bold', { x: 1044, y: 872, size: 30, color: 'compute' }, up);
-  S.text('uncounted: adds a little', { x: 1066, y: 872, size: 24, weight: 650, color: 'compute' }, up);
+  S.icon('ph:arrow-up-bold', { x: SX2 + 14, y: 872, size: 30, color: 'compute' }, up);
+  S.text('uncounted: adds a little', { x: SX2 + 36, y: 872, size: 24, weight: 650, color: 'compute' }, up);
   hide([chip2, up]);
   const tSm = T('b5~Softmax') - 0.1;
   fade(chip2, 0, 1, tSm, 0.4);
@@ -203,8 +219,8 @@ V.scene('ch10_s05', S => {
 
   // ================================================================ b6: the rule prices the weights
   const tB6 = T('b6') - 0.1;
-  const rule = S.text([{ t: 'operations = ', c: 'ink' }, { t: '2', c: 'compute' }, { t: ' × parameters', c: 'struct' }], { x: 1810, y: 130, size: 32, weight: 750, anchor: 'end' });
-  const shortT = S.text('short contexts only', { x: 1810, y: 176, size: 24, weight: 600, anchor: 'end', color: 'muted' });
+  const rule = S.text([{ t: 'operations = ', c: 'ink' }, { t: '2', c: 'compute' }, { t: ' × parameters', c: 'struct' }], { x: 960, y: 200, size: 32, weight: 750, anchor: 'middle' });
+  const shortT = S.text('short contexts only', { x: 960, y: 244, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
   hide([rule, shortT]);
   fade(rule, 0, 1, tB6, 0.4);
   fade(shortT, 0, 1, tB6 + 0.4, 0.35);

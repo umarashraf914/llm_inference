@@ -171,7 +171,8 @@ V.scene('ch01_s03', S => {
   // ================================================================ PART 2: five rows, multiply and add
   S.add(fx.out([wall, solo, counter, cLabel, axis], { d: 0.45 }), 'b4-0.45');
   const RY = i => 280 + i * 105;
-  const C2 = { inp: 300, times: 395, w: 495, chip: 650, addL: 920, addCx: 1050, addCy: 490, outCx: 1500 };
+  // the diagram, from the inputs' header (~200 before the shift) to the output box (~1,610), centred on the screen
+  const C2 = { inp: 355, times: 450, w: 550, chip: 705, addL: 975, addCx: 1105, addCy: 490, outCx: 1555 };
   // part 1 shrinks into row 1
   S.xset(part1, { x: 0, y: 0, s: 1, ox: P.inp, oy: EY });
   S.add(fx.xform(part1, { x: C2.inp - P.inp, y: RY(0) - EY, s: 0.66 }, { d: 0.75, ease: 'power3.inOut' }), 'b4-0.5');
@@ -260,8 +261,8 @@ V.scene('ch01_s03', S => {
 
   // ---------------------------------------------------------------- b6: at enormous scale, a stack of layers
   S.add(gsap.to(extra, { autoAlpha: 0, duration: 0.3 }), 'b6');
-  S.xset(part2, { x: 0, y: 0, s: 1, ox: 900, oy: 490 });
-  S.add(fx.xform(part2, { x: 960 - 900, y: 520 - 490, s: 0.05 }, { d: 0.7, ease: 'power3.in' }), 'b6~large-0.1');
+  S.xset(part2, { x: 0, y: 0, s: 1, ox: 960, oy: 490 });
+  S.add(fx.xform(part2, { x: 0, y: 520 - 490, s: 0.05 }, { d: 0.7, ease: 'power3.in' }), 'b6~large-0.1');
   S.add(gsap.to(part2, { autoAlpha: 0, duration: 0.2 }), S.t('b6~large') + 0.5);
   // the sheet: hundreds of identical cells
   const sheet = S.g();

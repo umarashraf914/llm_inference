@@ -9,7 +9,8 @@
    b3  the top chart goes; an inset pair of log axes; a '1' marker joins and glows with '300'; three points on a
        45-degree line, '× 10 across, × 10 up'; 'straight line = multiplying'.
    Layout: rows y 200 / 260 / 320 / 380, bars from x 210, axis y 420; log lane y 700 from x 210 to 1710; inset
-   origin (1350, 440). */
+   origin (1350, 440), drawn there and moved 535 left so it is centred above the lane. All of it is one pane: the
+   ordinary scale alone centred (+247), then up to +106 when the log lane comes under it. */
 V.scene('ch11_s03', S => {
   const K = ch11Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const X0 = 210, L = 1500;
@@ -93,6 +94,7 @@ V.scene('ch11_s03', S => {
   fade(x10, 1, 0, tB3, 0.3);
   fade(br, 1, 0, tB3, 0.3);
   const ins = S.g();
+  ins.setAttribute('transform', 'translate(-535,0)');   // centred above the lane
   const O = [1350, 440], D = 100;
   const axX = S.path({ d: `M${O[0]},${O[1]} H${O[0] + 3 * D}`, stroke: 'white', strokeOpacity: 0.6, sw: 2 }, ins);
   const axY = S.path({ d: `M${O[0]},${O[1]} V${O[1] - 3 * D}`, stroke: 'white', strokeOpacity: 0.6, sw: 2 }, ins);
@@ -122,8 +124,12 @@ V.scene('ch11_s03', S => {
   const stepT = S.text('× 10 across, × 10 up', { x: 1478, y: 360, size: 22, weight: 650, color: 'ink' }, ins);
   hide([steps, stepT]);
   fade([steps, stepT], 0, 1, tLine + 1.0, 0.35);
-  const mult = S.text('straight line = multiplying', { x: 1500, y: 494, size: 28, weight: 750, anchor: 'middle', color: 'ink' });
+  const mult = S.text('straight line = multiplying', { x: 965, y: 494, size: 28, weight: 750, anchor: 'middle', color: 'ink' });
   hide(mult);
   fade(mult, 0, 1, T('b3~multiplying') - 0.1, 0.4);
+  // the frame as one pane: the ordinary scale alone and centred, then up to make room for the log lane
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane).forEach(e => pane.appendChild(e));
+  whole(t => pane.setAttribute('transform', `translate(0,${lerp(247, 106, EIO(cl((t - tB2) / 0.6))).toFixed(1)})`));
   void m3; void m30; void m300; void m1; void dots; void ticks;
 });

@@ -21,7 +21,7 @@ V.scene('ch16_s03', S => {
   const XC = AP[6].r + 3;  // where the cache row ends: the first difference
 
   // ================================================================ b1: the conversation so far, and four new tokens
-  const kicker = S.text('case A: continue the chat', { x: 70, y: 150, size: 30, weight: 750, color: 'ink' });
+  const kicker = S.text('case A: continue the chat', { x: 960, y: 150, size: 30, weight: 750, anchor: 'middle', color: 'ink' });   // centred
   rise(kicker, T('b1~Case') - 0.1, 6);
   const score = ch16Score(S, { rows: [{ case: 'time t', hit: 0, pre: 777 }, { case: 'A', hit: 784, pre: 4, at: T('b2~Hit') + 0.6 }] });
   void score;

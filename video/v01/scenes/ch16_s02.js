@@ -22,7 +22,7 @@ V.scene('ch16_s02', S => {
   const WORDS = ['What', 'is', 'the', 'capital', 'of', 'France', '?'];
 
   // ================================================================ b1: one preamble for every conversation
-  const kicker = S.text('a smaller example, token by token', { x: 70, y: 150, size: 28, weight: 700, color: 'muted' });
+  const kicker = S.text('a smaller example, token by token', { x: 960, y: 150, size: 28, weight: 700, anchor: 'middle', color: 'muted' });   // centred
   rise(kicker, T('b1~smaller') - 0.1, 6);
   const tRow = T('b1~service') - 0.15, tFill = T('b2~all') - 0.05, tHatch = T('b3~preamble') + 0.2;
   const arrL = S.text('arriving', { x: 230, y: AY + 1, size: 26, weight: 750, anchor: 'end', color: 'muted' });

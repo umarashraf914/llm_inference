@@ -71,10 +71,13 @@ V.scene('ch11_s01', S => {
   shimmer.setAttribute('data-audit', 'ignore');
   whole(t => {
     const on = t > tAll + 0.6 && t < T('b3') ? 1 : 0;
-    wash.ic.setAttribute('transform', `rotate(${(on * 12 * Math.sin(t * 7)).toFixed(2)} ${480} ${CY0 + 64})`);
+    // in the strip the words fade, so each icon settles to the middle of its card
+    const mid = (CH / 2 - 64) * EIO(cl((t - T('b3') + 0.1) / 0.6));
+    wash.ic.setAttribute('transform', `translate(0,${mid.toFixed(1)}) rotate(${(on * 12 * Math.sin(t * 7)).toFixed(2)} ${480} ${CY0 + 64})`);
+    dry.ic.setAttribute('transform', `translate(0,${mid.toFixed(1)})`);
     shimmer.setAttribute('opacity', (on * (0.5 + 0.5 * Math.sin(t * 9))).toFixed(3));
     const sq = on ? 1 - 0.18 * Math.max(0, Math.sin(t * 5)) : 1;
-    fold.ic.setAttribute('transform', `translate(0,${(CY0 + 64) * (1 - sq)}) scale(1,${sq.toFixed(3)})`);
+    fold.ic.setAttribute('transform', `translate(0,${(mid + (CY0 + 64) * (1 - sq)).toFixed(1)}) scale(1,${sq.toFixed(3)})`);
   });
   const c60 = S.text('one load every 60 min', { x: 960, y: 680, size: 34, weight: 700, anchor: 'middle', color: 'ink' }, laundry);
   const c40 = S.text('one load every 40 min', { x: 960, y: 680, size: 34, weight: 700, anchor: 'middle', color: 'helps' }, laundry);
@@ -105,6 +108,9 @@ V.scene('ch11_s01', S => {
 
   // ================================================================ b3: a chip has two stations
   const tB3 = T('b3') - 0.1;
+  // from b3 the laundry line is a small strip at the top and the chip's two stations sit under it (y 106-790):
+  // the camera holds the whole 130 px lower, so it is centred
+  S.add(S.fx.cam({ x: 960, y: 410, scale: 1, d: 0.8, ease: 'power2.inOut' }), tB3);
   whole(t => {
     const k = EIO(cl((t - tB3) / 1.2)), s = lerp(1, 0.45, k);
     laundry.setAttribute('transform', `translate(${(960 - 960 * s).toFixed(1)},${(lerp(300, 110, k) - 300 * s).toFixed(1)}) scale(${s.toFixed(4)})`);
@@ -116,8 +122,9 @@ V.scene('ch11_s01', S => {
   const card = (x, tone, icon, name) => {
     const g = S.g(null, band);
     S.rect({ x: x - 180, y: 410, w: 360, h: 220, r: 22, fill: `url(#card-${tone})`, stroke: tone, sw: 2.5 }, g);
-    g.ic = S.icon(icon, { x, y: 490, size: 84, color: tone }, g);
-    S.text(name, { x, y: 586, size: 34, weight: 750, anchor: 'middle', color: tone }, g);
+    // the icon and its name, as one block, centred in the card (410-630)
+    g.ic = S.icon(icon, { x, y: 474, size: 84, color: tone }, g);
+    S.text(name, { x, y: 570, size: 34, weight: 750, anchor: 'middle', color: tone }, g);
     return g;
   };
   const mem = card(480, 'bytes', 'ph:memory-duotone', 'memory');

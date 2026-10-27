@@ -9,7 +9,7 @@ V.scene('ch03_s07', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
-  const tick = (x, y, size = 40) => { const g = S.g(); S.circle({ x, y, r: size * 0.45, fill: '#0c1326' }, g); S.icon('ph:check-circle-duotone', { x, y, size, color: 'helps' }, g); S.set(g, { autoAlpha: 0 }, 0); return g; };
+  const tick = (x, y, size = 40, parent) => { const g = S.g(null, parent); S.circle({ x, y, r: size * 0.45, fill: '#0c1326' }, g); S.icon('ph:check-circle-duotone', { x, y, size, color: 'helps' }, g); S.set(g, { autoAlpha: 0 }, 0); return g; };
 
   // ---------------------------------------------------------------- the pills: one colour per kind of text, fixed widths
   const PS = 24, PH = 48, GAP = 10;
@@ -49,18 +49,25 @@ V.scene('ch03_s07', S => {
   };
 
   // ---------------------------------------------------------------- b1: does it reach the context? always yes
-  const card = (x, w) => {
-    const g = S.g();
+  const card = (x, w, parent) => {
+    const g = S.g(null, parent);
     S.rect({ x, y: 170, w, h: 420, r: 26, fill: '#0c1326', filter: 'url(#shadow)' }, g);
     g.bg = S.rect({ x, y: 170, w, h: 420, r: 26, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.6, sw: 2.5 }, g);
     S.set(g, { autoAlpha: 0 }, 0);
     return g;
   };
-  const L = card(140, 760);
+  // the two questions are a pair (x 140-900 and 1,020-1,780) but the first is alone through b1: it sits
+  // centred (Lw, 440 px right) and moves to its place as the second arrives
+  const Lw = S.g();
+  S.set(Lw, { x: 440 }, 0);
+  // the camera keeps each stage centred: the two cards (y 170-590) 150 px lower through b1-b2, the shelves as
+  // drawn in b3-b4, the strips of b5-b6 100 px lower
+  S.xset(S.camera, { x: 0, y: 150, s: 1 });
+  const L = card(140, 760, Lw);
   S.text('Does it reach the context?', { x: 180, y: 232, size: 38, weight: 700, family: 'display', color: 'ink' }, L);
   const lSub = S.text('always yes, no exceptions', { x: 180, y: 282, size: 26, weight: 550, color: 'muted' }, L);
   const lPills = [['provider', 'system prompt'], ['yours', 'tool definitions'], ['newest', 'loaded skill']].map(([k, t], i) => mkPill(k, 180, 370 + i * 70, { label: t, w: S.measure(t, { size: PS, weight: 600 }) + 34 }, L));
-  const lTicks = lPills.map(p => tick(p.x + p.w + 34, p.cy));
+  const lTicks = lPills.map(p => tick(p.x + p.w + 34, p.cy, 40, Lw));
   S.add(fx.in(L, { from: 'up', d: 0.6 }), 0.2);
   S.add(fx.pop(lTicks[0], { d: 0.4 }), 'b1~Yes');
   S.add(fx.pop(lTicks[1], { d: 0.4 }), 'b1~tool');
@@ -74,6 +81,7 @@ V.scene('ch03_s07', S => {
   S.text('already settled', { x: 520, y: 520, size: 28, anchor: 'middle', weight: 600, color: 'ink' }, settled);
   S.set(settled, { autoAlpha: 0 }, 0);
   const B2 = T('b2') - 0.1;
+  S.add(gsap.fromTo(Lw, { x: 440 }, { x: 0, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), B2 - 0.3);
   lPills.forEach((p, i) => S.add(gsap.to([p, lTicks[i]], { x: 520 - (p.x + p.w / 2), y: 440 - p.cy, scale: 0.3, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.5, ease: 'power2.in' }), B2 + i * 0.05));
   S.add(fx.pop(settled, { d: 0.5 }), B2 + 0.45);
   S.add(gsap.to(L.bg, { attr: { 'fill-opacity': 0.4 }, duration: 0.4 }), B2);
@@ -90,10 +98,12 @@ V.scene('ch03_s07', S => {
   S.add(fx.in(rSub, { from: 'up', d: 0.4, dist: 12 }), 'b2~That');
   S.add(fx.swap(rSub, 'product decision: where it is stored'), 'b2~product-0.1');
   S.add(gsap.to([L, settled], { autoAlpha: 0, duration: 0.5 }), 'b2~decision');
+  S.add(gsap.to(R, { x: 960 - 1400, duration: 0.6, ease: 'power2.inOut' }), 'b2~decision');   // alone now: to the centre
 
   // ---------------------------------------------------------------- b3: three places
   const B3 = T('b3') - 0.1;
   S.add(gsap.to(R, { autoAlpha: 0, scale: 0.92, transformOrigin: '50% 50%', duration: 0.5, ease: 'power2.in' }), B3);
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), B3 + 0.2);
   const SHELF = [{ y: 150, h: 200 }, { y: 375, h: 200 }, { y: 600, h: 220 }];
   const shelfG = SHELF.map((s, i) => {
     const g = S.g();
@@ -200,6 +210,7 @@ V.scene('ch03_s07', S => {
   const B5 = T('b5') - 0.1;
   S.add(fx.out([ord, take, ...feeds, ...shelfG], { d: 0.45, stagger: 0 }), B5);
   const SX = 160, Y1 = 300, Y2 = 480, Y3 = 660;
+  S.add(fx.cam({ x: 960, y: 440, scale: 1, d: 0.9, ease: 'power2.inOut' }), B5 + 0.2);
   S.xset(top, { x: 0, y: 0, s: 1, ox: 720, oy: 480 });
   S.add(fx.xform(top, { x: SX - 720, y: Y1 - 480, s: 1 }, { d: 0.9, ease: 'power3.inOut' }), B5 + 0.2);
   const reqLbl = S.text('your request', { x: 712, y: 480 - PH / 2 - 32, size: 26, weight: 650, color: 'ink' }, top);

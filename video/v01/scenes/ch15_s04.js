@@ -10,7 +10,8 @@
        slivers of history and the new message.
    b4  the sweep replays; caption 'front to back, stop at the first difference'; warm and cold chips.
    Layout: bars x 260-1700 (segments at 260 | 520 | 820 | 1556 | 1700, 'new' a tenth, schematic); arriving
-   y 392-448, cached y 492-548; tags y 346; b1 labels y 596; counters y 668; result x 1640, y 806 / 868. */
+   y 392-448, cached y 492-548; tags y 346; b1 labels y 596; counters y 668; result x 1640, y 806 / 868. In b1 the
+   bars are alone, so the body sits 130 lower, centred below the heading; it rises for b2's counters and result. */
 V.scene('ch15_s04', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1;
@@ -167,5 +168,9 @@ V.scene('ch15_s04', S => {
   rise(warm, T('b4~warm') - 0.1, 8);
   const cold = S.pill('cold: beginning not held', { x: 1130, y: 690, tone: 'neutral', size: 26, h: 46 });
   rise(cold, T('b4~cold') - 0.1, 8);
+  // the body: centred below the heading while the bars are alone (b1), up 130 for b2's counters and result
+  const body = S.g();
+  [...S.main.children].filter(e => e !== body && e !== head).forEach(e => body.appendChild(e));
+  whole(t => body.setAttribute('transform', `translate(0,${(130 * (1 - EIO(cl((t - tB2) / 0.8)))).toFixed(1)})`));
   void segG; void segLabels; void cacG;
 });

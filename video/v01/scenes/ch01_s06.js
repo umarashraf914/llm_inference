@@ -33,6 +33,11 @@ V.scene('ch01_s06', S => {
   S.add(gsap.fromTo(slot, { opacity: 1 }, { opacity: 0.35, duration: 0.5, yoyo: true, repeat: 33, ease: 'sine.inOut' }), S.t('b1~blank') + 0.3);
   const heading = S.text('it scores every token it knows', { x: 960, y: 280, size: 34, anchor: 'middle', color: 'muted', weight: 600 });
   S.add(fx.in(heading, { from: 'up', d: 0.45 }), 'b1~scores');
+  // alone in b1, the sentence and its heading sit at the centre of the frame; they rise to the top as the scores come
+  const top = S.g();
+  [...pills, slot, heading].forEach(e => top.appendChild(e));
+  S.set(top, { y: 310 }, 0);
+  S.add(gsap.fromTo(top, { y: 310 }, { y: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), S.t('b2') - 0.4);
 
   // ---------------------------------------------------------------- b2: four scores, to scale
   const ROW = i => 380 + i * 100, BX = 640, U = 100;   // 100 px per unit of score

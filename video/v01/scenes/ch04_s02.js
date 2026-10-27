@@ -6,6 +6,8 @@
 V.scene('ch04_s02', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
+  // the camera keeps the map and the chart centred: 110 px lower with the first chart (b1-b2), 45 with the second
+  S.xset(S.camera, { x: 0, y: 110, s: 1 });
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
   const GREY = '#7c879e';
 
@@ -89,6 +91,7 @@ V.scene('ch04_s02', S => {
 
   // ---------------------------------------------------------------- b3: the chart moves up; a 500-token answer, either way, in seconds
   const B3 = T('b3') - 0.15;
+  S.add(fx.cam({ x: 960, y: 495, scale: 1, d: 0.8, ease: 'power2.inOut' }), B3 - 0.2);
   S.add(fx.out([map, ...pins, ax1, ratio, caveat], { d: 0.4, stagger: 0 }), B3);
   S.xset(chart1, { x: 0, y: 0, s: 1, ox: 960, oy: 485 });
   S.add(fx.xform(chart1, { x: 0, y: 236 - 485, s: 0.7 }, { d: 0.8, ease: 'power3.inOut' }), B3 + 0.2);

@@ -23,10 +23,9 @@ V.scene('ch16_s04', S => {
   const XD = COLR(5) + GAP / 2;  // between 'of' and 'Japan'
 
   // ================================================================ b1: a new conversation, the same start
-  const kicker = S.text('case B: a minute later, one word changed', { x: 70, y: 150, size: 30, weight: 750, color: 'ink' });
+  const kicker = S.text('case B: a minute later, one word changed', { x: 960, y: 140, size: 30, weight: 750, anchor: 'middle', color: 'ink' });   // centred, its tag under it
   rise(kicker, T('b1~Case') - 0.1, 6);
-  const kw = S.measure('case B: a minute later, one word changed', { size: 30, weight: 750 });
-  const newT = S.pill('new conversation, not a follow-up', { x: 70 + kw + 30 + S.measure('new conversation, not a follow-up', { size: 24, weight: 600 }) / 2 + 22, y: 150, tone: 'neutral', size: 24, h: 42 });
+  const newT = S.pill('new conversation, not a follow-up', { x: 960, y: 192, tone: 'neutral', size: 24, h: 42 });
   rise(newT, T('b1~new') - 0.1, 6);
   ch16Score(S, { rows: [{ case: 'time t', hit: 0, pre: 777 }, { case: 'A', hit: 784, pre: 4 }, { case: 'B', hit: 775, pre: 2, at: T('b2~Hit') + 0.6 }] });
   const lab = (txt, y, tone) => { const e = S.text(txt, { x: X0 - 24, y: y + 1, size: 26, weight: 750, anchor: 'end', color: tone }); rise(e, 0.6, 0); return e; };

@@ -18,9 +18,18 @@ V.scene('ch05_s02', S => {
   const DS = 40, cw = S.measure('0', { size: DS, weight: 600, family: 'mono' }), GAPW = cw * 0.45;
   const zx = j => DX + cw + GAPW + j * cw + Math.floor(j / 3) * GAPW;   // the x of zero j
 
+  // b1-b2: the list (pills x 100-260, digits to ~760) is alone: listG holds it centred (LS px right) and it
+  // moves to its column as the bars arrive in b3
+  const LS = 531, listG = S.g();
+  S.set(listG, { x: LS }, 0);
+  // and through b1 its one row (with the callout, y 145-313) sits on the screen's middle, 290 px down; the list
+  // rises to its place as the second row arrives
+  S.set(listG, { y: 290 }, 0);
+  S.add(gsap.fromTo(listG, { y: 290 }, { y: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), S.t('b2') - 0.2);
+
   // ---------------------------------------------------------------- a row: the pill (10 with its exponent), its name, its digits, its bar
   const mkRow = (r, i, tone = 'struct') => {
-    const y = Y0 + i * PITCH, g = S.g();
+    const y = Y0 + i * PITCH, g = S.g(null, listG);
     g.pill = S.g(null, g);
     S.rect({ x: 100, y: y - 32, w: 160, h: 64, r: 18, fill: '#0c1326' }, g.pill);
     g.pillBg = S.rect({ x: 100, y: y - 32, w: 160, h: 64, r: 18, fill: `url(#card-${tone})`, stroke: tone, sw: 2 }, g.pill);
@@ -49,7 +58,7 @@ V.scene('ch05_s02', S => {
     S.add(gsap.fromTo(z, { autoAlpha: 0, y: -30 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'back.out(2)', immediateRender: false }), at);
     S.add(gsap.fromTo(r1.pow.expEl, { scale: 1, transformOrigin: '50% 50%' }, { scale: 1.5, duration: 0.15, yoyo: true, repeat: 1, transformOrigin: '50% 50%', immediateRender: false }), at);
   });
-  const callG = S.g();
+  const callG = S.g(null, listG);
   S.path({ d: `M${r1.pow.expCx + 4},${r1.pow.expCy - 14} L${r1.pow.expCx + 40},${Y0 - 92} L${r1.pow.expCx + 70},${Y0 - 92}`, stroke: 'ink', sw: 2 }, callG);
   S.text('exponent = number of zeros', { x: r1.pow.expCx + 80, y: Y0 - 91, size: 28, weight: 650, color: 'ink' }, callG);
   ignore(callG.firstChild);
@@ -73,7 +82,7 @@ V.scene('ch05_s02', S => {
   const r5 = rows[4], TMM = T('b2~a thousand') - 0.05;
   S.add(gsap.to(rows.slice(0, 4), { opacity: 0.4, duration: 0.4 }), TMM);
   const grp = [[DX, zx(2) + cw, 'thousand'], [zx(3), zx(8) + cw, 'million'], [zx(9), zx(14) + cw, 'million']].map(([x1, x2, l]) => {
-    const b = S.bracket({ x1, x2, y: r5.y + 28, label: l, tone: 'ink', size: 24 });
+    const b = S.bracket({ x1, x2, y: r5.y + 28, label: l, tone: 'ink', size: 24 }, listG);
     S.set(b, { autoAlpha: 0 }, 0);
     return b;
   });
@@ -82,7 +91,7 @@ V.scene('ch05_s02', S => {
   S.add(fx.out(grp, { d: 0.3, stagger: 0 }), STEP);
   S.add(gsap.to(rows.slice(0, 4), { opacity: 1, duration: 0.4 }), STEP);
   const tags = [0, 1, 2, 3].map(i => {
-    const t = S.text('× 1,000', { x: 180, y: Y0 + i * PITCH + 84, size: 20, anchor: 'middle', weight: 700, color: 'compute' });
+    const t = S.text('× 1,000', { x: 180, y: Y0 + i * PITCH + 84, size: 20, anchor: 'middle', weight: 700, color: 'compute' }, listG);
     S.set(t, { autoAlpha: 0 }, 0);
     S.add(fx.in(t, { from: 'fade', d: 0.3 }), STEP + 0.2 + i * 0.15);
     return t;
@@ -92,6 +101,7 @@ V.scene('ch05_s02', S => {
   // ---------------------------------------------------------------- b3: ordinary scale, then the log scale
   const B3 = T('b3') - 0.1;
   S.add(gsap.to(rows.map(g => g.digits), { autoAlpha: 0, duration: 0.35 }), B3);
+  S.add(gsap.fromTo(listG, { x: LS }, { x: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), B3 + 0.2);
   const axis = S.text('ordinary scale', { x: 1050, y: 860, size: 28, anchor: 'middle', weight: 600, color: 'muted' });
   S.set(axis, { autoAlpha: 0 }, 0);
   S.add(fx.in(axis, { from: 'fade', d: 0.35 }), B3 + 0.3);

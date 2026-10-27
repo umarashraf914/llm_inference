@@ -6,6 +6,8 @@
 V.scene('ch03_s09', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
+  // the whole picture sits 80 px lower until b5, so it is centred (the chips and the grid start high)
+  S.xset(S.camera, { x: 0, y: 80, s: 1 });
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
   const BX = 160, BW = 1600, BY = 720, BH = 36;           // the context window bar
   const X = tok => BX + tok * BW / 200000;                // 80,000 → 800, 2,000 → 16 px, 3,200 → 25.6 px
@@ -188,6 +190,7 @@ V.scene('ch03_s09', S => {
 
   // ---------------------------------------------------------------- b5: progressive disclosure, forced by arithmetic
   S.add(fx.out([plugin, plugLbl, dim], { d: 0.4, stagger: 0 }), 'b5-0.1');
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), 'b5-0.3');   // back up, making room for the takeaway
   const take = S.takeaway('progressive disclosure', { tone: 'helps' });
   S.add(fx.in(take, { from: 'up', d: 0.5 }), 'b5~progressive-0.1');
   const R2 = 850;

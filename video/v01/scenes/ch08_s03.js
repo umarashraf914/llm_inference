@@ -123,6 +123,9 @@ V.scene('ch08_s03', S => {
 
   // ================================================================ b3: the score grid
   const t3 = T('b3') - 0.1;
+  // the score grid stands alone in the upper half until the values pour down from it in b4: the camera holds it
+  // 110 px lower, and eases back as the lines and the updated vector come
+  S.add(fx.cam({ x: 960, y: 430, scale: 1, d: 0.8, ease: 'power2.inOut' }), t3 + 0.4);
   S.add(fx.out([cat, ...tiles, ...tileNames, shelf, rec, ...ghosts], { to: 'left', d: 0.5, dist: 80, stagger: 0.02 }), t3);
   // the three outputs shrink into a small inset at the top right
   const inset = S.g();
@@ -219,6 +222,7 @@ V.scene('ch08_s03', S => {
   const vals = toks.map((w, c) => { const g = S.g(); ch08Vec(S, { token: `${w}-V`, round: 1, n: 3, ch: (VH - 2 * GP) / 3, gap: GP, cw: 34, x: G.x + c * G.cw + G.cw / 2, y: VY }, g); ch08Hide(g); return g; });
   const lines = toks.map((w, c) => { const l = S.line({ x1: G.x + c * G.cw + G.cw / 2, y1: G.y + 5 * G.ch - 4, x2: G.x + c * G.cw + G.cw / 2, y2: VY - VH / 2 - 6, stroke: 'compute', sw: 1.5 + 3 * sc[4][c] }); l.setAttribute('data-audit', 'ignore'); ch08Hide(l); return l; });
   const tBl = T('b4~blend') - 0.1;
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), tBl - 0.4);
   fade(vals, 0, 1, tBl, 0.35);
   fade(lines, 0, 1, tBl + 0.2, 0.35);
   const UX = 1330;

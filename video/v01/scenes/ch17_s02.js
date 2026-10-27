@@ -13,9 +13,12 @@
    b3  the decode panel: '≈ 42 ms on H100'; single pills climb the stack three times, lighting it coral.
    b4  verdicts 'feels responsive?' and 'reads comfortably?'; the pills stutter and settle; the panels shrink onto
        a small roofline (amber prefill past the '295' ridge, coral decode far left); 'opposite resource profiles'.
-   Layout: timeline y 540 in b1, y 200 from b2; panels x 240-900 (prefill, amber) and 1020-1680 (decode, coral),
-   y 400-1010, stacks of 80 bars (pitch 5) from y 870 up; roofline origin (725, 930), 110 px per decade across,
-   90 px per decade up. */
+   Layout, composed from the centre: in b1 the chat window (y 276-566) and the timeline under it (y 686) centre
+   as one block; from b2 the timeline (y 172) and the two panels (y 372-982) do. The timeline starts 30 px left of
+   x 240 in b1 and 85 px left from b2, so its full length (send to the ninth pill) is centred: it ends at x 1765.
+   Panels x 240-900 (prefill, amber) and 1020-1680 (decode, coral), stacks of 80 bars (pitch 5) from y 842 up;
+   alone in b2, the prefill panel stands at the centre (x 630-1290) and slides left as decode arrives;
+   in b4 the roofline (origin (725, 845), 110 px per decade across, 90 up) sits under the timeline. */
 V.scene('ch17_s02', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1;
@@ -31,18 +34,19 @@ V.scene('ch17_s02', S => {
   const pillAt = i => (i === 0 ? tFirst : tEach + 0.15 + 0.24 * (i - 1));
   const geo = t => {
     const up = EIO(cl((t - tUp) / 0.9));
-    const y = lerp(540, 200, up);
+    const y = lerp(686, 172, up), o = lerp(-30, -85, up);         // o: the timeline's shift left, so its full length is centred
     const q = EIO(cl((t - tQ) / 0.5)) * 100;                      // the queue pushes everything right
     const bw0 = 500 * E('power1.inOut')(cl((t - tGrow) / (tFirst - tGrow)));
     const bw = lerp(bw0, 280, up) + 400 * EIO(cl((t - tSev) / 0.8)); // 0.5 s, then several seconds
-    const x0 = 260 + q, x1 = x0 + bw;
+    const x0 = 260 + o + q, x1 = x0 + bw;
     const pitch = lerp(110, 90, up), pw = lerp(70, 60, up);
-    return { y, up, q, x0, x1, pitch, pw, px: i => x1 + 30 + pitch * i };
+    return { y, up, o, q, x0, x1, pitch, pw, px: i => x1 + 30 + pitch * i };
   };
   const jit = (i, t) => 22 * Math.sin(i * 2.7 + 1) * Math.sin(Math.PI * cl((t - tStut) / (tSettle + 0.6 - tStut)));
 
   // ================================================================ b1: two waits
-  const chat = S.g();
+  const chatW = S.g(), chat = S.g(null, chatW);
+  chatW.setAttribute('transform', 'translate(0,146)');
   S.rect({ x: 480, y: 130, w: 960, h: 290, r: 22, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 }, chat);
   const bub = S.g(null, chat);
   const qs = 'What is the capital of France?', qw = S.measure(qs, { size: 26, weight: 600, case: 'keep' });
@@ -88,13 +92,14 @@ V.scene('ch17_s02', S => {
   const tBrT = tFill + 0.4, tGap = tEach + 0.25, tTpotL = T('b1~time#2') - 0.05, t42 = tB3 + 0.4;
   whole(t => {
     const G = geo(t), y = G.y;
-    axis.setAttribute('y1', y); axis.setAttribute('y2', y);
+    axis.setAttribute('y1', y); axis.setAttribute('y2', y); axis.setAttribute('x1', 240 + G.o); axis.setAttribute('x2', 1860 + G.o);
     sendTick.setAttribute('y1', y - 24); sendTick.setAttribute('y2', y + 24);
-    sendL.setAttribute('y', y - 44);
+    sendTick.setAttribute('x1', 240 + G.o); sendTick.setAttribute('x2', 240 + G.o);
+    sendL.setAttribute('y', y - 44); sendL.setAttribute('x', 240 + G.o);
     setO(axis, cl((t - tSend) / 0.3)); setO(sendTick, cl((t - tSend) / 0.2));
     setO(sendL, cl((t - tSend) / 0.2) * (1 - cl((t - tFirst - 0.1) / 0.3)));
     // the queue, then the pause bar: outline as it grows, amber fill from 'time to first token'
-    queue.setAttribute('y', y - 18); queue.setAttribute('x', 260); queue.setAttribute('width', Math.max(0.01, G.q).toFixed(1)); setO(queue, G.q > 1 ? 1 : 0);
+    queue.setAttribute('y', y - 18); queue.setAttribute('x', 260 + G.o); queue.setAttribute('width', Math.max(0.01, G.q).toFixed(1)); setO(queue, G.q > 1 ? 1 : 0);
     [pauseO, pauseF, pauseFs].forEach(r => { r.setAttribute('y', y - 18); r.setAttribute('x', G.x0.toFixed(1)); });
     pauseO.setAttribute('width', Math.max(0.01, G.x1 - G.x0).toFixed(1)); setO(pauseO, t > tGrow ? 1 : 0);
     const f = EIO(cl((t - tFill) / 0.7));
@@ -136,18 +141,23 @@ V.scene('ch17_s02', S => {
   whole(t => { const G = geo(t); tPause.setAttribute('x', ((G.x0 + G.x1) / 2).toFixed(1)); tPause.setAttribute('y', G.y + 54); setO(tPause, cl((t - tGrow - 0.3) / 0.3) * (1 - cl((t - tFill) / 0.3))); });
 
   // ================================================================ b2: prefill makes the pause
+  const PY = 372;  // the panels' top
   const panel = (x, tone, title, at) => {
-    const h = S.g(), g = S.g(null, h);  // h takes the entrance, g the shrink onto the roofline
-    S.rect({ x, y: 400, w: 660, h: 610, r: 22, fill: '#0c1326', fillOpacity: 0.7, stroke: tone, strokeOpacity: 0.8, sw: 2.5 }, g);
-    const tt = S.text(title, { x: x + 330, y: 444, size: 32, weight: 800, anchor: 'middle', color: tone }, g);
+    const w = S.g(), h = S.g(null, w), g = S.g(null, h);  // w takes the slide, h the entrance, g the shrink onto the roofline
+    S.rect({ x, y: PY, w: 660, h: 610, r: 22, fill: '#0c1326', fillOpacity: 0.7, stroke: tone, strokeOpacity: 0.8, sw: 2.5 }, g);
+    const tt = S.text(title, { x: x + 330, y: PY + 44, size: 32, weight: 800, anchor: 'middle', color: tone }, g);
     const bars = [];
-    for (let k = 0; k < 80; k++) bars.push(S.rect({ x: x + 150, y: 868 - 5 * k, w: 360, h: 3, r: 1, fill: '#3a4560' }, g));
+    for (let k = 0; k < 80; k++) bars.push(S.rect({ x: x + 150, y: PY + 468 - 5 * k, w: 360, h: 3, r: 1, fill: '#3a4560' }, g));
     bars.forEach(b => b.setAttribute('data-audit', 'ignore'));
     rise(h, at, 14, 0.5);
-    g.title = tt; g.bars = bars; g.cx = x + 330;
+    g.title = tt; g.bars = bars; g.cx = x + 330; g.wrap = w;
     return g;
   };
   const PF = panel(240, 'compute', 'prefill', tUp + 0.5), DC = panel(1020, 'bytes', 'decode', tB3 + 0.1);
+  // alone in b2, the prefill panel stands at the centre; it makes room for decode as b3 begins
+  const pfx = t => 390 * (1 - EIO(cl((t - tB3 + 0.3) / 0.6)));
+  whole(t => PF.wrap.setAttribute('transform', `translate(${pfx(t).toFixed(1)},0)`));
+  K.ignore([PF.wrap, DC.wrap], tB3 - 0.3, 0.7);
   hide(DC.title);
   fade(DC.title, 0, 1, tB3 + 0.4, 0.3);
   hide(PF.title);
@@ -157,8 +167,9 @@ V.scene('ch17_s02', S => {
   [conT, conP].forEach(e => e.setAttribute('data-audit', 'ignore'));
   whole(t => {
     const G = geo(t), cT = (G.x0 + G.x1) / 2, cP = G.px(1) + G.pw / 2 + G.pitch / 2;
-    conT.setAttribute('d', `M${cT.toFixed(1)},${G.y + 84} C${cT.toFixed(1)},340 ${PF.cx},350 ${PF.cx},408`);
-    conP.setAttribute('d', `M${cP.toFixed(1)},${G.y + 84} C${cP.toFixed(1)},340 ${DC.cx},350 ${DC.cx},408`);
+    const pc = (PF.cx + pfx(t)).toFixed(1);
+    conT.setAttribute('d', `M${cT.toFixed(1)},${G.y + 84} C${cT.toFixed(1)},${PY - 60} ${pc},${PY - 50} ${pc},${PY + 8}`);
+    conP.setAttribute('d', `M${cP.toFixed(1)},${G.y + 84} C${cP.toFixed(1)},${PY - 60} ${DC.cx},${PY - 50} ${DC.cx},${PY + 8}`);
     setO(conT, cl((t - tUp - 0.9) / 0.4) * (1 - cl((t - tB4) / 0.4)));
     setO(conP, cl((t - tB3 - 0.2) / 0.4) * (1 - cl((t - tB4) / 0.4)));
   });
@@ -170,19 +181,19 @@ V.scene('ch17_s02', S => {
   block.setAttribute('data-audit', 'ignore');
   whole(t => {
     const n = t < tHalf ? 10 : t < tSev ? 6 : 6 + Math.round(10 * EIO(cl((t - tSev) / 0.8)));
-    const w = n * 20 - 4, x0 = PF.cx - w / 2;
+    const w = n * 20 - 4, x0 = PF.cx + pfx(t) - w / 2;
     const climb = EIO(cl((t - tPass) / (tOut - tPass))), leave = cl((t - tOut) / 0.4);
-    const y0 = t < tOut + 0.4 ? lerp(930, 440, climb) - 40 * leave : 930;  // after leaving the top, a new block waits below
+    const y0 = t < tOut + 0.4 ? lerp(PY + 530, PY + 40, climb) - 40 * leave : PY + 530;  // after leaving the top, a new block waits below
     minis.forEach(([m, r, c]) => { m.setAttribute('x', (x0 + 20 * c).toFixed(1)); m.setAttribute('y', (y0 + 16 * r).toFixed(1)); setO(m, c < n ? 1 : 0); });
     const shown = t < tUp + 0.6 ? 0 : t < tOut + 0.4 ? 1 - leave : cl((t - tHalf) / 0.3);
     setO(block, shown * (1 - cl((t - tR) / 0.3)));
-    const yClimb = lerp(930, 440, climb);
-    PF.bars.forEach((b, k) => b.setAttribute('fill', t > tPass && yClimb < 868 - 5 * k ? S.tone('compute') : '#3a4560'));
+    const yClimb = lerp(PY + 530, PY + 40, climb);
+    PF.bars.forEach((b, k) => b.setAttribute('fill', t > tPass && yClimb < PY + 468 - 5 * k ? S.tone('compute') : '#3a4560'));
   });
   K.pulse(glowP[0], tOut + 0.35, 1, 0.8);
   const tag = (txt, at, out) => {
     const g = S.g();
-    const e = S.pill(txt, { x: 0, y: 150, tone: 'compute', size: 24, h: 40 }, g);
+    const e = S.pill(txt, { x: 0, y: 122, tone: 'compute', size: 24, h: 40 }, g);
     whole(t => { const G = geo(t); g.setAttribute('transform', `translate(${((G.x0 + G.x1) / 2).toFixed(1)},0)`); });
     hide(e);
     fade(e, 0, 1, at, 0.3);
@@ -191,10 +202,10 @@ V.scene('ch17_s02', S => {
   };
   tag('≈ 0.5 s, typical', tHalf, tSev);
   tag('several seconds, typical', tSev + 0.3, tFull);
-  const fullL = S.text('full speed', { x: 0, y: 150, size: 24, weight: 700, anchor: 'middle', color: 'compute' });
+  const fullL = S.text('full speed', { x: 0, y: 122, size: 24, weight: 700, anchor: 'middle', color: 'compute' });
   whole(t => { const G = geo(t); fullL.setAttribute('x', (G.x0 + (G.x1 - G.x0) * 0.45).toFixed(1)); setO(fullL, cl((t - tFull - 0.2) / 0.3) * (1 - cl((t - tB3) / 0.3))); });
-  const qL = S.text('queue', { x: 310, y: 150, size: 24, weight: 700, anchor: 'middle', color: 'muted' });
-  whole(t => setO(qL, cl((t - tQ - 0.3) / 0.3) * (1 - cl((t - tB3) / 0.3))));
+  const qL = S.text('queue', { x: 0, y: 122, size: 24, weight: 700, anchor: 'middle', color: 'muted' });
+  whole(t => { const G = geo(t); qL.setAttribute('x', (260 + G.o + 50).toFixed(1)); setO(qL, cl((t - tQ - 0.3) / 0.3) * (1 - cl((t - tB3) / 0.3))); });
 
   // ================================================================ b3: decode makes each gap
   const tClimb = T('b3~its') - 0.15;
@@ -203,17 +214,17 @@ V.scene('ch17_s02', S => {
   const CL = 0.75;
   whole(t => {
     const j = Math.max(0, Math.min(2, Math.floor((t - tClimb) / CL))), u = cl((t - tClimb - CL * j) / CL);
-    const y = lerp(930, 430, EIO(u));
+    const y = lerp(PY + 530, PY + 30, EIO(u));
     one.setAttribute('y', y.toFixed(1));
     setO(one, t > tB3 + 0.4 && t < tClimb + 3 * CL ? 1 : 0);
-    DC.bars.forEach((b, k) => b.setAttribute('fill', t > tClimb && (j > 0 || y < 868 - 5 * k) ? S.tone('bytes') : '#3a4560'));
+    DC.bars.forEach((b, k) => b.setAttribute('fill', t > tClimb && (j > 0 || y < PY + 468 - 5 * k) ? S.tone('bytes') : '#3a4560'));
   });
   [1, 2, 3].forEach(i => K.pulse(glowP[i], tClimb + CL * i - 0.05, 1, 0.5));
 
   // ================================================================ b4: both are felt; opposite ends of the roofline
   fade([PF.title, DC.title], 1, 0, tB4, 0.3);
   const verdict = (txt, tone, at, xf) => {
-    const e = S.text(txt, { x: 0, y: 310, size: 28, weight: 750, anchor: 'middle', color: tone });
+    const e = S.text(txt, { x: 0, y: 282, size: 28, weight: 750, anchor: 'middle', color: tone });
     whole(t => { const G = geo(t); e.setAttribute('x', xf(G).toFixed(1)); });
     rise(e, at, 6);
     fade(e, 1, 0, T('b4~Both') - 0.1, 0.3);
@@ -222,17 +233,19 @@ V.scene('ch17_s02', S => {
   verdict('feels responsive?', 'compute', T('b4~feels') - 0.1, G => (G.x0 + G.x1) / 2);
   verdict('reads comfortably?', 'bytes', T('b4~reads') - 0.1, G => G.px(1) + G.pw / 2 + G.pitch / 2);
   // the panels shrink into dots and fly onto a small roofline
-  const RX = I => 725 + 110 * (Math.log10(I) + 0.2), RY = P => 930 - 90 * Math.log10(P);
+  const RO = 845;  // the roofline's floor: the chart sits under the timeline, the two centred as one block
+  const RX = I => 725 + 110 * (Math.log10(I) + 0.2), RY = P => RO - 90 * Math.log10(P);
   const ridge = [RX(989 / 3.35), RY(989)], dP = [RX(2000), RY(989)], dD = [RX(1), RY(3.35)];
-  K.track(PF, [K.K(tR, { x: 0, y: 0, s: 1, o: 1 }), K.K(tR + 0.8, { x: dP[0] - PF.cx, y: dP[1] - 705, s: 0.03, o: 0, e: 'power3.in' })], PF.cx, 705);
-  K.track(DC, [K.K(tR, { x: 0, y: 0, s: 1, o: 1 }), K.K(tR + 0.8, { x: dD[0] - DC.cx, y: dD[1] - 705, s: 0.03, o: 0, e: 'power3.in' })], DC.cx, 705);
+  const PC = PY + 305;  // the panels' centre
+  K.track(PF, [K.K(tR, { x: 0, y: 0, s: 1, o: 1 }), K.K(tR + 0.8, { x: dP[0] - PF.cx, y: dP[1] - PC, s: 0.03, o: 0, e: 'power3.in' })], PF.cx, PC);
+  K.track(DC, [K.K(tR, { x: 0, y: 0, s: 1, o: 1 }), K.K(tR + 0.8, { x: dD[0] - DC.cx, y: dD[1] - PC, s: 0.03, o: 0, e: 'power3.in' })], DC.cx, PC);
   K.ignore([PF, DC, block], tR, 0.9);
   const roof = S.g();
-  S.path({ d: `M725,${RY(10 ** 3.2)} V930 H1215`, stroke: '#ffffff', strokeOpacity: 0.5, sw: 2 }, roof);
+  S.path({ d: `M725,${RY(10 ** 3.2)} V${RO} H1215`, stroke: '#ffffff', strokeOpacity: 0.5, sw: 2 }, roof);
   S.path({ d: `M725,${RY(3.35 * 10 ** -0.2).toFixed(1)} L${ridge[0].toFixed(1)},${ridge[1].toFixed(1)}`, stroke: 'bytes', sw: 4 }, roof);
   S.path({ d: `M${ridge[0].toFixed(1)},${ridge[1].toFixed(1)} H1205`, stroke: 'compute', sw: 4 }, roof);
-  S.path({ d: `M${ridge[0].toFixed(1)},${ridge[1].toFixed(1)} V930`, stroke: '#ffffff', sw: 2, dash: '5 6' }, roof);
-  S.text('295', { x: ridge[0], y: 958, size: 24, weight: 700, anchor: 'middle', color: 'ink' }, roof);
+  S.path({ d: `M${ridge[0].toFixed(1)},${ridge[1].toFixed(1)} V${RO}`, stroke: '#ffffff', sw: 2, dash: '5 6' }, roof);
+  S.text('295', { x: ridge[0], y: RO + 28, size: 24, weight: 700, anchor: 'middle', color: 'ink' }, roof);
   roof.setAttribute('data-audit', 'ignore');
   rise(roof, tR + 0.2, 0, 0.5);
   const dot = (p, tone, label, lx, ly, anchor) => {
@@ -244,6 +257,6 @@ V.scene('ch17_s02', S => {
   };
   dot(dP, 'compute', 'prefill', dP[0], dP[1] - 30, 'middle');
   dot(dD, 'bytes', 'decode', dD[0] - 22, dD[1] + 1, 'end');
-  const fin = S.text('opposite resource profiles', { x: 965, y: 1004, size: 28, weight: 750, anchor: 'middle', color: 'ink' });
+  const fin = S.text('opposite resource profiles', { x: 965, y: RO + 74, size: 28, weight: 750, anchor: 'middle', color: 'ink' });
   rise(fin, tR + 1.1, 6);
 });

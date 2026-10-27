@@ -15,6 +15,8 @@ V.scene('ch12_s03', {
   const at = spec => S.t(spec);
 
   // ================================================================ layout (all in one place)
+  // the equation band and the picture under it (y 150-820) sit 100 px lower, by camera, so the whole is centred
+  S.xset(S.camera, { x: 0, y: 100, s: 1 });
   const DIE = { x: 1250, y: 560, size: 240 };               // libChip body 240 + pins: about 275 px across
   const RING = { r: 175, sw: 10 };                          // clears the die's pins (≈ 158 px) by 17 px
   const STK = { w: 90, h: 220, y: 450, lcx: 960, rcx: 1540 };

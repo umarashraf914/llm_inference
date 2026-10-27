@@ -8,7 +8,8 @@
        texture; they compress to 80 rows, counter 4 → 80; every tile shimmers.
    b4  one token climbs the stack, an amber flash at every row, 'multiplies per token' 1 → 80; 'not shared,
        not reused'; the camera dives to layers 39 and 40: their W_K tiles side by side, '≠'.
-   Layout: left picture centred x 480; right stack x 940-1640, y 290-900 (80 rows, 7.6 px pitch). */
+   Layout: left picture centred x 480 (in b1-b2 moved right to the centre); right stack x 940-1640,
+   y 290-900 (80 rows, 7.6 px pitch). */
 V.scene('ch08_s06', S => {
   const { fx } = S;
   const T = s => S.t(s);
@@ -19,10 +20,13 @@ V.scene('ch08_s06', S => {
   const fade = (els, a, b, at, d = 0.45) => S.add(ch08Fade(els, a, b, { d }), at);
 
   // ================================================================ b1: the tempting picture (dashed, grey)
-  const left = S.g();
+  // the picture, its heading centred over it, is alone in b1-b2: `left` holds it centred (L1, then L2 once the
+  // ticks come in on its right), and returns to its place (0) as it is struck and shrinks aside in b3
+  const left = S.g(), L1 = 425, L2 = 300;
+  S.set(left, { x: L1 }, 0);
   const LX = 480;
-  const hdr1 = S.text('One natural picture:', { x: 110, y: 100, size: 40, weight: 700, family: 'display', color: 'ink' }, left);
-  const hdr2 = S.text('computed once, carried upward', { x: 110, y: 146, size: 32, weight: 600, color: 'muted' }, left);
+  const hdr1 = S.text('One natural picture:', { x: LX, y: 100, size: 40, weight: 700, family: 'display', anchor: 'middle', color: 'ink' }, left);
+  const hdr2 = S.text('computed once, carried upward', { x: LX, y: 146, size: 32, weight: 600, anchor: 'middle', color: 'muted' }, left);
   const dbox = (x, y, w, h, label, size = 28) => {
     const g = S.g(null, left);
     S.rect({ x: x - w / 2, y: y - h / 2, w, h, r: 12, stroke: 'muted', sw: 2.5, dash: '8 7' }, g);
@@ -56,6 +60,7 @@ V.scene('ch08_s06', S => {
   const reas = S.text('a reasonable reading', { x: LX, y: 1000, size: 26, weight: 600, anchor: 'middle', color: 'faint' }, left);
   const q = S.text('?', { x: LX, y: 420, size: 150, weight: 700, family: 'display', anchor: 'middle', color: 'muted' }, left);
   ch08Hide([tk1, tk2, reas, q]);
+  S.add(gsap.fromTo(left, { x: L1 }, { x: L2, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), T('b2~fixed') - 0.7);
   fade(reas, 0, 1, T('b2~invites') - 0.1);
   fade(tk1, 0, 1, T('b2~fixed') - 0.1);
   fade(tk2, 0, 1, T('b2~embedding') - 0.1);
@@ -64,13 +69,14 @@ V.scene('ch08_s06', S => {
 
   // ================================================================ b3: struck; each layer owns its own
   const tNot = T('b3~not') - 0.1;
-  const strike = S.line({ x1: 90, y1: 1010, x2: 880, y2: 110, stroke: 'muted', sw: 5 });
+  const strike = S.line({ x1: 90, y1: 1010, x2: 880, y2: 110, stroke: 'muted', sw: 5 }, left);
   strike.setAttribute('data-audit', 'ignore');
   S.set(strike, { autoAlpha: 0 }, 0);
   S.add(fx.draw(strike, { d: 0.4 }), tNot);
   const leftAll = S.g();
-  leftAll.appendChild(left); leftAll.appendChild(strike);
+  leftAll.appendChild(left);
   S.add(fx.xform(leftAll, { x: 30, y: 300, s: 0.42, ox: 0, oy: 0 }, { d: 0.8, ease: 'power3.inOut' }), tNot + 0.45);
+  S.add(gsap.fromTo(left, { x: L2 }, { x: 0, duration: 0.8, ease: 'power3.inOut', immediateRender: false }), tNot + 0.45);
   S.add(ch08Fade(leftAll, 1, 0.45, { d: 0.6 }), tNot + 0.5);
   S.add(ch08Ignore(leftAll, S.duration - tNot - 0.5), tNot + 0.45);
   const wrong = S.text('tempting, but wrong', { x: 250, y: 780, size: 28, weight: 650, anchor: 'middle', color: 'muted' });
@@ -173,14 +179,15 @@ V.scene('ch08_s06', S => {
   S.add(ch08Fade([wrong, why], 0.4, 0, { d: 0.5 }), tZ + 0.4);
   S.add(ch08Fade([mul, notShared], 1, 0, { d: 0.4 }), tZ);
   const pair = S.g();
-  const k39 = ch08WeightTile(S, { x: 900, y: 400, w: 240, h: 240, seed: 3939, cols: 10, rows: 10, name: 'K', nameSize: 44 }, pair);
-  const k40 = ch08WeightTile(S, { x: 1260, y: 400, w: 240, h: 240, seed: 4040, cols: 10, rows: 10, name: 'K', nameSize: 44 }, pair);
-  S.text('layer 39', { x: 1020, y: 360, size: 32, weight: 700, anchor: 'middle', color: 'ink' }, pair);
-  S.text('layer 40', { x: 1380, y: 360, size: 32, weight: 700, anchor: 'middle', color: 'ink' }, pair);
+  // the pair, centred where the camera dived
+  const k39 = ch08WeightTile(S, { x: 660, y: 400, w: 240, h: 240, seed: 3939, cols: 10, rows: 10, name: 'K', nameSize: 44 }, pair);
+  const k40 = ch08WeightTile(S, { x: 1020, y: 400, w: 240, h: 240, seed: 4040, cols: 10, rows: 10, name: 'K', nameSize: 44 }, pair);
+  S.text('layer 39', { x: 780, y: 360, size: 32, weight: 700, anchor: 'middle', color: 'ink' }, pair);
+  S.text('layer 40', { x: 1140, y: 360, size: 32, weight: 700, anchor: 'middle', color: 'ink' }, pair);
   ch08Hide(pair);
   S.add(ch08Fade(pair, 0, 1, { d: 0.5 }), tZ + 0.7);
   S.add(gsap.fromTo(pair, { scale: 0.85, transformOrigin: '50% 50%' }, { scale: 1, duration: 0.6, ease: 'power3.out', transformOrigin: '50% 50%', immediateRender: false }), tZ + 0.7);
-  const ne = S.text('≠', { x: 1200, y: 520, size: 90, weight: 700, family: 'display', anchor: 'middle', color: 'muted' });
+  const ne = S.text('≠', { x: 960, y: 520, size: 90, weight: 700, family: 'display', anchor: 'middle', color: 'muted' });
   ch08Hide(ne);
   fade(ne, 0, 1, T('b4~nothing') - 0.1, 0.4);
 });

@@ -15,7 +15,8 @@
        bar from 63.92 B to the advertised 70 B: 'over 6 B missing'.
    b5  the dashed ledger goes; the real one returns to the centre: 'only per-layer matrices add up'; the
        corner key brightens once.
-   Layout: card 820 wide, y 190-840 (x 680, b4 x 100, b5 x 550); dashed card x 990-1810; key bottom left. */
+   Layout: card 820 wide, y 190-840 (x 550, centred; x 853 beside the tables in b2, x 100 in b4); dashed card
+   x 990-1810; the source key centred along the foot. */
 V.scene('ch08_s10', S => {
   const T = s => S.t(s);
   const cl = v => Math.max(0, Math.min(1, v));
@@ -49,10 +50,11 @@ V.scene('ch08_s10', S => {
   const M = v => `${v.toFixed(1)} M`, B2 = v => `${v.toFixed(2)} B`;
 
   // ================================================================ the corner key (from s09) and the card
-  const keyG = S.g();
-  S.icon('ph:book-open-duotone', { x: 124, y: 1008, size: 30, color: 'muted' }, keyG);
-  const keyT = S.text('shapes: published 70B model (Llama 3 70B)', { x: 150, y: 1008, size: 22, weight: 600, color: 'muted' }, keyG);
-  const keyHi = S.text('shapes: published 70B model (Llama 3 70B)', { x: 150, y: 1008, size: 22, weight: 600, color: 'ink' });
+  const keyG = S.g();                                                // centred along the foot, as in s09
+  const keyX = 960 - (30 + 11 + S.measure('shapes: published 70B model (Llama 3 70B)', { size: 22, weight: 600 })) / 2;
+  S.icon('ph:book-open-duotone', { x: keyX + 15, y: 1008, size: 30, color: 'muted' }, keyG);
+  const keyT = S.text('shapes: published 70B model (Llama 3 70B)', { x: keyX + 41, y: 1008, size: 22, weight: 600, color: 'muted' }, keyG);
+  const keyHi = S.text('shapes: published 70B model (Llama 3 70B)', { x: keyX + 41, y: 1008, size: 22, weight: 600, color: 'ink' });
   keyHi.setAttribute('data-audit', 'ignore');    // a brighter copy laid over the key
   ch08Hide(keyHi);
   const CX = 680, CW = 820, CY = 190, CH = 650, LX = CX + 40, VX = CX + CW - 40;
@@ -69,12 +71,19 @@ V.scene('ch08_s10', S => {
   const Y = { att: 350, ff: 410, one: 490, bar: 530, x80: 630, voc: 690, rule: 732, tot: 785 };
   row('attention, per layer', '151.0 M', Y.att);
   row('feed-forward, per layer', '704.6 M', Y.ff);
-  // where the card sits: x 680 (b1-b3), x 100 (b4), x 550 (b5)
-  const tL = T('b4') - 0.2, tR = T('b5') + 0.1;
-  const cardX = t => lerp(lerp(0, 100 - CX, EIO(cl((t - tL) / 0.8))), 550 - CX, EIO(cl((t - tR) / 0.8)));
+  // where the card sits: centred (x 550) when it is alone; x 680 while the vocabulary tables stand at its left
+  // (b2); centred again once they have merged into it; x 100 beside the dashed card (b4); centred (b5)
+  const tL = T('b4') - 0.2, tR = T('b5') + 0.1, tTab = T('b2~embedding') - 0.15, tMerged = T('b2~Two#2') - 0.1;
+  const CB2 = 173;                                                   // b2: the tables (x 75-555) and the card, centred as a pair
+  const XK = [[tTab - 0.75, 550 - CX], [tTab - 0.05, CB2], [tMerged + 1.0, CB2], [tMerged + 1.8, 550 - CX],
+    [tL, 550 - CX], [tL + 0.8, 100 - CX], [tR, 100 - CX], [tR + 0.8, 550 - CX]];
+  const cardX = t => {
+    if (t <= XK[0][0]) return XK[0][1];
+    for (let i = 1; i < XK.length; i++) if (t <= XK[i][0]) { const [t0, a] = XK[i - 1], [t1, b] = XK[i]; return lerp(a, b, EIO(cl((t - t0) / (t1 - t0)))); }
+    return XK[XK.length - 1][1];
+  };
   whole(t => cardG.setAttribute('transform', `translate(${cardX(t).toFixed(1)},0)`));
-  S.add(ch08Ignore(cardG, 0.85), tL);
-  S.add(ch08Ignore(cardG, 0.85), tR);
+  [tTab - 0.75, tMerged + 1.0, tL, tR].forEach(t => S.add(ch08Ignore(cardG, 0.85), t));
 
   // ================================================================ b1: one layer, × 80
   const sumRule = S.path({ d: `M${VX - 230},${Y.one - 38} H${VX}`, stroke: 'white', strokeOpacity: 0.35, sw: 2 }, cardG);
@@ -109,26 +118,26 @@ V.scene('ch08_s10', S => {
     ch08Texture(S, { x: x + 4, y: TBY + 6, w: TBW - 8, h: TBH - 12, cols: 3, rows: 48, seed, tone: 'struct', ops: [0.18, 0.4, 0.7] }, g);
     return g;
   };
-  const tab1 = S.g(), tab2 = S.g();
-  tab1.appendChild(table(160, 501));
-  tab2.appendChild(table(420, 502));
+  const tab1 = S.g(), tab2 = S.g(), T1 = 180 + CB2, T2 = 440 + CB2;   // table centres, beside the card at +CB2
+  tab1.appendChild(table(T1 - 20, 501));
+  tab2.appendChild(table(T2 - 20, 502));
   const lab = (s, x, y, o = {}) => S.text(s, { x, y, anchor: 'middle', size: 26, weight: 650, color: 'ink', ...o });
-  const t1n = lab('embedding', 180, 710, { size: 28 }), t1d = lab('128,256 × 8,192', 180, 746, { size: 24, family: 'mono', color: 'compute' });
-  const t1v = lab('1.05 B', 180, 792, { size: 34, family: 'mono', weight: 700, color: 'compute' });
-  const t1g = lab('= 2.1 GB at 2 bytes', 180, 834, { size: 22, weight: 600, color: 'muted' });
+  const t1n = lab('embedding', T1, 710, { size: 28 }), t1d = lab('128,256 × 8,192', T1, 746, { size: 24, family: 'mono', color: 'compute' });
+  const t1v = lab('1.05 B', T1, 792, { size: 34, family: 'mono', weight: 700, color: 'compute' });
+  const t1g = lab('= 2.1 GB at 2 bytes', T1, 834, { size: 22, weight: 600, color: 'muted' });
   [t1n, t1d, t1v, t1g].forEach(e => tab1.appendChild(e));
-  const t2n = lab('output projection', 440, 710, { size: 28 }), t2h = lab('output head', 440, 744, { size: 24, weight: 600, color: 'muted' });
-  const t2v = lab('1.05 B', 440, 792, { size: 34, family: 'mono', weight: 700, color: 'compute' });
-  const sep = S.pill('separate here', { x: 440, y: 186, tone: 'neutral', size: 22, h: 40 }, tab2);
+  const t2n = lab('output projection', T2, 710, { size: 28 }), t2h = lab('output head', T2, 744, { size: 24, weight: 600, color: 'muted' });
+  const t2v = lab('1.05 B', T2, 792, { size: 34, family: 'mono', weight: 700, color: 'compute' });
+  const sep = S.pill('separate here', { x: T2, y: 186, tone: 'neutral', size: 22, h: 40 }, tab2);
   [t2n, t2v].forEach(e => tab2.appendChild(e));
   tab2.appendChild(t2h);
   ch08Hide([t1d, t1v, t1g, t2h, sep]);
   const tE = T('b2~embedding') - 0.15, tSep = T('b2~separate') - 0.1, tAll = T('b2~Two#2') - 0.1;
   const slideIn = t0 => [K(t0, { x: -260, o: 0 }), K(t0 + 0.7, { x: 0, o: 1, e: 'power3.out' })];
-  // both merge into the ledger row (the row's label sits at x ~720 + card offset 0 in b2)
-  const merge = (cx, t0) => [K(t0, { x: 0, y: 0, s: 1, o: 1 }), K(t0 + 0.7, { x: LX + 160 - cx, y: Y.voc - 520, s: 0.12, o: 0, e: 'power2.in' })];
-  track(tab1, [...slideIn(tE), ...merge(180, tAll + 0.2)], 180, 520);
-  track(tab2, [...slideIn(tSep), ...merge(440, tAll + 0.3)], 440, 520);
+  // both merge into the ledger row (the row's label sits at x ~720 + the card's offset CB2 in b2)
+  const merge = (cx, t0) => [K(t0, { x: 0, y: 0, s: 1, o: 1 }), K(t0 + 0.7, { x: LX + CB2 + 160 - cx, y: Y.voc - 520, s: 0.12, o: 0, e: 'power2.in' })];
+  track(tab1, [...slideIn(tE), ...merge(T1, tAll + 0.2)], T1, 520);
+  track(tab2, [...slideIn(tSep), ...merge(T2, tAll + 0.3)], T2, 520);
   fade(t1d, 0, 1, tE + 0.4, 0.35);
   fade(t1v, 0, 1, T('b2~one') - 0.1, 0.35);
   fade(t1g, 0, 1, T('b2~billion') + 0.1, 0.35);

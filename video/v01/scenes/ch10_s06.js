@@ -13,8 +13,10 @@
        'decode offers 1'.
    b5  a strip of 295 squares, one amber: '1 of 295 ≈ 0.34%' (H100), '< 1%'; 'earlier: under 1%' /
        'H200: 1 of 206 ≈ 0.5%'.
-   Layout: card x 140-520 at y 350; lines from x 560 (amber y 280, coral y 420); H100 card x 1260-1800,
-   y 220-540; pipe y 640; strip y 890. */
+   Layout: card x 140-520 at y 440; lines from x 560 (amber y 370, coral y 510); H100 card x 1230-1820, y 300-620,
+   its lines centred on it; pipe y 730. The left group is one picture, centred while it is alone (b1-b3, moved
+   (320, 75)); at b4 it moves to (-20, -19) beside the H100 card, the top row centred; at b5 the row moves up to
+   -113 and the strip band (y 767) comes in under it, the whole frame centred. */
 V.scene('ch10_s06', S => {
   const K = ch10Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
@@ -60,6 +62,7 @@ V.scene('ch10_s06', S => {
   hide(anyM);
   fade(anyM, 0, 1, T('b2~worth') - 0.1, 0.35);
   const tUn = T('b2~unrelated') - 0.1;
+  fade(nBr, 1, 0, tUn, 0.3);    // the N bracket has made its point; 'unrelated, same number' takes its place
   const twoA = S.text('multiply-accumulate = 2 ops', { x: LX + 22, y: AY - 52, size: 24, weight: 650, color: 'compute' });
   const twoC = S.text('16 bits = 2 bytes', { x: LX + 22, y: CY + 52, size: 24, weight: 650, color: 'bytes' });
   const unrel = S.text('unrelated, same number', { x: LX + BW / 2 + 60, y: (AY + CY) / 2, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
@@ -71,7 +74,7 @@ V.scene('ch10_s06', S => {
 
   // ================================================================ b3: one operation per byte
   const tB3 = T('b3') - 0.1;
-  fade([twoA, twoC, unrel, nBr], 1, 0, tB3, 0.3);
+  fade([twoA, twoC, unrel], 1, 0, tB3, 0.3);
   const fracL = S.path({ d: `M${LX},${(AY + CY) / 2} H${LX + BW}`, stroke: 'ink', sw: 3 });
   hide(fracL);
   K.track(aBar, [K.K(tB3 + 0.2, { y: 0 }), K.K(tB3 + 0.7, { y: 30 })]);
@@ -90,18 +93,23 @@ V.scene('ch10_s06', S => {
   fade(ai, 0, 1, T('b3~arithmetic') - 0.1, 0.4);
   fade(ai2, 0, 1, T('b3~arithmetic') + 0.3, 0.4);
 
+  const left = S.g();          // everything so far: the left group
+  [...S.main.children].filter(e => e !== left).forEach(e => left.appendChild(e));
+
   // ================================================================ b4: what the chip could do
   const tB4 = T('b4') - 0.1;
   fade(card, 1, 0.3, tB4, 0.4);
   const h100 = S.g();
   S.rect({ x: 1230, y: 300, w: 590, h: 320, r: 18, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.22, sw: 2 }, h100);
-  S.icon('ph:cpu-duotone', { x: 1274, y: 350, size: 40, color: 'compute' }, h100);
-  S.text('H100', { x: 1306, y: 350, size: 32, weight: 750, color: 'ink' }, h100);
+  // its contents centred on the card (x 1525): the icon and name as one row, then the lines
+  const HC = 1525, hx = HC - (52 + S.measure('H100', { size: 32, weight: 750 })) / 2;
+  S.icon('ph:cpu-duotone', { x: hx + 20, y: 350, size: 40, color: 'compute' }, h100);
+  S.text('H100', { x: hx + 52, y: 350, size: 32, weight: 750, color: 'ink' }, h100);
   hide(h100);
-  fade(h100, 0, 1, tB4 + 0.1, 0.4);
-  const l1 = S.text('989 trillion ops / second', { x: 1260, y: 420, size: 28, weight: 700, family: 'mono', color: 'compute' }, h100);
-  const l2 = S.text('3.35 trillion bytes / second', { x: 1260, y: 474, size: 28, weight: 700, family: 'mono', color: 'bytes' }, h100);
-  const div = S.text([{ t: '989 ÷ 3.35 ≈ ', c: 'ink' }, { t: '295', c: 'compute' }], { x: 1260, y: 560, size: 36, weight: 800, family: 'mono' }, h100);
+  fade(h100, 0, 1, tB4 + 0.45, 0.4);     // once the left group has moved over
+  const l1 = S.text('989 trillion ops / second', { x: HC, y: 420, size: 28, weight: 700, family: 'mono', anchor: 'middle', color: 'compute' }, h100);
+  const l2 = S.text('3.35 trillion bytes / second', { x: HC, y: 474, size: 28, weight: 700, family: 'mono', anchor: 'middle', color: 'bytes' }, h100);
+  const div = S.text([{ t: '989 ÷ 3.35 ≈ ', c: 'ink' }, { t: '295', c: 'compute' }], { x: HC, y: 560, size: 36, weight: 800, family: 'mono', anchor: 'middle' }, h100);
   hide([l1, l2, div]);
   fade(l1, 0, 1, T('b4~compute') - 0.1, 0.35);
   fade(l2, 0, 1, T('b4~bandwidth') - 0.1, 0.35);
@@ -129,11 +137,13 @@ V.scene('ch10_s06', S => {
   hide([need, offer]);
   fade(need, 0, 1, tDec + 0.2, 0.35);
   fade(offer, 0, 1, T('b4~one#3') - 0.1, 0.35);
+  const right = S.g();          // the H100 group
+  [h100, pipe, need, offer].forEach(e => right.appendChild(e));
 
   // ================================================================ b5: a third of one percent
   const tB5 = T('b5') - 0.1;
   fade([h100, need, offer], 1, 0.3, tB5, 0.4);
-  const SX0 = 140, SX1 = 1780, N = 295, pitch = (SX1 - SX0) / N, SY = 880;
+  const SX0 = 140, SX1 = 1780, N = 295, pitch = (SX1 - SX0) / N, SY = 767;
   const strip = S.g();
   strip.setAttribute('data-audit', 'ignore');
   let dGrey = '';
@@ -145,17 +155,23 @@ V.scene('ch10_s06', S => {
   const tStrip = T('b5~third') - 0.2;
   fade(strip, 0, 1, tStrip, 0.8);
   void lit; void litGlow;
-  const lab = S.text([{ t: '1 of 295 ≈ ', c: 'ink' }, { t: '0.34%', c: 'compute' }], { x: SX0, y: 950, size: 32, weight: 750, family: 'mono' });
-  const labH = S.text('H100', { x: SX0, y: 990, size: 22, weight: 600, color: 'muted' });
-  const lt1 = S.text('< 1%', { x: SX0 + S.measure('1 of 295 ≈ 0.34%', { size: 32, weight: 750, family: 'mono' }) + 30, y: 950, size: 32, weight: 800, color: 'ink' });
+  const lab = S.text([{ t: '1 of 295 ≈ ', c: 'ink' }, { t: '0.34%', c: 'compute' }], { x: SX0, y: SY + 70, size: 32, weight: 750, family: 'mono' });
+  const labH = S.text('H100', { x: SX0, y: SY + 110, size: 22, weight: 600, color: 'muted' });
+  const lt1 = S.text('< 1%', { x: SX0 + S.measure('1 of 295 ≈ 0.34%', { size: 32, weight: 750, family: 'mono' }) + 30, y: SY + 70, size: 32, weight: 800, color: 'ink' });
   hide([lab, labH, lt1]);
   fade([lab, labH], 0, 1, tStrip + 0.6, 0.4);
   fade(lt1, 0, 1, T('b5~under') - 0.1, 0.35);
+  // the callback chip, ending with the strip, sized to its lines and with them centred in it
+  const callW = Math.max(S.measure('earlier: under 1%', { size: 26, weight: 650 }), S.measure('H200: 1 of 206 ≈ 0.5%', { size: 22, weight: 600, family: 'mono' })) + 52;
   const call = S.g();
-  S.rect({ x: 1180, y: 920, w: 600, h: 86, r: 14, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.2, sw: 2 }, call);
-  S.text('earlier: under 1%', { x: 1206, y: 948, size: 26, weight: 650, color: 'muted' }, call);
-  S.text('H200: 1 of 206 ≈ 0.5%', { x: 1206, y: 984, size: 22, weight: 600, family: 'mono', color: 'muted' }, call);
+  S.rect({ x: SX1 - callW, y: SY + 40, w: callW, h: 86, r: 14, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.2, sw: 2 }, call);
+  S.text('earlier: under 1%', { x: SX1 - callW / 2, y: SY + 68, size: 26, weight: 650, anchor: 'middle', color: 'muted' }, call);
+  S.text('H200: 1 of 206 ≈ 0.5%', { x: SX1 - callW / 2, y: SY + 104, size: 22, weight: 600, family: 'mono', anchor: 'middle', color: 'muted' }, call);
   hide(call);
   S.add(K.drive(0.5, k => { setO(call, k); call.setAttribute('transform', `translate(${(60 * (1 - E('power3.out')(k))).toFixed(1)},0)`); }), T('b5~thirty') - 0.1);
+  // the frame's layout: the left group alone and centred, then beside the H100 card, then the row up for the strip
+  const row = t => lerp(-19, -113, EIO(cl((t - tB5) / 0.7))) + 19;
+  whole(t => { const u = EIO(cl((t - tB4) / 0.8)); left.setAttribute('transform', `translate(${lerp(320, -20, u).toFixed(1)},${(lerp(75, -19, u) + row(t)).toFixed(1)})`); });
+  whole(t => right.setAttribute('transform', `translate(-20,${(-19 + row(t)).toFixed(1)})`));
   void pulse; void E;
 });

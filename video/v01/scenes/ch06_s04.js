@@ -4,7 +4,7 @@
    b2  the laptop's pipe: 2 lanes (1 lane = 64 wires), dashes racing at 640 px/s; counter ≈ 96 → ≈ 100 GB/s.
    b3  the H100's pipe: 80 lanes, forty times taller, dashes at 87% of the speed (5.2 vs 6 billion bits/s);
        '40× the wires → ≈ 35× the bandwidth'; counter to 3.35 TB/s; then 'lanes to scale'.
-   b4  the equation's 'wires' underlined in teal; the pipes shrink to the corner; the package returns with
+   b4  the equation's 'wires' underlined in teal; the pipes shrink away; the package returns, centred, with
        hair-thin wires and its memory slides in until it nearly touches the die: 'wide needs short'.
    Checks: 128 × 6e9 / 8 = 96 GB/s; 5,120 × 5.234e9 / 8 = 3.35 TB/s; 5,120 / 128 = 40; 3.35 TB / 96 GB = 34.9.
    Layout: equation y 92-260; upper pipe x 360-1480 at y 372 (10 px); lower pipe y 545-945 (400 px);
@@ -19,7 +19,10 @@ V.scene('ch06_s04', S => {
   const ignoreIn = (els, a, b) => ch06Clock(S, a, b, t => els.forEach(e => (t > a && t < b ? e.setAttribute('data-audit', 'ignore') : e.removeAttribute('data-audit'))));
 
   // ================================================================ b1: the equation
-  const eqG = S.g();
+  // while it is alone (b1) the equation is centred, EQY lower; it moves up into the top band as the pipes come
+  const eqG = S.g(), EQY = 380;
+  S.set(eqG, { y: EQY }, 0);
+  S.add(gsap.fromTo(eqG, { y: EQY }, { y: 0, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), T('b2') - 0.25);
   const L1 = 132, L2 = 206;
   const wBw = S.measure('bandwidth', { size: 56, weight: 700, family: 'display' }), wEq = S.measure('=', { size: 56, weight: 700, family: 'display' });
   const x1 = 960 - (wBw + 22 + wEq) / 2;
@@ -107,7 +110,10 @@ V.scene('ch06_s04', S => {
 
   // ---------------------------------------------------------------- b2: the laptop's narrow pipe
   const V0 = 640;                                             // px/s for 6 billion bits a second per wire
-  const tUp = T('b2') - 0.1;
+  const tUp = T('b2') + 0.35;                                 // once the equation has moved up
+  // with only the equation and the laptop's pipe on screen (y 98-428), the camera holds them 300 px lower;
+  // it eases back as the H100's pipe arrives below in b3
+  S.add(fx.cam({ x: 960, y: 240, scale: 1, d: 0.8, ease: 'power2.inOut' }), T('b2') - 0.2);
   const up = makePipe({ lanes: 2, cy: 372, v: V0, sp: 46, dw: 12, dh: 3.4, t0: tUp + 0.5 });
   const upName = S.text('laptop', { x: 330, y: 372, size: 34, weight: 700, family: 'display', anchor: 'end', color: 'ink' }, pipes);
   const upWires = S.text('≈ 128 wires', { x: PX0, y: 334, size: 28, weight: 600, color: 'ink' }, pipes);
@@ -117,7 +123,7 @@ V.scene('ch06_s04', S => {
   [up, upName, upWires, upRate, upCap, upTag].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
   S.add(gsap.fromTo(up, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, immediateRender: false }), tUp);
   S.add(fx.draw(up.outline, { d: 0.8 }), tUp);
-  S.add(fx.in(upName, { from: 'right', d: 0.5, dist: 16 }), 'b2~laptop-0.1');
+  S.add(fx.in(upName, { from: 'right', d: 0.5, dist: 16 }), tUp + 0.1);
   S.add(fx.in(upCap, { from: 'up', d: 0.45, dist: 12 }), 'b2~narrow-0.1');
   S.add(fx.in(upWires, { from: 'up', d: 0.45, dist: 12 }), 'b2~pipe-0.1');
   S.add(fx.in(upRate, { from: 'up', d: 0.45, dist: 12 }), 'b2~running-0.1');
@@ -134,6 +140,7 @@ V.scene('ch06_s04', S => {
 
   // ---------------------------------------------------------------- b3: the H100's wide pipe
   const tLo = T('b3~wide') - 0.1;
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), tLo - 0.3);
   S.add(fx.dim([upWires, upRate, upCap, upTag, upName], { to: 0.3 }), tLo);
   S.add(fx.dim(eqG, { to: 0.4 }), tLo);
   const lo = makePipe({ lanes: 80, cy: 745, v: V0 * 5.2 / 6, sp: 46, dw: 10, dh: 2.4, t0: tLo + 0.45 });
@@ -182,16 +189,17 @@ V.scene('ch06_s04', S => {
   const wUnder = S.line({ x1: tWires.l, y1: L2 + 28, x2: tWires.r, y2: L2 + 28, stroke: 'helps', sw: 4 });
   S.set(wUnder, { autoAlpha: 0 }, 0);
   S.add(fx.draw(wUnder, { d: 0.5 }), tW);
-  // the pipes shrink into the bottom-left corner
+  // the pipes shrink into the middle of the frame and fade, where the package's bus will draw
   const tS = T('b4~long') - 0.45;
   const pipesAll = S.g();
   pipesAll.appendChild(pipes); pipesAll.appendChild(x40); pipesAll.appendChild(scaleTag);
-  S.add(fx.xform(pipesAll, { x: -96, y: 52, s: 0.3, ox: 150, oy: 1000 }, { d: 1.0, ease: 'power3.inOut' }), tS);
-  S.add(gsap.to(pipesAll, { opacity: 0.55, duration: 0.8 }), tS + 0.2);
+  S.add(fx.xform(pipesAll, { x: 40, y: -20, s: 0.3, ox: 920, oy: 660 }, { d: 1.0, ease: 'power3.inOut' }), tS);
+  S.add(gsap.to(pipesAll, { autoAlpha: 0, duration: 0.7 }), tS + 0.2);
   ignoreIn([pipesAll], tS, S.duration);
-  // the package returns, its bus now hair-thin lines, and the memory slides in against the die
+  // the package returns, centred, its bus now hair-thin lines, and the memory slides in against the die; the
+  // board shortens on the right, so the package moves right by half that to stay centred
   const PS = 1.1;
-  const pkg = ch06Package(S, { x: 1000, y: 640, s: PS, wires: 40, wireSw: 0.75 });
+  const pkg = ch06Package(S, { x: 960, y: 640, s: PS, wires: 40, wireSw: 0.75 });
   S.set(pkg, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(pkg, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, immediateRender: false }), tS + 0.55);
   S.add(pkg.drawOn({ d: 1.0 }), tS + 0.55);
@@ -199,7 +207,8 @@ V.scene('ch06_s04', S => {
   S.add(pkg.setGap(GAP1, { d: 1.0 }), tG);
   const bw0 = +pkg.board.getAttribute('width');
   S.add(gsap.fromTo(pkg.board, { attr: { width: bw0 } }, { attr: { width: bw0 - (170 - GAP1) }, duration: 1.0, ease: 'power2.inOut', immediateRender: false }), tG);
-  const short = S.text('wide needs short', { x: 1000 - PS * (170 - GAP1) / 2, y: 950, size: 36, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  S.add(gsap.fromTo(pkg, { x: 0 }, { x: PS * (170 - GAP1) / 2, duration: 1.0, ease: 'power2.inOut', immediateRender: false }), tG);
+  const short = S.text('wide needs short', { x: 960, y: 950, size: 36, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   S.set(short, { autoAlpha: 0 }, 0);
   S.add(fx.in(short, { from: 'up', d: 0.5, dist: 14 }), tG + 0.6);
   const hard = S.text("why it's hard: later this chapter", { x: tDiv.r, y: L2 + 48, size: 24, weight: 550, anchor: 'end', color: 'muted' });

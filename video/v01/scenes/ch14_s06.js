@@ -12,7 +12,8 @@
    b4  a crack sweeps from XX through every remaining cell; 'recompute from here'; the bottom cells glow, then go
        grey; everything but the bar dims; the two-line caption.
    Layout: pills y 262 at x 760 + 110 j; cells y 318 / 348 / 378 (bottom = layer 1), 70 × 24; status words end at
-   x 690; bar x 240-1680 (18 px per layer), y 535-585; zoom panel x 240-1680, y 680-970. */
+   x 690; bar x 240-1680 (18 px per layer), y 535-585; zoom panel x 240-1680, y 680-970. The frame grows downward,
+   so it is centred below the header as it grows: the strip alone +280, with the bar +140, in place from b3. */
 V.scene('ch14_s06', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1;
@@ -112,6 +113,7 @@ V.scene('ch14_s06', S => {
   const zl = S.path({ d: `M${BX},${BY + 50} L${BX},690 M${BX + SEG},${BY + 50} L${BX + 1440},690`, stroke: TEAL, strokeOpacity: 0.5, sw: 1.5, dash: '5 5' }, zoom);
   zl.setAttribute('data-audit', 'ignore');
   const zc = S.g(null, zoom);
+  zc.setAttribute('transform', 'translate(160,0)');   // the row of three (x 300-1300) centred in the panel
   const zbox = (x, w, txt, tone) => {
     const g = S.g(null, zc);
     S.rect({ x, y: 742, w, h: 64, r: 12, fill: `url(#card-${tone})`, stroke: tone, sw: 2.5 }, g);
@@ -163,4 +165,8 @@ V.scene('ch14_s06', S => {
   const c2 = S.text('one layer in 80: not worth the bookkeeping', { x: 960, y: 846, size: 30, weight: 650, anchor: 'middle', color: 'muted' });
   rise(c1, tDim + 0.2); rise(c2, tDim + 0.5);
   void toks; void tB2; void lerp; void EIO;
+  // centred below the header as it grows (see the header)
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && e !== hdr).forEach(e => pane.appendChild(e));
+  whole(t => pane.setAttribute('transform', `translate(0,${(280 - 140 * EIO(cl((t - tB2) / 0.7)) - 140 * EIO(cl((t - tB3) / 0.7))).toFixed(1)})`));
 });

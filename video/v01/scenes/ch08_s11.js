@@ -22,7 +22,7 @@ V.scene('ch08_s11', S => {
   const fade = (els, a, b, at, d = 0.45, stagger = 0) => S.add(ch08Fade(els, a, b, { d, stagger }), at);
   const STRUCT = S.tone('struct'), BYTES = S.tone('bytes');
 
-  const hd = S.text('Depth, one layer at a time', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hd = S.text('Depth, one layer at a time', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch08Hide(hd);
   fade(hd, 0, 1, 0.3, 0.5);
   fade(hd, 1, 0, T('b2') + 0.2, 0.5);

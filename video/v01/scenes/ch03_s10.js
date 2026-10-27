@@ -15,13 +15,18 @@ V.scene('ch03_s10', S => {
     { label: 'your custom instructions', tok: 300, badge: 'ph:user-duotone' },
     { label: 'one loaded skill', tok: 2000 },
   ];
-  const RY = [300, 380, 460, 540], RX = 460, SX = 140, SY = 470;
+  // b1's chart (labels to RX - 20, bars from RX, values after them) centred; the stacked bar from SX, with
+  // the question and the answer tokens after it, centred too
+  const RY = [300, 380, 460, 540], RX = 835, SX = 300, SY = 470;
   let acc = 0;
   ROWS.forEach(r => { r.w = r.tok * PX; r.sx = SX + acc * PX; acc += r.tok; });
-  const TOTAL = acc;                                       // 4,750 → 1,187.5 px, ends at x 1,327.5
+  const TOTAL = acc;                                       // 4,750 → 1,187.5 px, ends at x 1,487.5
   const fmtN = v => Math.round(v).toLocaleString('en-US');
 
   // ---------------------------------------------------------------- b1: the preamble, row by row
+  // the camera keeps each stage centred: the rows (y 200-564) 150 px lower in b1, the stacked bar 80 in b2, the
+  // full layout with the context window as drawn in b3, the bar and its captions 95 lower in b4
+  S.xset(S.camera, { x: 0, y: 150, s: 1 });
   const h1 = S.text('What sits in front of your first word', { x: 960, y: 126, size: 40, anchor: 'middle', weight: 700, family: 'display', color: 'ink' });
   const h2 = S.text('and who put it there', { x: 960, y: 176, size: 32, anchor: 'middle', weight: 600, color: 'muted' });
   S.add(fx.in([h1, h2], { from: 'up', d: 0.5, stagger: 0.12 }), 0.15);
@@ -53,11 +58,12 @@ V.scene('ch03_s10', S => {
   });
 
   // ---------------------------------------------------------------- b2: end to end: 4,750 tokens, before any catalogue
-  const rule = S.line({ x1: SX, y1: SY - 84, x2: 1780, y2: SY - 84, stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 });
+  const rule = S.line({ x1: 140, y1: SY - 84, x2: 1780, y2: SY - 84, stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 });
   S.set(rule, { autoAlpha: 0 }, 0);
   S.add(gsap.set(rule, { autoAlpha: 1 }), 'b2-0.2');
   S.add(fx.draw(rule, { d: 0.6 }), 'b2-0.2');
   const SLIDE = T('b2') + 0.2;
+  S.add(fx.cam({ x: 960, y: 460, scale: 1, d: 0.8, ease: 'power2.inOut' }), 'b2-0.2');
   rows.forEach((g, i) => {
     const r = ROWS[i];
     S.add(fx.out(g.lbl, { d: 0.3 }), SLIDE - 0.1);
@@ -96,6 +102,7 @@ V.scene('ch03_s10', S => {
 
   // ---------------------------------------------------------------- b3: every turn it counts against your window, and you pay
   S.add(fx.out(brk, { d: 0.3 }), 'b3-0.1');
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), 'b3-0.4');
   const turnT = S.text('', { x: 1650, y: 150, size: 34, anchor: 'end', weight: 700, family: 'mono', color: 'ink' });
   const TICKS = [T('b3~turn'), T('b3~turn') + 1.55, T('b3~turn') + 3.1, T('b3~turn') + 4.65];
   const coins = TICKS.map((t, k) => {
@@ -143,6 +150,7 @@ V.scene('ch03_s10', S => {
   // ---------------------------------------------------------------- b4: illustrative; storage invisible, token count not
   const B4 = T('b4') - 0.1;
   S.add(fx.out([turnT, coinLbl, ...coins, win, attn, ...ans.map(a => a[1])], { d: 0.4, stagger: 0 }), B4);
+  S.add(fx.cam({ x: 960, y: 445, scale: 1, d: 0.8, ease: 'power2.inOut' }), B4 + 0.1);
   const stamp = ch03Stamp(S, 'illustrative', { x: 1000, y: SY - 190, size: 34, rotate: -5 });
   S.add(stamp.stamp(), 'b4~illustrative-0.1');
   const badges = rows.filter(g => g.badge).map(g => g.badge);

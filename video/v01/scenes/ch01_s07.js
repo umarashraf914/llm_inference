@@ -177,4 +177,14 @@ V.scene('ch01_s07', S => {
   S.add(fx.in(pb2L, { from: 'left', d: 0.35 }), 'b6~hundred+0.25');
   const take = S.takeaway('the exponential exaggerates every gap', { tone: 'compute' });
   S.add(fx.in(take, { from: 'up', d: 0.5 }), 'b6~exaggerates-0.2');
+
+  // the table and everything on it move down as one block, so it sits in the middle of the space under the recipe
+  // banner and the 'softmax' title (which stay at the top): 90 px while it fills, 120 once the total and the stacked
+  // bar have gone after b4
+  const keep = new Set([recipe, eCard, smTitle, extra]);
+  const table = S.g();
+  [...S.main.children].filter(e => e !== table && !keep.has(e)).forEach(e => table.appendChild(e));
+  S.main.insertBefore(table, S.main.firstChild);
+  S.set(table, { y: 90 }, 0);
+  S.add(gsap.fromTo(table, { y: 90 }, { y: 120, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), S.t('b5') - 0.4);
 });

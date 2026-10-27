@@ -45,6 +45,9 @@ V.scene('ch15_s06', S => {
   };
 
   // ================================================================ b1: the rule, and one bar
+  // the rule's card and its one bar (y 120-495) are the whole picture in b1: the camera holds them 180 px lower,
+  // and eases back as the two bars of b2 fill the space under the card
+  S.xset(S.camera, { x: 0, y: 180, s: 1 });
   const card = S.g();
   const glow = S.rect({ x: 520, y: 100, w: 880, h: 160, r: 40, fill: 'url(#pglow-helps)', opacity: 0 }, card);
   glow.setAttribute('data-audit', 'ignore');
@@ -75,6 +78,7 @@ V.scene('ch15_s06', S => {
   fade(bar1G, 1, 0, tB2, 0.4);
 
   // ================================================================ b2: how identical, and from where
+  S.add(S.fx.cam({ d: 0.8, ease: 'power2.inOut' }), tB2 - 0.2);
   const tSim = T('b2~similar') - 0.1, tIdent = T('b2~identical') - 0.1, tPairs = T('b2~Diverge') - 0.1;
   const q1s = 'how similar?', q1w = S.measure(q1s, { size: 32, weight: 700 });
   const q1 = S.text(q1s, { x: 960, y: 316, size: 32, weight: 700, anchor: 'middle', color: 'muted' });

@@ -11,7 +11,9 @@ V.scene('ch03_s05', S => {
   // ---------------------------------------------------------------- the first frame: s04's last (the same crowd, frozen, dimmed)
   const crowd = ch03Crowd(S, { x: 120, y: 210, w: 1680, h: 430, n: 48, size: 26, seed: 3 });
   crowd.setAttribute('opacity', 0.35);
-  const ENV = { x: 420, y: 160, w: 700, h: 360 };
+  // b1-b2: the envelope (flap included, y ENV.y-56 to ENV.y+360) with the spinner, then the model, beside it:
+  // one group centred on the screen
+  const ENV = { x: 380, y: 388, w: 700, h: 360 };
   const ECX = ENV.x + ENV.w / 2, ECY = ENV.y + ENV.h / 2;
   const pickK = crowd.squares.reduce((b, c, k, a) => (Math.hypot(c.cx - ECX, c.cy - ECY) < Math.hypot(a[b].cx - ECX, a[b].cy - ECY) ? k : b), 0);
   const P = crowd.squares[pickK];
@@ -65,7 +67,9 @@ V.scene('ch03_s05', S => {
   S.xset(env, { x: 960 - ECX, y: 540 - ECY, s: 26 * 3.2 / ENV.w, ox: ECX, oy: ECY });
   S.set(env, { autoAlpha: 0 }, 0);
   S.add(gsap.to(env, { autoAlpha: 1, duration: 0.2 }), UNFOLD);
-  S.add(fx.xform(env, { x: 0, y: 0, s: 1 }, { d: 0.75, ease: 'power3.out' }), UNFOLD);
+  // it unfolds at the centre while it is alone, and moves to its place as the spinner arrives beside it
+  S.add(fx.xform(env, { x: 960 - ECX, y: 0, s: 1 }, { d: 0.75, ease: 'power3.out' }), UNFOLD);
+  S.add(fx.xform(env, { x: 0, y: 0, s: 1 }, { d: 0.7, ease: 'power2.inOut' }), T('b1~how random') - 0.75);
   S.call(() => env.setAttribute('data-audit', 'ignore'), 0);
   S.call(() => env.removeAttribute('data-audit'), UNFOLD + 0.8);
   const fill = (c, at) => {
@@ -82,7 +86,7 @@ V.scene('ch03_s05', S => {
   S.add(fx.pop(setIcons[2], { d: 0.4 }), 'b1~random+0.35');
 
   // ---------------------------------------------------------------- b1: how random the draw should be: ch01's spinner, once, lands on dog
-  const W = { x: 1290, y: 444, r: 92 };
+  const W = { x: ENV.x + 870, y: ENV.y + 284, r: 92 };
   const spin = S.g();
   const wheel = S.g(null, spin);
   S.circle({ x: W.x, y: W.y, r: W.r + 6, fill: '#0c1326', stroke: 'struct', sw: 2, strokeOpacity: 0.5 }, wheel);
@@ -112,7 +116,7 @@ V.scene('ch03_s05', S => {
   S.add(fx.out([spin, legend], { d: 0.4 }), 'b2+0.05');
 
   // ---------------------------------------------------------------- b2: re-sent every time; the model remembers nothing
-  const model = ch03ModelBlock(S, { x: 1350, y: 200, h: 150, size: 30 });
+  const model = ch03ModelBlock(S, { x: ENV.x + 785, y: ENV.y + 40, h: 150, size: 30 });   // the pair centred
   S.set(model, { autoAlpha: 0 }, 0);
   S.add(fx.in(model, { from: 'right', d: 0.6, dist: 40 }), 'b2~surprise');
   // the whole envelope folds into a parcel and travels into the model, then a fresh copy is back for next time
@@ -143,6 +147,7 @@ V.scene('ch03_s05', S => {
   S.add(fx.xform(stateless, { x: 1150 - model.cx, y: 152 - (model.b + 58), s: 0.8 }, { d: 0.7, ease: 'power3.inOut' }), SH + 0.1);
   S.call(() => stateless.setAttribute('data-audit', 'ignore'), SH);
   S.call(() => stateless.removeAttribute('data-audit'), SH + 0.85);
+  const n3 = S.main.children.length;   // from here on, the ladder's block (see the end)
   const tag = S.pill('conversation only, illustrative', { x: 300, y: 300, h: 42, size: 24, tone: 'neutral', style: 'outline', anchor: 'start' });
   S.set(tag, { autoAlpha: 0 }, 0);
   S.add(fx.in(tag, { from: 'up', d: 0.4, dist: 12 }), 'b3~only');
@@ -244,4 +249,10 @@ V.scene('ch03_s05', S => {
   const clock = { t: 0 };
   S.add(gsap.fromTo(clock, { t: 0 }, { t: S.duration, duration: S.duration, ease: 'none', immediateRender: false, onUpdate: () => paint(clock.t) }), 0);
   paint(0);
+
+  // the ladder (its tag, rows, labels and the cost arrow) is one block, 80 px down: centred under the thumbnail
+  // header, which stays at the top
+  const ladder = S.g();
+  [...S.main.children].slice(n3).filter(e => e !== ladder).forEach(e => ladder.appendChild(e));
+  ladder.setAttribute('transform', 'translate(0,80)');
 });

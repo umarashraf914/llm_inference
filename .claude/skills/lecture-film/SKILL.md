@@ -19,7 +19,7 @@ headless Chromium. V01, *The Memory Wall*, is the first: 19 chapters, 156 scenes
 | `video/vNN/scenes/` | one file per scene; `chNN_common.js` holds a chapter's shared builders |
 | `video/vNN/build/` | timing, audio, stills, previews (not in git) |
 | `video/vNN/film.json` | title, source lecture and atlas, released versions |
-| `video/tools/` | `tts`, `render` (stills, audit, video), `columns` (rows of pictures), `where`, `reel`, `release`, `narration_pack`, `make_4k` |
+| `video/tools/` | `tts`, `render` (stills, audit, video), `columns` (rows of pictures), `compose` (frames from the centre out), `where`, `reel`, `release`, `narration_pack`, `make_4k` |
 
 The guides sit with V01 and hold for every film: `video/v01/SCRIPT_GUIDE.md` for a chapter's script,
 `video/v01/ANIMATION_GUIDE.md` for the scene API, art direction and technical rules. `PLAN.md` and
@@ -89,60 +89,84 @@ a rule, its finding is named in brackets; every other rule is checked by eye, in
      also found ch03_s03's balance 20 px off its card and ch03_s10's badges at the left ends of their
      segments.
 
+### Composing a frame
+
+6. **Compose each frame like a slide, from the centre out.** Plan the frame from everything it will
+   hold, then centre that whole composition on the screen; centre a group of boxes as a group, and
+   each box's contents in its box. Never start at the top left and draw until the drawing ends. The
+   user: "consider each frame as an entity, and based on what will come to that frame, draw everything
+   centred ... the way we make each separate slide in PPT." With a heading, the body is centred in the
+   space under it; with a takeaway, in the space above it.
+   - Lay a frame out from its measured parts, as ch17_s02 and ch18_s01 do: the block's left and right
+     edges from `S.measure` and the parts' widths, then place it from the centre
+     (`X = 960 - (left + right) / 2`).
+   - `tools/compose.py vNN chNN` (or `all`) measures each beat's settled frame and every box with
+     contents, and lists the ones off centre; `--sheet` saves the frames with the blocks drawn on them.
+     They are candidates, not verdicts: a corner tally, a picture dimmed to context and a camera
+     close-up may sit off centre.
+7. **Alone first, centred; then make room.** A picture that will share the frame later but stands
+   alone for more than a moment sits at the centre while it is alone, and moves to its place as its
+   partner arrives. A layout that fills beat by beat keeps each stage centred the same way: a camera
+   offset (`S.xset(S.camera, …)`, then `fx.cam`) or one group's offset, moved only when content
+   arrives or leaves, so the move reads as making room. V01 does this in ch17_s02 (the prefill panel),
+   ch01_s04 (the token row), ch04_s04 (the ledger), ch03_s07 (the two questions) and ch18_s01 (the
+   puzzle, then the division). A lone moment under a second, between beats, is better left alone: a
+   slide there only adds a jerk (ch06_s03).
+
 ### Type
 
-6. **Poppins, labels in Title Case, set by the engine.** This is the user's choice, made after trying
+8. **Poppins, labels in Title Case, set by the engine.** This is the user's choice, made after trying
    faces on real frames. Write every string in lower case, as it is said; a scene never capitalises
    text itself.
-7. **Data stays as written**: draw tokens, example sentences, chat messages, quoted answers and code
+9. **Data stays as written**: draw tokens, example sentences, chat messages, quoted answers and code
    with `case: 'keep'`. `libToken`, the chat window and mono text already do; a `libToken` chip that
    names something takes `case: 'label'`. Measure with the same options you draw with.
-8. **A phrase split over lines is one phrase**: `V.caseLines(['nothing else about', 'the architecture'])`
+10. **A phrase split over lines is one phrase**: `V.caseLines(['nothing else about', 'the architecture'])`
    drawn with `case: 'keep'`, or `S.para`. A smaller or muted second line is a caption of its own.
-9. **One-letter subscripts are real subscripts**: `V.subs('W_K', size)` as `S.text` segments.
-10. **After any change of face or case, audit every scene again and look again.** The switch to
+11. **One-letter subscripts are real subscripts**: `V.subs('W_K', size)` as `S.text` segments.
+12. **After any change of face or case, audit every scene again and look again.** The switch to
     Poppins pushed thirty-odd labels into a neighbour, an edge or off screen.
 
 ### Room around labels
 
-11. **Size every box from `S.measure` of its label**, with the same size, weight, family and case,
+13. **Size every box from `S.measure` of its label**, with the same size, weight, family and case,
     and room to spare inside: aim for 12 px (the audit flags under 3 px [text-tight]). Never guess a
     width, and never place one thing beside another at a guessed offset: measure the first and leave a
     gap. Guessed offsets left ch04_s02's "15 s" under 8 px from its token counter, ch02_s03's "first of many"
     reading as one phrase with "amortising", ch11_s01's decode pill touching its tag, and ch13_s04's
     "time saved" filling its weight edge to edge.
-12. **A label is never on an icon, a line or a box's edge** [text-on-icon, text-on-line,
+14. **A label is never on an icon, a line or a box's edge** [text-on-icon, text-on-line,
     crosses-shape-edge].
-13. **A label never touches a neighbour.** Two labels on one line never meet end to end
+15. **A label never touches a neighbour.** Two labels on one line never meet end to end
     [text-touch]. A label never sits flush against the box or disc beside it [text-touches-box].
     Before a release, sweep for near misses with `render.py vNN audit all --touch-gap 8` and look at
     each finding: widen the gap wherever a viewer would see two things nearly touching; a single
     sample in mid-motion usually is not one.
-14. **Make room for the largest value a counter reaches**, not its first. In ch17_s05, 22,000
+16. **Make room for the largest value a counter reaches**, not its first. In ch17_s05, 22,000
     tokens/s came within a few pixels of the card beside it. A label inside a growing bar waits
     until the bar can hold it.
 
 ### Saying the right thing
 
-15. **A label belongs to the picture it is on**, and sits by the part it explains. The stopwatch on
+17. **A label belongs to the picture it is on**, and sits by the part it explains. The stopwatch on
     ch12_s02's H100 chart showed the H200's 30 ms; it now reads "one token". In ch16_s08 the sum
     "7 + 7 + 4" is centred under the 18 it adds up to, worked out from the plate's measured parts.
-16. **Every number on screen comes from the script's checks.** Check any new one in Python before it
+18. **Every number on screen comes from the script's checks.** Check any new one in Python before it
     is drawn.
 
 ### Working
 
-17. **The audit reads text; only eyes see alignment, arrows and the story.** For every scene: the
+19. **The audit reads text; only eyes see alignment, arrows and the story.** For every scene: the
     contact sheet for the story, full-size stills for detail, a `--debug` still wherever lines join
     pictures.
-18. **A fault seen once is a pattern until shown otherwise.** The user's note named one laptop and
+20. **A fault seen once is a pattern until shown otherwise.** The user's note named one laptop and
     one server ("this is a general pattern in our video"); the same fault was in five more scenes.
     Fix it film-wide, and fix the shared builder when that is the cause.
-19. **Turn a repeated fault into a check.** The audit's text checks (text-on-icon, text-tight,
+21. **Turn a repeated fault into a check.** The audit's text checks (text-on-icon, text-tight,
     text-touch, text-touches-box) were added while fixing V01, so those faults cannot come back
     unseen. An audit change is an `engine.js` change, which re-renders every scene of every film:
     batch it with other engine work.
-20. **Do the work yourself, in the session.** No sub-agents or multi-agent workflows: while V01 was
+22. **Do the work yourself, in the session.** No sub-agents or multi-agent workflows: while V01 was
     made they used up the user's usage limit again and again ("I just want my video"), and the user
     has asked twice to work without them.
 
@@ -153,7 +177,10 @@ a rule, its finding is named in brackets; every other rule is checked by eye, in
 3. In the stills, nothing overlaps, clips or is tiny. Lines meet whole pictures at their centres,
    arrows run straight and land on something, and spacing is even. Pictures under a row of cards sit
    centred under their cards on one line (`tools/columns.py vNN chNN` lists any that do not).
-4. `render.py vNN audit chNN` ends `AUDIT CLEAN`, and `stills` printed no warnings.
+4. Every beat's frame is composed from the centre out: the whole block centred, its groups and box
+   contents centred, a lone picture at the centre until its partner comes (`tools/compose.py vNN chNN`
+   lists any that are not; look at each one).
+5. `render.py vNN audit chNN` ends `AUDIT CLEAN`, and `stills` printed no warnings.
 
 ## The user's computers
 

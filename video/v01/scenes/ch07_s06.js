@@ -23,6 +23,9 @@ V.scene('ch07_s06', S => {
   const LX = 260, RX = 1420, TY = 300;
 
   // ================================================================ the two tables
+  // the camera keeps each stage centred: the tables alone (y 203-681) 95 px lower in b1 and b5, as drawn while
+  // the reading counts fill the space below (b2-b4), and 150 px lower under the heading in b6
+  S.xset(S.camera, { x: 0, y: 95, s: 1 });
   const side = (x, title) => {
     const hold = S.g();
     const tb = ch07Table(S, { x, y: TY, ...TP }, hold);
@@ -80,6 +83,7 @@ V.scene('ch07_s06', S => {
   });
 
   // ================================================================ b2: 200 rows in
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), T('b2') - 0.3);
   const t2 = T('b2') - 0.1;
   S.add(ch07Fade([scores, inside], 1, 0, { d: 0.4 }), t2);
   const ell1 = L.tb.ells[0];
@@ -177,6 +181,7 @@ V.scene('ch07_s06', S => {
   S.add(ch07Fade(same, 0, 1, { d: 0.45 }), T('b4~same') - 0.1);
 
   // ================================================================ b5: one table or two
+  S.add(fx.cam({ x: 960, y: 445, scale: 1, d: 0.8, ease: 'power2.inOut' }), T('b5') - 0.1);
   const t5 = T('b5~one') - 0.1;
   const ledgerAll = [ledL, ledR, hair, lblL, fillR, lblR2, zeroOps, perW, opsR, reads];
   S.add(ch07Fade([...ledgerAll, same, slabs], 1, 0, { d: 0.5 }), t5);
@@ -209,6 +214,7 @@ V.scene('ch07_s06', S => {
   clock(tB, tB + 1.6, t => { const u = cl((t - tB) / 1.0), f = 1 - cl((t - tB - 1.0) / 0.6); flow.setAttribute('width', ((R.tb.w + 80) * E('power2.out')(u)).toFixed(1)); flow.setAttribute('opacity', f.toFixed(3)); });
 
   // ================================================================ b6: the exception
+  S.add(fx.cam({ x: 960, y: 390, scale: 1, d: 0.8, ease: 'power2.inOut' }), T('b6') - 0.3);
   const t6 = T('b6') - 0.1;
   S.add(ch07Fade(ours, 1, 0, { d: 0.35 }), t6);
   const head = ch07Heading(S);

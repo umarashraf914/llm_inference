@@ -148,6 +148,13 @@ a cache hit; blue `struct` = structure, containers, tokens, neutral data; violet
 secondary contrast (negative values, a second series). Text is `ink` (white) or `muted` (grey).
 
 **Composition.**
+- Compose each frame like a slide, from the centre out: plan it from everything it will hold, centre
+  that whole block on the screen (with a heading, in the space under it; with a takeaway, in the space
+  above it), centre a group of boxes as a group and each box's contents in its box. Never start at the
+  top left and draw until the drawing ends. A picture that is alone for a while sits at the centre and
+  moves to its place when its partner arrives; a layout that fills beat by beat keeps each stage
+  centred with a camera offset (`S.xset(S.camera, …)`, then `fx.cam`) or one group's offset, moved only
+  when content arrives or leaves. `tools/compose.py v01 chNN` measures each beat's frame and box.
 - Use the frame. The main object of a scene should span roughly 50–80% of the width. Nothing
   important smaller than it needs to be; no postage-stamp diagrams in a sea of navy.
 - One focal point at a time. When the narration moves on, dim (`fx.dim`, 0.2–0.35) what is no longer
@@ -252,4 +259,5 @@ them and check them in a `--debug` still.
    spacing is even, colour means what it should. Lines meet whole pictures at their centres and arrows
    land on something (a `--debug` still shows it; the audit cannot).
 4. `python3 tools/render.py v01 audit <chapter>` → `AUDIT CLEAN`, and no warnings from `stills`.
-5. It looks designed, not assembled: consistent margins, a clear focal point, deliberate motion.
+5. It looks designed, not assembled: consistent margins, a clear focal point, deliberate motion, and
+   every beat's frame composed from the centre out (`python3 tools/compose.py v01 <scene>`).

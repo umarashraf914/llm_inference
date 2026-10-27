@@ -76,7 +76,8 @@ V.scene('ch02_s03', S => {
   // the camera pushes in on the timeline's right end; three tokens each carry their own 140 GB
   S.add(fx.out([fixed, amort, many, hours, ptr], { d: 0.3 }), 'b3~Next-0.35');
   S.add(fx.out([counter, cLbl, cWork, low], { d: 0.4 }), 'b3~Next');
-  S.add(fx.cam({ x: 1380, y: 470, scale: 1.45, d: 1.2 }), 'b3~Next');
+  // centred on the three tokens and their question (x 1,150-1,730, y 264-544)
+  S.add(fx.cam({ x: 1440, y: 410, scale: 1.45, d: 1.2 }), 'b3~Next');
   const PX = [1240, 1440, 1640];
   const toks = PX.map((x, i) => {
     const g = S.g();

@@ -69,11 +69,15 @@ V.scene('ch14_s04', S => {
   xxGlow.setAttribute('data-audit', 'ignore');
   pulse(xxGlow, T('b1~changed') - 0.1, 1, 1.0);
 
-  // centred while it is the only thing on screen, then into the left third
-  K.track(left, [K.K(tB2 - 0.2, { x: 670 }), K.K(tB2 + 0.6, { x: 0 })]);
+  // centred while it is the only thing on screen; in b2 beside the comparison, the pair centred (+84); in the
+  // left third once the table comes (0)
+  const tBack = T('b2~matched') + 0.1;
+  K.track(left, [K.K(tB2 - 0.2, { x: 670 }), K.K(tB2 + 0.6, { x: 84 }), K.K(tBack, { x: 84 }), K.K(tBack + 0.6, { x: 0 })]);
 
   // ================================================================ b2: compare number by number, roll into one distance
-  const demo = S.g();
+  const demoW = S.g();
+  demoW.setAttribute('transform', 'translate(84,0)');   // with the left group, the pair centred
+  const demo = S.g(null, demoW);
   const DX = i => 980 + 62 * i, rnd = S.rand(8);
   const diffs = Array.from({ length: 8 }, () => 8 + 30 * rnd());
   const tKeys = T('b2~keys') - 0.15, tNum = T('b2~number') - 0.1, tOne = T('b2~one') - 0.1;
@@ -121,6 +125,8 @@ V.scene('ch14_s04', S => {
   rise(h1, tTab); rise(h2, tTab + 0.15);
   const DIST = [0, 3.538930, 16.746760, 20.102747], RY = l => 690 - 110 * l, BX = 1140, BW = 500;
   const tRow = [T('b3~one') - 0.1, T('b3~two') - 0.1, T('b3~three') - 0.1, T('b3~four') - 0.1];
+  // with the table up, the picture (y 129-736) sits 60 px lower by camera for the rest of the scene
+  S.add(S.fx.cam({ x: 960, y: 480, scale: 1, d: 0.8, ease: 'power2.inOut' }), tB3 - 0.3);
   const tScr = T('b4~sizes') - 0.1;
   const rows = DIST.map((d, l) => {
     const g = S.g();

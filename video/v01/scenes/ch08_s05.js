@@ -21,7 +21,9 @@ V.scene('ch08_s05', S => {
   const R1 = 290, R2 = 480, BKX = 1080;
   const row = (words, xs, y) => words.map((w, i) => libToken(S, { text: w, x: xs[i], y, size: 34 }));
   const rowA = row(['the', 'river', 'bank'], [620, 830, BKX], R1), rowB = row(['the', 'savings', 'bank'], [600, 830, BKX], R2);
-  const top = S.g();
+  // the two rows (x 555-1196) with their tag centred under them are b1's whole picture: `top` centres it
+  const top = S.g(), TOPX = 85, TOPY = 116;
+  S.set(top, { x: TOPX, y: TOPY }, 0);
   [...rowA, ...rowB].forEach(p => top.appendChild(p));
   const wave = S.icon('ph:waves-bold', { x: BKX + 96, y: R1, size: 40, color: 'struct' }, top);
   const coin = S.icon('ph:coins-bold', { x: BKX + 96, y: R2, size: 38, color: 'struct' }, top);
@@ -40,13 +42,13 @@ V.scene('ch08_s05', S => {
   ch08Vec(S, { token: 'savings', dir: 'row', n: 6, cw: 14, ch: 12, gap: 2, x: BKX, y: R2 - 44 }, stB);
   ch08Hide([stA, stB]);
   fade([stA, stB], 0, 1, tTh + 0.5, 0.4);
-  const same = S.text('same token, different result', { x: BKX + 150, y: (R1 + R2) / 2, size: 30, weight: 650, color: 'ink' }, top);
+  const same = S.text('same token, different result', { x: 875, y: R2 + 150, size: 30, weight: 650, anchor: 'middle', color: 'ink' }, top);
   ch08Hide(same);
   fade(same, 0, 1, T('b1~neighbour') - 0.1);
 
   // ================================================================ b2-b4: the strip and the window
   const t2 = T('b2') - 0.1;
-  S.add(gsap.to(top, { y: -60, opacity: 0, duration: 0.7, ease: 'power2.in' }), t2);
+  S.add(gsap.to(top, { y: TOPY - 60, opacity: 0, duration: 0.7, ease: 'power2.in' }), t2);
   S.add(ch08Ignore(top, 0.8), t2);
   const headA = S.text('Context:', { x: 960, y: 170, size: 54, weight: 750, family: 'display', anchor: 'middle', color: 'struct' });
   const headB = S.text('everything the model can see', { x: 960, y: 236, size: 42, weight: 650, family: 'display', anchor: 'middle', color: 'ink' });

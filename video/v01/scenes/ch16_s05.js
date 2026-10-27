@@ -27,10 +27,9 @@ V.scene('ch16_s05', S => {
   const XD = COLR(0) + GAP / 2;
 
   // ================================================================ b1: the whole phrase in common, the first token not
-  const kicker = S.text('case C: a minute later, same words reordered', { x: 70, y: 150, size: 30, weight: 750, color: 'ink' });
+  const kicker = S.text('case C: a minute later, same words reordered', { x: 960, y: 140, size: 30, weight: 750, anchor: 'middle', color: 'ink' });   // centred, its tag under it
   rise(kicker, T('b1~Case') - 0.1, 6);
-  const kw = S.measure('case C: a minute later, same words reordered', { size: 30, weight: 750 });
-  const seen = S.pill('seen earlier', { x: 70 + kw + 30 + S.measure('seen earlier', { size: 24, weight: 600 }) / 2 + 22, y: 150, tone: 'neutral', size: 24, h: 42 });
+  const seen = S.pill('seen earlier', { x: 960, y: 192, tone: 'neutral', size: 24, h: 42 });
   hide(seen);
   const tSeen = T('b1~pair') - 0.1;
   whole(t => setO(seen, cl((t - tSeen) / 0.15) * (1 - cl((t - tSeen - 1.6) / 0.4)) * (t < tSeen + 0.6 ? 0.6 + 0.4 * Math.abs(Math.sin(t * 18)) : 1)));

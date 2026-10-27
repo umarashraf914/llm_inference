@@ -21,35 +21,41 @@ V.scene('ch06_s09', S => {
   const MS_A = 140e9 / 989e12 * 1000, MS_M = 140 / 3.35;          // 0.1416 ms, 41.79 ms
 
   // ================================================================ b1: the two cards
-  const CW = 640, CH = 260, CY = 130, CXA = 180, CXM = 1100;
-  const cardA = S.g(), cardM = S.g();
+  // the cards and what sits on them (topG) are centred while they are alone (b1, TY1 lower), move up for the
+  // lanes (b2-b3), and come down again over the question (b4, TY4 lower); every line centred in its card
+  const CW = 640, CH = 260, CY = 130, CXA = 180, CXM = 1100, CA = CXA + CW / 2, CM = CXM + CW / 2;
+  const TY1 = 280, TY4 = 189, topG = S.g();
+  S.set(topG, { y: TY1 }, 0);
+  S.add(gsap.fromTo(topG, { y: TY1 }, { y: 0, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), T('b2') - 0.6);
+  const cardA = S.g(null, topG), cardM = S.g(null, topG);
   S.card({ x: CXA, y: CY, w: CW, h: CH, tone: 'compute', r: 26 }, cardA);
-  S.text('Compute throughput', { x: CXA + 40, y: CY + 70, size: 44, weight: 700, family: 'display', color: 'compute' }, cardA);
-  S.text('operations per second', { x: CXA + 40, y: CY + 128, size: 30, weight: 550, color: 'ink' }, cardA);
+  S.text('Compute throughput', { x: CA, y: CY + 82, size: 44, weight: 700, family: 'display', anchor: 'middle', color: 'compute' }, cardA);
+  S.text('operations per second', { x: CA, y: CY + 132, size: 30, weight: 550, anchor: 'middle', color: 'ink' }, cardA);
   S.card({ x: CXM, y: CY, w: CW, h: CH, tone: 'bytes', r: 26 }, cardM);
-  S.text('Memory bandwidth', { x: CXM + 40, y: CY + 70, size: 44, weight: 700, family: 'display', color: 'bytes' }, cardM);
-  S.text('bytes per second', { x: CXM + 40, y: CY + 128, size: 30, weight: 550, color: 'ink' }, cardM);
-  S.text('off-chip memory → chip', { x: CXM + 40, y: CY + 176, size: 28, weight: 550, color: 'muted' }, cardM);
+  S.text('Memory bandwidth', { x: CM, y: CY + 82, size: 44, weight: 700, family: 'display', anchor: 'middle', color: 'bytes' }, cardM);
+  S.text('bytes per second', { x: CM, y: CY + 132, size: 30, weight: 550, anchor: 'middle', color: 'ink' }, cardM);
+  S.text('off-chip memory → chip', { x: CM, y: CY + 180, size: 28, weight: 550, anchor: 'middle', color: 'muted' }, cardM);
   S.add(fx.in(cardA, { from: 'scale', d: 0.6, scale: 0.86 }), 'b1~compute-0.15');
   S.add(fx.in(cardM, { from: 'scale', d: 0.6, scale: 0.86 }), 'b1~memory-0.15');
   // 'fetch': a coral arrow from the bandwidth card into the compute card; 'multiply': an amber loop
   // through the cards' middle: the arrow joins the two cards, not their bottom rows
-  const fetch = S.arrow({ x1: CXM - 14, y1: CY + CH / 2, x2: CXA + CW + 14, y2: CY + CH / 2, color: 'bytes', sw: 5, head: 18 });
+  const fetch = S.arrow({ x1: CXM - 14, y1: CY + CH / 2, x2: CXA + CW + 14, y2: CY + CH / 2, color: 'bytes', sw: 5, head: 18 }, topG);
   S.set(fetch, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(fetch, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.1, immediateRender: false }), 'b1~fetch-0.1');
   S.add(fx.drawArrow(fetch, { d: 0.5 }), 'b1~fetch-0.1');
-  const loopG = S.g(), loopIn = S.g(null, loopG);
-  S.icon('ph:arrows-clockwise-bold', { x: CXA + CW - 86, y: CY + CH / 2, size: 76, color: 'compute' }, loopIn);
+  // the loop sits under the card's lines and stays until 'idle' takes its place (b3)
+  const loopG = S.g(null, topG), loopIn = S.g(null, loopG), LPY = CY + 196;
+  S.icon('ph:arrows-clockwise-bold', { x: CA, y: LPY, size: 64, color: 'compute' }, loopIn);
   S.set(loopG, { autoAlpha: 0 }, 0);
   S.add(fx.in(loopG, { from: 'fade', d: 0.3 }), 'b1~multiply-0.1');
-  S.add(gsap.fromTo(loopIn, { rotation: 0, svgOrigin: `${CXA + CW - 86} ${CY + CH / 2}` }, { rotation: 360, svgOrigin: `${CXA + CW - 86} ${CY + CH / 2}`, duration: 1.0, ease: 'power2.inOut', immediateRender: false }), 'b1~multiply');
+  S.add(gsap.fromTo(loopIn, { rotation: 0, svgOrigin: `${CA} ${LPY}` }, { rotation: 360, svgOrigin: `${CA} ${LPY}`, duration: 1.0, ease: 'power2.inOut', immediateRender: false }), 'b1~multiply');
 
   // ================================================================ b2: one token, drawn to scale
   const lanes = S.g();
   const what = S.text('one token · H100 · if it fitted', { x: 960, y: 486, size: 28, weight: 600, anchor: 'middle', color: 'muted' }, lanes);
   S.set(what, { autoAlpha: 0 }, 0);
   S.add(fx.in(what, { from: 'fade', d: 0.45 }), 'b2~Pretend-0.1');
-  S.add(gsap.to([fetch, loopG], { autoAlpha: 0, duration: 0.4 }), 'b2~Pretend');
+  S.add(gsap.to(fetch, { autoAlpha: 0, duration: 0.4 }), 'b2~Pretend');
   // the axis, 0-45 ms
   const AY = 790;
   const axis = S.g(null, lanes);
@@ -136,18 +142,20 @@ V.scene('ch06_s09', S => {
   S.text('token done ≈ 42 ms', { x: AX0 + W_M + 2, y: 538, size: 28, weight: 700, anchor: 'middle', color: 'white' }, done);
   S.set(done, { autoAlpha: 0 }, 0);
   S.add(fx.in(done, { from: 'down', d: 0.5, dist: 30 }), 'b3~slower-0.1');
-  const pace = S.g();
+  const pace = S.g(null, topG);
   S.text('slower one', { x: 960, y: CY + CH / 2 - 18, size: 28, weight: 600, anchor: 'middle', color: 'muted' }, pace);
   S.text('sets the pace', { x: 960, y: CY + CH / 2 + 18, size: 28, weight: 600, anchor: 'middle', color: 'muted' }, pace);
   S.set(pace, { autoAlpha: 0 }, 0);
   S.add(fx.in(pace, { from: 'fade', d: 0.45 }), 'b3~sets-0.1');
   // 'leaving the other idle': the compute card greys out, an hourglass and 'idle, waiting'
-  const idle = S.g();
-  S.icon('ph:hourglass-medium-duotone', { x: CXA + CW - 84, y: CY + CH - 70, size: 70, color: 'muted' }, idle);
-  S.text('idle, waiting', { x: CXA + 40, y: CY + CH - 62, size: 30, weight: 650, color: 'muted' }, idle);
+  const idle = S.g(null, topG);                                     // hourglass and words, one row where the loop was
+  const ix0 = CA - (56 + 14 + S.measure('idle, waiting', { size: 30, weight: 650 })) / 2;
+  S.icon('ph:hourglass-medium-duotone', { x: ix0 + 28, y: LPY, size: 56, color: 'muted' }, idle);
+  S.text('idle, waiting', { x: ix0 + 70, y: LPY + 1, size: 30, weight: 650, color: 'muted' }, idle);
   S.set(idle, { autoAlpha: 0 }, 0);
   const tIdle = T('b3~idle') - 0.15;
   S.add(gsap.to(cardA, { opacity: 0.35, duration: 0.5 }), tIdle);
+  S.add(gsap.to(loopG, { autoAlpha: 0, duration: 0.3 }), tIdle);
   S.add(fx.in(idle, { from: 'fade', d: 0.45 }), tIdle + 0.15);
   // 'not an average of twenty-one': a dashed ghost marker at 630 px, then struck out
   const ghost = S.g(null, lanes);
@@ -169,7 +177,8 @@ V.scene('ch06_s09', S => {
   S.add(fx.out([pace, idle], { d: 0.4 }), tQ);
   S.add(gsap.to(cardA, { opacity: 1, duration: 0.5 }), tQ + 0.2);
   ignoreIn([lanes], tQ, S.duration);
-  const q = S.text('which runs out first?', { x: 960, y: 560, size: 56, weight: 700, family: 'display', anchor: 'middle', color: 'white' });
+  S.add(gsap.fromTo(topG, { y: 0 }, { y: TY4, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), tQ + 0.3);
+  const q = S.text('which runs out first?', { x: 960, y: 560 + TY4, size: 56, weight: 700, family: 'display', anchor: 'middle', color: 'white' });
   S.set(q, { autoAlpha: 0 }, 0);
   S.add(fx.in(q, { from: 'up', d: 0.6, dist: 16 }), 'b4~Almost-0.1');
 });

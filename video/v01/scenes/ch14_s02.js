@@ -11,7 +11,10 @@
        the card is struck and dims.
    b4  the pipeline folds into a slab 'layer 1' with a teal tick; 'layer 2' above it with '?'; caption.
    Layout: table x 120-380, y 312-864 (24 rows, 23 px); pipeline y 560: input box x 480-760, '×' 810, W_K at 940,
-   arrow 1022-1146 with the rotation at 1084, key bar at 1262; right third x 1480-1850; bottom band y 760-990. */
+   arrow 1022-1146 with the rotation at 1084, key bar at 1262; the comparison drawn at x 1480-1850; bottom band
+   y 760-990. Composition: the table and the pipeline are one stage, centred as a pair (+222); in b2 the
+   comparison takes the table's place left of the pipeline (-1238), so nothing moves; in b3 the stage moves to
+   +32, the pipeline centred, and the sentences with the prefix-rule card are centred under it (-105). */
 V.scene('ch14_s02', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const { fx } = S;
@@ -196,7 +199,7 @@ V.scene('ch14_s02', S => {
     ws.slice(0, 5).forEach((w, j) => { const p = S.g(null, sent); libToken(S, { text: w, x: sx(j), y, size: 26, w: SW, state: j === 4 ? 'new' : 'token' }, p); K.track(p, [K.K(tOne + 0.3 + 0.05 * j + 0.15 * i, { x: -20, o: 0 }), K.K(tOne + 0.7 + 0.05 * j + 0.15 * i, { x: 0, o: 1, e: 'power3.out' })]); last = p; });
     return last;
   });
-  const corner = ch14Tag(S, 'one-layer model only', { x: 1860, y: 128, anchor: 'end' });
+  const corner = ch14Tag(S, 'one-layer model only', { x: 960, y: 196 });   // under the header, centred
   hide(corner);
   fade(corner, 0, 1, tOne + 0.2, 0.35);
   const card = S.g();
@@ -247,5 +250,12 @@ V.scene('ch14_s02', S => {
   const take = S.takeaway('independent for exactly one layer', { tone: 'helps' });
   hide(take);
   fade(take, 0, 1, tExact + 0.3, 0.5);
+  // the composition (see the header)
+  const stage = S.g();
+  S.main.insertBefore(stage, tab);
+  [tab, chip, pipe, banner, tbl, kvb].forEach(e => stage.appendChild(e));
+  whole(t => stage.setAttribute('transform', `translate(${lerp(222, 32, EIO(cl((t - tB3) / 0.8))).toFixed(1)},0)`));
+  right.setAttribute('transform', 'translate(-1238,0)');
+  [sent, card].forEach(e => e.setAttribute('transform', 'translate(-105,0)'));
   void fx; void tB2;
 });

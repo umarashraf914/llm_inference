@@ -12,7 +12,7 @@
    b5  pull back: all but the band dims, ghost stations above suggest 80, the band pulses: 'only the stream
        flows'.
    Layout: band x 865-975 from y 1080 up (off the top); stations y 820 / 580 / 340; loops to x 1330;
-   shelf x 1560-1800. */
+   shelf x 1560-1800; the view (camAt) moves all of it so each beat's picture is centred. */
 V.scene('ch08_s07', S => {
   const { fx } = S;
   const T = s => S.t(s);
@@ -25,6 +25,7 @@ V.scene('ch08_s07', S => {
 
   const world = S.g();
   const BX0 = 865, BW = 110, BXC = BX0 + BW / 2, BBOT = 1080, BTOP = -760, ST = [820, 580, 340];
+  const V1X = -120;                                                // the view's offset in b1-b2 (see camAt)
 
   // ================================================================ b1: the band
   const band = S.rect({ x: BX0, y: BBOT, w: BW, h: 0, r: 0, fill: 'struct', fillOpacity: 0.32, stroke: 'struct', strokeOpacity: 0.7, sw: 2 }, world);
@@ -41,8 +42,9 @@ V.scene('ch08_s07', S => {
   const wbr = y => { const g = S.g(null, world); S.path({ d: `M${BX0},${y - 10} v10 H${BX0 + BW} v-10`, stroke: 'ink', strokeOpacity: 0.8, sw: 2.5 }, g); S.text('8,192', { x: BX0 - 14, y: y - 4, size: 24, weight: 650, family: 'mono', anchor: 'end', color: 'ink' }, g); g.querySelector('path').setAttribute('data-audit', 'ignore'); ch08Hide(g); return g; };
   const br0 = wbr(970);
   fade(br0, 0, 1, T('b1~wide') - 0.1);
-  const hd1 = S.text('One thing flows up', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
-  const hd2 = S.text('Q, K, V made fresh each stop', { x: 110, y: 186, size: 32, weight: 600, color: 'muted' });
+  // the header stands beside the band (which runs off the top), the two centred together with the view below
+  const hd1 = S.text('One thing flows up', { x: BX0 + BW + 40 + V1X, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hd2 = S.text('Q, K, V made fresh each stop', { x: BX0 + BW + 40 + V1X, y: 186, size: 32, weight: 600, color: 'muted' });
   ch08Hide([hd1, hd2]);
   fade([hd1, hd2], 0, 1, T('b1~residual') - 0.1, 0.5);
 
@@ -120,14 +122,21 @@ V.scene('ch08_s07', S => {
   const t4 = T('b4') - 0.1;
   const camEase = (t, a, b, d) => E('power2.inOut')(cl((t - a) / d));
   const tIn = t4, tOut = T('b5') - 0.05;
+  // the view, [scale, x, y] with world = translate(x, y) scale(s), each beat's picture centred: b1-b2 the band
+  // and its stations; b3 with the cache shelf; b4 eased in on all of it (x 618-1800); b5 pulled back, the band
+  // beside its caption with the dimmed stations to its right
+  const s4 = 1.06, s5 = 0.8;
+  const VW = [[1, V1X, 0], [1, -285, 0], [s4, 960 - s4 * 1209, 700 - s4 * 700], [s5, 905 - s5 * BXC, 1000 - s5 * 1000]];
+  const mixV = (a, b, k) => a.map((v, i) => lerp(v, b[i], k));
   const camAt = t => {
-    const kIn = camEase(t, tIn, 0, 1.2), kOut = camEase(t, tOut, 0, 1.2);
-    let s = 1 + 0.06 * kIn, ox = 1200, oy = 700;
-    s = lerp(s, 0.8, kOut); const oyy = lerp(oy, 1000, kOut), oxx = lerp(ox, 960, kOut);
-    world.setAttribute('transform', `translate(${(oxx - s * oxx).toFixed(2)},${(oyy - s * oyy).toFixed(2)}) scale(${s.toFixed(4)})`);
+    let v = VW[0];
+    v = mixV(v, VW[1], camEase(t, t3 - 0.2, 0, 0.8));
+    v = mixV(v, VW[2], camEase(t, tIn, 0, 1.2));
+    v = mixV(v, VW[3], camEase(t, tOut, 0, 1.2));
+    world.setAttribute('transform', `translate(${v[1].toFixed(2)},${v[2].toFixed(2)}) scale(${v[0].toFixed(4)})`);
   };
   camAt(0);
-  clock(tIn, S.duration, camAt);
+  clock(0, S.duration, camAt);
   S.add(ch08Ignore(world, S.duration - tIn - 0.01), tIn);
   // the neighbour bands for 'the' and 'cat'
   const nbDefs = S.el('defs', {});
@@ -176,8 +185,9 @@ V.scene('ch08_s07', S => {
   fade(reuse, 0, 1, T('b4~reused') - 0.15, 0.35);
 
   // ================================================================ b5: only the stream flows
-  const dims = [...st, shelf, ...kept.flatMap(g => g.slice(1)), nbThe, nbCat, thr, stripes, dep, reuse, fromEmb, baseL, br0, br3, upd, satL];
+  const dims = [...st, shelf, ...kept.flatMap(g => g.slice(1)), stripes, dep, reuse, fromEmb, baseL, br0, br3, upd, satL];
   S.add(ch08Fade(dims, 1, 0.22, { d: 0.6 }), tOut);
+  S.add(ch08Fade([nbThe, nbCat, thr], 1, 0, { d: 0.6 }), tOut);    // the left side clears for the caption
   const ghosts = S.g(null, world);
   [ST[2] - 240, ST[2] - 480, ST[2] - 720].forEach(y => {
     S.path({ d: `M${BX0 + BW},${y + 40} H${LOOPX - 14} Q${LOOPX},${y + 40} ${LOOPX},${y + 26} V${y - 26} Q${LOOPX},${y - 40} ${LOOPX - 14},${y - 40} H${BX0 + BW + 18}`, stroke: 'struct', strokeOpacity: 0.4, sw: 2.5, dash: '8 7' }, ghosts);
@@ -191,7 +201,7 @@ V.scene('ch08_s07', S => {
   pulse.setAttribute('data-audit', 'ignore');
   const tPu = T('b5~flows') - 0.4;
   clock(tPu, tPu + 1.4, t => { const u = cl((t - tPu) / 1.4); pulse.setAttribute('y', lerp(BBOT, BTOP, E('power1.in')(u)).toFixed(1)); pulse.setAttribute('opacity', (0.28 * Math.sin(Math.PI * u)).toFixed(3)); });
-  const cap = S.text('only the stream flows', { x: 380, y: 540, size: 48, weight: 750, family: 'display', anchor: 'middle', color: 'struct' });
+  const cap = S.text('only the stream flows', { x: 905 - s5 * BW / 2 - 50, y: 540, size: 48, weight: 750, family: 'display', anchor: 'end', color: 'struct' });
   ch08Hide(cap);
   fade(cap, 0, 1, T('b5~only') - 0.1, 0.5);
 });

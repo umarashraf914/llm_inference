@@ -53,7 +53,7 @@ V.scene('ch08_s08', S => {
   const BX = 1150, BW = 80;
 
   // ================================================================ header and panel
-  const hdA = S.text('Every layer: weight matrices', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hdA = S.text('Every layer: weight matrices', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch08Hide(hdA);
   fade(hdA, 0, 1, 0.3, 0.5);
   const led = S.g();                         // everything that later slides away as the ledger
@@ -218,7 +218,7 @@ V.scene('ch08_s08', S => {
 
   // ================================================================ b3: the ledger
   const tB3 = T('b3') - 0.15;
-  const hdB = S.text('Matrices in the whole model', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hdB = S.text('Matrices in the whole model', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch08Hide(hdB);
   fade(hdA, 1, 0, tB3, 0.35);
   fade(hdB, 0, 1, tB3 + 0.3, 0.45);
@@ -351,7 +351,9 @@ V.scene('ch08_s08', S => {
 
   // ================================================================ b4: 80 different sets
   const tB4 = T('b4') - 0.15;
-  const ledX = t => -1400 * E('power2.in')(cl((t - tB4) / 0.8));
+  // the panel is alone until the count comes in on its right (b2, 'six'): until then it sits LX1 right, centred
+  const LX1 = 250, tSlide = T('b2~six') - 0.9;
+  const ledX = t => LX1 * (1 - E('power2.inOut')(cl((t - tSlide) / 0.8))) - 1400 * E('power2.in')(cl((t - tB4) / 0.8));
   whole(t => led.setAttribute('transform', `translate(${ledX(t).toFixed(1)},0)`));
   S.add(ch08Ignore(led, 0.85), tB4);
   fade(led, 1, 0, tB4 + 0.8, 0.1);

@@ -7,7 +7,8 @@
    Right: K and V tiles split into 8 heads of 128 (b1); the per-layer product, the × 80 counter (b2); the large
    '320 KB per token' (b3).
    Layout: slots at y 870 - 38 k (L1 … L10), '…' 490, L80 452; header y 400; panel lines y 470 / 525 / 640;
-   figure y 780. */
+   figure y 780. The column (drawn at x 80-397, moved 290 right) and the panel (centred on PCX) are one pair,
+   centred under the formula band. */
 V.scene('ch13_s08', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1;
@@ -37,6 +38,8 @@ V.scene('ch13_s08', S => {
 
   // ================================================================ left third: one token, eighty layers deep
   const colG = S.g();
+  colG.setAttribute('transform', 'translate(290,0)');   // the column and the panel, centred as a pair
+  const PCX = 1169;                                      // the panel's centre line
   const hdr = S.text('One token, eighty layers deep', { x: 252, y: 400, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, colG);
   const tok = S.g(null, colG);
   libToken(S, { text: 'token', x: 218, y: 930, size: 24, w: 110, state: 'token', case: 'label' }, tok);
@@ -65,7 +68,7 @@ V.scene('ch13_s08', S => {
 
   // ================================================================ b1: what one layer's K and V hold
   const kv = S.g();
-  const SEGW = 70, KX = 680;
+  const SEGW = 70, KX = PCX - 4 * SEGW;   // the eight heads centred on the panel
   const row = (y, name, fill) => {
     const g = S.g(null, kv);
     S.text(name, { x: KX - 20, y, size: 28, weight: 800, anchor: 'end', color: 'struct' }, g);
@@ -119,12 +122,12 @@ V.scene('ch13_s08', S => {
   const perLayer = S.g();
   // the per-layer line, with room on the right for '= 4 KB' (b3)
   placeLine([['2', 'ink', T('b2~Two')], ['×', 'muted', tE], ['8', 'ink', tE], ['×', 'muted', tT], ['128', 'ink', tT], ['×', 'muted', t2], ['2', 'ink', t2],
-    ['=', 'muted', t4], ['4,096', 'ink', t4], ['bytes', 'ink', t4], ['=', 'muted', tKB + 0.3], ['4 KB', 'helps', tKB + 0.3]], 1200, 470, perLayer);
-  const perL = S.text('Per Layer, Per Token', { x: 1200, y: 526, size: 26, weight: 650, anchor: 'middle', color: 'muted', case: 'keep' });   // two parallel halves
+    ['=', 'muted', t4], ['4,096', 'ink', t4], ['bytes', 'ink', t4], ['=', 'muted', tKB + 0.3], ['4 KB', 'helps', tKB + 0.3]], PCX, 470, perLayer);
+  const perL = S.text('Per Layer, Per Token', { x: PCX, y: 526, size: 26, weight: 650, anchor: 'middle', color: 'muted', case: 'keep' });   // two parallel halves
   hide(perL);
   fade(perL, 0, 1, T('b2~per') - 0.1, 0.35);
   const tot = S.g();
-  const totEls = placeLine([['×', 'muted'], ['80', 'bytes'], ['=', 'muted'], ['327,680', 'bytes'], ['bytes', 'bytes']], 1200, 640, tot);
+  const totEls = placeLine([['×', 'muted'], ['80', 'bytes'], ['=', 'muted'], ['327,680', 'bytes'], ['bytes', 'bytes']], PCX, 640, tot);
   const cnt = totEls[3];
   cnt.setAttribute('text-anchor', 'end');
   cnt.setAttribute('x', (cnt.__x + wOf('327,680', 'mono')).toFixed(1));
@@ -136,12 +139,13 @@ V.scene('ch13_s08', S => {
 
   // ================================================================ b3: three hundred and twenty kilobytes per token
   fade(perL, 1, 0, tB3, 0.35);
-  const fig = S.text([{ t: '320 KB', c: 'bytes' }, { t: ' per token', c: 'ink' }], { x: 1200, y: 790, size: 68, weight: 800, anchor: 'middle' });
-  const used = S.pill('used from here on', { x: 1200, y: 862, tone: 'neutral', size: 24, h: 40 });
+  const fig = S.text([{ t: '320 KB', c: 'bytes' }, { t: ' per token', c: 'ink' }], { x: PCX, y: 790, size: 68, weight: 800, anchor: 'middle' });
+  const used = S.pill('used from here on', { x: PCX, y: 862, tone: 'neutral', size: 24, h: 40 });
   hide([fig, used]);
-  S.add(K.drive(0.5, k => { setO(fig, k); fig.setAttribute('transform', `translate(600,790) scale(${(0.85 + 0.15 * E('back.out(1.6)')(k)).toFixed(3)}) translate(-600,-790)`); }), T('b3~kilobytes') - 0.4);
+  // it pops up about its own centre
+  S.add(K.drive(0.5, k => { setO(fig, k); fig.setAttribute('transform', `translate(${PCX},790) scale(${(0.85 + 0.15 * E('back.out(1.6)')(k)).toFixed(3)}) translate(${-PCX},-790)`); }), T('b3~kilobytes') - 0.4);
   fade(used, 0, 1, T('b3~token') - 0.1, 0.35);
-  const kbNote = S.text('1 KB = 1,024 bytes here', { x: 1200, y: 916, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
+  const kbNote = S.text('1 KB = 1,024 bytes here', { x: PCX, y: 916, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
   hide(kbNote);
   fade(kbNote, 0, 1, tKB, 0.35);
   // all eighty layers: the '80' and the whole column glow coral together

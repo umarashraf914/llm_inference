@@ -4,6 +4,8 @@
    Bottom: the same division with numbers, one row per chip (H100 295, H200 206), aligned column by column
    under the words, which then fade to a faint skeleton. Last, the bar corrects itself to the real numbers:
    0.14 ms of arithmetic, 29.2 ms per token, a gap of 206.
+   Composed from the centre: the bar and its tag are one picture, centred (the bar starts at x 154); the camera
+   holds the puzzle at the centre in b1, the puzzle and the division in b2, and all three bands from b3.
    Every number here is checked in script/ch18.json (checks). */
 V.scene('ch18_s01', S => {
   const { fx } = S;
@@ -24,7 +26,7 @@ V.scene('ch18_s01', S => {
   const lerp = (a, b, f) => a + (b - a) * f;
 
   // ================================================================ top band: the puzzle bar (y 90-300)
-  const BAR = { x0: 210, y: 160, h: 60, w: 1500 };        // 1,500 px = 30 ms, 50 px per ms: 0.1 ms is 5 px
+  const BAR = { x0: 154, y: 160, h: 60, w: 1500 };        // 1,500 px = 30 ms, 50 px per ms: 0.1 ms is 5 px; with its tag, centred
   const X = ms => BAR.x0 + ms * BAR.w / MS;
   const BCY = BAR.y + BAR.h / 2;
   const sc = libScaleCompare(S, {
@@ -42,20 +44,20 @@ V.scene('ch18_s01', S => {
   const tickL = S.line({ x1: X(0), y1: DIM_Y - 11, x2: X(0), y2: DIM_Y + 11, stroke: 'ink', sw: 2, strokeOpacity: 0.8 }, dim);
   const tickR = S.line({ x1: X(MS), y1: DIM_Y - 11, x2: X(MS), y2: DIM_Y + 11, stroke: 'ink', sw: 2, strokeOpacity: 0.8 }, dim);
   S.set([dimLine], { autoAlpha: 0 }, 0);                 // fx.draw would leave a round-capped dot before it runs
-  const lbl30 = S.text('30 ms per token', { x: 960, y: 278, size: 30, weight: 600, anchor: 'middle', color: 'ink' });
+  const lbl30 = S.text('30 ms per token', { x: (X(0) + X(MS)) / 2, y: 278, size: 30, weight: 600, anchor: 'middle', color: 'ink' });
 
   // '0.1 ms arithmetic' above the sliver, on a short amber leader to its top
   const sliverCx = ms => (X(0) + X(ms)) / 2;
   const arith = S.g();
-  S.text('0.1 ms arithmetic', { x: 196, y: 118, size: 28, weight: 600, color: 'compute' }, arith);
+  S.text('0.1 ms arithmetic', { x: X(0) - 14, y: 118, size: 28, weight: 600, color: 'compute' }, arith);
   const leader1 = S.line({ x1: sliverCx(ARITH), y1: 137, x2: sliverCx(ARITH), y2: 155, stroke: 'compute', sw: 2.5 }, arith);
   S.set(leader1, { autoAlpha: 0 }, 0);
 
   // 'that gap': a grey bracket over the coral part
-  const gapBr = S.path({ d: `M240,155 V144 H${X(MS)} V155`, stroke: 'muted', sw: 2.5, join: 'miter', cap: 'butt' });
+  const gapBr = S.path({ d: `M${X(0) + 30},155 V144 H${X(MS)} V155`, stroke: 'muted', sw: 2.5, join: 'miter', cap: 'butt' });
 
   // the tag '× 300' just right of the bar's end (a group: it is struck, slid and rolled at the end)
-  const TAG = { x: 1728, y: BCY + 1, size: 34 };
+  const TAG = { x: X(MS) + 18, y: BCY + 1, size: 34 };
   const tagG = S.g();
   const tag = S.text('× 300', { x: TAG.x, y: TAG.y, size: TAG.size, weight: 650, color: 'muted', tnum: true }, tagG);
   const tagW = S.measure('× 300', { size: TAG.size, weight: 650 });
@@ -63,7 +65,8 @@ V.scene('ch18_s01', S => {
 
   // ================================================================ b1: thirty milliseconds, a tenth of one
   // While the puzzle is the whole story, it sits at the centre of the frame; on 'It is a division' the camera
-  // eases down so the bar rises to its top band and the ÷ arrives at centre stage below it.
+  // eases so the bar rises and the ÷ arrives below it, the two bands centred together (y 160-580, centre 370);
+  // as the rows begin in b3 it eases on to the full layout.
   const PUZZLE_CY = 198;                                  // centre of the bar with its labels (y 100-296)
   S.xset(S.camera, { x: 0, y: 540 - PUZZLE_CY, s: 1 });
   const tSweep = S.t('b1~Thirty-0.15'), tSliver = S.t('b1~tenth-0.1');
@@ -83,7 +86,7 @@ V.scene('ch18_s01', S => {
 
   // 'a division': the labels and the bracket go, the ÷ waits at centre stage
   S.add(fx.out([lbl30, arith, gapBr], { d: 0.4 }), 'b1~division-0.3');
-  S.add(fx.cam({ d: 1.3, ease: 'power2.inOut' }), 'b1~It is-0.05');
+  S.add(fx.cam({ y: 370, d: 1.3, ease: 'power2.inOut' }), 'b1~It is-0.05');
   S.add(gsap.to(bloom, { autoAlpha: 0, duration: 0.4 }), 'b1~division-0.3');
 
   // ================================================================ the division and its two rows: geometry
@@ -217,6 +220,7 @@ V.scene('ch18_s01', S => {
     S.add(fx.in(r.gpu, { from: 'left', d: 0.6, dist: 30 }), `${at}-0.25`);
     S.add(fx.in(r.terms, { from: 'down', d: 0.45, dist: 16, stagger: 0.09 }), `${at}+0.05`);
   };
+  S.add(fx.cam({ d: 0.9, ease: 'power2.inOut' }), S.t('b3~Two') - 0.4);
   writeRow(h100, 'b3~Two');
   S.add(gsap.set(h100.res, { autoAlpha: 1 }), 'b3~Two+0.55');
   S.add(fx.count(h100.res, 0, GAP1, { d: 0.95, ease: 'power2.out' }), 'b3~Two+0.55');
@@ -249,14 +253,14 @@ V.scene('ch18_s01', S => {
   // 'Three hundred': the tag is struck
   S.add(fx.strike(tag, { tone: 'ink', sw: 3, d: 0.3 }), 'b3~Three-0.05');
   const strikeLn = tagG.lastChild;
-  // 'came from': 5 → 7 px sliver, 1710 → 1668 trim, dimension line with it; the grey corrections
+  // 'came from': 5 → 7 px sliver, 1654 → 1612 trim, dimension line with it; the grey corrections
   const tFix = 'b3~came-0.1', dFix = 0.38;
   S.add(sc.grow(1, ARITH_REAL, { d: dFix, ease: 'power2.inOut' }), tFix);
   S.add(sc.grow(0, MS_REAL, { d: dFix, ease: 'power2.inOut' }), tFix);
   S.add(gsap.fromTo(dimLine, { attr: { x2: X(MS) } }, { attr: { x2: X(MS_REAL) }, duration: dFix, ease: 'power2.inOut', immediateRender: false }), tFix);
   S.add(gsap.fromTo(tickR, { attr: { x1: X(MS), x2: X(MS) } }, { attr: { x1: X(MS_REAL), x2: X(MS_REAL) }, duration: dFix, ease: 'power2.inOut', immediateRender: false }), tFix);
   const arith2 = S.g();
-  const fix1 = S.text('0.1 ms was 0.14', { x: 196, y: 118, size: 28, weight: 600, color: 'muted' }, arith2);
+  const fix1 = S.text('0.1 ms was 0.14', { x: X(0) - 14, y: 118, size: 28, weight: 600, color: 'muted' }, arith2);
   const leader2 = S.line({ x1: sliverCx(ARITH_REAL), y1: 137, x2: sliverCx(ARITH_REAL), y2: 155, stroke: 'compute', sw: 2.5 }, arith2);
   S.set(leader2, { autoAlpha: 0 }, 0);
   const fix2 = S.text('30 ms was 29.2', { x: (X(0) + X(MS_REAL)) / 2, y: 278, size: 28, weight: 600, anchor: 'middle', color: 'muted' });

@@ -17,12 +17,12 @@ V.scene('ch06_s08', S => {
   const glow = (el, at, k = 1.15) => S.add(gsap.fromTo(el, { scale: 1, transformOrigin: '50% 50%' }, { scale: k, duration: 0.25, yoyo: true, repeat: 1, ease: 'sine.inOut', transformOrigin: '50% 50%', immediateRender: false }), at);
 
   // ================================================================ b1: amount vs rate; the sheet
-  const tagAmt = S.pill('an amount: gigabytes', { x: 690, y: 118, tone: 'struct', size: 28, h: 54 });
-  const tagRate = S.pill('a rate: gigabytes per second', { x: 1240, y: 118, tone: 'bytes', size: 28, h: 54 });
+  const tagAmt = S.pill('an amount: gigabytes', { x: 690, y: 188, tone: 'struct', size: 28, h: 54 });
+  const tagRate = S.pill('a rate: gigabytes per second', { x: 1240, y: 188, tone: 'bytes', size: 28, h: 54 });
   S.add(fx.in(tagAmt, { from: 'up', d: 0.5, dist: 14 }), 'b1~amount-0.1');
   S.add(fx.in(tagRate, { from: 'up', d: 0.5, dist: 14 }), 'b1~rate-0.1');
 
-  const SH = { x: 460, y: 180, w: 1000, h: 550 };
+  const SH = { x: 460, y: 250, w: 1000, h: 550 };              // tags, sheet and the line under it, centred
   const sheet = S.g();
   const page = S.g(null, sheet);
   S.path({ d: `M${SH.x + 18},${SH.y} H${SH.x + SH.w - 46} L${SH.x + SH.w},${SH.y + 46} V${SH.y + SH.h - 18} Q${SH.x + SH.w},${SH.y + SH.h} ${SH.x + SH.w - 18},${SH.y + SH.h} H${SH.x + 18} Q${SH.x},${SH.y + SH.h} ${SH.x},${SH.y + SH.h - 18} V${SH.y + 18} Q${SH.x},${SH.y} ${SH.x + 18},${SH.y} Z`, fill: '#141d35', stroke: 'ink', strokeOpacity: 0.3, sw: 2, filter: 'url(#shadow)' }, page);
@@ -40,15 +40,15 @@ V.scene('ch06_s08', S => {
     { name: 'Peak compute', val: '989 TFLOP/s', tone: 'compute', tag: 'a rate', note: '16-bit · 989 trillion ≈ 10¹⁵' },
     { name: 'Power draw', val: '700 W', tone: 'neutral', tag: 'a rate', note: 'watt = energy per second' },
   ];
-  const RY = [340, 440, 540, 640];
+  const RY = [410, 510, 610, 710];
   const rows = ROWS.map((r, i) => {
     const g = S.g(null, sheet), y = RY[i];
     if (i) S.line({ x1: SH.x + 30, y1: y - 50, x2: SH.x + SH.w - 30, y2: y - 50, stroke: 'ink', strokeOpacity: 0.08, sw: 1.5 }, g);
     r.nameEl = S.text(r.name, { x: SH.x + 40, y, size: 32, weight: 600, color: 'ink' }, g);
     r.pill = S.pill(r.val, { x: 980, y, tone: r.tone, size: 32, h: 58, mono: true }, g);
     r.tagEl = S.text(r.tag, { x: SH.x + SH.w - 40, y, size: 28, weight: 650, anchor: 'end', color: r.tag === 'a rate' ? 'bytes' : 'struct' }, g);
-    if (r.note) {
-      r.noteEl = S.text(r.note, { x: SH.x + SH.w + 26, y, size: 24, weight: 550, color: 'muted' });
+    if (r.note) {                                                 // in its row, under the name
+      r.noteEl = S.text(r.note, { x: SH.x + 40, y: y + 36, size: 22, weight: 550, color: 'muted' });
       S.set(r.noteEl, { autoAlpha: 0 }, 0);
     }
     [r.nameEl, r.pill, r.tagEl].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
@@ -70,7 +70,7 @@ V.scene('ch06_s08', S => {
   S.add(fx.in(rows[2].noteEl, { from: 'left', d: 0.4, dist: 12 }), 'b2~tera-0.1');
   S.add(fx.out(rows[2].noteEl, { d: 0.3 }), 'b2~Power-0.2');
   S.add(fx.in(rows[3].noteEl, { from: 'left', d: 0.4, dist: 12 }), 'b2~energy-0.1');
-  S.add(fx.out(rows[3].noteEl, { d: 0.3 }), T('b3') - 0.1);
+  S.add(fx.out(rows[3].noteEl, { d: 0.3 }), T('b2~too') - 0.1);
   // the three rate tags glow together, then the one amount tag
   const tGlow = T('b2~too') + 0.05;
   S.add(gsap.to(rows.map(r => r.g), { opacity: 1, duration: 0.3 }), tGlow - 0.2);
@@ -86,7 +86,7 @@ V.scene('ch06_s08', S => {
   S.add(fx.out(three, { d: 0.35 }), tDim);
   S.add(gsap.to(sheet, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }), tLift);
   ignoreIn([sheet], tLift, T('b4~sheet') + 0.3);
-  const CW = 600, CH = 440, CYT = 250, CXS = [190, 1130];
+  const CW = 600, CH = 440, CYT = 320, CXS = [190, 1130];
   const liftCard = (k, r) => {
     const outer = S.g(), g = S.g(null, outer);
     const x = CXS[k];
@@ -106,7 +106,7 @@ V.scene('ch06_s08', S => {
   ignoreIn([capCard, bwCard], tLift, tLift + 0.9);
 
   // the tank in the capacity card: open at the top, holds 80 GB
-  const TK = { x: CXS[0] + 370, w: 180, top: 470, bot: 640 };
+  const TK = { x: CXS[0] + 370, w: 180, top: CYT + 220, bot: CYT + 390 };
   const tank = S.g(null, capCard.inner);
   S.rect({ x: TK.x, y: TK.top, w: TK.w, h: TK.bot - TK.top, fill: 'struct', fillOpacity: 0.08 }, tank);
   const tankWalls = S.path({ d: `M${TK.x - 10},${TK.top} H${TK.x} V${TK.bot} H${TK.x + TK.w} V${TK.top} H${TK.x + TK.w + 10}`, stroke: 'struct', sw: 4 }, tank);
@@ -117,7 +117,7 @@ V.scene('ch06_s08', S => {
   S.add(fx.in(tank, { from: 'up', d: 0.5, dist: 14 }), 'b3~Capacity says-0.1');
   S.add(fx.in(fitQ, { from: 'up', d: 0.45, dist: 12 }), 'b3~whether-0.1');
   // the pipe in the bandwidth card, dashes flowing through it
-  const PP = { x: CXS[1] + 340, w: 220, y: 555, h: 40 };
+  const PP = { x: CXS[1] + 340, w: 220, y: CYT + 305, h: 40 };
   const pipe = S.g(null, bwCard.inner);
   S.rect({ x: PP.x, y: PP.y - PP.h / 2, w: PP.w, h: PP.h, r: 8, fill: '#2a1218', stroke: 'bytes', sw: 3 }, pipe);
   const pipeFlow = S.path({ d: '', fill: 'bytes' }, pipe);

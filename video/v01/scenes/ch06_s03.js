@@ -9,8 +9,9 @@
        two coral byte blocks slide together into a weight (65,536 patterns); the equation from ch02 comes
        back in the bottom band; a 140 GB file bounces off a tiny chip into a big memory block.
    b4  '16 bits: the common default' / 'fewer bits: later'; then 'parameters × bytes each = bytes'.
-   Layout: scopes x 110-910 and 1010-1810, y 230-600 (plot 250-580); headings y 130, readouts y 196.
-   Bit/byte column x 150-920, y 268-680; bottom band y 760-1000 (equation, then chip and memory right). */
+   Layout: scopes x 110-910 and 1010-1810, y 230-600 (plot 250-580); headings y 130, readouts y 196; in b1-b2
+   both sit 160 lower, and the ten-level scope starts centred. Bit/byte column x 150-920, y 268-680; bottom
+   band y 760-1000 (equation, then chip and memory right), centred as one. */
 V.scene('ch06_s03', S => {
   const { fx } = S;
   const T = s => S.t(s);
@@ -50,7 +51,12 @@ V.scene('ch06_s03', S => {
   const pathD = (x0, x1, yf) => { let d = ''; for (let x = x0; x <= x1 + 0.01; x += 3) d += `${d ? 'L' : 'M'}${x.toFixed(1)},${yf(x).toFixed(1)}`; return d; };
 
   // ================================================================ left half: ten levels
+  // b1: the ten-level scope is alone, so `left` starts centred (LX0 px right) and moves to its half as the
+  // two-level scope arrives (b2). Both scopes sit DY lower, centred top to bottom, until b3 needs the bottom
+  // band: then `right` moves up into its quadrant
+  const LX0 = 450, DY = 160;
   const left = S.g();
+  S.set(left, { x: LX0, y: DY }, 0);
   const scopeL = scope(110, left);
   S.set(scopeL, { autoAlpha: 0 }, 0);
   const XL0 = 170, XL1 = 890, SWL = 180, BAND = 33;
@@ -117,6 +123,7 @@ V.scene('ch06_s03', S => {
 
   // ================================================================ right half: two levels
   const right = S.g();
+  S.set(right, { y: DY }, 0);
   const scopeR = scope(1010, right);
   const XR0 = 1180, XR1 = 1790, SWR = 122, YH = 285, YLo = 545, THR = 415;
   const bandsR = S.g(null, right);
@@ -156,8 +163,8 @@ V.scene('ch06_s03', S => {
     const { glow, core } = trL;
     if (t < tWire2) {
       const a = ramp(t, tWire0, tWire1 - tWire0), b = ramp(t, tWire1, tWire2 - tWire1, eIO3);
-      const y = lerp(540, yFlatL, b);
-      core.setAttribute('d', `M${lerp(-20, XL0, b).toFixed(1)},${y.toFixed(1)} L${lerp(1940, XL1, b).toFixed(1)},${y.toFixed(1)}`);
+      const y = lerp(540 - DY, yFlatL, b);                       // from the full-width wire on screen (left is offset)
+      core.setAttribute('d', `M${lerp(-20 - LX0, XL0, b).toFixed(1)},${y.toFixed(1)} L${lerp(1940 - LX0, XL1, b).toFixed(1)},${y.toFixed(1)}`);
       core.setAttribute('stroke-width', lerp(220, 3, a).toFixed(2));
       core.setAttribute('stroke', mix(CORAL, INK, b));
       core.setAttribute('opacity', lerp(0.85, 1, a).toFixed(3));
@@ -199,6 +206,7 @@ V.scene('ch06_s03', S => {
   S.add(fx.dim(caption, { to: 0.35 }), tWarm);
 
   // ---------------------------------------------------------------- b2 cues
+  S.add(gsap.fromTo(left, { x: LX0 }, { x: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), T('b2') - 0.6);
   S.add(fx.in(scopeR, { from: 'fade', d: 0.6 }), T('b2') - 0.2);
   S.add(fx.in(headR, { from: 'up', d: 0.5, dist: 16 }), 'b2~Two-0.1');
   S.add(fx.in(bandsR, { from: 'fade', d: 0.5 }), 'b2~levels-0.15');
@@ -209,6 +217,7 @@ V.scene('ch06_s03', S => {
   S.add(fx.out(left, { d: 0.7 }), 'b2~counted-0.1');
 
   // ================================================================ b3: bits, a byte, a weight
+  S.add(gsap.fromTo(right, { y: DY }, { y: 0, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), T('b3') - 0.85);
   fadeTo(right, 0.3, T('b3') - 0.2, 0.5);
   const CELL = { x: 150, y: 268, s: 64, p: 76 }, CY = CELL.y + CELL.s / 2;
   const ROW = [0, 1, 0, 1, 0, 1, 0, 1];
@@ -271,7 +280,7 @@ V.scene('ch06_s03', S => {
   // "That's why": the labels fade; the equation from ch02 returns whole in the bottom band
   const tWhy = T('b3~why') - 0.42;
   S.add(fx.dim([byteBr, patsG, wLbl, wPat, cellsG, flier, ...blocks], { to: 0.2 }), tWhy);
-  const eq = S.equation([{ t: '70 billion weights', tone: 'ink' }, { t: '× 2 bytes', tone: 'bytes' }, { t: '= 140 GB', tone: 'ink' }], { x: 840, y: 800, size: 46, gap: 34 });
+  const eq = S.equation([{ t: '70 billion weights', tone: 'ink' }, { t: '× 2 bytes', tone: 'bytes' }, { t: '= 140 GB', tone: 'ink' }], { x: 714, y: 800, size: 46, gap: 34 });   // the band (equation, chip, memory) centred
   const [eqW, eq2, eq140] = eq.parts;
   const gbNote = S.text('1 GB = 1 billion bytes', { x: eq140.cx, y: 858, size: 24, weight: 550, anchor: 'middle', color: 'muted' });
   S.add(fx.in(eq, { from: 'up', d: 0.6, dist: 18 }), tWhy + 0.1);
@@ -281,7 +290,7 @@ V.scene('ch06_s03', S => {
   S.add(fx.draw(box2, { d: 0.6 }), 'b3~seventy');
 
   // a 140 GB file bounces off a tiny chip and settles into a big memory block
-  const CHIP = { x: 1480, y: 905, s: 38 }, MEM = { x: 1580, y: 830, w: 200, h: 136 };
+  const CHIP = { x: 1354, y: 905, s: 38 }, MEM = { x: 1454, y: 830, w: 200, h: 136 };
   const chipO = S.g();
   S.rect({ x: CHIP.x - CHIP.s / 2, y: CHIP.y - CHIP.s / 2, w: CHIP.s, h: CHIP.s, r: 6, fill: '#1a1408', stroke: 'compute', sw: 2.5 }, chipO);
   S.text('chip', { x: CHIP.x, y: CHIP.y + 46, size: 24, weight: 600, anchor: 'middle', color: 'compute' }, chipO);
@@ -298,7 +307,7 @@ V.scene('ch06_s03', S => {
   S.text('140 GB', { x: 0, y: 40, size: 24, weight: 700, family: 'mono', anchor: 'middle', color: 'bytes' }, fileIn);
   fileBack.setAttribute('data-audit', 'ignore');
   S.set(file, { autoAlpha: 0 }, 0);
-  const P0 = [eq140.cx, 800 - 112], C1 = [1400, 590], P1 = [CHIP.x, CHIP.y - CHIP.s / 2 - 26], C2 = [1560, 660], P2 = [MEM.x + MEM.w / 2, MEM.y + MEM.h / 2 + 6];
+  const P0 = [eq140.cx, 800 - 112], C1 = [1274, 590], P1 = [CHIP.x, CHIP.y - CHIP.s / 2 - 26], C2 = [1434, 660], P2 = [MEM.x + MEM.w / 2, MEM.y + MEM.h / 2 + 6];
   const bez = (a, c, b, u) => [0, 1].map(i => (1 - u) * (1 - u) * a[i] + 2 * (1 - u) * u * c[i] + u * u * b[i]);
   const tF0 = T('b3~make#2') - 0.1, tF1 = tF0 + 0.55, tF2 = tF1 + 0.65;
   S.add(fx.in(file, { from: 'fade', d: 0.25 }), tF0 - 0.25);

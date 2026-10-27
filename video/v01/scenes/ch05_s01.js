@@ -101,7 +101,7 @@ V.scene('ch05_s01', S => {
 
   // ================================================================ b2: the arithmetic bench
   S.add(fx.out(intro, { d: 0.45 }), 'b2-0.15');
-  const BX = 1060, BCY = 540, R1 = 440, R2 = 640, CW = 230, CH = 140;
+  const BX = 960, BCY = 540, R1 = 440, R2 = 640, CW = 230, CH = 140;      // the bench, centred
   const COL = [BX - 340, BX, BX + 340], SIGN = [BX - 170, BX + 170];
   const head = S.text([{ t: 'one operation ' }, { t: '= ', c: 'muted' }, { t: 'one piece of arithmetic' }],
     { x: BX, y: 160, size: 52, weight: 700, family: 'display', anchor: 'middle' });
@@ -202,16 +202,17 @@ V.scene('ch05_s01', S => {
   S.add(gsap.fromTo(operands.map(c => c.bg), { attr: { 'stroke-opacity': 0.6, 'stroke-width': 2 } },
     { attr: { 'stroke-opacity': 1, 'stroke-width': 4 }, duration: 0.3, yoyo: true, repeat: 1, repeatDelay: 0.25, ease: 'sine.inOut', immediateRender: false }), 'b2~numbers-0.05');
 
-  // 'Not a line of code, nor a step of reasoning': one ghost at a time, struck through
+  // 'Not a line of code, nor a step of reasoning': one ghost at a time under the bench, struck through;
+  // icon and words centred in the card as one
   const ghost = (icon, label) => {
     const g = S.g();
-    const X0 = 108, GW = 420, GY = BCY, GH = 116;
+    const GW = 420, X0 = 960 - GW / 2, GY = R2 + CH / 2 + 120, GH = 116;
     S.rect({ x: X0, y: GY - GH / 2, w: GW, h: GH, r: 20, fill: '#ffffff', fillOpacity: 0.03, stroke: '#ffffff', strokeOpacity: 0.3, sw: 2, dash: '10 8' }, g);
     const inner = S.g(null, g);
-    S.icon(icon, { x: X0 + 58, y: GY, size: 54, color: 'muted' }, inner);
-    const t = S.text(label, { x: X0 + 102, y: GY, size: 32, color: 'muted', weight: 550 }, inner);
-    const tw = S.measure(label, { size: 32, weight: 550 });
-    const ln = S.line({ x1: X0 + 22, y1: GY + 2, x2: X0 + 102 + tw + 14, y2: GY + 2, stroke: 'ink', sw: 4, strokeOpacity: 0.85 }, inner);
+    const tw = S.measure(label, { size: 32, weight: 550 }), x0 = X0 + (GW - (54 + 20 + tw)) / 2;
+    S.icon(icon, { x: x0 + 27, y: GY, size: 54, color: 'muted' }, inner);
+    const t = S.text(label, { x: x0 + 74, y: GY, size: 32, color: 'muted', weight: 550 }, inner);
+    const ln = S.line({ x1: x0 - 8, y1: GY + 2, x2: x0 + 74 + tw + 14, y2: GY + 2, stroke: 'ink', sw: 4, strokeOpacity: 0.85 }, inner);
     ln.__strike = true;                          // the audit allows a strike through its own label
     g.t = t; g.ln = ln;
     return g;
@@ -294,9 +295,9 @@ V.scene('ch05_s01', S => {
   S.add(fx.out([ruler, workL], { d: 0.4 }), 'b4-0.25');
   // the bench has done its job: it clears before FLOP crosses its corner and the camera leaves it
   S.add(fx.out(benchParts, { d: 0.45, stagger: 0.02 }), 'b4-0.2');
-  // FLOP shrinks into the top-left corner and stays: the unit the rest of the chapter counts in
+  // FLOP shrinks to a heading at the top centre and stays: the unit the rest of the chapter counts in
   const FS2 = 0.3;
-  S.add(fx.xform(flopG, { x: 112 - FL, y: 176 - FY, s: FS2 }, { d: 1.0, ease: 'power3.inOut' }), 'b4~flop-0.1');
+  S.add(fx.xform(flopG, { x: 960 - WF * FS2 / 2 - FL, y: 176 - FY, s: FS2 }, { d: 1.0, ease: 'power3.inOut' }), 'b4~flop-0.1');
   // the camera pushes in on the tally reading 2
   const CS = 1.65, CY = TY - 40;
   S.add(fx.cam({ x: TX, y: CY, scale: CS, d: 1.6, ease: 'power2.inOut' }), 'b4~deliberately-0.2');

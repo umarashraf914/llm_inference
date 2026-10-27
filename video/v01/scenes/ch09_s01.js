@@ -82,7 +82,8 @@ V.scene('ch09_s01', S => {
   S.add(fx.count(gb, 0, 140, { d: 1.05, ease: 'power2.out' }), 'b1~hundred-0.1');
 
   // ================================================================ stage 1 · where it sits
-  const MEM0 = { x: 1250, y: 690 }, CHIP0 = { x: 1570, y: 690 }, LBL_Y = 822;
+  // the tags (right-aligned at TGX), the container and the chip make one row, centred (x 471-1450)
+  const MEM0 = { x: 1079, y: 690 }, CHIP0 = { x: 1399, y: 690 }, LBL_Y = 822, TGX = 859;
   const mem = ch09Memory(S, { x: MEM0.x, y: MEM0.y });
   const chip = ch09Chip(S, { x: CHIP0.x, y: CHIP0.y });
   mem.style.opacity = 0; mem.style.visibility = 'hidden';
@@ -110,7 +111,7 @@ V.scene('ch09_s01', S => {
   // three facts, one at a time, each stepping back as the next lands
   const TAGS = ['the entire model', 'off the chip', 'same for every request'];
   const tagAt = ['b2~entire+0.15', 'b2~off-0.1', 'b2~same-0.1'];
-  const tags = TAGS.map((t, i) => S.text(t, { x: 1030, y: 630 + i * 62, size: 32, anchor: 'end', weight: 600, color: 'ink' }));
+  const tags = TAGS.map((t, i) => S.text(t, { x: TGX, y: 630 + i * 62, size: 32, anchor: 'end', weight: 600, color: 'ink' }));
   tags.forEach((t, i) => {
     S.add(fx.in(t, { from: 'right', d: 0.55, dist: 30 }), tagAt[i]);
     if (i) S.add(fx.dim(tags[i - 1], { to: 0.4 }), tagAt[i]);
@@ -130,7 +131,8 @@ V.scene('ch09_s01', S => {
   S.add(fx.out([...tags, take], { d: 0.35, stagger: 0.03 }), 'b2>+0.1');
   S.add(fx.out([...P, note, bit, memLbl, chipLbl], { d: 0.4, stagger: 0.02 }), 'b2>+0.25');
   const SK = 30 / WL, SY = 150;
-  let sx = 120;
+  // the strip, centred over the header
+  let sx = 960 - (SK * (mono('70 B') + xW + w2 + eqW + mono('140 GB')) + 4 * 11) / 2;
   const stripAt = [];
   stripAt.push(sx); sx += SK * mono('70 B') + 11;
   stripAt.push(sx); sx += SK * xW + 11;
@@ -145,7 +147,7 @@ V.scene('ch09_s01', S => {
   S.add(chip.place({ x: ICX, y: R[2], s: CHIP_S }, { d: 1.1 }), 'b2>+0.3');
   S.add(gsap.to(chip, { opacity: 0.4, duration: 0.6 }), 'b2>+1.1');
 
-  const header = S.text('Fetching 140 GB from each place', { x: 120, y: 226, size: 46, weight: 700, family: 'display' });
+  const header = S.text('Fetching 140 GB from each place', { x: 960, y: 226, size: 46, weight: 700, family: 'display', anchor: 'middle' });
   S.add(fx.in(header, { from: 'left', d: 0.7 }), 'b3+0.75');
 
   // the row labels

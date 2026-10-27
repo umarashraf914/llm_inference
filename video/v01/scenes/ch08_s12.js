@@ -47,7 +47,7 @@ V.scene('ch08_s12', S => {
   });
   const small = (s, x, y, o = {}) => S.text(s, { x, y, size: 22, weight: 600, anchor: 'middle', color: 'muted', ...o });
 
-  const hd = S.text('From a vector to a word', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hd = S.text('From a vector to a word', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch08Hide(hd);
   fade(hd, 0, 1, 0.3, 0.5);
   fade(hd, 1, 0, T('b4') - 0.2, 0.4);
@@ -278,4 +278,18 @@ V.scene('ch08_s12', S => {
   ch08Hide([den, times, slot]);
   fade(den, 0, 1, tBar + 0.4, 0.4);
   fade([times, slot], 0, 1, tBar + 0.8, 0.4, 0.2);
+
+  // ================================================================ the pane: every picture but the header
+  // The picture grows from the left: the stack and its vector (b1), then the projection and the pick (b2),
+  // then the path with its return arrow (b3); the pane holds each beat's picture centred
+  const pane = S.g();
+  [...S.layers.main.children].filter(e => e !== pane && e !== hd).forEach(e => pane.appendChild(e));
+  // measured extents (x, before the pane): b1 130-720; b2 130-1683; b3 130-1582; b4 190-1350, then the number
+  // 480-1480
+  const PK = [[tOP - 0.8, 535], [tOP, 80], [tB4, 80], [tB4 + 0.8, 190], [tColl, 190], [tColl + 0.6, -20]];
+  whole(t => {
+    let x = PK[0][1];
+    for (let i = 1; i < PK.length; i++) if (t > PK[i - 1][0]) x = lerp(PK[i - 1][1], PK[i][1], EIO(cl((t - PK[i - 1][0]) / (PK[i][0] - PK[i - 1][0]))));
+    pane.setAttribute('transform', `translate(${x.toFixed(1)},0)`);
+  });
 });

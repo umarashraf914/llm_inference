@@ -72,11 +72,14 @@ V.scene('ch00_s02', {
     // what the 30 ms produce, as the outline reaches the right end
     S.add(bar.pill.pop({ d: 0.5 }), TO + 0.8);
 
-    // the chip, and its count
+    // the chip, and its count: the two as one group, centred on the screen once the count is complete
+    // (chip 96 px, 32 px, the count); the '?' over the bar (x 1,240) mirrors the chip later
+    const wCount = S.measure('140,000,000,000', { size: 64, weight: 600, family: 'mono' });
+    const CHX = Math.round(960 - (96 + 32 + wCount) / 2 + 48);
     const chipHolder = S.g();
-    const chip = ch00Chip(S, { x: 300, y: 380 }, chipHolder);
+    const chip = ch00Chip(S, { x: CHX, y: 380 }, chipHolder);
     S.add(chip.drawOn({ d: 0.9 }), 'b1~arithmetic-0.3');
-    const CNT = { x: 380, y: 380, size: 64 };
+    const CNT = { x: CHX + 80, y: 380, size: 64 };
     const cntG = S.g();
     const counter = S.text('0', { x: CNT.x, y: CNT.y, size: CNT.size, weight: 600, family: 'mono', color: 'compute' }, cntG);
     const glyphG = S.g(null, cntG);
@@ -97,18 +100,18 @@ V.scene('ch00_s02', {
     // ---------------------------------------------------------------- b2: a modern chip gets through it in 0.1 ms
     S.add(chip.busy({ d: 0.6 }), 'b2~data-0.1');
     // the count collapses into a small amber block, which drops into the bar's left end as the 5 px sliver
-    const blk = S.rect({ x: 376, y: 346, w: 590, h: 124, r: 6, fill: 'compute' });
+    const blk = S.rect({ x: CNT.x - 4, y: 346, w: 590, h: 124, r: 6, fill: 'compute' });
     blk.setAttribute('data-audit', 'ignore');
     hide(blk);
     const TG = S.t('b2~get') - 0.05;
     const col = gsap.timeline();
     // the digits and label turn into one amber block (quick), which then contracts to the left
     col.fromTo(blk, { autoAlpha: 0 }, { autoAlpha: 0.95, duration: 0.1, ease: 'power1.out' }, 0);
-    col.fromTo(blk, { attr: { x: 376, y: 346, width: 590, height: 124, rx: 6, ry: 6 } },
-      { attr: { x: 382, y: 352, width: 26, height: 56, rx: 3, ry: 3 }, duration: 0.26, ease: 'power3.in' }, 0);
+    col.fromTo(blk, { attr: { x: CNT.x - 4, y: 346, width: 590, height: 124, rx: 6, ry: 6 } },
+      { attr: { x: CNT.x + 2, y: 352, width: 26, height: 56, rx: 3, ry: 3 }, duration: 0.26, ease: 'power3.in' }, 0);
     col.to([cntG, opsLabel], { autoAlpha: 0, duration: 0.1, ease: 'power1.in' }, 0);
     // down first, then left (x late, y early), so it passes right of the chip, not over it
-    col.fromTo(blk, { attr: { x: 382, width: 26, rx: 3, ry: 3 } }, { attr: { x: B.x0, width: SLIVER, rx: 0, ry: 0 }, duration: 0.34, ease: 'power2.in', immediateRender: false }, 0.26);
+    col.fromTo(blk, { attr: { x: CNT.x + 2, width: 26, rx: 3, ry: 3 } }, { attr: { x: B.x0, width: SLIVER, rx: 0, ry: 0 }, duration: 0.34, ease: 'power2.in', immediateRender: false }, 0.26);
     col.fromTo(blk, { autoAlpha: 0.95, attr: { y: 352, height: 56 } }, { autoAlpha: 1, attr: { y: B.y, height: B.h }, duration: 0.34, ease: 'power1.out', immediateRender: false }, 0.26);
     col.set(bar.sliver, { autoAlpha: 1 }, 0.6);
     col.set(blk, { autoAlpha: 0 }, 0.6);
@@ -143,6 +146,9 @@ V.scene('ch00_s02', {
     const TA = S.t('b2~all') - 0.05, DA = 0.5;                                    // opens on 'all of it'
     const TB = S.t('b3~Back') + 0.08, DB = 0.6;                                   // collapses on 'Back', done by 'scale'
     const magAt = t => (t < TA ? 0 : t < TA + DA ? easeIO((t - TA) / DA) : t < TB ? 1 : t < TB + DB ? 1 - easeIO((t - TB) / DB) : 0);
+    // the panel opens over the chip's row: the chip steps aside while it is open
+    S.add(gsap.fromTo(chipHolder, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.3, ease: 'power1.inOut', immediateRender: false }), TA);
+    S.add(gsap.fromTo(chipHolder, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: 'power1.inOut', immediateRender: false }), TB + DB - 0.1);
 
     // ---------------------------------------------------------------- b3: back at true scale; under 1%; something else
     S.add(chip.wake({ d: 0.6 }), 'b3~Back');
@@ -168,12 +174,14 @@ V.scene('ch00_s02', {
 
     // ---------------------------------------------------------------- b4: the chip is not slow; 300 tokens of arithmetic
     S.add(chip.pulse({ d: 0.7 }), "b4~isn't-0.1");
-    const model = ch00ModelFile(S, { x: 300, y: 482, size: 80, label: 'model', labelSize: 34 });
-    const modelGlow = S.circle({ x: 300, y: 482, r: 64, fill: 'url(#pglow-struct)' }, S.layers.back);
+    // just below the chip, its label on its left (on its right it would run into the token count at x 852)
+    const model = ch00ModelFile(S, { x: CHX, y: 482, size: 80 });
+    model.labelEl = S.text('model', { x: CHX - 40 - 24, y: 482, size: 34, weight: 550, anchor: 'end', color: 'ink' }, model);
+    const modelGlow = S.circle({ x: CHX, y: 482, r: 64, fill: 'url(#pglow-struct)' }, S.layers.back);
     modelGlow.setAttribute('data-audit', 'ignore');
     hide(modelGlow);
     S.add(fx.pop(model.icon, { d: 0.55, from: 0.5 }), 'b4~model-0.25');
-    S.add(fx.in(model.labelEl, { from: 'left', d: 0.5, dist: 18 }), 'b4~model-0.1');
+    S.add(fx.in(model.labelEl, { from: 'right', d: 0.5, dist: 18 }), 'b4~model-0.1');
     S.add(gsap.fromTo(modelGlow, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }), 'b4~chatbot-0.15');
 
     // the copies: copy k (1..299) lands at T0 + DT·√(k/299), so the front accelerates (x ∝ t²) and the last

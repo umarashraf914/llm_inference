@@ -141,6 +141,9 @@ V.scene('ch01_s01', S => {
   const listLabel = S.text('70 billion weights', { x: GX, y: gridB.b + 44, size: 28, anchor: 'middle', color: 'muted', weight: 550 });
   S.add(fx.in(listLabel, { from: 'up', d: 0.5 }), 'b3~Training+0.4');
   S.add(fx.in([train, trainTitle], { from: 'left', d: 0.7, stagger: 0.1 }), 'b3~Training');
+  // until the inference panel comes, the training panel and the list are the whole picture (x 100-1110): the camera
+  // centres them, and eases back as the inference panel arrives on the right in b4
+  S.add(fx.cam({ x: 605, y: 540, scale: 1, d: 1.0, ease: 'power2.inOut' }), 'b3~Training-0.4');
 
   // training feeds the list: amber work flows in while every value flickers, then settles
   const inArrow = S.arrow({ x1: P.lx + P.w + 14, y1: CY, x2: gridB.l - 14, y2: CY, color: 'faint', sw: 3, head: 14 });
@@ -186,6 +189,7 @@ V.scene('ch01_s01', S => {
   const trainLabels = [f1.label, f2.label, f3.label];
   S.add(fx.dim(trainLabels, { to: 0.3 }), 'b4~Inference');
   S.add(fx.dim(inArrow, { to: 0.3 }), 'b4~Inference');
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), 'b4~Inference-0.2');
   S.add(fx.in([infer, inferTitle], { from: 'right', d: 0.7, stagger: 0.1 }), 'b4~Inference');
   const outArrow = S.arrow({ x1: gridB.r + 14, y1: CY, x2: P.rx - 14, y2: CY, color: 'struct', sw: 3, head: 14 });
   S.add(fx.drawArrow(outArrow, { d: 0.5 }), 'b4~Inference+0.3');

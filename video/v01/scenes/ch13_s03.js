@@ -13,8 +13,10 @@
    b5  'recompute every step'; the curve runs off the top: 'impossible, not just expensive'; the left half dims;
        takeaway 'one quadratic term outgrows everything linear'.
    The curve's run off the top leaves along its own tangent (slope 1.31 px/px at 10,000 tokens).
-   Layout: pills y 412 at x 612 + 116 i, K tiles y 352, V tiles y 312, banner y 192-272; boxes y 560-640; blocks
-   in b3 at x 360-560, y 780-930 (50 px pitch); chart origin (1060, 700), 700 x 460 px; strip y 780-860. */
+   Layout: pills y 412 at x 612 + 116 i, K tiles y 352, V tiles y 312, banner y 192-272; boxes y 560-640. The upper
+   group, boxes and ticks are one pane, lowered 150 (centred below the header) until b3 brings the row under them.
+   b3's row (blocks at x 515-715, y 780-930, 50 px pitch; the sums from x 795) is centred (DX3 = 155); b4's pair,
+   the grown blocks and the chart (origin (913, 700), 700 x 460 px; strip y 780-860), is centred (DX4 = 147). */
 V.scene('ch13_s03', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const { fx } = S;
@@ -104,11 +106,16 @@ V.scene('ch13_s03', S => {
     const k = cl((t - tTk) / 0.25), f = cl((t - tTk - 0.25) / 0.6);
     ticks.setAttribute('opacity', ((k * (1 - 0.45 * f)) * (1 - cl((t - tB3) / 0.4))).toFixed(3));
   });
+  // the upper group, the boxes and the ticks, centred below the header until b3's row comes in under them
+  const pane1 = S.g();
+  [up, boxes, ticks].forEach(e => pane1.appendChild(e));
+  whole(t => pane1.setAttribute('transform', `translate(0,${(150 * (1 - EIO(cl((t - tB3) / 0.6)))).toFixed(1)})`));
   // b3 shrinks the boxes upward; b4 clears them
   K.track(boxes, [K.K(tB3, { y: 0, s: 1, o: 1 }), K.K(tB3 + 0.6, { y: -60, s: 0.75 }), K.K(tB4, { o: 1 }), K.K(tB4 + 0.4, { o: 0 })], 960, 600);
 
   // ================================================================ b3: add it up
-  const X0 = 360, BASE = 930, P = 50;
+  const DX3 = 155, DX4 = 147;   // b3's row centred; b4's pair centred
+  const X0 = 360 + DX3, BASE = 930, P = 50;
   const blkMove = S.g(), blk = S.g(null, blkMove);
   const tAdd = T('b3~Add') - 0.05;
   const base = S.path({ d: `M${X0},${BASE + 2} H${X0 + 4 * P}`, stroke: 'compute', strokeOpacity: 0.35, sw: 2 });
@@ -119,7 +126,7 @@ V.scene('ch13_s03', S => {
     const at = tAdd + 0.3 * c + 0.08 * r;
     K.track(b, [K.K(at, { y: -22, o: 0 }), K.K(at + 0.3, { y: 0, o: 1, e: 'bounce.out' })]);
   }
-  const EQX = 640, MONO = (s, z) => S.measure(s, { size: z, weight: 700, family: 'mono' });
+  const EQX = 640 + DX3, MONO = (s, z) => S.measure(s, { size: z, weight: 700, family: 'mono' });
   const termsA = [[{ t: '0', c: 'compute' }], [{ t: '+ ', c: 'muted' }, { t: '1', c: 'compute' }], [{ t: '+ ', c: 'muted' }, { t: '2', c: 'compute' }], [{ t: '+ ', c: 'muted' }, { t: '3', c: 'compute' }], [{ t: '= ', c: 'muted' }, { t: '6', c: 'compute' }]];
   const rowA = S.g();
   let xa = EQX;
@@ -161,26 +168,26 @@ V.scene('ch13_s03', S => {
   // n = 1,000: about half a million recomputations, where a thousand would do
   const tK = T('b3~thousand') + 0.15;
   S.add(ch13Retext(formula, 'total = n(n − 1) / 2', 'total = 1,000 × 999 / 2', 0.4), tK);
-  const cnt = S.text('0', { x: 880, y: 926, size: 40, weight: 750, family: 'mono', anchor: 'end', color: 'compute' });
-  const cntL = S.text('recomputations', { x: 898, y: 928, size: 22, weight: 600, color: 'muted' });
+  const cnt = S.text('0', { x: 880 + DX3, y: 926, size: 40, weight: 750, family: 'mono', anchor: 'end', color: 'compute' });
+  const cntL = S.text('recomputations', { x: 898 + DX3, y: 928, size: 22, weight: 600, color: 'muted' });
   hide([cnt, cntL]);
   fade([cnt, cntL], 0, 1, tK + 0.3, 0.3);
   whole(t => { cnt.textContent = Math.round(499500 * E('power2.out')(cl((t - tK - 0.4) / 1.5))).toLocaleString('en-US'); });
   // continues 'Recomputations' on the same line: 'vs' stays small, and it starts a space after that word
-  const would = S.text([{ t: 'vs ', c: 'muted' }, { t: '1,000', c: 'helps', w: 750 }, { t: ' Would Do', c: 'muted' }], { x: 898 + S.measure('recomputations', { size: 22, weight: 600 }) + 7, y: 928, size: 22, weight: 600, case: 'keep' });
+  const would = S.text([{ t: 'vs ', c: 'muted' }, { t: '1,000', c: 'helps', w: 750 }, { t: ' Would Do', c: 'muted' }], { x: 898 + DX3 + S.measure('recomputations', { size: 22, weight: 600 }) + 7, y: 928, size: 22, weight: 600, case: 'keep' });
   hide(would);
   fade(would, 0, 1, T('b3~where') - 0.1, 0.35);
   fade([base, box, dimN, dimM, half, formula, qTag, cnt, cntL, would], 1, 0, tB4, 0.4);
   fade(up, 0.4, 0, tB4, 0.4);
 
   // ================================================================ b4: two ways to grow
-  // the blocks alone stay, grown to fill the left half: (460, 855) → (440, 560), × 1.8
+  // the blocks alone stay, grown to fill the left half: (460 + DX3, 855) → (440 - DX4, 560), × 1.8
   const tImp = T('b5~impossible') - 0.15;
-  K.track(blkMove, [K.K(tB4, { x: 0, y: 0, s: 1, o: 1 }), K.K(tB4 + 0.9, { x: -20, y: -295, s: 1.8 }), K.K(tImp + 0.3, { o: 1 }), K.K(tImp + 0.9, { o: 0.35 })], 460, 855);
-  const title = S.text('Two ways to grow', { x: 1410, y: 128, size: 44, weight: 750, anchor: 'middle', color: 'ink' });
+  K.track(blkMove, [K.K(tB4, { x: 0, y: 0, s: 1, o: 1 }), K.K(tB4 + 0.9, { x: -20 - DX3 - DX4, y: -295, s: 1.8 }), K.K(tImp + 0.3, { o: 1 }), K.K(tImp + 0.9, { o: 0.35 })], 460 + DX3, 855);
+  const title = S.text('Two ways to grow', { x: 1410 - DX4, y: 128, size: 44, weight: 750, anchor: 'middle', color: 'ink' });
   hide(title);
   fade(title, 0, 1, tB4 + 0.4, 0.45);
-  const OX = 1060, OY = 700, PW = 700, PH = 460;
+  const OX = 1060 - DX4, OY = 700, PW = 700, PH = 460;
   const chart = S.g();
   const axes = S.path({ d: `M${OX},${OY - PH} V${OY} H${OX + PW + 10}`, stroke: 'white', strokeOpacity: 0.6, sw: 2.5 }, chart);
   K.draw(axes, 1200, tB4 + 0.5, 0.7);
@@ -194,7 +201,7 @@ V.scene('ch13_s03', S => {
   }
   const yName = S.text('total work', { x: OX + 12, y: OY - PH - 18, size: 22, weight: 650, color: 'muted' }, chart);
   const xName = S.text('tokens', { x: OX + PW / 2, y: OY + 54, size: 22, weight: 650, anchor: 'middle', color: 'muted' }, chart);
-  const sch = S.pill('schematic', { x: 1716, y: 130, tone: 'neutral', size: 20, h: 30 }, chart);
+  const sch = S.pill('schematic', { x: 1716 - DX4, y: 130, tone: 'neutral', size: 20, h: 30 }, chart);
   hide([grid, yName, xName, sch]);
   fade([grid, yName, xName], 0, 1, tB4 + 0.9, 0.4);
   fade(sch, 0, 1, tB4 + 1.2, 0.4);
@@ -244,7 +251,7 @@ V.scene('ch13_s03', S => {
   }
   // three block columns fly from the left half into the strip as rising bars (tokens 2, 3, 4)
   for (let c = 1; c <= 3; c++) {
-    const f = (x, y) => [440 + (x - 460) * 1.8, 560 + (y - 855) * 1.8];
+    const f = (x, y) => [440 - DX4 + (x - 460 - DX3) * 1.8, 560 + (y - 855) * 1.8];
     const [ax, ay] = f(X0 + P * c + 3, BASE - P * c + 3), [bx, by] = f(X0 + P * c + 47, BASE - 3);
     const from = [ax, ay, bx - ax, by - ay], to = [CX(c + 1) + 3, SB - U * c, 10, U * c];
     const fly = S.rect({ x: from[0], y: from[1], w: from[2], h: from[3], r: 4, fill: 'url(#solid-compute)' }, strip);
@@ -271,7 +278,7 @@ V.scene('ch13_s03', S => {
   // at ten thousand
   const tags = S.g();
   S.text('× 1,000', { x: OX + PW - 15, y: OY - 24, size: 26, weight: 750, anchor: 'end', color: 'helps' }, tags);
-  S.text('× 1,000,000', { x: 1560, y: OY - PH - 22, size: 26, weight: 750, anchor: 'end', color: 'compute' }, tags);
+  S.text('× 1,000,000', { x: 1560 - DX4, y: OY - PH - 22, size: 26, weight: 750, anchor: 'end', color: 'compute' }, tags);
   hide(tags);
   fade(tags, 0, 1, tTen2 + 1.6, 0.4);
   const worse = S.text('≈ 5,000× worse', { x: OX + 40, y: 320, size: 36, weight: 800, color: 'compute' });
@@ -284,7 +291,7 @@ V.scene('ch13_s03', S => {
   const run = S.path({ d: `M${OX + PW},${OY - PH} C${OX + PW + 20},${OY - PH - 26} ${OX + PW + 28},${OY - PH - 120} ${OX + PW + 30},-30`, stroke: 'compute', sw: 4 });
   run.setAttribute('data-audit', 'ignore');
   K.draw(run, 320, tImp, 0.7);
-  const imp = S.pill('impossible, not just expensive', { x: 1430, y: 300, tone: 'compute', size: 24, h: 44 });
+  const imp = S.pill('impossible, not just expensive', { x: 1430 - DX4, y: 300, tone: 'compute', size: 24, h: 44 });
   hide(imp);
   fade(imp, 0, 1, tImp + 0.4, 0.35);
   const tAll = T('b5~Almost') - 0.1;

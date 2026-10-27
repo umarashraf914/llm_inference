@@ -7,7 +7,7 @@
        everything dims and two cards say it both ways, joined by 'short by ×1.39, either way'.
    Checks: 3.35e12 × 0.03 = 100.5e9; 100.5 / 140 = 0.718; 140 − 100.5 = 39.5; 140 / 3.35 = 41.8 ms;
    140 / 100.5 = 41.8 / 30 = 1.39.
-   Bucket x 780-1080, y 360-720, 2.4 px per GB (140 GB at y 384, 100.5 GB at y 479). */
+   Bucket x 1018-1318, y 360-720, 2.4 px per GB (140 GB at y 384, 100.5 GB at y 479). */
 V.scene('ch06_s07', S => {
   const { fx } = S;
   const T = s => S.t(s);
@@ -17,6 +17,9 @@ V.scene('ch06_s07', S => {
   const eIO2 = E('power2.inOut');
 
   // ================================================================ b1: a rate is an amount over a time
+  // b2's picture (the parked fraction at the pipe's mouth, the pipe, the bucket, the stopwatch and its readout)
+  // spans 150 + DX to 1360 + DX: DX centres it
+  const DX = 238;
   const headA = S.text([{ t: 'a rate', c: 'bytes' }, { t: ' = amount ÷ time', c: 'ink' }], { x: 960, y: 112, size: 50, weight: 700, family: 'display', anchor: 'middle' });
   const headB = S.text([{ t: 'rate', c: 'bytes' }, { t: ' × time = ', c: 'ink' }, { t: 'amount', c: 'struct' }], { x: 960, y: 112, size: 50, weight: 700, family: 'display', anchor: 'middle' });
   S.set(headB, { autoAlpha: 0 }, 0);
@@ -53,14 +56,16 @@ V.scene('ch06_s07', S => {
   const tRw = T('b1~times') - 0.1;
   S.add(gsap.to(headA, { autoAlpha: 0, duration: 0.3 }), tRw);
   S.add(fx.in(headB, { from: 'up', d: 0.45, dist: 12 }), tRw + 0.2);
-  S.add(fx.xform(frac, { x: 230 - 960, y: 280 - FY, s: 0.6, ox: 960, oy: FY }, { d: 0.9, ease: 'power3.inOut' }), T('b1~gives') - 0.1);
+  S.add(fx.xform(frac, { x: 150 + DX - 960, y: 280 - FY, s: 0.6, ox: 960, oy: FY }, { d: 0.9, ease: 'power3.inOut' }), T('b1~gives') - 0.1);   // to the pipe's mouth
 
   // ================================================================ b2: 3.35 TB/s for 30 ms
+  // the heading and the bucket picture (y 70-780) sit 90 px lower through b2; the camera eases back as the
+  // two cards fill the bottom band in b3
+  S.add(fx.cam({ x: 960, y: 450, scale: 1, d: 0.8, ease: 'power2.inOut' }), T('b2') - 0.3);
   const whatIf = S.text('what-if: the 30 ms came from the H200', { x: 960, y: 170, size: 26, weight: 550, anchor: 'middle', color: 'muted' });
   S.set(whatIf, { autoAlpha: 0 }, 0);
   S.add(fx.in(whatIf, { from: 'fade', d: 0.45 }), 'b2~faster-0.1');
 
-  const DX = 80;                                                  // the bucket group sits a little right of centre
   const BK = { x: 780 + DX, y: 360, w: 300, h: 360 }, PXG = 2.4, BOT = BK.y + BK.h;
   const yOf = gb => BOT - PXG * gb;
   const scene = S.g();
@@ -71,7 +76,7 @@ V.scene('ch06_s07', S => {
   const walls = S.path({ d: `M${BK.x - 12},${BK.y} H${BK.x} V${BOT} H${BK.x + BK.w} V${BK.y} H${BK.x + BK.w + 12}`, stroke: 'ink', strokeOpacity: 0.8, sw: 4 }, bucket);
   for (let gb = 20; gb <= 140; gb += 20) S.line({ x1: BK.x, y1: yOf(gb), x2: BK.x + 12, y2: yOf(gb), stroke: 'ink', strokeOpacity: 0.35, sw: 2 }, bucket);
   // the pipe: in from the left, an elbow down into the bucket
-  const PY = 318, PH = 24, PX0 = 380, PX1 = 830 + DX;
+  const PY = 318, PH = 24, PX0 = 300 + DX, PX1 = 830 + DX;
   const pipe = S.g(null, scene);
   S.path({ d: `M${PX0},${PY} H${PX1 + PH} V${BK.y + 18} H${PX1} V${PY + PH} H${PX0} Z`, fill: '#2a1218', stroke: 'bytes', sw: 2.5 }, pipe);
   const flowD = S.path({ d: '', fill: 'bytes' }, pipe);
@@ -135,6 +140,7 @@ V.scene('ch06_s07', S => {
   S.add(fx.in(pct, { from: 'up', d: 0.4, dist: 10 }), 'b3~whole-0.1');
   // 'from the other side': everything above dims to 30%
   const tSide = T('b3~from') - 0.1;
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), tSide - 0.3);
   S.add(gsap.to([scene, eq, headB, frac, whatIf, sw], { opacity: 0.3, duration: 0.5, ease: 'power2.out' }), tSide);
   // two cards in the bottom band, joined by a bracket
   const CY = 896, CH = 92, CW = 640, CXL = 960 - CW - 30, CXR = 960 + 30;

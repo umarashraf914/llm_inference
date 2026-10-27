@@ -11,7 +11,8 @@
    b5  everything dims; 'a vague sense of readiness' struck; 'how many arriving tokens are already held here?'
    Layout: bars x 396-1796, y 250 / 430 (h 40), row labels x 70; plate y 342; after the tilt the upper tier is
    scaled 0.8 about (960, 100). Lower tier: blocks row y 560, database (300, 720), gear (760, 720), package
-   x 1196-1784, y 560-880 with two HBM stacks of 2 × 5 slots. */
+   x 1196-1784, y 560-880 with two HBM stacks of 2 × 5 slots. In b1-b2 the upper tier is alone, so it sits 200
+   lower, centred; it rises into the top band as it shrinks (b3). */
 V.scene('ch16_s01', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
@@ -32,7 +33,7 @@ V.scene('ch16_s01', S => {
     cnt0.textContent = fmt(1032 * E('power2.out')(cl((t - tCount - 0.15) / 0.8)));
     const k = cl((t - tCount) / 0.3), out = EIO(cl((t - tCount - 1.25) / 0.5));
     setO(cnt0, k * (1 - out));
-    cnt0.setAttribute('transform', `translate(${(420 * out).toFixed(1)},${(-200 * out).toFixed(1)})`);
+    cnt0.setAttribute('transform', `translate(${(420 * out).toFixed(1)},0)`);   // toward the upper bar (the tier sits 200 lower in b1-b2)
   });
   // the weather conversation, top left throughout
   const wIcon = S.icon('ph:cloud-sun-duotone', { x: 96, y: 152, size: 56, color: 'muted' });
@@ -174,6 +175,12 @@ V.scene('ch16_s01', S => {
   });
   const coldT = S.pill('cold: evicted', { x: 1490, y: 966, tone: 'neutral', size: 26, h: 44 });
   rise(coldT, tEv + 0.6, 8);
+
+  // the upper tier, centred while alone (b1-b2), rises into the top band as it shrinks (b3)
+  const tier = S.g();
+  S.main.insertBefore(tier, wIcon);
+  [wIcon, wLab, upper, sameG, flash].forEach(e => tier.appendChild(e));
+  whole(t => tier.setAttribute('transform', `translate(0,${(200 * (1 - EIO(cl((t - tTilt) / 0.9)))).toFixed(1)})`));
 
   // ================================================================ b4: only the text survives
   const db = S.g();

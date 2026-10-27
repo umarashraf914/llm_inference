@@ -156,7 +156,10 @@ V.scene('ch03_s01', S => {
 
   // the push-in: the hall falls away and one server is left, centred at (960, SVY) at scale SC
   const SC = 1.25, SVY = 515;
-  const C2 = { x: SX, y: Y + (540 - SVY) / SC, scale: SC };
+  // the picture from here on (the devices at the left, the server, the stopwatch at the right) is centred as a
+  // whole: the server sits HX px right of the screen's middle, and everything around it moves with it
+  const HX = 100;
+  const C2 = { x: SX - HX / SC, y: Y + (540 - SVY) / SC, scale: SC };
   S.add(fx.cam({ ...C2, d: 1.6, ease: 'power3.inOut' }), 'b3~inside-0.45');
   S.add(gsap.fromTo(dc.buildingG, { opacity: 1 }, { opacity: 0, duration: 0.6, immediateRender: false }), 'b3~inside-0.4');
   S.add(gsap.fromTo(dc.racksG, { opacity: 0.5 }, { opacity: 0, duration: 0.8, immediateRender: false }), 'b3~inside-0.1');
@@ -165,22 +168,22 @@ V.scene('ch03_s01', S => {
 
   // the user's end comes back small at the far left; a question arrives; the stopwatch barely moves
   const mini = S.g(null, S.hud);
-  const ml = libDevice(S, { x: 236, y: sv.y, w: 170 }, mini);
-  const W1 = 318, W2 = sL - 16;                            // the small line: laptop to server
+  const ml = libDevice(S, { x: 236 + HX, y: sv.y, w: 170 }, mini);
+  const W1 = 318 + HX, W2 = sL - 16;                            // the small line: laptop to server
   const NET = { x: Math.round((W1 + W2) / 2), y: sv.y };   // its globe: every user's line runs through it
   const mw = ch03Wire(S, { x1: W1, y1: sv.y, x2: W2, y2: sv.y, globe: NET, globeSize: 44 }, S.hud);
   S.add(fx.in(ml, { from: 'left', d: 0.6 }), 'b3~one-0.1');
   S.add(mw.drawOn({ d: 0.6 }), 'b3~one+0.15');
   // ('b3~in a' would match "sits in a data centre": time everything here from 'fraction')
   const tF = T('b3~fraction');
-  const q2 = libToken(S, { text: 'your question', x: 326, y: sv.y, size: 24, anchor: 'start', case: 'label' }, S.hud);
+  const q2 = libToken(S, { text: 'your question', x: 326 + HX, y: sv.y, size: 24, anchor: 'start', case: 'label' }, S.hud);
   hide(q2);
   const q2End = sL - 12 - q2.w / 2;
   S.add(q2.travel(`M${q2.cx},${q2.cy} L${q2End},${sv.y}`, { d: 0.6, ease: 'power2.inOut', appear: true }), tF - 0.6);
   S.add(q2.moveBy(30, 0, { d: 0.25, ease: 'power2.in' }), tF - 0.02);
   S.add(q2.out({ d: 0.25 }), tF - 0.02);
 
-  const SWX = 1490;
+  const SWX = 1490 + HX;
   const sw = libStopwatch(S, { x: SWX, y: sv.y - 10, size: 150, span: 1000, readout: 'none', tone: 'struct' }, S.hud);
   const swLabel = S.text('a fraction of a second', { x: SWX, y: sv.y + 96, size: 28, weight: 550, color: 'muted', anchor: 'middle' }, S.hud);
   S.add(sw.in({ d: 0.5 }), 'b3~one');
@@ -202,12 +205,12 @@ V.scene('ch03_s01', S => {
 
   // shared by many: more people, on more devices, through the same network, into the same server
   const more = [
-    libDevice(S, { kind: 'phone', x: 236, y: sv.y - 190, w: 62 }, mini),
-    libDevice(S, { x: 236, y: sv.y + 195, w: 150 }, mini),
+    libDevice(S, { kind: 'phone', x: 236 + HX, y: sv.y - 190, w: 62 }, mini),
+    libDevice(S, { x: 236 + HX, y: sv.y + 195, w: 150 }, mini),
   ];
   const mw2 = [
-    ch03Wire(S, { x1: 236 + 48, y1: sv.y - 178, x2: NET.x - 22, y2: NET.y - 16, globe: false }, S.hud),
-    ch03Wire(S, { x1: 236 + 82, y1: sv.y + 182, x2: NET.x - 22, y2: NET.y + 16, globe: false }, S.hud),
+    ch03Wire(S, { x1: 236 + HX + 48, y1: sv.y - 178, x2: NET.x - 22, y2: NET.y - 16, globe: false }, S.hud),
+    ch03Wire(S, { x1: 236 + HX + 82, y1: sv.y + 182, x2: NET.x - 22, y2: NET.y + 16, globe: false }, S.hud),
   ];
   S.add(fx.in(more, { from: 'left', d: 0.6, stagger: 0.12 }), 'b4~Shared-0.2');
   mw2.forEach((w, i) => S.add(w.drawOn({ d: 0.5 }), T('b4~Shared') + 0.1 + i * 0.12));
@@ -217,7 +220,7 @@ V.scene('ch03_s01', S => {
   const into = { x: sL - 8, y: sv.y };
   const SRC = [
     { x: mw2[0].x1, y: mw2[0].y1, via: true },              // phone
-    { x: 326, y: sv.y, via: false },                        // the first laptop (its line already runs through the globe)
+    { x: 326 + HX, y: sv.y, via: false },                        // the first laptop (its line already runs through the globe)
     { x: mw2[1].x1, y: mw2[1].y1, via: true },              // second laptop
   ].map((p, i) => {
     const d = p.via ? `M${p.x},${p.y} L${NET.x},${NET.y} L${into.x},${into.y}` : `M${p.x},${p.y} L${into.x},${into.y}`;
@@ -241,7 +244,7 @@ V.scene('ch03_s01', S => {
   const tags = [['shared', [CH03.icons.shared]], ['always on', [CH03.icons.alwaysOn]], ['paid by the hour', [CH03.icons.hour, CH03.icons.coin]]]
     .map(([t, ic]) => ch03Tag(S, t, { x: 0, y: sv.y + 205, icons: ic, anchor: 'start', size: 30 }, tagRow));
   const TG = 30, total = tags.reduce((a, t) => a + t.w, 0) + TG * (tags.length - 1);
-  let tx = 960 - total / 2;
+  let tx = 960 + HX - total / 2;
   tags.forEach(t => { S.xset(t, { x: tx }); tx += t.w + TG; });
   S.add(tags[0].stamp(), 'b4~Shared-0.2');
   S.add(tags[1].stamp(), 'b4~always-0.2');
@@ -249,6 +252,6 @@ V.scene('ch03_s01', S => {
   S.add(tags[2].stamp(), 'b4~paid-0.2');
 
   // production
-  const prod = S.text('production', { x: 960, y: sv.y - 190, size: 56, weight: 700, family: 'display', anchor: 'middle' }, S.hud);
+  const prod = S.text('production', { x: 960 + HX, y: sv.y - 190, size: 56, weight: 700, family: 'display', anchor: 'middle' }, S.hud);
   S.add(fx.in(prod, { from: 'scale', scale: 1.18, d: 0.6 }), 'b4~production-0.2');
 });

@@ -36,14 +36,19 @@ V.scene('ch09_s03', S => {
   const pulse = (el, at, peak, d = 0.6) => S.add(gsap.fromTo(el, { attr: { opacity: 0 } }, { attr: { opacity: peak }, duration: d / 2, yoyo: true, repeat: 1, ease: 'sine.inOut', immediateRender: false }), at);
 
   // ================================================================ header; the world (the camera moves it in b5)
-  const hd = S.text('The weights are read, never written', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
-  const sub = S.text('nothing about them changes while the service runs', { x: 110, y: 186, size: 30, weight: 600, color: 'muted' });
+  const hd = S.text('The weights are read, never written', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  const sub = S.text('nothing about them changes while the service runs', { x: 960, y: 186, size: 30, weight: 600, anchor: 'middle', color: 'muted' });
   hide([hd, sub]);
   fade([hd, sub], 0, 1, 0.3, 0.5, 0.25);
   const world = S.g();
   const BC = [340, 540], BUS0 = 520, BUS1 = 1110, CH = [1220, 540], CS = 180, U = [[1680, 380], [1680, 700]];
-  const mem = ch09Memory(S, { x: BC[0], y: BC[1], s: 1.06, filled: true, label: '140 GB of weights', labelSize: 32 }, world);
-  const lockG = S.g(null, world);
+  // b1: the block and its read / write notes are alone, so b1G holds them centred (B1X right); they move to the
+  // left end of the composition as the bus, the chip and the users come in (b2)
+  const b1G = S.g(null, world), B1X = 605;
+  S.set(b1G, { x: B1X }, 0);
+  S.add(gsap.fromTo(b1G, { x: B1X }, { x: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), T('b2') - 0.85);
+  const mem = ch09Memory(S, { x: BC[0], y: BC[1], s: 1.06, filled: true, label: '140 GB of weights', labelSize: 32 }, b1G);
+  const lockG = S.g(null, b1G);
   const lockO = S.icon('ph:lock-simple-open-duotone', { x: BC[0] + 168, y: BC[1] - 80, size: 40, color: 'ink' }, lockG);
   const lockC = S.icon('ph:lock-simple-duotone', { x: BC[0] + 168, y: BC[1] - 80, size: 40, color: 'ink' }, lockG);
   hide([mem, lockC]);
@@ -53,20 +58,20 @@ V.scene('ch09_s03', S => {
 
   // ================================================================ b1: read = copy out; write = change
   const tRead = T('b1~only') - 0.1;
-  const tile = S.rect({ x: -22, y: -22, w: 44, h: 44, r: 6, fill: 'url(#solid-bytes)', stroke: 'white', strokeOpacity: 0.5, sw: 1.5 }, world);
+  const tile = S.rect({ x: -22, y: -22, w: 44, h: 44, r: 6, fill: 'url(#solid-bytes)', stroke: 'white', strokeOpacity: 0.5, sw: 1.5 }, b1G);
   const tileSrc = [250, 474], tileDst = [250, 322];
   whole(t => {
     const k = E('power3.out')(cl((t - tRead - 0.2) / 0.7));
     tile.setAttribute('transform', `translate(${tileSrc[0]},${lerp(tileSrc[1], tileDst[1], k).toFixed(1)})`);
     setO(tile, cl((t - tRead) / 0.2) * (1 - cl((t - T('b2') + 0.2) / 0.4)));
   });
-  const rArr = S.arrow({ x1: 250, y1: 438, x2: 250, y2: 352, color: 'bytes', sw: 4 }, world);
+  const rArr = S.arrow({ x1: 250, y1: 438, x2: 250, y2: 352, color: 'bytes', sw: 4 }, b1G);
   hide(rArr);
   fade(rArr, 0, 1, tRead + 0.1, 0.4);
-  const rLab = S.text('read = copy out', { x: 250, y: 268, size: 25, weight: 700, anchor: 'middle', color: 'bytes' }, world);
+  const rLab = S.text('read = copy out', { x: 250, y: 268, size: 25, weight: 700, anchor: 'middle', color: 'bytes' }, b1G);
   hide(rLab);
   fade(rLab, 0, 1, T('b1~copied') - 0.1, 0.4);
-  const pen = S.g(null, world);
+  const pen = S.g(null, b1G);
   S.icon('ph:pencil-simple-duotone', { x: 470, y: 350, size: 54, color: 'ink' }, pen);
   const penX = S.path({ d: 'M440,320 L500,380', stroke: 'muted', sw: 5 }, pen);
   penX.setAttribute('stroke-dasharray', '90 90');
@@ -75,15 +80,15 @@ V.scene('ch09_s03', S => {
   hide(pen);
   whole(t => { const k = cl((t - tWr) / 0.4); setO(pen, k * (1 - 0.6 * cl((t - tCh - 0.3) / 0.4)) * (1 - cl((t - T('b2') + 0.15) / 0.35))); pen.setAttribute('transform', `translate(0,${(-6 * Math.sin(t * 4) * k).toFixed(1)})`); });
   whole(t => penX.setAttribute('stroke-dashoffset', (90 * (1 - EIO(cl((t - tCh - 0.1) / 0.35)))).toFixed(1)));
-  const wLab = S.text('write = change', { x: 480, y: 268, size: 25, weight: 700, anchor: 'middle', color: 'ink' }, world);
+  const wLab = S.text('write = change', { x: 480, y: 268, size: 25, weight: 700, anchor: 'middle', color: 'ink' }, b1G);
   hide(wLab);
   fade(wLab, 0, 1, tCh, 0.4);
   fade(lockO, 1, 0, tCh + 0.4, 0.15);
   fade(lockC, 0, 1, tCh + 0.4, 0.15);
   const tTr = T('b1~Training') - 0.1;
   fade([rLab, wLab], 1, 0.4, tTr, 0.4);
-  const inset1 = S.text('training: rewritten every step', { x: 110, y: 898, size: 26, weight: 600, color: 'muted' });
-  const inset2 = S.text('serving: read only', { x: 110, y: 942, size: 28, weight: 700, color: 'ink' });
+  const inset1 = S.text('training: rewritten every step', { x: 960, y: 898, size: 26, weight: 600, anchor: 'middle', color: 'muted' });
+  const inset2 = S.text('serving: read only', { x: 960, y: 942, size: 28, weight: 700, anchor: 'middle', color: 'ink' });
   hide([inset1, inset2]);
   fade(inset1, 0, 1, tTr + 0.1, 0.4);
   fade(inset2, 0, 1, T('b1~Serving') - 0.1, 0.4);

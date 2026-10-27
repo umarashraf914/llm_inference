@@ -4,13 +4,19 @@
 V.scene('ch01_s04', S => {
   const { fx } = S;
   const TY = 260, SIZE = 40, PADX = 22, GAP = 16;
+  const WORDS = ['the', 'quick', 'brown', 'fox', 'jumps'];
+  const ww = WORDS.map(w => S.measure(w, { size: SIZE, weight: 600, case: 'keep' }));
+  // the top row as one group centred on the screen: the bubble (96), 92 px, the five pills, and the place the
+  // sixth token takes in b3 (GAP + 120)
+  const rowW = ww.reduce((a, w) => a + w + 2 * PADX, 0) + GAP * (WORDS.length - 1);
+  const BX = Math.round(960 - (96 + 92 + rowW + GAP + 120) / 2 + 96 + 92);
 
   // ---------------------------------------------------------------- b1: the chat bubble and the echo of the cold open
-  const bubble = S.icon('ph:chat-circle-text-duotone', { x: 160, y: TY, size: 96, color: 'struct' });
+  const bubble = S.icon('ph:chat-circle-text-duotone', { x: BX - 140, y: TY, size: 96, color: 'struct' });
   S.add(fx.pop(bubble, { from: 0.6, d: 0.6 }), 0.15);
   const echo = S.g();
   echo.setAttribute('data-audit', 'ignore');
-  const echoPills = [0, 1, 2, 3, 4, 5].map(i => S.pill(['Why', 'is', 'the', 'sky', 'blue', '?'][i], { x: 420 + i * 110, y: 150, h: 40, size: 22, tone: 'struct', case: 'keep' }, echo));
+  const echoPills = [0, 1, 2, 3, 4, 5].map(i => S.pill(['Why', 'is', 'the', 'sky', 'blue', '?'][i], { x: 960 + (i - 2.5) * 110, y: 150, h: 40, size: 22, tone: 'struct', case: 'keep' }, echo));
   S.set(echoPills, { autoAlpha: 0 }, 0);
   echoPills.forEach((p, i) => {
     const at = S.t('b1~Remember') + i * 0.12;
@@ -19,11 +25,8 @@ V.scene('ch01_s04', S => {
   });
 
   // the sentence bar, then five pills
-  const WORDS = ['the', 'quick', 'brown', 'fox', 'jumps'];
-  const ww = WORDS.map(w => S.measure(w, { size: SIZE, weight: 600, case: 'keep' }));
   const sp = S.measure(' ', { size: SIZE, weight: 600 }) + 6;
   const barW = ww.reduce((a, b) => a + b, 0) + sp * (WORDS.length - 1) + 2 * PADX;
-  const BX = 300;
   const bar = S.rect({ x: BX, y: TY - 36, w: barW, h: 72, r: 18, fill: 'url(#card-struct)', stroke: 'struct', sw: 2, strokeOpacity: 0.8 });
   // word positions inside the bar, and in the pill row
   let x = BX + PADX;
@@ -72,10 +75,16 @@ V.scene('ch01_s04', S => {
   pills.forEach((p, i) => S.add(fx.pulse(p, { scale: 1.1, d: 0.3 }), S.t('b1~make') + i * 0.12));
   S.add(fx.count(counter, 1, 5, { d: 0.55, fmt: v => String(Math.round(v)) }), 'b1~make');
   S.add(fx.in(five, { from: 'up', d: 0.4 }), 'b1~five#2');
+  // alone in b1, the row (with its bubble, cuts and count) sits at the centre of the frame; as the rarer word
+  // arrives it rises to its band at the top, making room for the example and the bars
+  const top = S.g();
+  [bubble, echo, bar, ...pills, ...cuts, scissors, counter, five].forEach(e => top.appendChild(e));
+  S.set(top, { y: 250 }, 0);
+  S.add(gsap.fromTo(top, { y: 250 }, { y: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), 'b2~Rarer-0.6');
 
   // ---------------------------------------------------------------- b2: rarer words split; words versus tokens
   S.add(fx.out([five, counter], { d: 0.3 }), 'b2~Rarer-0.2');
-  const EX = { cx: 1500, y: 470 };
+  const EX = { cx: 960, y: 470 };                              // on the centre line, between the row and the bars
   const exWord = S.g();
   const parts = ['un', 'believ', 'ably'], pw = parts.map(p => S.measure(p, { size: 34, weight: 600, case: 'keep' }));
   const exBarW = pw.reduce((a, b) => a + b, 0) + 2 * PADX;
@@ -95,7 +104,7 @@ V.scene('ch01_s04', S => {
   const illus = S.text('illustrative split', { x: EX.cx, y: EX.y + 66, size: 24, anchor: 'middle', color: 'muted', weight: 550 });
   S.add(fx.in(illus, { from: 'up', d: 0.35 }), 'b2~three');
 
-  // the two bars, one scale: 500 words = 600 px
+  // the two bars, one scale: 500 words = 600 px; bars and labels together centred (the longest ends ~1,614)
   const BL = 300, U = 600 / 500;
   const bars = S.g();
   const wordsBar = S.bar({ x: BL, y: 690, w: 500 * U, h: 46, frac: 1, tone: 'struct' }, bars);
@@ -127,16 +136,20 @@ V.scene('ch01_s04', S => {
   // ---------------------------------------------------------------- b4: tokens are the unit
   S.add(fx.out([...exPills, illus, bars, sixth, seen], { d: 0.4 }), 'b4-0.2');
   S.add(gsap.to(words, { autoAlpha: 1, duration: 0.4 }), 'b4');
+  // the label and the three cards it names: one pair, centred on the screen, 80 px apart
+  const UNIT = { size: 34, weight: 650 };
+  const wUnit = S.measure('the unit everything is counted in', UNIT);
+  const CL = Math.round(960 - (wUnit + 80 + 640) / 2), CX = CL + Math.round(wUnit) + 80;
   const cards = [['tokens per second', 'b4~second'], ['cost per token', 'b4~Cost'], ['milliseconds per token', 'b4~Milliseconds']].map(([t, at], i) => {
     const y = 470 + i * 120;
     const g = S.g();
-    S.rect({ x: 1110, y: y - 46, w: 640, h: 92, r: 18, fill: '#0c1326' }, g);
-    S.rect({ x: 1110, y: y - 46, w: 640, h: 92, r: 18, fill: 'url(#card-struct)', stroke: 'struct', sw: 2, strokeOpacity: 0.7 }, g);
-    S.rect({ x: 1140, y: y - 18, w: 54, h: 36, r: 10, fill: 'struct', fillOpacity: 0.35, stroke: 'struct', sw: 2 }, g);
-    S.text(t, { x: 1220, y: y + 1, size: 34, color: 'ink', weight: 600 }, g);
+    S.rect({ x: CX, y: y - 46, w: 640, h: 92, r: 18, fill: '#0c1326' }, g);
+    S.rect({ x: CX, y: y - 46, w: 640, h: 92, r: 18, fill: 'url(#card-struct)', stroke: 'struct', sw: 2, strokeOpacity: 0.7 }, g);
+    S.rect({ x: CX + 30, y: y - 18, w: 54, h: 36, r: 10, fill: 'struct', fillOpacity: 0.35, stroke: 'struct', sw: 2 }, g);
+    S.text(t, { x: CX + 110, y: y + 1, size: 34, color: 'ink', weight: 600 }, g);
     S.add(fx.in(g, { from: 'right', d: 0.5 }), `${at}-0.25`);
     return g;
   });
-  const unit = S.text('the unit everything is counted in', { x: 680, y: 590, size: 34, anchor: 'middle', color: 'struct', weight: 650 });
+  const unit = S.text('the unit everything is counted in', { x: CL + wUnit / 2, y: 590, ...UNIT, anchor: 'middle', color: 'struct' });
   S.add(fx.in(unit, { from: 'up', d: 0.5 }), 'b4~unit');
 });

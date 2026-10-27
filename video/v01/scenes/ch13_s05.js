@@ -11,7 +11,8 @@
        each with a 'KV cache' badge; 'obvious once seen'.
    b4  the read stream thickens; the staircase from scene 1, rows added in step with new slabs; 'reads: still
        growing'.
-   b5  all but the cache region and its stream dims; takeaway; 'why so many later fixes exist'. */
+   b5  all but the cache region and its stream dims; takeaway; 'why so many later fixes exist'.
+   Composition: in b1 the package is alone, so it is centred (+460); it moves back to its half as the panel comes. */
 V.scene('ch13_s05', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
@@ -77,8 +78,8 @@ V.scene('ch13_s05', S => {
   fade(rec, 1, 0, tH, 0.4);
   K.draw(region, 1400, tH + 0.6, 0.6);
   fade(regionL, 0, 1, tH + 0.8, 0.35);
-  // the camera: push into the stack on 'H B M', ease back at b2
-  K.track(world, [K.K(tH, { s: 1 }), K.K(tH + 0.9, { s: 1.3 }), K.K(tB2 + 0.1, { s: 1.3 }), K.K(tB2 + 1.1, { s: 1 })], 720, 600);
+  // the camera: the package alone and centred; push into the stack on 'H B M', ease back to the left half at b2
+  K.track(world, [K.K(tH, { x: 460, s: 1 }), K.K(tH + 0.9, { x: 460, s: 1.3 }), K.K(tB2 + 0.1, { x: 460, s: 1.3 }), K.K(tB2 + 1.1, { x: 0, s: 1 })], 720, 600);
 
   // ---------------------------------------------------------------- the passes: compute → append → read
   const PASS = [
@@ -160,7 +161,7 @@ V.scene('ch13_s05', S => {
   });
   S.path({ d: 'M1266,304 H1294 M1286,297 L1295,304 L1286,311 M1561,304 H1589 M1581,297 L1590,304 L1581,311', stroke: 'muted', sw: 2.5 }, panel);
   hide(panel);
-  fade(panel, 0, 1, tB2 + 0.3, 0.5);
+  fade(panel, 0, 1, tB2 + 0.8, 0.5);   // once the package has moved out of its way
   void pf;
   // which box is lit: amber from c to a, teal from a to r, coral from r to the next c
   const tReadsB4 = T('b4~reads') - 0.1;
