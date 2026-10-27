@@ -272,6 +272,63 @@ def _count(k):
             _FRAMES.value += k
 
 
+def performance_work():
+    """On Windows 11, work Windows judges to be in the background (as with a window minimised or behind others) can be
+    moved onto the power-saving cores of a hybrid processor, such as the E-cores of Intel's 12th generation and
+    later, and its timers coarsened: a render left running while the computer is used for something else would
+    crawl. Opt this process and every process it has started (Playwright's driver, the browser's processes, ffmpeg)
+    out of that power saving, as work the user is waiting for. Elsewhere, or where Windows refuses, nothing."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        from ctypes import wintypes
+        k = ctypes.WinDLL("kernel32", use_last_error=True)
+        k.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+        k.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]
+        k.Process32FirstW.argtypes = k.Process32NextW.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+        k.OpenProcess.restype = wintypes.HANDLE
+        k.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        k.SetProcessInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+        k.CloseHandle.argtypes = [wintypes.HANDLE]
+
+        class Entry(ctypes.Structure):                  # PROCESSENTRY32W
+            _fields_ = [("size", wintypes.DWORD), ("usage", wintypes.DWORD), ("pid", wintypes.DWORD),
+                        ("heap", ctypes.c_size_t), ("module", wintypes.DWORD), ("threads", wintypes.DWORD),
+                        ("parent", wintypes.DWORD), ("priority", ctypes.c_long), ("flags", wintypes.DWORD),
+                        ("exe", ctypes.c_wchar * 260)]
+
+        class Throttling(ctypes.Structure):             # PROCESS_POWER_THROTTLING_STATE
+            _fields_ = [("version", wintypes.ULONG), ("control", wintypes.ULONG), ("state", wintypes.ULONG)]
+
+        snap = k.CreateToolhelp32Snapshot(0x2, 0)       # TH32CS_SNAPPROCESS
+        if not snap or snap == ctypes.c_void_p(-1).value:
+            return
+        kids, e = {}, Entry()
+        e.size = ctypes.sizeof(Entry)
+        more = k.Process32FirstW(snap, ctypes.byref(e))
+        while more:
+            kids.setdefault(e.parent, []).append(e.pid)
+            more = k.Process32NextW(snap, ctypes.byref(e))
+        k.CloseHandle(snap)
+        mine, todo = set(), [os.getpid()]
+        while todo:                                     # (a reused process id could make a loop: each is taken once)
+            p = todo.pop()
+            if p not in mine:
+                mine.add(p)
+                todo += kids.get(p, [])
+        # the mechanisms named in control and off in state: execution speed (EcoQoS, the power-saving cores) and,
+        # from Windows 11, ignoring timer resolution while hidden; Windows 10 knows only the first
+        ways = [Throttling(1, 0x1 | 0x4, 0), Throttling(1, 0x1, 0)]
+        for p in mine:
+            h = k.OpenProcess(0x0200, False, p)         # PROCESS_SET_INFORMATION
+            if h:                                       # 4: ProcessPowerThrottling; the first way Windows takes
+                any(k.SetProcessInformation(h, 4, ctypes.byref(w), ctypes.sizeof(w)) for w in ways)
+                k.CloseHandle(h)
+    except Exception:                                   # a hint to the scheduler: never worth stopping a render for
+        pass
+
+
 def render_one(args):
     film, entry, fps, out, scale, gpu, encoder = args
     st = Stage(Path(film), scale=scale, gpu=gpu)
@@ -281,10 +338,16 @@ def render_one(args):
     part = out.with_name(f"{out.stem}.partial.mp4")      # renamed only once complete, so a resume never trusts half a file
     enc = subprocess.Popen([ffmpeg(), "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(fps), "-i", "-",
                             *encoder_args(encoder, scale), "-r", str(fps), "-g", str(fps * 4), "-video_track_timescale", str(fps * 1000), str(part)], stdin=subprocess.PIPE)
-    t0 = time.time()
+    performance_work()                      # this worker, its browser and its encoder, all started by now
+    t0, spent = time.time(), [0.0, 0.0, 0.0]    # seconds seeking, drawing (the screenshot), handing frames to ffmpeg
     for i in range(n):
+        a = time.perf_counter()
         st.seek(i / fps)
-        enc.stdin.write(st.jpeg())
+        b = time.perf_counter()
+        frame = st.jpeg()
+        c = time.perf_counter()
+        enc.stdin.write(frame)
+        spent[0] += b - a; spent[1] += c - b; spent[2] += time.perf_counter() - c
         if i % 15 == 14:
             _count(15)
     _count(n % 15)
@@ -300,7 +363,7 @@ def render_one(args):
             if k == 19:
                 raise
             time.sleep(0.5)
-    return entry["id"], n, time.time() - t0
+    return entry["id"], n, time.time() - t0, [round(s / max(n, 1) * 1000) for s in spent]
 
 
 def render_settings(scale, fps, gpu, encoder):
@@ -368,29 +431,36 @@ def render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, do
     total = sum(round(j[1]["duration"] * fps) for j in jobs)
     t0, frames = time.time(), 0
     drawn = multiprocessing.Value("q", 0)       # every frame drawn, finished scenes or not, so the estimate is right early
+    seen = [(t0, 0)]                            # (time, frames drawn) at each line, for the speed over the last minute
 
     def progress():
-        el, f = time.time() - t0, drawn.value
+        now, f = time.time(), drawn.value
+        el = now - t0
         if not f:
             return f"{clock(el)} | starting"
-        rate = f / el
+        seen.append((now, f))
+        while now - seen[1][0] >= 60:           # keep as the oldest the newest sample at least a minute old
+            seen.pop(0)
+        rate, (t1, f1) = f / el, seen[0]
+        recent = f" ({(f - f1) / (now - t1):.1f} in the last minute)" if t1 > t0 else ""
         left = (total - f) / rate
         left = (f"about {left / 3600:.1f} h left" if left >= 5400 else f"about {round(left / 60)} min left" if left >= 90
                 else "under 2 min left" if f < total else "all frames drawn")
-        return f"{clock(el)} | {f:,} of {total:,} frames ({100 * f / total:.0f}%), {rate:.1f} frames/s, {left}"
+        return f"{clock(el)} | {f:,} of {total:,} frames ({100 * f / total:.0f}%), {rate:.1f} frames/s{recent}, {left}"
 
     with Pool(workers, initializer=_share, initargs=(drawn,)) as pool:
         it, k = pool.imap_unordered(render_one, jobs), 0
         while k < len(jobs):
             try:
-                sid, n, dt = it.next(timeout=PROGRESS_EVERY)
+                sid, n, dt, ms = it.next(timeout=PROGRESS_EVERY)
             except multiprocessing.TimeoutError:     # no scene finished in the last minute: say how far the rest are
                 print("   " + progress(), flush=True)
                 continue
             k += 1
             done(sid)
             frames += n
-            print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps) | {progress()}", flush=True)
+            print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps; a frame: seek {ms[0]} ms, draw "
+                  f"{ms[1]} ms, to the encoder {ms[2]} ms) | {progress()}", flush=True)
     dt = time.time() - t0
     print(f"rendered {len(jobs)} scenes, {frames} frames in {dt/60:.1f} min ({frames/max(dt, 1e-9):.1f} fps overall)")
 

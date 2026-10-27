@@ -22,7 +22,9 @@ work on other films or on the engine never changes it.
   narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home folder; failing that, it
   is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
 - Rendering takes from under an hour on a big workstation to several hours on a small computer. Stop it at any time
-  (Ctrl+C, or close the window) and run the same command again: finished scenes are kept.
+  (Ctrl+C, or close the window) and run the same command again: finished scenes are kept. It leaves room for other
+  work, keeping memory in use under 80%; on Windows its processes opt out of the power saving that moves background
+  work onto a hybrid processor's power-saving cores.
 
   --version N        render this version of the film (default: its latest)
   --working-copy     render the film's files as they are now, released or not (a draft)
