@@ -38,9 +38,11 @@ this, about 2 to 3 GB a film, and deletes those unused for 90 days.)
 **Each computer sets itself up** on its first run, and remembers what it found:
 
 - a private Python environment in `video/.venv` with Playwright's Chromium, numpy and a bundled ffmpeg;
-- a one-minute check of the graphics card and hardware video encoder (NVIDIA NVENC on Windows, Apple
+- a check, a few minutes long, of the graphics card and hardware video encoder (NVIDIA NVENC on Windows, Apple
   VideoToolbox on a Mac). They draw and encode test frames alongside the software path, and are used only if
-  they match its look and are faster. `--recheck` redoes the check; `--cpu` renders in software for one run;
+  they match its look and are faster. Several ways of drawing on the card are tried, each with a time limit, and
+  the report says how far each got. `--check` redoes the check and stops; `--recheck` redoes it and renders;
+  `--cpu` renders in software for one run;
 - as many scenes at once as its cores and memory allow.
 
 **Narration** travels with the repository: `video/vNN/narration/` holds the film's timing and each scene's

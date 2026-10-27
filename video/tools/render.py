@@ -27,7 +27,7 @@
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
 Needs build/timing.json from tools/tts.py and scenes/<scene>.js (plus optional scenes/<chapter>_common.js).
 """
-import argparse, base64, json, os, shutil, subprocess, sys, time, urllib.parse
+import argparse, base64, json, multiprocessing, os, shutil, subprocess, sys, time, urllib.parse
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -41,18 +41,27 @@ VT_QUALITY = os.environ.get("VT_QUALITY", "80")
 SOFTWARE_GPUS = ("SwiftShader", "Basic Render", "WARP", "llvmpipe", "softpipe")
 
 
-def launch_options(gpu=None):
+GPU_SWITCHES = {"nosandbox": "--disable-gpu-sandbox"}
+
+
+def launch_options(gpu=None, log=None):
     """Chromium launch options. Without gpu: software drawing, the look every audit was made against. With gpu:
     draw on the graphics card, through the headless shell ('shell') or the full browser's new headless mode ('full'),
-    whichever this platform's Chromium accelerates; gpu_status() says whether it really did."""
+    optionally naming ANGLE's back-end and extra switches: 'full:gl', 'full:d3d11:nosandbox' (gpu_check.WAYS lists
+    what is tried). gpu_status() says whether a graphics card really draws. log: a file for Chromium's own log."""
     args = ["--font-render-hinting=none", "--force-color-profile=srgb", "--disable-lcd-text", "--hide-scrollbars"]
+    if log:
+        args += ["--enable-logging", "--v=0", f"--log-file={log}"]
     if not gpu:
         return {"args": ["--disable-gpu", *args]}
-    angle = os.environ.get("FILM_ANGLE") or {"win32": "d3d11", "darwin": "metal"}.get(sys.platform, "vulkan")
+    mode, *rest = gpu.split(":")
+    angle = (rest[0] if rest and rest[0] else None) or os.environ.get("FILM_ANGLE") or \
+        {"win32": "d3d11", "darwin": "metal"}.get(sys.platform, "vulkan")
     args += ["--enable-gpu", "--ignore-gpu-blocklist", "--enable-gpu-rasterization", f"--use-angle={angle}"]
+    args += [GPU_SWITCHES[x] for x in rest[1:] if x in GPU_SWITCHES]
     if angle == "swiftshader":                  # a software stand-in for a graphics card, for testing this path
         args.append("--enable-unsafe-swiftshader")
-    return {"args": args, **({"channel": "chromium"} if gpu == "full" else {})}
+    return {"args": args, **({"channel": "chromium"} if mode == "full" else {})}
 
 
 def gpu_status(browser):
@@ -98,8 +107,9 @@ def serve_files(page, root=VIDEO):
         if f.is_file() and root in f.parents:
             route.fulfill(status=200, body=f.read_bytes(), headers={
                 "Content-Type": TYPES.get(f.suffix.lower(), "application/octet-stream"), "Cache-Control": "no-store"})
-        else:
-            route.fulfill(status=404, body=b"", headers={"Cache-Control": "no-store"})
+        else:   # with a body, so the full browser too opens a missing page as a 404 (an empty one fails the visit)
+            route.fulfill(status=404, body=f"not found: {rel}", headers={
+                "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store"})
 
     page.route(ORIGIN + "/**", answer)
 
@@ -125,13 +135,14 @@ def select(timing, sel):
 
 
 class Stage:
-    def __init__(self, film, debug=False, scale=1, gpu=None):
+    def __init__(self, film, debug=False, scale=1, gpu=None, log=None):
         from playwright.sync_api import sync_playwright
         self.pw = sync_playwright().start()
-        self.browser = self.pw.chromium.launch(**launch_options(gpu))
+        self.browser = self.pw.chromium.launch(**launch_options(gpu, log))
         # the stage is always laid out at 1920x1080; scale only sets how many pixels draw it (2 -> 3840x2160)
         self.page = self.browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=scale)
-        serve_files(self.page, Path(film).parent)
+        self.root = Path(film).parent.resolve()      # the video/ folder whose files the stage is served
+        serve_files(self.page, self.root)
         self.errors = []
         self.page.on("pageerror", lambda e: self.errors.append(str(e)))
         self.page.on("console", lambda m: self.errors.append(m.text) if m.type == "error" else None)
@@ -142,18 +153,21 @@ class Stage:
         self.film, self.debug = film, debug
         self.loaded_chapter = None
 
-    def load(self, entry, tries=3):
+    def load(self, entry, tries=3, wait=60):
+        """Open the stage on a scene and build it; wait: seconds allowed for the page (at most 30) and for the scene."""
         sid = entry["id"]
         url = f"{ORIGIN}/engine/stage.html?film={self.film.name}&scene={sid}"
         for attempt in range(1, tries + 1):
             self.errors.clear()
-            self.page.goto(url)
+            r = self.page.goto(url, timeout=min(30, wait) * 1000)
+            if r and not r.ok:                          # the stage's own files are missing: waiting cannot help
+                raise RuntimeError(f"{sid}: engine/stage.html answered {r.status} (files served from {self.root})")
             # the stage sets __chapterLoaded to true once the engine, the scene and every font are in, or to 'error'
             try:
-                self.page.wait_for_function("window.__chapterLoaded !== undefined", timeout=60000, polling=100)
+                self.page.wait_for_function("window.__chapterLoaded !== undefined", timeout=wait * 1000, polling=100)
                 state, why = self.page.evaluate("[window.__chapterLoaded, window.__loadError]")
             except Exception as e:                      # playwright's TimeoutError
-                state, why = "error", f"not loaded after 60 s ({type(e).__name__})"
+                state, why = "error", f"not loaded after {wait} s ({type(e).__name__})"
             if state is True:
                 break
             if attempt == tries:
@@ -243,6 +257,21 @@ def do_audit(film, timing, ids, step):
     return total
 
 
+PROGRESS_EVERY = 60     # seconds between progress lines while scenes render
+_FRAMES = None          # in each worker: the count of frames drawn by all workers (shared), for the progress lines
+
+
+def _share(counter):
+    global _FRAMES
+    _FRAMES = counter
+
+
+def _count(k):
+    if _FRAMES is not None and k:
+        with _FRAMES.get_lock():
+            _FRAMES.value += k
+
+
 def render_one(args):
     film, entry, fps, out, scale, gpu, encoder = args
     st = Stage(Path(film), scale=scale, gpu=gpu)
@@ -256,6 +285,9 @@ def render_one(args):
     for i in range(n):
         st.seek(i / fps)
         enc.stdin.write(st.jpeg())
+        if i % 15 == 14:
+            _count(15)
+    _count(n % 15)
     enc.stdin.close()
     if enc.wait():
         raise RuntimeError(f"{entry['id']}: ffmpeg failed")
@@ -324,19 +356,41 @@ def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existin
             place(target[s], outdir / f"{s}.mp4")
 
 
+def clock(s):
+    m, s = divmod(int(s), 60)
+    h, m = divmod(m, 60)
+    return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+
+
 def render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done=lambda s: None):
     jobs = sorted([(str(film), timing["scenes"][s], fps, str(target[s]), scale, gpu, encoder) for s in todo],
                   key=lambda j: -j[1]["duration"])
     total = sum(round(j[1]["duration"] * fps) for j in jobs)
     t0, frames = time.time(), 0
-    with Pool(workers) as pool:
-        for k, (sid, n, dt) in enumerate(pool.imap_unordered(render_one, jobs), 1):
+    drawn = multiprocessing.Value("q", 0)       # every frame drawn, finished scenes or not, so the estimate is right early
+
+    def progress():
+        el, f = time.time() - t0, drawn.value
+        if not f:
+            return f"{clock(el)} | starting"
+        rate = f / el
+        left = (total - f) / rate
+        left = (f"about {left / 3600:.1f} h left" if left >= 5400 else f"about {round(left / 60)} min left" if left >= 90
+                else "under 2 min left" if f < total else "all frames drawn")
+        return f"{clock(el)} | {f:,} of {total:,} frames ({100 * f / total:.0f}%), {rate:.1f} frames/s, {left}"
+
+    with Pool(workers, initializer=_share, initargs=(drawn,)) as pool:
+        it, k = pool.imap_unordered(render_one, jobs), 0
+        while k < len(jobs):
+            try:
+                sid, n, dt = it.next(timeout=PROGRESS_EVERY)
+            except multiprocessing.TimeoutError:     # no scene finished in the last minute: say how far the rest are
+                print("   " + progress(), flush=True)
+                continue
+            k += 1
             done(sid)
             frames += n
-            el = time.time() - t0
-            eta = el / frames * (total - frames)
-            print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps) | {100 * frames / total:.0f}% done, "
-                  f"about {eta / 3600:.1f} h left", flush=True)
+            print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps) | {progress()}", flush=True)
     dt = time.time() - t0
     print(f"rendered {len(jobs)} scenes, {frames} frames in {dt/60:.1f} min ({frames/max(dt, 1e-9):.1f} fps overall)")
 
@@ -354,7 +408,7 @@ def main():
     ap.add_argument("--scale", type=float, default=1, help="pixel density: 1 -> 1920x1080, 2 -> 3840x2160")
     ap.add_argument("--out", help="folder for video segments (default build/segments)")
     ap.add_argument("--skip-existing", action="store_true", help="leave segments already in the folder alone (resume)")
-    ap.add_argument("--gpu", choices=["shell", "full"], help="draw on the graphics card (see launch_options)")
+    ap.add_argument("--gpu", help="draw on the graphics card: shell or full, optionally :angle[:nosandbox] (see launch_options)")
     ap.add_argument("--encoder", choices=["x264", "nvenc", "videotoolbox"], default="x264")
     ap.add_argument("--cache", help="keep and reuse rendered scenes here, by fingerprint (see tools/scenekeys.py)")
     a = ap.parse_args()

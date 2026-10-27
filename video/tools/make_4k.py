@@ -31,6 +31,7 @@ work on other films or on the engine never changes it.
   --workers N        scenes rendered at once (default: from CPU cores, memory and the encoder)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
   --recheck          check the graphics card and video encoder again
+  --check            check the graphics card and video encoder again, report, and stop (no rendering)
   --narration ZIP    use this narration pack instead of the repository's narration
   --preset P         x264 preset: slow (default), medium (faster, slightly larger file)
   --only ch18 ...    just these chapters, as a quick test (saved as ..._4K_ch18.mp4)
@@ -164,7 +165,7 @@ def inner_argv(a, folder, version):
     if a.only:
         argv += ["--only", *a.only]
     return argv + [f for f, on in (("--keep-segments", a.keep_segments), ("--cpu", a.cpu),
-                                   ("--recheck", a.recheck or a.gpu_recheck)) if on]
+                                   ("--recheck", a.recheck or a.gpu_recheck), ("--check", a.check)) if on]
 
 
 def use_film(film_dir, meta, version):
@@ -439,7 +440,7 @@ def render_profile(recheck):
             for line in prof["report"]:
                 print("   " + line)
             return prof
-    step("Checking this computer's graphics card and video encoder against software (a minute or two, once)")
+    step("Checking this computer's graphics card and video encoder against software (a few minutes, once)")
     try:
         prof = gpu_check.check(FILM, json.loads((FILM / "build" / "timing.json").read_text()),
                                say=lambda m: print("   " + m, flush=True), keep=FILM / "build" / "gpu_check")
@@ -466,7 +467,7 @@ def prune_cache():
 
 def seg_dir(gpu, encoder):
     # one folder per way of rendering, so a resumed run never mixes scenes drawn or encoded differently
-    profile = f"{gpu or 'cpu'}-{encoder}"
+    profile = f"{(gpu or 'cpu').replace(':', '-')}-{encoder}"
     return FILM / "build" / ("segments_4k" if profile == "cpu-x264" else f"segments_4k_{profile}")
 
 
@@ -486,6 +487,7 @@ def main(argv):
     ap.add_argument("--keep-segments", action="store_true")
     ap.add_argument("--cpu", action="store_true")
     ap.add_argument("--recheck", action="store_true")
+    ap.add_argument("--check", action="store_true")
     ap.add_argument("--gpu", action="store_true", help=argparse.SUPPRESS)            # (the default now)
     ap.add_argument("--gpu-recheck", action="store_true", help=argparse.SUPPRESS)    # (old name of --recheck)
     a = ap.parse_args(argv)
@@ -505,6 +507,19 @@ def main(argv):
     ensure_narration(a.narration)
     from ffbin import frames_and_fps
 
+    if a.check:
+        memo = VENV / "render-profile.json"
+        try:
+            before = json.loads(memo.read_text()) if memo.exists() else None
+        except ValueError:
+            before = None
+        prof = render_profile(True)
+        print(f"\nSaved: from now on this computer draws {'on the GPU (' + prof['gpu'] + ')' if prof['gpu'] else 'in software'}"
+              f" and encodes with {ENCODERS[prof['encoder']]}.")
+        if before and (before.get("gpu"), before.get("encoder")) != (prof["gpu"], prof["encoder"]):
+            print("That is a change, so the next render draws every scene again once (scenes are reused only when "
+                  "drawn and encoded the same way).")
+        return
     prof = {"gpu": None, "encoder": "x264"} if a.cpu else render_profile(a.recheck or a.gpu_recheck)
     gpu, encoder = prof["gpu"], prof["encoder"]
     seg = seg_dir(gpu, encoder)
