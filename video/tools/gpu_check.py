@@ -101,7 +101,8 @@ def kill_tree(p):
 
 def capture_limited(film, timing, picks, gpu, timeout=GPU_TIMEOUT):
     """capture() in a process of its own, stopped with its browser if it is not done within timeout seconds."""
-    with tempfile.TemporaryDirectory() as tmp:
+    # on Windows a stopped process can hold a file a moment longer; leave such a file rather than fail the check
+    with tempfile.TemporaryDirectory(**({"ignore_cleanup_errors": True} if sys.version_info >= (3, 10) else {})) as tmp:
         out = Path(tmp)
         (out / "timing.json").write_text(json.dumps(timing))
         cmd = [sys.executable, str(Path(__file__).resolve()), "--capture", gpu, "--film", str(Path(film).resolve()),
