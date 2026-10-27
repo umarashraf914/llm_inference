@@ -28,7 +28,8 @@ work on other films or on the engine never changes it.
   --working-copy     render the film's files as they are now, released or not (a draft)
   --list             list the films and their versions, and stop
   --out PATH         where to save the film (default: your Downloads folder)
-  --workers N        scenes rendered at once (default: from CPU cores, memory and the encoder)
+  --workers N        scenes rendered at once (default: three quarters of the CPU threads, fewer where memory in
+                     use, other programs included, would pass 80%)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
   --recheck          check the graphics card and video encoder again
   --check            check the graphics card and video encoder again, report, and stop (no rendering)
@@ -55,6 +56,9 @@ KOKORO = {"kokoro-v1.0.onnx": "7d5df8ecf7d4b1878015a32686053fd0eebe2bc3772346087
 # memory per scene rendering at once: Chromium at 3840x2160 (~0.6 GB) plus its encoder (x264 ~1.8 GB, measured;
 # the hardware encoders keep their buffers on the graphics card or media engine)
 GB_PER_WORKER = {"x264": 2.6, "nvenc": 1.0, "videotoolbox": 1.0}
+GB_GPU_DRAWING = 2.0    # more when Chromium draws on the graphics card: its GPU process and the memory it shares with
+                        # the card (measured: 18 scenes at once on an RTX 5000 Ada, with NVENC, held about 50 GB)
+MEMORY_TARGET = 0.8     # as many scenes at once as keep memory in use, other programs included, under this share
 ENCODERS = {"x264": "x264", "nvenc": "NVIDIA NVENC", "videotoolbox": "Apple VideoToolbox"}
 
 
@@ -384,6 +388,8 @@ def ensure_narration(given):
 
 # ---------------------------------------------------------------- machine
 def memory_gb():
+    """(total memory, memory available to programs now) in GB; either is None where it cannot be read."""
+    total = avail = None
     try:
         if os.name == "nt":
             import ctypes
@@ -393,27 +399,40 @@ def memory_gb():
                             ("total", "avail", "ptotal", "pavail", "vtotal", "vavail", "xavail")]
             m = MS(); m.len = ctypes.sizeof(MS)
             ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m))
-            return m.total / 2 ** 30
-        return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2 ** 30
-    except (OSError, ValueError, AttributeError):
-        return None
+            return m.total / 2 ** 30, m.avail / 2 ** 30
+        total = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2 ** 30
+        if sys.platform == "darwin":            # free pages, and those holding cache the system gives up on demand
+            out = subprocess.run(["vm_stat"], capture_output=True, text=True).stdout
+            page = int(re.search(r"page size of (\d+)", out).group(1))
+            avail = page * sum(map(int, re.findall(r"Pages (?:free|inactive|speculative):\s+(\d+)", out))) / 2 ** 30
+        else:
+            with open("/proc/meminfo") as f:
+                avail = next(int(ln.split()[1]) for ln in f if ln.startswith("MemAvailable:")) / 2 ** 20
+    except (OSError, ValueError, AttributeError, StopIteration):
+        pass
+    return total, avail
 
 
 def describe_machine():
-    mem = memory_gb()
+    mem, _ = memory_gb()
     system = {"Darwin": "macOS", "Windows": "Windows"}.get(platform.system(), platform.system())
     return f"{system} ({platform.machine()}), {os.cpu_count()} logical CPUs" + (f", {mem:.0f} GB memory" if mem else "")
 
 
-def default_workers(encoder="x264"):
-    # a worker keeps about 1.3 cores busy (Chromium drawing and JPEG-ing 8 MP frames, less when the GPU draws; the
-    # encoder behind it), so cores and memory set how many scenes render at once
+def default_workers(encoder="x264", gpu=None):
+    """(how many scenes render at once, what sets that number). A worker keeps about 1.3 cores busy (Chromium drawing
+    and JPEG-ing 8 MP frames, less when the GPU draws; the encoder behind it), so three quarters of the processor's
+    threads; fewer where memory in use, counting what is already open, would pass MEMORY_TARGET of the total, so the
+    computer stays usable for other work while it renders."""
     cores = os.cpu_count() or 2
-    w = max(1, round(cores * 0.75))
-    mem = memory_gb()
-    if mem:
-        w = min(w, max(1, int((mem - 3) // GB_PER_WORKER[encoder])))
-    return min(w, 32)
+    w, why = max(1, round(cores * 0.75)), f"for {cores} logical CPUs"
+    total, avail = memory_gb()
+    if total:
+        in_use = total - avail if avail is not None else 3
+        fit = max(1, int((MEMORY_TARGET * total - in_use) // (GB_PER_WORKER[encoder] + (GB_GPU_DRAWING if gpu else 0))))
+        if fit < w:
+            w, why = fit, f"keeping memory in use under {MEMORY_TARGET:.0%}"
+    return (32, "at most 32") if w > 32 else (w, why)
 
 
 def keep_awake():
@@ -531,7 +550,7 @@ def main(argv):
     if not order:
         sys.exit(f"no chapters match {a.only}")
     frames = sum(round(timing["scenes"][s]["duration"] * 30) for s in order)
-    workers = a.workers or default_workers(encoder)
+    workers, why = (a.workers, "as asked") if a.workers else default_workers(encoder, gpu)
     for where in {seg.parent, out.parent if out.parent.exists() else downloads()}:
         free = shutil.disk_usage(where).free / 1e9
         need = 4 + frames / 166140 * 6
@@ -541,7 +560,7 @@ def main(argv):
     keep_awake()
     how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {ENCODERS[encoder]}"
     step(f"Rendering {len(order)} scenes ({frames:,} frames, {frames / 30 / 60:.0f} min of film) at 3840x2160, "
-         f"{workers} at a time, {how}. Stop any time; run the same command to resume.")
+         f"{workers} at a time ({why}), {how}. Stop any time; run the same command to resume.")
     run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,
          "--cache", CACHE, "--workers", workers, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
         env=dict(env(), PRESET=a.preset, CRF=str(a.crf)))
