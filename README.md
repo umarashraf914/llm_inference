@@ -42,8 +42,10 @@ this, about 2 to 3 GB a film, and deletes those unused for 90 days.)
 
 - a private Python environment in `video/.venv` with Playwright's Chromium, numpy and a bundled ffmpeg;
 - a check, a few minutes long, of the graphics card and hardware video encoder (NVIDIA NVENC on Windows, Apple
-  VideoToolbox on a Mac). They draw and encode test frames alongside the software path, and are used only if
-  they match its look and are faster. Several ways of drawing on the card are tried, each with a time limit, and
+  VideoToolbox on a Mac). They draw and encode test frames alongside the software path. The card draws only if
+  it matches the software look and is faster; the hardware encoder is used only if it is as good as x264 and
+  its files about as small (NVENC once made V01 19 GB where x264 makes 2 GB, for no visible gain). Several
+  ways of drawing on the card are tried, each with a time limit, and
   the report says how far each got. `--check` redoes the check and stops; `--recheck` redoes it and renders;
   `--cpu` renders in software for one run;
 - as many scenes at once as its processor and memory allow, keeping memory in use (other programs included)

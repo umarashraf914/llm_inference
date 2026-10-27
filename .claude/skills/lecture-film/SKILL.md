@@ -195,7 +195,8 @@ that. Rendered video never goes into git (`.gitignore` holds `/rendered/`).
   byte, or the next run on Windows executes half-lines.
 - Each computer checks its graphics card and video encoder once against software drawing and keeps
   the result. `make_film --check` redoes the check and reports; on the Windows machine the card
-  draws and NVENC encodes.
+  draws. A hardware encoder must be as good as x264 and about as small: NVENC once passed on
+  quality alone and made V01 19 GB where x264 makes 2 GB, with no visible gain.
 - Scenes at once: three quarters of the CPU threads, fewer if memory in use would pass 80%.
 - The progress line shows frames per second over the whole run and over the last minute. Each
   finished scene shows a frame's time split into seek, draw and encoder: ask for those lines when

@@ -5,9 +5,10 @@
 
 Chromium can draw on the graphics card, through the headless shell or the full browser in new-headless mode. For each
 way, this asks Chromium whether a real graphics card is drawing, renders the same probe frames there and in software
-(the look every audit was made against), compares them pixel by pixel and times both. It also encodes the probe
-frames with this computer's hardware encoder (NVIDIA NVENC, or Apple VideoToolbox on a Mac) and with x264, and
-compares both after decoding. The GPU is used only where it matches software closely and is faster.
+(the look every audit was made against), compares them pixel by pixel and times both. It also encodes three seconds
+of the film with this computer's hardware encoder (NVIDIA NVENC, or Apple VideoToolbox on a Mac) and with x264, and
+compares both after decoding, and their sizes. The GPU draws only where it matches software closely and is faster;
+the hardware encoder is used only where it is as good as x264 and about as small.
 
 Several ways of drawing on the graphics card are tried (WAYS: the headless shell or the full browser, and ANGLE's
 back-ends: Direct3D 11, Direct3D 11 on 12, OpenGL and Vulkan on Windows). Each first gets a quick test: start the
@@ -26,13 +27,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import render  # noqa: E402
 from ffbin import ffmpeg  # noqa: E402
 
-VERSION = 2                     # bump when the choices change, so every computer checks again (a change of way
+VERSION = 3                     # bump when the choices change, so every computer checks again (a change of way
                                 # redraws every scene once, as scenes drawn differently are not reused: so the new
-                                # ways tried since are left to make_4k --check, not forced on a resumed render)
+                                # ways tried since are left to make_4k --check, not forced on a resumed render).
+                                # 3: a hardware encoder must also be about as small as x264
 FRAMES = 8                      # consecutive frames timed per probe
 FAR = 64                        # a pixel is "far off" if a channel differs by more than this (of 255)
 MIN_PSNR, MAX_FAR = 36.0, 0.002  # GPU drawing passes if every probe frame is at least this close
 MAX_LOSS = 1.5                  # dB a hardware encoder may give up against x264
+MAX_SIZE = 1.5                  # times x264's bitrate a hardware encoder may take for that. NVENC once passed on
+                                # quality alone and made V01 19.1 GB where x264 makes 2 GB, for no visible gain
+STRETCH = 90                    # consecutive frames (3 s) the encoders are compared on: most of a film is a diagram
+                                # held under narration with the background's glow drifting, where x264 spends least
+                                # (on separate probe frames NVENC took 3.4x x264's bitrate; over the film, 10x)
 GPU_TIMEOUT = 150               # s a GPU drawing test may take (software drawing needs about 30 s for the same frames)
 QUICK_TIMEOUT = 45              # s the quick test of a way may take
 LOAD_WAIT = 15                  # s the quick test waits for each of: the film's page to load, its scene to be ready
@@ -54,8 +61,8 @@ def probes(timing, n=6):
     return [(s, 0.55) for s in dict.fromkeys(picks)]
 
 
-def capture(film, timing, picks, gpu, scale=2, note=lambda m: None):
-    """Per probe, a run of FRAMES consecutive frames (JPEG bytes) drawn with this gpu mode, and seconds per frame.
+def capture(film, timing, picks, gpu, scale=2, note=lambda m: None, frames=FRAMES):
+    """Per probe, a run of `frames` consecutive frames (JPEG bytes) drawn with this gpu mode, and seconds per frame.
     note(step) is told each step as it starts, so a test that stalls can say where."""
     note("starting the browser")
     st = render.Stage(film, scale=scale, gpu=gpu)
@@ -69,8 +76,8 @@ def capture(film, timing, picks, gpu, scale=2, note=lambda m: None):
             st.load(entry)
             t0 = round(entry["duration"] * frac * 30) / 30
             run = []
-            for i in range(FRAMES):
-                note(f"drawing {sid}, frame {i + 1} of {FRAMES}")
+            for i in range(frames):
+                note(f"drawing {sid}, frame {i + 1} of {frames}")
                 a = time.perf_counter()
                 st.seek(t0 + i / 30)
                 run.append(st.jpeg())
@@ -348,12 +355,21 @@ def check(film, timing, say=print, ways=WAYS, allow_software=False, keep=None):
         if ok is not True:
             log(f"{NAMES[enc]}: not available ({ok})")
             continue
-        x264 = x264 or encoded_quality(ref[:3], "x264")
-        db, mbps = encoded_quality(ref[:3], enc)
-        good = db >= x264[0] - MAX_LOSS
-        log(f"{NAMES[enc]}: {db:.1f} dB at {mbps:.0f} Mbit/s, against x264's {x264[0]:.1f} dB at {x264[1]:.0f} Mbit/s "
-            f"-> {'as good' if good else 'not as good, keeping x264'}")
-        if good and (best_db is None or db > best_db):
+        if x264 is None:
+            say(f"encoders: drawing {STRETCH / 30:.0f} s of the film to compare them on")
+            try:
+                stretch = capture(film, timing, picks[len(picks) // 2:][:1], None, frames=STRETCH)[0]
+            except Exception as e:
+                log(f"{NAMES[enc]}: not compared, the film could not be drawn for it ({e}); keeping x264")
+                break
+            x264 = encoded_quality(stretch, "x264")
+        db, mbps = encoded_quality(stretch, enc)
+        good, size = db >= x264[0] - MAX_LOSS, mbps / x264[1]
+        verdict = ("not as good, keeping x264" if not good else
+                   f"as good, but {size:.1f}x the size: keeping x264" if size > MAX_SIZE else "as good and about as small")
+        log(f"{NAMES[enc]}: {db:.1f} dB at {mbps:.1f} Mbit/s, against x264's {x264[0]:.1f} dB at {x264[1]:.1f} Mbit/s "
+            f"-> {verdict}")
+        if good and size <= MAX_SIZE and (best_db is None or db > best_db):
             decision["encoder"], best_db = enc, db
 
     best_s = None

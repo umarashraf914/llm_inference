@@ -16,9 +16,9 @@ work on other films or on the engine never changes it.
 
 - Each computer sets itself up on its first run: a private Python environment in video/.venv (Playwright with its
   own Chromium, numpy, a bundled ffmpeg), GSAP from npm, and a check of the graphics card and hardware video
-  encoder (NVIDIA NVENC, Apple VideoToolbox) against the software path. Whatever matches the software look and is
-  faster is used from then on. The result stays on that computer: --recheck redoes it, --cpu renders in software
-  for one run.
+  encoder (NVIDIA NVENC, Apple VideoToolbox) against the software path. The card draws from then on if it matches
+  the software look and is faster; the hardware encoder is used if it is as good as x264 and its files about as
+  small. The result stays on that computer: --recheck redoes it, --cpu renders in software for one run.
 - Narration: from the repository (video/vNN/narration, kept up to date by git pull); failing that, the film's
   narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home folder; failing that, it
   is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
@@ -450,20 +450,20 @@ def keep_awake():
 
 def render_profile(recheck):
     """How this computer renders (gpu_check.check): worked out on its first run and remembered, so every later run,
-    and a resumed one above all, renders the same way."""
+    and a resumed one above all, renders the same way. A changed check (gpu_check.VERSION) runs again once."""
     import gpu_check
     memo = VENV / "render-profile.json"
-    if memo.exists() and not recheck:
-        try:
-            prof = json.loads(memo.read_text())
-        except ValueError:
-            prof = {}
-        if prof.get("version") == gpu_check.VERSION:
-            step("This computer renders as its first-run check found (--recheck redoes it):")
-            for line in prof["report"]:
-                print("   " + line)
-            return prof
-    step("Checking this computer's graphics card and video encoder against software (a few minutes, once)")
+    try:
+        before = json.loads(memo.read_text()) if memo.exists() else None
+    except ValueError:
+        before = None
+    if before and not recheck and before.get("version") == gpu_check.VERSION:
+        step("This computer renders as its first-run check found (--recheck redoes it):")
+        for line in before["report"]:
+            print("   " + line)
+        return before
+    again = " again, as the check has changed since this computer last ran it" if before and not recheck else ""
+    step(f"Checking this computer's graphics card and video encoder against software{again} (a few minutes, once)")
     try:
         prof = gpu_check.check(FILM, json.loads((FILM / "build" / "timing.json").read_text()),
                                say=lambda m: print("   " + m, flush=True), keep=FILM / "build" / "gpu_check")
@@ -471,6 +471,9 @@ def render_profile(recheck):
         print(f"   the check failed ({e}); rendering in software this time")
         return {"gpu": None, "encoder": "x264"}
     memo.write_text(json.dumps(prof))
+    if before and (before.get("gpu"), before.get("encoder")) != (prof["gpu"], prof["encoder"]):
+        print("   That is a change, so the next render draws every scene again once (scenes are reused only when "
+              "drawn and encoded the same way).")
     return prof
 
 
@@ -531,17 +534,9 @@ def main(argv):
     from ffbin import frames_and_fps
 
     if a.check:
-        memo = VENV / "render-profile.json"
-        try:
-            before = json.loads(memo.read_text()) if memo.exists() else None
-        except ValueError:
-            before = None
-        prof = render_profile(True)
+        prof = render_profile(True)            # says too whether that changes how this computer renders
         print(f"\nSaved: from now on this computer draws {'on the GPU (' + prof['gpu'] + ')' if prof['gpu'] else 'in software'}"
               f" and encodes with {ENCODERS[prof['encoder']]}.")
-        if before and (before.get("gpu"), before.get("encoder")) != (prof["gpu"], prof["encoder"]):
-            print("That is a change, so the next render draws every scene again once (scenes are reused only when "
-                  "drawn and encoded the same way).")
         return
     prof = {"gpu": None, "encoder": "x264"} if a.cpu else render_profile(a.recheck or a.gpu_recheck)
     gpu, encoder = prof["gpu"], prof["encoder"]
