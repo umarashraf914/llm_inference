@@ -71,8 +71,14 @@ a rule, its finding is named in brackets; every other rule is checked by eye, in
    When a loop ends, its arrows, badges and labels dim together. The user called ch04_s05 (a token
    going three places) "not aligned, arrows are weird"; it was redrawn this way.
 4. **An icon is a picture too.** Lines meet its middle, and labels keep clear of it [text-on-icon].
-   Real-world objects use `fluent:*` icons and UI symbols `ph:*-duotone`. Find ids with
-   `tools/build_icons.py --search <word>`, then run it bare to bundle them.
+   Icons come from the library in `icons/` (131,000 free icons in 46 sets; its README says which set
+   for what), and its kit first: `icons/kit/sheets/` shows the 655 picked for these lectures. Brands
+   are `lobe:` (AI) and `logos:`, things `fluent-emoji:`, interface ideas `fluent-color:`, glyphs
+   tinted by the scene `ph:*-duotone`. The user found V01's icons generic and asked for "very
+   production quality": a picture icon beats a glyph wherever the frame shows a thing. One family
+   per frame, and look at an icon on the films' background before using it
+   (`tools/build_icons.py --sheet out.jpg <ids>`): black outlines and dark wordmarks vanish on navy.
+   Find ids with `--search <word>`, then run `build_icons.py` bare to bundle them.
 
 ### Rows of pictures
 

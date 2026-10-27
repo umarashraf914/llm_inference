@@ -1,109 +1,42 @@
 #!/usr/bin/env python3
-"""Bundle the icons the scenes use into engine/icons.generated.js, and search the icon sets.
+"""Bundle the icons the scenes use into engine/icons.generated.js; search the icon library and see its icons.
 
-Icon ids used in scene code:
-  ph:<name>[-duotone|-fill|-bold|-light|-thin]   Phosphor (MIT)      e.g. ph:cpu-duotone
-  lucide:<name>                                 Lucide (ISC)        e.g. lucide:server
-  tabler:<name> / tabler-filled:<name>          Tabler (MIT)        e.g. tabler:database
-  fluent:<name>                                 Fluent Emoji Flat (MIT, full colour)  e.g. fluent:laptop
-  carbon:<name>                                 IBM Carbon (Apache-2.0)
-  ms:<name>                                     Material Symbols (Apache-2.0)
+Icon ids in scene code are <prefix>:<name>, from the library's sets (tools/iconlib.py, icons/README.md), e.g.
+  lobe:claude-color  logos:nvidia  fluent-emoji:robot  fluent-color:chat-48  ph:cpu-duotone  solar:server-bold-duotone
 
-  python3 video/tools/build_icons.py              # scan scenes, write the bundle
-  python3 video/tools/build_icons.py --search gpu # list matching ids in every set
+  python3 video/tools/build_icons.py                         # scan the scenes, write the bundle
+  python3 video/tools/build_icons.py --search gpu            # matching ids, best first, in every set
+  python3 video/tools/build_icons.py --search gpu --family objects --limit 40
+  python3 video/tools/build_icons.py --sheet out.jpg --search robot      # see the matches, on the films' background
+  python3 video/tools/build_icons.py --sheet out.jpg lobe:claude-color logos:nvidia fluent-emoji:robot
+  python3 video/tools/build_icons.py --sets                  # the sets: size, licence, what each is for
+  python3 video/tools/build_icons.py --kit                   # the film kit (icons/kit.json): sheets and SVG files
 """
-import json, os, re, sys
+import argparse, json, os, sys
 from pathlib import Path
 
-VIDEO = Path(__file__).resolve().parents[1]
-NM = VIDEO / "node_modules"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import iconlib  # noqa: E402
+
+VIDEO = iconlib.VIDEO
 OUT = VIDEO / "engine" / "icons.generated.js"
-ID_RE = re.compile(r"""['"`]((?:ph|lucide|tabler|tabler-filled|fluent|carbon|ms):[a-z0-9-]+)['"`]""")
-ICONIFY = {"fluent": "fluent-emoji-flat", "carbon": "carbon", "ms": "material-symbols"}
-WRAP_ATTRS = ("fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin")
-_iconify_cache = {}
+KIT = iconlib.REPO / "icons" / "kit.json"
 
 
-def iconify(prefix):
-    if prefix not in _iconify_cache:
-        _iconify_cache[prefix] = json.loads((NM / "@iconify-json" / ICONIFY[prefix] / "icons.json").read_text())
-    return _iconify_cache[prefix]
-
-
-def svg_file(path):
-    s = path.read_text()
-    root = re.search(r"<svg([^>]*)>", s).group(1)
-    vb = [float(x) for x in re.search(r'viewBox="([^"]+)"', root).group(1).split()]
-    body = re.sub(r"^.*?<svg[^>]*>|</svg>\s*$", "", s, flags=re.S).strip()
-    attrs = " ".join(f'{k}="{v}"' for k, v in re.findall(r'([a-z-]+)="([^"]*)"', root) if k in WRAP_ATTRS)
-    if attrs:
-        body = f"<g {attrs}>{body}</g>"
-    return vb, body
-
-
-def resolve(icon_id):
-    prefix, name = icon_id.split(":", 1)
-    if prefix == "ph":
-        m = re.search(r"-(duotone|fill|bold|light|thin)$", name)
-        weight = m.group(1) if m else "regular"
-        p = NM / "@phosphor-icons/core/assets" / weight / f"{name}.svg"
-        vb, body = svg_file(p)
-        return {"vb": vb, "body": body, "mono": True}
-    if prefix == "lucide":
-        vb, body = svg_file(NM / "lucide-static/icons" / f"{name}.svg")
-        return {"vb": vb, "body": body, "mono": True}
-    if prefix in ("tabler", "tabler-filled"):
-        sub = "filled" if prefix == "tabler-filled" else "outline"
-        vb, body = svg_file(NM / "@tabler/icons/icons" / sub / f"{name}.svg")
-        return {"vb": vb, "body": body, "mono": True}
-    if prefix in ICONIFY:
-        d = iconify(prefix)
-        ic = d["icons"].get(name)
-        if ic is None:
-            alias = d.get("aliases", {}).get(name)
-            if alias:
-                ic = d["icons"][alias["parent"]]
-        if ic is None:
-            raise FileNotFoundError(icon_id)
-        w, h = ic.get("width", d.get("width", 16)), ic.get("height", d.get("height", 16))
-        return {"vb": [0, 0, w, h], "body": ic["body"], "mono": prefix != "fluent"}
-    raise ValueError(f"unknown icon prefix in {icon_id}")
-
-
-def search(term):
-    term = term.lower()
-    hits = []
-    for weight in ("duotone", "fill", "regular"):
-        for p in sorted((NM / "@phosphor-icons/core/assets" / weight).glob(f"*{term}*.svg")):
-            hits.append(f"ph:{p.stem}")
-    hits += [f"lucide:{p.stem}" for p in sorted((NM / "lucide-static/icons").glob(f"*{term}*.svg"))]
-    hits += [f"tabler:{p.stem}" for p in sorted((NM / "@tabler/icons/icons/outline").glob(f"*{term}*.svg"))]
-    for prefix in ICONIFY:
-        d = iconify(prefix)
-        hits += [f"{prefix}:{n}" for n in sorted(d["icons"]) if term in n]
-    return hits
-
-
-def main(argv):
-    if argv[:1] == ["--search"]:
-        for t in argv[1:]:
-            print(f"== {t}")
-            for h in search(t):
-                print(h)
-        return 0
-    if not NM.is_dir():
-        print(f"no {NM.name}/ (run npm install): keeping the committed {OUT.name}")
+def bundle():
+    if not iconlib.NM.is_dir():
+        print(f"no {iconlib.NM.name}/ (run npm install): keeping the committed {OUT.name}")
         return 0
     ids = set()
     for f in list(VIDEO.glob("*/scenes/*.js")) + list(VIDEO.glob("lib/*.js")) + [VIDEO / "engine" / "engine.js"]:
-        ids |= set(ID_RE.findall(f.read_text()))
+        ids |= set(iconlib.ID_RE.findall(f.read_text()))
     out, missing = {}, []
     for i in sorted(ids):
         try:
-            out[i] = resolve(i)
+            out[i] = iconlib.resolve(i)
         except (FileNotFoundError, KeyError, ValueError, AttributeError):
             missing.append(i)
-    # atomic replace: several agents may rebuild at once
+    # atomic replace: a rebuild never leaves half a file
     tmp = OUT.with_suffix(f".{os.getpid()}.tmp")
     tmp.write_text("/* generated by tools/build_icons.py; do not edit */\nwindow.ICONS = " + json.dumps(out, separators=(",", ":")) + ";\n")
     os.replace(tmp, OUT)
@@ -111,6 +44,136 @@ def main(argv):
     for m in missing:
         print(f"MISSING {m}  (try: python3 video/tools/build_icons.py --search {m.split(':')[1].split('-')[0]})")
     return 1 if missing else 0
+
+
+def list_sets():
+    total = 0
+    for fam, what in iconlib.FAMILIES.items():
+        print(f"\n== {fam}: {what}")
+        for prefix, _, f, tier, use in iconlib.SETS:
+            if f != fam:
+                continue
+            info = iconlib.set_info(prefix)
+            total += info["total"] or 0
+            lic = info["license"].get("spdx") or info["license"].get("title")
+            print(f"  {prefix:<28} {info['total']:>6}  {'colour' if info['colour'] else 'one colour':<10} tier {tier}  "
+                  f"{lic:<10} {info['name']}: {use}")
+    print(f"\n{total:,} icons in {len(iconlib.SETS)} sets")
+
+
+# what the library overview shows of a set: its makers' samples, then the first names holding these words
+SAMPLE_WORDS = ["robot", "brain", "chip", "cpu", "server", "database", "cloud", "rocket", "clock", "chart", "chat", "gear",
+                "user", "lightning", "fire", "globe", "lock", "key", "book", "python", "nvidia", "google", "docker", "folder"]
+LOBE_SAMPLES = ["claude-color", "openai", "nvidia-color", "gemini-color", "meta-color", "deepseek-color", "qwen-color",
+                "mistral-color", "huggingface-color"]
+
+
+def library_sheets(root):
+    """icons/library_<n>.jpg: every set in the library, a row each: what it is, then nine of its icons."""
+    pages = []
+    groups = [("Colour sets: brands, things, interface, files", ("brands", "objects", "ui", "code")),
+              ("One-colour sets: symbols the scene tints", ("glyphs",))]
+    for n, (title, fams) in enumerate(groups, 1):
+        cells, total, count = [], 0, 0
+        for prefix, _, fam, tier, use in iconlib.SETS:
+            if fam not in fams:
+                continue
+            info = iconlib.set_info(prefix)
+            total += info["total"] or 0
+            count += 1
+            pool = iconlib.names(prefix)
+            have = set(pool)
+            picks = LOBE_SAMPLES if prefix == "lobe" else []
+            if iconlib.source(prefix)[0] == "iconify":
+                meta = json.loads((iconlib.NM / "@iconify-json" / iconlib.source(prefix)[1] / "info.json").read_text())
+                picks = [s for s in meta.get("samples", []) if s in have]
+            for w in SAMPLE_WORDS:
+                if len(picks) >= 9:
+                    break
+                hit = next((x for x in pool if w in x.split("-") and x not in picks), None)
+                if hit:
+                    picks.append(hit)
+            picks = (picks + [x for x in pool if x not in picks])[:9]
+            lic = info["license"].get("spdx") or info["license"].get("title")
+            cells.append(("label", f"{info['name']}", f"{prefix}:  {info['total']:,} icons · {lic} · tier {tier}"))
+            cells += [(f"{prefix}:{p}", None) for p in picks]
+        sub = f"{count} sets, {total:,} icons."
+        pages.append((root / f"library_{n}.jpg", iconlib.sheet_html(cells, title, sub, cols=10, icon=64)))
+    return pages
+
+
+def kit():
+    """icons/kit.json -> icons/kit/sheets/<topic>.jpg (every concept and its icons, on the films' background) and
+    icons/kit/svg/<prefix>/<name>.svg (one standalone file per icon); and icons/library_<n>.jpg, every set."""
+    spec = json.loads(KIT.read_text(encoding="utf-8"))
+    root = KIT.parent / "kit"
+    pages, used = [], set()
+    for n, topic in enumerate(spec["topics"], 1):
+        cells = []
+        for c in topic["concepts"]:
+            for k, icon in enumerate(c["icons"]):
+                cells.append((icon, c["name"] if k == 0 else None))
+                used.add(icon)
+        sub = f"{len(topic['concepts'])} concepts, {len(cells)} icons. {topic.get('note', '')}".strip()
+        pages.append((root / "sheets" / f"{n:02d}_{topic['id']}.jpg",
+                      iconlib.sheet_html(cells, topic["title"], sub, cols=topic.get("cols", 8))))
+    bad = []
+    for icon in sorted(used):
+        prefix, name = icon.split(":", 1)
+        try:
+            text = iconlib.svg_text(icon)
+        except (KeyError, FileNotFoundError, ValueError):
+            bad.append(icon)
+            continue
+        f = root / "svg" / prefix / f"{name}.svg"
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(text, encoding="utf-8")
+    keep = {root / "svg" / i.split(":")[0] / f"{i.split(':', 1)[1]}.svg" for i in used}
+    for f in (root / "svg").glob("*/*.svg"):        # icons dropped from the kit
+        if f not in keep:
+            f.unlink()
+    for f in (root / "sheets").glob("*.jpg"):
+        if f not in {p for p, _ in pages}:
+            f.unlink()
+    iconlib.render_sheets(pages + library_sheets(KIT.parent))
+    print(f"{len(spec['topics'])} sheets in {(root / 'sheets').relative_to(iconlib.REPO)}, "
+          f"{len(used) - len(bad)} icons in {(root / 'svg').relative_to(iconlib.REPO)}")
+    for b in bad:
+        print(f"MISSING {b}")
+    return 1 if bad else 0
+
+
+def main(argv):
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("ids", nargs="*", help="icon ids for --sheet")
+    ap.add_argument("--search", nargs="+", metavar="WORDS", help="each argument is one search (quote several words)")
+    ap.add_argument("--family", choices=list(iconlib.FAMILIES))
+    ap.add_argument("--set", dest="prefixes", nargs="+", metavar="PREFIX")
+    ap.add_argument("--limit", type=int, default=60)
+    ap.add_argument("--sheet", metavar="OUT", help="draw the icons (ids, or the --search hits) into this image")
+    ap.add_argument("--cols", type=int, default=8)
+    ap.add_argument("--sets", action="store_true")
+    ap.add_argument("--kit", action="store_true")
+    a = ap.parse_args(argv)
+    if a.sets:
+        return list_sets()
+    if a.kit:
+        return kit()
+    if a.search or a.sheet:
+        found = []
+        for term in a.search or []:
+            hits = iconlib.search(term, a.prefixes, a.family, a.limit)
+            found += [(h, None) for h in hits if (h, None) not in found]
+            if not a.sheet:
+                print(f"== {term} ({len(hits)}{'+' if len(hits) == a.limit else ''})")
+                print("\n".join(hits))
+        if a.sheet:
+            cells = found + [(i, None) for i in a.ids]
+            title = " · ".join(a.search) if a.search else ""
+            iconlib.render_sheets([(a.sheet, iconlib.sheet_html(cells, title, cols=a.cols))])
+            print(a.sheet)
+        return 0
+    return bundle()
 
 
 if __name__ == "__main__":

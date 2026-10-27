@@ -17,11 +17,13 @@ AMBIENT_SLACK seconds: a shift of 3 or 4 brightness levels in a soft haze, at th
 import hashlib, json, re
 from pathlib import Path
 
+import iconlib
+
 FORMAT = 1                      # bump when capture or encoding changes what a segment looks like
 AMBIENT_SLACK = 10.0            # seconds
 DEF = re.compile(r"^(?:async\s+function|function|const|let|var|class)\s+([A-Za-z_$][\w$]*)|^window\.([A-Za-z_$][\w$]*)\s*=", re.M)
 IDENT = re.compile(r"[A-Za-z_$][\w$]*")
-ICON = re.compile(r"""['"`]((?:ph|lucide|tabler|tabler-filled|fluent|carbon|ms):[a-z0-9-]+)['"`]""")
+ICON = iconlib.ID_RE         # an icon id in scene code, from any set in the library
 
 
 def sha(data):

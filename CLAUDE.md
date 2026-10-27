@@ -20,6 +20,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | `transcripts/` | Caption files, one per video (see below) |
 | `plans/depth_pass/` | The plan for deepening every atlas to high-school maths: one review per atlas, and a README |
 | `video/` | The motion-graphics films: `vNN/` per film (script, scenes, `narration/`, `film.json`), the engine, and `tools/` |
+| `icons/` | The icon library the films draw from (46 free sets, 131,000 icons, installed by npm) and its kit of 655 picked for these lectures, with sheets |
 | `make_film.bat`, `make_film.command` | Double-click launchers that render a finished film in 4K on the user's own computers |
 | `rendered/` | The finished 4K films, on the computers that rendered them (ignored by git) |
 

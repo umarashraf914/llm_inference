@@ -180,9 +180,13 @@ secondary contrast (negative values, a second series). Text is `ink` (white) or 
   (1.2–1.8 s, power2.inOut).
 - Never let two things fight for attention in the same half-second.
 
-**Icons.** `fluent:*` (full colour) for real-world objects: laptop, office-building, globe, books,
-stopwatch, money-bag, gear, light-bulb. `ph:*-duotone` for symbols in UI style: cpu, database,
-memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids with
+**Icons.** From the library in `icons/` (its README says which set for what), and its kit first:
+`icons/kit/sheets/` shows the 655 icons picked for these lectures, by topic. Brands: `lobe:<brand>-color`
+for AI labs and tools, `logos:` for other technology. Real-world things and ideas: `fluent-emoji:`
+(robot, brain, rocket, stopwatch, money-bag, truck, fire, snowflake). Interface ideas: `fluent-color:`
+(chat, agents, database, document). Symbols in diagrams, tinted by meaning: `ph:*-duotone` (cpu,
+database, timer, arrows, check-circle, x-circle). Keep one family per frame, and check an icon on the
+films' background first: `python3 tools/build_icons.py --sheet out.jpg <ids>`. Find ids with
 `python3 tools/build_icons.py --search <word>`, then run `build_icons.py` (no args) to bundle.
 
 **Joining pictures.** The user spotted these faults in V01 and the audit cannot see them, so plan
