@@ -21,6 +21,7 @@ from the Google Drive folder `Inference_Engineering` (last modified 2026-09-03/0
 | `plans/depth_pass/` | The plan for deepening every atlas to high-school maths: one review per atlas, and a README |
 | `video/` | The motion-graphics films: `vNN/` per film (script, scenes, `narration/`, `film.json`), the engine, and `tools/` |
 | `make_film.bat`, `make_film.command` | Double-click launchers that render a finished film in 4K on the user's own computers |
+| `rendered/` | The finished 4K films, on the computers that rendered them (ignored by git) |
 
 | # | Atlas | Figures | Video |
 |---|---|---|---|
@@ -65,8 +66,11 @@ and the checks that enforce them. The scene guide is `video/v01/ANIMATION_GUIDE.
 Each film is `video/vNN/`, built in a cloud session (narration with `video/tools/tts.py`, scenes, 1080p previews)
 and rendered in 4K on the user's own computers (a Mac and a Windows workstation) by `video/tools/make_4k.py`, which
 the launchers at the repository root run after a `git pull`. The user picks a film and a version from its menu.
-Each computer checks its own GPU and encoder on its first run and keeps the result in `video/.venv`. Rendered video
-never goes into git (`build/` is ignored).
+Each computer checks its own GPU and encoder on its first run and keeps the result in `video/.venv`. The finished
+film is saved in the repository folder, in `rendered/` (for example `rendered/V01_The_Memory_Wall_4K_version4.mp4`),
+not in Downloads: the user asked for that. Rendered video never goes into git (`rendered/` and `build/` are ignored).
+The launchers run `git pull` and then go on reading themselves, and Windows reads a running `.bat` by byte offset:
+change the launchers' text before the `git pull` line only at the same length, byte for byte.
 
 Films keep every version. `video/vNN/film.json` holds the title, the source (lecture, length, YouTube id, atlas,
 transcript) and the versions, each a commit: make_4k renders a version from the repository as it was at that

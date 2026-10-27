@@ -19,7 +19,7 @@ headless Chromium. V01, *The Memory Wall*, is the first: 19 chapters, 156 scenes
 | `video/vNN/scenes/` | one file per scene; `chNN_common.js` holds a chapter's shared builders |
 | `video/vNN/build/` | timing, audio, stills, previews (not in git) |
 | `video/vNN/film.json` | title, source lecture and atlas, released versions |
-| `video/tools/` | `tts`, `render` (stills, audit, video), `where`, `reel`, `release`, `narration_pack`, `make_4k` |
+| `video/tools/` | `tts`, `render` (stills, audit, video), `columns` (rows of pictures), `where`, `reel`, `release`, `narration_pack`, `make_4k` |
 
 The guides sit with V01 and hold for every film: `video/v01/SCRIPT_GUIDE.md` for a chapter's script,
 `video/v01/ANIMATION_GUIDE.md` for the scene API, art direction and technical rules. `PLAN.md` and
@@ -74,56 +74,75 @@ a rule, its finding is named in brackets; every other rule is checked by eye, in
    Real-world objects use `fluent:*` icons and UI symbols `ph:*-duotone`. Find ids with
    `tools/build_icons.py --search <word>`, then run it bare to bundle them.
 
+### Rows of pictures
+
+5. **Pictures under a row of cards are each centred under their own card, and share one centre
+   line.** In ch03_s02 (Router, Scheduler, Memory Manager, Kernels) each picture had its own guessed x
+   and y. The user: "the figures are not centred under each of their names' boxes, and not horizontally
+   in line with each other; this looks ugly."
+   - Lay it out as ch03_s02 does now: take each card's centre (`MID[i]`), fix one centre line (`DY`),
+     and place every picture from those two numbers. What is centred is the picture that stays, not a
+     token passing through it.
+   - `tools/columns.py vNN chNN` (or `all`) finds rows of equal cards and lists each picture off its
+     card's centre or off the row's line. They are places to look at, not verdicts: a bar chart's bars
+     share a baseline on purpose, and a caption under two cards belongs to neither. Its first sweep
+     also found ch03_s03's balance 20 px off its card and ch03_s10's badges at the left ends of their
+     segments.
+
 ### Type
 
-5. **Poppins, labels in Title Case, set by the engine.** This is the user's choice, made after trying
+6. **Poppins, labels in Title Case, set by the engine.** This is the user's choice, made after trying
    faces on real frames. Write every string in lower case, as it is said; a scene never capitalises
    text itself.
-6. **Data stays as written**: draw tokens, example sentences, chat messages, quoted answers and code
+7. **Data stays as written**: draw tokens, example sentences, chat messages, quoted answers and code
    with `case: 'keep'`. `libToken`, the chat window and mono text already do; a `libToken` chip that
    names something takes `case: 'label'`. Measure with the same options you draw with.
-7. **A phrase split over lines is one phrase**: `V.caseLines(['nothing else about', 'the architecture'])`
+8. **A phrase split over lines is one phrase**: `V.caseLines(['nothing else about', 'the architecture'])`
    drawn with `case: 'keep'`, or `S.para`. A smaller or muted second line is a caption of its own.
-8. **One-letter subscripts are real subscripts**: `V.subs('W_K', size)` as `S.text` segments.
-9. **After any change of face or case, audit every scene again and look again.** The switch to
-   Poppins pushed thirty-odd labels into a neighbour, an edge or off screen.
+9. **One-letter subscripts are real subscripts**: `V.subs('W_K', size)` as `S.text` segments.
+10. **After any change of face or case, audit every scene again and look again.** The switch to
+    Poppins pushed thirty-odd labels into a neighbour, an edge or off screen.
 
 ### Room around labels
 
-10. **Size every box from `S.measure` of its label**, with the same size, weight, family and case,
+11. **Size every box from `S.measure` of its label**, with the same size, weight, family and case,
     and room to spare inside: aim for 12 px (the audit flags under 3 px [text-tight]). Never guess a
-    width.
-11. **A label is never on an icon, a line or a box's edge** [text-on-icon, text-on-line,
+    width, and never place one thing beside another at a guessed offset: measure the first and leave a
+    gap. Guessed offsets left ch04_s02's "15 s" under 8 px from its token counter, ch02_s03's "first of many"
+    reading as one phrase with "amortising", ch11_s01's decode pill touching its tag, and ch13_s04's
+    "time saved" filling its weight edge to edge.
+12. **A label is never on an icon, a line or a box's edge** [text-on-icon, text-on-line,
     crosses-shape-edge].
-12. **A label never touches a neighbour.** Two labels on one line never meet end to end
+13. **A label never touches a neighbour.** Two labels on one line never meet end to end
     [text-touch]. A label never sits flush against the box or disc beside it [text-touches-box].
     Before a release, sweep for near misses with `render.py vNN audit all --touch-gap 8` and look at
     each finding: widen the gap wherever a viewer would see two things nearly touching; a single
     sample in mid-motion usually is not one.
-13. **Make room for the largest value a counter reaches**, not its first. In ch17_s05, 22,000
+14. **Make room for the largest value a counter reaches**, not its first. In ch17_s05, 22,000
     tokens/s came within a few pixels of the card beside it. A label inside a growing bar waits
     until the bar can hold it.
 
 ### Saying the right thing
 
-14. **A label belongs to the picture it is on.** The stopwatch on ch12_s02's H100 chart showed the
-    H200's 30 ms; it now reads "one token".
-15. **Every number on screen comes from the script's checks.** Check any new one in Python before it
+15. **A label belongs to the picture it is on**, and sits by the part it explains. The stopwatch on
+    ch12_s02's H100 chart showed the H200's 30 ms; it now reads "one token". In ch16_s08 the sum
+    "7 + 7 + 4" is centred under the 18 it adds up to, worked out from the plate's measured parts.
+16. **Every number on screen comes from the script's checks.** Check any new one in Python before it
     is drawn.
 
 ### Working
 
-16. **The audit reads text; only eyes see alignment, arrows and the story.** For every scene: the
+17. **The audit reads text; only eyes see alignment, arrows and the story.** For every scene: the
     contact sheet for the story, full-size stills for detail, a `--debug` still wherever lines join
     pictures.
-17. **A fault seen once is a pattern until shown otherwise.** The user's note named one laptop and
+18. **A fault seen once is a pattern until shown otherwise.** The user's note named one laptop and
     one server ("this is a general pattern in our video"); the same fault was in five more scenes.
     Fix it film-wide, and fix the shared builder when that is the cause.
-18. **Turn a repeated fault into a check.** The audit's text checks (text-on-icon, text-tight,
+19. **Turn a repeated fault into a check.** The audit's text checks (text-on-icon, text-tight,
     text-touch, text-touches-box) were added while fixing V01, so those faults cannot come back
     unseen. An audit change is an `engine.js` change, which re-renders every scene of every film:
     batch it with other engine work.
-19. **Do the work yourself, in the session.** No sub-agents or multi-agent workflows: while V01 was
+20. **Do the work yourself, in the session.** No sub-agents or multi-agent workflows: while V01 was
     made they used up the user's usage limit again and again ("I just want my video"), and the user
     has asked twice to work without them.
 
@@ -132,15 +151,21 @@ a rule, its finding is named in brackets; every other rule is checked by eye, in
 1. Every beat's `show` is realised, in sync with its words, and every number is right.
 2. The contact sheet reads as a story.
 3. In the stills, nothing overlaps, clips or is tiny. Lines meet whole pictures at their centres,
-   arrows run straight and land on something, and spacing is even.
+   arrows run straight and land on something, and spacing is even. Pictures under a row of cards sit
+   centred under their cards on one line (`tools/columns.py vNN chNN` lists any that do not).
 4. `render.py vNN audit chNN` ends `AUDIT CLEAN`, and `stills` printed no warnings.
 
 ## The user's computers
 
 The user renders in 4K at work and at home by double-clicking `make_film.bat` (a Windows
 workstation: Intel i7, RTX 5000 Ada, 64 GB) or `make_film.command` (a Mac mini M1, 16 GB). Both run
-`tools/make_4k.py` after a `git pull`. Rendered video never goes into git.
+`tools/make_4k.py` after a `git pull`. The film is saved in the repository folder, in `rendered/`
+(for example `rendered/V01_The_Memory_Wall_4K_version4.mp4`), not in Downloads: the user asked for
+that. Rendered video never goes into git (`.gitignore` holds `/rendered/`).
 
+- The launchers update themselves with that `git pull` and then read on, and Windows reads a running
+  `.bat` by byte offset. Change their text above the `git pull` line only at the same length, byte for
+  byte, or the next run on Windows executes half-lines.
 - Each computer checks its graphics card and video encoder once against software drawing and keeps
   the result. `make_film --check` redoes the check and reports; on the Windows machine the card
   draws and NVENC encodes.

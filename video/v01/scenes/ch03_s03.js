@@ -165,7 +165,7 @@ V.scene('ch03_s03', S => {
   S.add(gsap.fromTo(cardBg, { filter: 'none' }, { filter: 'url(#glow-struct)', duration: 0.4, yoyo: true, repeat: 1 }), 'b3~token');
 
   // ---------------------------------------------------------------- b4: a recent inversion: the balance tips from training to inference
-  const BP = { x: 420, y: 520, L: 160, hang: 60 };
+  const BP = { x: TX[0], y: 520, L: 160, hang: 60 };          // centred under the share-of-compute card it pictures
   const bal = S.g();
   S.path({ d: `M${BP.x},${BP.y} L${BP.x},${BP.y + 210} M${BP.x - 44},${BP.y + 210} L${BP.x + 44},${BP.y + 210}`, stroke: 'muted', sw: 5, cap: 'round' }, bal);
   S.path({ d: `M${BP.x - 16},${BP.y + 14} L${BP.x},${BP.y - 6} L${BP.x + 16},${BP.y + 14} Z`, fill: 'muted' }, bal);

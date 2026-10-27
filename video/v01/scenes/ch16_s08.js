@@ -173,7 +173,10 @@ V.scene('ch16_s08', S => {
   rise(warmT, T('b3~thousands') + 0.3, 6);
   const plate = ch16Plate(S, { x: (250 + L.end) / 2, y: 724, hit: '770', pre: '18 tokens' }, W);
   rise(plate, tHit + 0.5, 10);
-  const brk = S.text('7 + 7 + 4', { x: plate.r - 108, y: 776, size: 24, weight: 700, anchor: 'middle', color: 'compute' }, W);
+  // 7 + 7 + 4 sits under the 18 it adds up to (the plate's text ends 32 px inside its right edge)
+  const pm = s => S.measure(s, { size: 30, weight: 800 });
+  const x18 = plate.r - 32 - pm('prefill 18 tokens') + pm('prefill 18') - pm('18') / 2;
+  const brk = S.text('7 + 7 + 4', { x: x18, y: 782, size: 24, weight: 700, anchor: 'middle', color: 'compute' }, W);
   rise(brk, T('b3~eighteen') - 0.1, 6);
 
   // ================================================================ b4: route by prefix

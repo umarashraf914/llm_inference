@@ -8,3 +8,5 @@ figures/*/.order.lock
 figures/*/order.tmp
 video/.versions/
 video/.cache/
+# finished films (video/tools/make_4k.py): they stay on the computer that rendered them
+/rendered/

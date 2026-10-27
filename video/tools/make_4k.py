@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Render a released film in 4K on this computer and save it as one video file in Downloads.
+"""Render a released film in 4K on this computer and save it as one video file in the repository folder, under
+rendered/ (git leaves that folder alone: rendered video never goes into git).
 
   python video/tools/make_4k.py              # asks which film and which version (the latest unless you pick another)
-  python video/tools/make_4k.py v01          # V01's latest version -> Downloads/V01_The_Memory_Wall_4K_version1.mp4
+  python video/tools/make_4k.py v01          # V01's latest version -> rendered/V01_The_Memory_Wall_4K_version4.mp4
   python video/tools/make_4k.py v01 --version 1
   python video/tools/make_4k.py --list       # the films, where each came from, and their versions
 
@@ -29,7 +30,7 @@ work on other films or on the engine never changes it.
   --version N        render this version of the film (default: its latest)
   --working-copy     render the film's files as they are now, released or not (a draft)
   --list             list the films and their versions, and stop
-  --out PATH         where to save the film (default: your Downloads folder)
+  --out PATH         where to save the film (default: rendered/ in the repository folder)
   --workers N        scenes rendered at once (default: three quarters of the CPU threads, fewer where memory in
                      use, other programs included, would pass 80%)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
@@ -48,6 +49,7 @@ VIDEO = TOOLS.parent
 FILM = NAME = PACK = None             # the film being rendered: see use_film()
 VENV = VIDEO / ".venv"
 CACHE = VIDEO / ".cache" / "segments"   # rendered scenes by fingerprint, kept across versions (tools/scenekeys.py)
+RENDERED = VIDEO.parent / "rendered"     # the finished films, in the repository folder (ignored by git)
 CACHE_DAYS = 90                          # a cached scene unused this long is deleted
 REQS = ["playwright==1.56.0", "numpy", "imageio-ffmpeg", "certifi"]
 TTS_REQS = ["kokoro-onnx==0.6.1"]
@@ -546,14 +548,15 @@ def main(argv):
     seg = seg_dir(gpu, encoder)
 
     name = NAME + ("_" + "_".join(a.only) if a.only else "")
-    out = Path(a.out).expanduser().resolve() if a.out else downloads() / f"{name}.mp4"
+    out = Path(a.out).expanduser().resolve() if a.out else RENDERED / f"{name}.mp4"
+    out.parent.mkdir(parents=True, exist_ok=True)
     timing = json.loads((FILM / "build" / "timing.json").read_text())
     order = [s for s in timing["order"] if not a.only or s.split("_")[0] in a.only]
     if not order:
         sys.exit(f"no chapters match {a.only}")
     frames = sum(round(timing["scenes"][s]["duration"] * 30) for s in order)
     workers, why = (a.workers, "as asked") if a.workers else default_workers(encoder, gpu)
-    for where in {seg.parent, out.parent if out.parent.exists() else downloads()}:
+    for where in {seg.parent, out.parent}:
         free = shutil.disk_usage(where).free / 1e9
         need = 4 + frames / 166140 * 6
         if free < need:

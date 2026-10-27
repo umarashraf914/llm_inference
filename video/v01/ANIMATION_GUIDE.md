@@ -190,6 +190,17 @@ them and check them in a `--debug` still.
 - Arrows that fan out leave one point and run straight, level where they can, and each lands on
   something drawn, never in empty space. A badge sits on its arrow with its label beside it, not across
   the line. When a loop ends, its arrows, badges and labels dim together (ch04_s05).
+- Pictures under a row of cards or name plates are each centred under their own card, and all share
+  one centre line. Lay them out as ch03_s02 does: take each card's centre (`MID[i]`), fix one centre
+  line (`DY`), and place every picture from those two numbers, never from a guessed x or y. What is
+  centred is the picture that stays, not a token passing through. The user saw ch03_s02's pictures
+  under Router, Scheduler, Memory Manager and Kernels each at its own height and off its card.
+  `python3 tools/columns.py v01 chNN` (or `all`) lists every picture off its card's centre or off its
+  row's line: places to look at, not verdicts (a bar chart's bars share a baseline on purpose).
+- Place one thing beside another from `S.measure` of the first, with a gap, never at a guessed offset
+  (ch04_s02's "15 s" and its token counter, ch02_s03's "first of many" tag, ch11_s01's decode pill).
+  A label that explains part of another sits under that part, found by measuring the parts (ch16_s08:
+  "7 + 7 + 4" under the 18 it adds up to).
 
 ## Technical rules (these bite)
 

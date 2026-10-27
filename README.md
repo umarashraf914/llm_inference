@@ -25,8 +25,9 @@ V01's faults so that none of them happens again, are in
 
 **To render**, double-click `make_film.bat` (Windows) or `make_film.command` (Mac) at the top of the repository.
 It updates from GitHub and asks which film and which version (press Enter for the newest film's latest
-version), then renders it into Downloads as, for example, `V01_The_Memory_Wall_4K_version1.mp4`. From a
-terminal: `python video/tools/make_4k.py` for the same questions, `make_4k.py v01` for V01's latest version,
+version), then renders it into the `rendered` folder of the repository, beside the launchers, as for example
+`rendered/V01_The_Memory_Wall_4K_version4.mp4` (git leaves that folder alone: rendered video never goes into
+git). From a terminal: `python video/tools/make_4k.py` for the same questions, `make_4k.py v01` for V01's latest version,
 `make_4k.py v01 --version 1` for a particular one, `make_4k.py --list` to see them all.
 
 **Changing a film** costs only what changed. Note the moments you want different, with the film's timestamps
@@ -53,7 +54,7 @@ this, about 2 to 3 GB a film, and deletes those unused for 90 days.)
 audio (Opus, about 50 MB a film), and a run decodes it again whenever `git pull` brings a change. A narration
 pack zip (`V01_narration_pack.zip`) in Downloads still works when there is none.
 
-The result, `Downloads/V01_The_Memory_Wall_4K.mp4` for V01 (about 2 GB), has two audio tracks (with and
+The result, `rendered/V01_The_Memory_Wall_4K_version4.mp4` for V01 (about 2 GB), has two audio tracks (with and
 without the ambient music), soft English subtitles and chapter markers. A run prints a running estimate; stop
 it at any time and run it again to carry on. Keep about 10 GB free. `--only ch18` renders one chapter as a
 quick test; `--help` lists the other options.

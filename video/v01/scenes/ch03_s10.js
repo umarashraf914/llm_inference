@@ -63,7 +63,8 @@ V.scene('ch03_s10', S => {
     S.add(fx.out(g.lbl, { d: 0.3 }), SLIDE - 0.1);
     S.add(gsap.to(g.bar, { x: r.sx - RX, y: SY - RY[i], duration: 0.8, ease: 'power3.inOut' }), SLIDE + i * 0.08);
     S.add(gsap.to(g.val, { x: r.sx + r.w / 2 - (RX + r.w + 16), y: SY - RY[i], autoAlpha: 0, duration: 0.6, ease: 'power3.inOut' }), SLIDE + i * 0.08);
-    if (g.badge) S.add(gsap.to(g.badge, { x: r.sx - RX, y: SY + 52 - RY[i], duration: 0.8, ease: 'power3.inOut' }), SLIDE + i * 0.08);
+    // the badge lands centred under its own segment, saying whose it is
+    if (g.badge) S.add(gsap.to(g.badge, { x: r.sx + r.w / 2 - RX - 22, y: SY + 52 - RY[i], duration: 0.8, ease: 'power3.inOut' }), SLIDE + i * 0.08);
     // the value, inside its segment once the bar lands
     g.inVal = S.text(fmtN(r.tok), { x: r.sx + r.w / 2, y: SY + 1, size: r.w > 100 ? 28 : 24, anchor: 'middle', weight: 700, family: 'mono', color: '#0a0f1e' });
     S.set(g.inVal, { autoAlpha: 0 }, 0);

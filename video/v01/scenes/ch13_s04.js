@@ -97,15 +97,19 @@ V.scene('ch13_s04', S => {
   S.circle({ x: 960, y: 700, r: 8, fill: 'muted' }, bal);
   const beam = S.path({ d: 'M0,0', stroke: 'ink', sw: 5 }, bal);
   const panL = S.g(null, bal), panR = S.g(null, bal);
+  // both weights as wide as the longer label needs, with room inside; the pans a little wider still
+  const WT = { size: 26, weight: 750 };
+  const PW = Math.max(S.measure('space', WT), S.measure('time saved', WT)) + 36, PAN = PW / 2 + 14;
   [panL, panR].forEach(p => {
-    S.path({ d: 'M-70,0 L0,-62 L70,0', stroke: 'muted', sw: 2 }, p);
-    S.path({ d: 'M-84,0 Q0,26 84,0 Z', fill: '#1a2133', stroke: 'muted', sw: 2.5 }, p);
+    S.path({ d: `M${-PAN + 14},0 L0,-62 L${PAN - 14},0`, stroke: 'muted', sw: 2 }, p);
+    S.path({ d: `M${-PAN},0 Q0,26 ${PAN},0 Z`, fill: '#1a2133', stroke: 'muted', sw: 2.5 }, p);
   });
   const space = S.g(null, panL), saved = S.g(null, panR);
-  S.rect({ x: -66, y: -58, w: 132, h: 54, r: 10, fill: 'url(#solid-bytes)' }, space);
-  S.text('space', { x: 0, y: -30, size: 26, weight: 750, anchor: 'middle', color: '#0a0f1e' }, space);
-  S.rect({ x: -80, y: -58, w: 160, h: 54, r: 10, fill: 'url(#solid-helps)' }, saved);
-  S.text('time saved', { x: 0, y: -30, size: 26, weight: 750, anchor: 'middle', color: '#0a0f1e' }, saved);
+  [[space, 'space', 'bytes'], [saved, 'time saved', 'helps']].forEach(([wg, s, tone]) => {
+    S.rect({ x: -PW / 2, y: -58, w: PW, h: 54, r: 10, fill: '#1a2133' }, wg);   // opaque: the strings pass behind
+    S.rect({ x: -PW / 2, y: -58, w: PW, h: 54, r: 10, fill: `url(#solid-${tone})` }, wg);
+    S.text(s, { x: 0, y: -30, ...WT, anchor: 'middle', color: '#0a0f1e' }, wg);
+  });
   bal.setAttribute('data-audit', 'ignore');
   const tDrop = tMem + 0.35;
   K.track(space, [K.K(tDrop, { y: -70, o: 0 }), K.K(tDrop + 0.4, { y: 0, o: 1, e: 'bounce.out' })]);

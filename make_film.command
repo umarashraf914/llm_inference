@@ -1,5 +1,5 @@
 #!/bin/bash
-# Render a finished film in 4K on this computer, saved to Downloads. Double-click in Finder, or: ./make_film.command v01
+# Render a film in 4K on this computer, saved in the rendered folder. Double-click in Finder or: ./make_film.command v01
 # Updates from GitHub first; video/tools/make_4k.py --help lists the options.
 cd "$(dirname "$0")" || exit 1
 git pull --ff-only || echo "(Could not update from GitHub; rendering the copy on this computer.)"

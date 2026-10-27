@@ -67,7 +67,9 @@ V.scene('ch02_s03', S => {
   S.add(fx.dim([counter, cLbl, cWork, low], { to: 0.3 }), 'b3');
   const fixed = S.text('fixed cost ÷ lots of work → tiny', { x: 960, y: 408, size: 32, anchor: 'middle', color: 'helps', weight: 650 });
   const amort = S.text('amortising', { x: 960, y: 456, size: 36, anchor: 'middle', color: 'helps', weight: 700, family: 'display' });
-  const many = S.text('first of many', { x: 960 + 110, y: 458, size: 24, color: 'muted', weight: 550 });
+  // a tag of its own, clear of the word, so the two do not read as one phrase
+  const AMW = S.measure('amortising', { size: 36, weight: 700, family: 'display' });
+  const many = S.pill('first of many', { x: 960 + AMW / 2 + 20, y: 456, anchor: 'start', h: 38, size: 22, padX: 14, tone: 'neutral', color: 'muted' });
   S.add(fx.in(fixed, { from: 'up', d: 0.4 }), 'b3~fixed-0.1');
   S.add(fx.in(amort, { from: 'up', d: 0.4 }), 'b3~amortising-0.1');
   S.add(fx.in(many, { from: 'left', d: 0.35 }), 'b3~comes');

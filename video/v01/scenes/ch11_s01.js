@@ -185,9 +185,11 @@ V.scene('ch11_s01', S => {
   fade(gauge, 0, 1, tCB + 0.3, 0.3);
   whole(t => aGlow.setAttribute('opacity', (0.8 * cl((t - tCB) / 0.5) * (1 - cl((t - T('b5') + 0.1) / 0.5))).toFixed(3)));
   fade(spare, 0, 1, tCB + 0.2, 0.4);
-  const mbTag = S.pill('memory bound: arithmetic idle', { x: 960, y: 650, tone: 'bytes', size: 26, h: 48 });
-  const decP = S.pill('decode', { x: 960 + mbTag.w / 2 + 70, y: 650, tone: 'struct', size: 24, h: 42, style: 'solid' });
-  const cbTag = S.pill('compute bound: bandwidth spare', { x: 960, y: 650, tone: 'compute', size: 26, h: 48 });
+  // the tags sit clear of the cards' bottom edge (630): the decode pill reaches under the arithmetic card
+  const TAGY = 680;
+  const mbTag = S.pill('memory bound: arithmetic idle', { x: 960, y: TAGY, tone: 'bytes', size: 26, h: 48 });
+  const decP = S.pill('decode', { x: 960 + mbTag.w / 2 + 16, y: TAGY, anchor: 'start', tone: 'struct', size: 24, h: 42, style: 'solid' });
+  const cbTag = S.pill('compute bound: bandwidth spare', { x: 960, y: TAGY, tone: 'compute', size: 26, h: 48 });
   hide([mbTag, decP, cbTag]);
   fade(mbTag, 0, 1, tMB + 0.2, 0.35);
   S.add(K.drive(0.35, k => { setO(decP, k); decP.setAttribute('transform', `translate(${(40 * (1 - E('back.out(2)')(k))).toFixed(1)},0)`); }), T('b4~like') - 0.1);
