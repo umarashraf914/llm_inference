@@ -184,7 +184,7 @@ function ch20LinkWires(S, opts = {}) {
   const aDieSub = S.text('tensor cores', { x: aX + chipW / 2, y: chipY + 128, size: 20, anchor: 'middle', weight: 600, color: 'muted' }, g);
   const aPhy = S.rect({ x: aX + chipW - 60, y: chipY + 172, w: 50, h: 72, r: 6, fill: S.tone('compute', 0.4), stroke: S.tone('compute'), sw: 1.5 }, g);
   const aPhyLbl = S.text('phy', { x: aX + chipW - 35, y: chipY + 215, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
-  const aSerdesLbl = S.text('serdes transmitter', { x: aX + (chipW - 60) / 2 + 8, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'compute' }, g);
+  const aSerdesLbl = S.text('serdes transmitter', { x: aX + 104, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'compute' }, g);
 
   const bX = cx + 280;
   const bBox = S.rect({ x: bX, y: chipY, w: chipW, h: chipH, r: 12, fill: '#141d2c', stroke: S.tone('helps'), sw: 2 }, g);
@@ -194,7 +194,7 @@ function ch20LinkWires(S, opts = {}) {
   const bDieSub = S.text('tensor cores', { x: bX + chipW / 2, y: chipY + 128, size: 20, anchor: 'middle', weight: 600, color: 'muted' }, g);
   const bPhy = S.rect({ x: bX + 10, y: chipY + 172, w: 50, h: 72, r: 6, fill: S.tone('helps', 0.4), stroke: S.tone('helps'), sw: 1.5 }, g);
   const bPhyLbl = S.text('phy', { x: bX + 35, y: chipY + 215, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
-  const bSerdesLbl = S.text('serdes receiver', { x: bX + 60 + (chipW - 60) / 2 - 8, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'helps' }, g);
+  const bSerdesLbl = S.text('serdes receiver', { x: bX + chipW - 104, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'helps' }, g);
 
   // High-Speed Differential Wire Bundle in between
   const wireX1 = aX + chipW - 10;

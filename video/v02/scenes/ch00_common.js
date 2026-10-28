@@ -82,7 +82,7 @@ function ch00Die(S, opts = {}) {
   S.line({ x1: rbX, y1: cy - half, x2: rbX + 8, y2: cy - half, stroke: S.tone('muted'), sw: 2 }, rightBracket);
   S.line({ x1: rbX, y1: cy + half, x2: rbX + 8, y2: cy + half, stroke: S.tone('muted'), sw: 2 }, rightBracket);
   S.line({ x1: rbX + 4, y1: cy - half, x2: rbX + 4, y2: cy + half, stroke: S.tone('muted'), sw: 2 }, rightBracket);
-  const sideLabel = S.text('29 mm', { x: rbX + 16, y: cy + 6, size: 22, anchor: 'start', color: 'muted', weight: 600, family: 'mono' }, rightBracket);
+  const sideLabel = S.text('29 mm', { x: rbX + 22, y: cy + 6, size: 22, anchor: 'start', color: 'muted', weight: 600, family: 'mono' }, rightBracket);
 
   const areaPill = S.pill('814 mm²', {
     x: cx, y: cy + half + 42, h: 36, tone: 'compute', size: 20, weight: 650, mono: true
