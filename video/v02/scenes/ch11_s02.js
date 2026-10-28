@@ -9,38 +9,38 @@ V.scene('ch11_s02', S => {
   const GX = 960;
 
   // Heading
-  const heading = S.heading('Destructive read and the refresh timer', { y: 110 });
+  const heading = S.heading('destructive read and the refresh timer', { y: 110 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Cycle diagram
+  // Cycle diagram (Atlas Fig 54)
   const cycle = ch11DestructiveCycle(S, { cx: GX, cy: 500 });
 
-  // Concluding Takeaway pill
-  const takeaway = S.pill('DRAM physics sets latency; wire count sets bandwidth', {
-    x: GX, y: 990, h: 48, tone: 'helps', size: 22, weight: 600, style: 'solid'
+  // Takeaway band
+  const takeaway = S.takeaway('dram physics sets latency; wire count sets bandwidth', {
+    tone: 'helps'
   });
 
   // Initial states
-  S.set([cycle.card, cycle.title, cycle.p1Card, cycle.p1Title, cycle.p1Desc1, cycle.p1Desc2], { autoAlpha: 0 });
-  S.set([cycle.p2Card, cycle.p2Title, cycle.p2Desc1, cycle.p2Desc2, cycle.refreshPill], { autoAlpha: 0 });
-  S.set(takeaway, { autoAlpha: 0 });
+  S.set([cycle.bg, cycle.title, cycle.s1Box, cycle.s1Title, cycle.s1Sub, cycle.a1], { autoAlpha: 0 });
+  S.set([cycle.s2Box, cycle.s2Title, cycle.s2Sub, cycle.a2, cycle.s3Box, cycle.s3Title, cycle.s3Sub], { autoAlpha: 0 });
+  S.set([cycle.refBox, cycle.refText1, cycle.summaryPill, takeaway.el], { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: Destructive Read & Drain
-  S.add(fx.in([cycle.card, cycle.title], { from: 'scale', d: 0.5 }), 'b1~Reading-0.2');
-  S.add(fx.in([cycle.p1Card, cycle.p1Title], { from: 'scale', d: 0.5 }), 'b1~destroys-0.2');
-  S.add(fx.in([cycle.p1Desc1, cycle.p1Desc2], { from: 'up', d: 0.4 }), 'b1~charge');
-  S.add(fx.pulse([cycle.p1Card, cycle.p1Title], { scale: 1.05, d: 0.4 }), 'b1~completely.');
+  S.add(fx.in([cycle.bg, cycle.title], { from: 'up', d: 0.5 }), 'b1~Reading-0.2');
+  S.add(fx.in([cycle.s1Box, cycle.s1Title, cycle.s1Sub, cycle.a1], { from: 'fade', d: 0.5 }), 'b1~destroys-0.2');
+  S.add(fx.in([cycle.s2Box, cycle.s2Title, cycle.s2Sub], { from: 'fade', d: 0.4 }), 'b1~charge');
+  S.add(fx.pulse([cycle.s2Box, cycle.s2Title], { scale: 1.05, d: 0.4 }), 'b1~completely.');
 
   // ---------------------------------------------------------------- b2: Mandatory Rewrite & Lock
-  S.add(fx.in([cycle.p2Card, cycle.p2Title], { from: 'scale', d: 0.5 }), 'b2~Every-0.2');
-  S.add(fx.in([cycle.p2Desc1, cycle.p2Desc2], { from: 'up', d: 0.4 }), 'b2~immediate');
-  S.add(fx.pulse([cycle.p2Card, cycle.p2Title], { scale: 1.05, d: 0.4 }), 'b2~blocked');
+  S.add(fx.in([cycle.a2, cycle.s3Box, cycle.s3Title, cycle.s3Sub], { from: 'fade', d: 0.5 }), 'b2~Every-0.2');
+  S.add(fx.pulse([cycle.s3Box, cycle.s3Title], { scale: 1.05, d: 0.4 }), 'b2~blocked');
 
   // ---------------------------------------------------------------- b3: 64 ms refresh timer
-  S.add(fx.in(cycle.refreshPill, { from: 'up', d: 0.5 }), 'b3~controller-0.2');
-  S.add(fx.pulse(cycle.refreshPill, { scale: 1.05, d: 0.4 }), 'b3~sixty-four');
+  S.add(fx.in([cycle.refBox, cycle.refText1], { from: 'up', d: 0.5 }), 'b3~controller-0.2');
+  S.add(fx.pulse(cycle.refBox, { scale: 1.04, d: 0.4 }), 'b3~sixty-four');
 
   // ---------------------------------------------------------------- b4: Physics vs Wire Bandwidth
-  S.add(fx.pulse([cycle.p1Card, cycle.p2Card], { scale: 1.04, d: 0.5 }), 'b4~slower');
-  S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
+  S.add(fx.in(cycle.summaryPill, { from: 'up', d: 0.4 }), 'b4~slower-0.2');
+  S.add(fx.pulse(cycle.summaryPill, { scale: 1.05, d: 0.5 }), 'b4~bandwidth:');
+  S.add(fx.in(takeaway.el, { from: 'up', d: 0.5 }), 'b4>-0.8');
 });
