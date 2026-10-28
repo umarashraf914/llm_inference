@@ -3,7 +3,8 @@
    bars to scale at 20 px per ms. 24 tokens/s vs 33 is the same division on a different chip. */
 V.scene('ch02_s05', S => {
   const { fx } = S;
-  const ROWS = [390, 530, 670], BX = 540, PXMS = 20;
+  const ROWS = [390, 530, 670], BX = 580, PXMS = 20;
+  const CY = 70;   // the chart's block sits this far below where it is drawn (see the end)
   const CH = [
     { name: 'H100', bw: '3.35 TB/s', ms: 41.8, tps: '23.9', tag: ['holds 80 GB: model won’t fit', 'a what-if'], band: '140 GB ÷ 3,350 GB/s = 0.0418 s' },
     { name: 'H200', bw: '4.8 TB/s', ms: 29.17, tps: '34.3', tag: ['holds 141 GB: a tight squeeze'], band: '140 GB ÷ 4,800 GB/s = 0.0292 s' },
@@ -22,8 +23,8 @@ V.scene('ch02_s05', S => {
   const cards = CH.map((c, i) => {
     const g = S.g();
     const y = ROWS[i];
-    S.rect({ x: 120, y: y - 58, w: 390, h: 116, r: 16, fill: '#0c1326' }, g);
-    g.bg = S.rect({ x: 120, y: y - 58, w: 390, h: 116, r: 16, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 }, g);
+    S.rect({ x: 120, y: y - 58, w: 440, h: 116, r: 16, fill: '#0c1326' }, g);
+    g.bg = S.rect({ x: 120, y: y - 58, w: 440, h: 116, r: 16, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.16, sw: 2 }, g);
     S.icon('ph:cpu-duotone', { x: 162, y: y - 22, size: 44, color: 'compute' }, g);
     g.name = S.text([{ t: c.name, c: 'ink', w: 700 }, { t: '  ·  ', c: 'muted', w: 500 }, { t: c.bw, c: 'bytes', w: 650 }], { x: 196, y: y - 22, size: 32 }, g);
     g.tags = c.tag.map((t, k) => S.text(t, { x: 196, y: y + 16 + k * 28, size: 22, color: 'muted', weight: 550 }, g));
@@ -39,7 +40,7 @@ V.scene('ch02_s05', S => {
   S.add(fx.draw(line30, { d: 0.6 }), "b1~Nvidia's+0.4");
   S.add(fx.in([lbl30, scaleTag], { from: 'fade', d: 0.4 }), "b1~Nvidia's+0.6");
   const bars = CH.map((c, i) => S.rect({ x: BX, y: ROWS[i] - 22, w: c.ms * PXMS, h: 44, r: 6, fill: 'url(#bar-bytes)' }));
-  const vals = CH.map((c, i) => S.text(`${c.ms.toFixed(1)} ms`, { x: i === 1 ? 1160 : BX + c.ms * PXMS + 16, y: ROWS[i] + 1, size: 30, family: 'mono', weight: 650, color: 'bytes' }));
+  const vals = CH.map((c, i) => S.text(`${c.ms.toFixed(1)} ms`, { x: i === 1 ? BX + 30 * PXMS + 20 : BX + c.ms * PXMS + 16, y: ROWS[i] + 1, size: 30, family: 'mono', weight: 650, color: 'bytes' }));
   const grow = (i, at) => {
     S.add(gsap.fromTo(bars[i], { attr: { width: 0 } }, { attr: { width: CH[i].ms * PXMS }, duration: 0.8, ease: 'power3.out' }), at);
     S.add(fx.in(vals[i], { from: 'left', d: 0.35 }), S.t(at) + 0.6);
@@ -101,18 +102,28 @@ V.scene('ch02_s05', S => {
   S.add(fx.in(cells[0], { from: 'fade', d: 0.35 }), 'b4~twenty-three');
   const badge = (txt, y) => S.pill(txt, { x: 1710, y, h: 34, size: 20, tone: 'struct', style: 'outline' });
   const b24 = badge('≈ 24 · later', 432);
-  S.add(gsap.to(qR, { x: 1710 - 1360, y: 432 - 248, scale: 0.4, transformOrigin: '50% 50%', duration: 0.5, ease: 'power2.in' }), 'b4~the H');
+  S.add(gsap.to(qR, { x: 1710 - 1360, y: 432 - 248 + CY, scale: 0.4, transformOrigin: '50% 50%', duration: 0.5, ease: 'power2.in' }), 'b4~the H');
   S.add(gsap.to(qR, { autoAlpha: 0, duration: 0.22 }), 'b4~the H');
   S.add(fx.in(b24, { from: 'fade', d: 0.3 }), S.t('b4~the H') + 0.45);
 
   // ---------------------------------------------------------------- b5: same division, different chip
   S.add(fx.in([cells[1], cells[2]], { from: 'fade', d: 0.35, stagger: 0.15 }), 'b5~Same');
   const b33 = badge('33 · rounded from 30 ms', 572);
-  S.add(gsap.to(qL, { x: 1710 - 560, y: 572 - 248, scale: 0.4, transformOrigin: '50% 50%', duration: 0.6, ease: 'power2.in' }), 'b5~Same+0.2');
+  S.add(gsap.to(qL, { x: 1710 - 560, y: 572 - 248 + CY, scale: 0.4, transformOrigin: '50% 50%', duration: 0.6, ease: 'power2.in' }), 'b5~Same+0.2');
   S.add(gsap.to(qL, { autoAlpha: 0, duration: 0.22 }), 'b5~Same+0.2');
   S.add(fx.in(b33, { from: 'fade', d: 0.3 }), S.t('b5~Same') + 0.75);
   S.add(fx.swap(neq, '='), 'b5~different');
   S.add(fx.out(neq, { d: 0.4 }), 'b5~chip+0.4');
   const take = S.takeaway('same division, different chips', { tone: 'bytes' });
   S.add(fx.in(take, { from: 'up', d: 0.5 }), 'b5~a habit-0.2');
+
+  // the chart (cards, bars, the 30 ms line, later the tokens/s column) is one block, CY px down so it sits in the
+  // middle under the rule and its worked line; until the column comes in b4 it is centred on its own (125 px
+  // right), then it makes room
+  const top = new Set([band, bandSub, qR, qL, neq, ...eq.parts.map(p => { let n = p; while (n.parentNode !== S.main) n = n.parentNode; return n; })]);
+  const chart = S.g();
+  [...S.main.children].filter(e => e !== chart && !top.has(e)).forEach(e => chart.appendChild(e));
+  S.main.insertBefore(chart, S.main.firstChild);
+  S.set(chart, { x: 125, y: CY }, 0);
+  S.add(gsap.fromTo(chart, { x: 125 }, { x: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), S.t('b4') - 0.3);
 });

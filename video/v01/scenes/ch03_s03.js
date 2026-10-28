@@ -29,6 +29,14 @@ V.scene('ch03_s03', S => {
 
   const t1 = tile(0, 'Share of AI compute');
   S.add(fx.in(t1, { from: 'up', d: 0.6 }), 0.15);
+  // alone in b1, the first tile stands at the centre; it moves to its place as the other two arrive in b2. The
+  // camera holds the tiles (and in b3 the bands and the card) 100 px lower, centred under the kicker, and eases
+  // back as the balance fills the lower left in b4
+  const t1w = S.g();
+  t1w.appendChild(t1);
+  S.set(t1w, { x: 960 - TX[0] }, 0);
+  S.add(gsap.fromTo(t1w, { x: 960 - TX[0] }, { x: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), T('b2~Big') - 0.85);   // clear of the middle before tile 2 lands there
+  S.xset(S.camera, { x: 0, y: 100, s: 1 });
   const DC = { x: TX[0], y: TY + 230, r: 100, sw: 40 };
   const pt = deg => [DC.x + DC.r * Math.sin(deg * Math.PI / 180), DC.y - DC.r * Math.cos(deg * Math.PI / 180)];
   const arc = (a0, a1) => { const [x0, y0] = pt(a0), [x1, y1] = pt(a1); return `M${x0.toFixed(2)},${y0.toFixed(2)} A${DC.r},${DC.r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)},${y1.toFixed(2)}`; };
@@ -99,7 +107,7 @@ V.scene('ch03_s03', S => {
   S.set(tick, { autoAlpha: 0 }, 0);
   const SPIN = T('b2~a day') - 0.2, SETTLE = SPIN + 0.75;
   S.add(fx.in(tick, { from: 'up', d: 0.35, dist: 12 }), SPIN - 0.1);
-  const hash = (a, b) => { let h = (a * 374761393 + b * 668265263) >>> 0; h = ((h ^ (h >>> 13)) * 1274126177) >>> 0; return (h ^ (h >>> 16)) / 4294967296; };
+  const hash = (a, b) => { let h = (a * 374761393 + b * 668265263) >>> 0; h = ((h ^ (h >>> 13)) * 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };   // unsigned: the spinning digits stay positive
   const paintRate = t => {
     if (t < SPIN) { rate.textContent = ''; return; }
     if (t >= SETTLE) { rate.textContent = 'over 230 million'; return; }
@@ -165,7 +173,7 @@ V.scene('ch03_s03', S => {
   S.add(gsap.fromTo(cardBg, { filter: 'none' }, { filter: 'url(#glow-struct)', duration: 0.4, yoyo: true, repeat: 1 }), 'b3~token');
 
   // ---------------------------------------------------------------- b4: a recent inversion: the balance tips from training to inference
-  const BP = { x: 420, y: 520, L: 160, hang: 60 };
+  const BP = { x: TX[0], y: 520, L: 160, hang: 60 };          // centred under the share-of-compute card it pictures
   const bal = S.g();
   S.path({ d: `M${BP.x},${BP.y} L${BP.x},${BP.y + 210} M${BP.x - 44},${BP.y + 210} L${BP.x + 44},${BP.y + 210}`, stroke: 'muted', sw: 5, cap: 'round' }, bal);
   S.path({ d: `M${BP.x - 16},${BP.y + 14} L${BP.x},${BP.y - 6} L${BP.x + 16},${BP.y + 14} Z`, fill: 'muted' }, bal);
@@ -195,6 +203,7 @@ V.scene('ch03_s03', S => {
     placePan(panR, BP.x + cx, BP.y + sy);
   };
   S.set(bal, { autoAlpha: 0 }, 0);
+  S.add(fx.cam({ d: 0.9, ease: 'power2.inOut' }), 'b4-0.4');
   S.add(fx.in(bal, { from: 'fade', d: 0.5 }), 'b4-0.1');
   S.add(gsap.to(panR.lbl, { attr: { 'font-size': 30 }, duration: 0.3 }), TIP + 0.6);
 

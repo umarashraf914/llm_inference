@@ -13,7 +13,10 @@
    b4  pulses; four teal cards: shrink it, share a common prefix, split across machines, don't store parts.
    b5  cards fade; 'the model', 'the conversation's state'; 'two things, one budget'.
    Layout: panel x 80-900, y 300-680; weights block x 130-550, y 420-580; cache block x 600-720 bottom 580 (five
-   blocks in b3 at x 592 + 58 c, w 48); bus x 900-1360 at y 580; die (1450, 580); users x 1720; readout y 160-262. */
+   blocks in b3 at x 592 + 58 c, w 48); bus x 900-1360 at y 580; die (1450, 580); users x 1720; readout y 160-262.
+   All of it is one pane, centred beat by beat: from scene 10's bars (0, 0) to (+55, +124) as they fold; up to +18
+   when the users come (b3); up to -81 for the four cards (b4, y 765-861, each with its icon and text centred);
+   in b5 the closing line takes the cards' place. */
 V.scene('ch13_s11', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const { fx } = S;
@@ -99,7 +102,7 @@ V.scene('ch13_s11', S => {
   K.draw(bp, 330, tSplit + 0.4, 0.4);
   hide(bp);
   fade(bp, 0, 1, tSplit + 0.4, 0.05);
-  const bT = S.text('one cache per conversation', { x: (cacheX(0) + cacheX(4) + 48) / 2, y: 398, size: 22, weight: 700, anchor: 'middle', color: 'ink' }, brk);
+  const bT = S.text('one cache per conversation', { x: (cacheX(0) + cacheX(4) + 48) / 2, y: 398, size: 20, weight: 700, anchor: 'middle', color: 'ink' }, brk);
   hide(bT);
   fade(bT, 0, 1, tSplit + 0.6, 0.35);
   const shared = S.pill('read once, shared', { x: 340, y: 392, tone: 'helps', size: 22, h: 36 });
@@ -139,7 +142,7 @@ V.scene('ch13_s11', S => {
 
   // ================================================================ the ceiling readout (top right)
   const ro = S.g();
-  const r1 = S.text([{ t: 'tokens/s', c: 'struct' }, { t: ' ≤ ', c: 'muted' }, { t: 'bandwidth', c: 'bytes' }, { t: ' ÷ ', c: 'muted' }, { t: 'bytes per token', c: 'bytes' }], { x: 1400, y: 168, size: 30, weight: 700, anchor: 'middle' }, ro);
+  const r1 = S.text([{ t: 'Tokens/s', c: 'struct' }, { t: ' ≤ ', c: 'muted' }, { t: 'bandwidth', c: 'bytes' }, { t: ' ÷ ', c: 'muted' }, { t: 'bytes per token', c: 'bytes' }], { x: 1400, y: 168, size: 30, weight: 700, anchor: 'middle' }, ro);
   hide(r1);
   fade(r1, 0, 1, T('b1~ceiling') - 0.1, 0.4);
   // line 2, placed token by token: 3.35 TB/s ÷ [140 GB | 173 GB] ≈ [24 → 19] tokens/s
@@ -188,16 +191,26 @@ V.scene('ch13_s11', S => {
   const CARDS = [['ph:arrows-in-duotone', 'shrink it', 'b4~shrinking'], ['ph:users-duotone', 'share a common prefix', 'b4~sharing'], ['ph:hard-drives-duotone', 'split across machines', 'b4~splitting'], ['ph:prohibit-duotone', "don't store parts", 'b4~never']];
   const cards = CARDS.map(([ic, txt, cue], i) => {
     const g = S.g(), x = 100 + 440 * i;
-    S.rect({ x, y: 846, w: 400, h: 96, r: 18, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, g);
-    S.icon(ic, { x: x + 52, y: 894, size: 50, color: 'helps' }, g);
-    S.text(txt, { x: x + 92, y: 895, size: 26, weight: 750, color: 'ink' }, g);
+    const ix = x + 200 - (63 + S.measure(txt, { size: 24, weight: 750 })) / 2 + 25;   // icon and text centred as one
+    S.rect({ x, y: 765, w: 400, h: 96, r: 18, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, g);
+    S.icon(ic, { x: ix, y: 813, size: 50, color: 'helps' }, g);
+    S.text(txt, { x: ix + 38, y: 814, size: 24, weight: 750, color: 'ink' }, g);
     const at = T(cue) - 0.1;
     K.track(g, [K.K(at, { y: 60, o: 0 }), K.K(at + 0.5, { y: 0, o: 1, e: 'power3.out' }), K.K(tB5, { o: 1 }), K.K(tB5 + 0.4, { o: 0 })]);
     return g;
   });
   // ================================================================ b5: two things, one budget
-  const key = S.text('two things, one budget', { x: 490, y: 242, size: 44, weight: 800, anchor: 'middle', color: 'ink' });
+  const key = S.text('two things, one budget', { x: 960, y: 813, size: 44, weight: 800, anchor: 'middle', color: 'ink' });   // where the cards were
   hide(key);
   S.add(K.drive(0.5, k => { setO(key, k); key.setAttribute('transform', `translate(0,${(14 * (1 - E('power3.out')(k))).toFixed(1)})`); }), T('b5~one') - 0.1);
-  void panR; void panT; void five; void cards; void fx; void tB2;
+  // the frame's layout (see the header): the system as one pane, the cards and the closing line outside it
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && !cards.includes(e) && e !== key).forEach(e => pane.appendChild(e));
+  const tUp2 = T('b4~shrinking') - 0.7;
+  whole(t => {
+    const f = EIO(cl((t - tFold) / 1.0));
+    const y = 124 * f - 106 * EIO(cl((t - tB3) / 0.8)) - 99 * EIO(cl((t - tUp2) / 0.6));
+    pane.setAttribute('transform', `translate(${(55 * f).toFixed(1)},${y.toFixed(1)})`);
+  });
+  void panR; void panT; void five; void fx; void tB2;
 });

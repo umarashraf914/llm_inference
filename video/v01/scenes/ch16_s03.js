@@ -16,12 +16,12 @@ V.scene('ch16_s03', S => {
   const rise = (e, at, dy = 12, d = 0.4) => { hide(e); S.add(K.drive(d, k => { setO(e, k); e.setAttribute('transform', `translate(0,${(dy * (1 - E('power3.out')(k))).toFixed(1)})`); }), at); };
   const AY = 440, CY = 566, H = 58;
   const ANS = ['The', 'capital', 'of', 'France', 'is', 'Paris', '.'], NEW = ['And', 'its', 'population', '?'];
-  const L = ch16Lay(S, [{ label: 'system', w: 118 }, { label: 'tools', w: 98 }, { label: 'question 1', w: 150 }, ...ANS.map(label => ({ label })), ...NEW.map(label => ({ label }))], { x0: 250, size: 26, pad: 26, minW: 52 });
+  const L = ch16Lay(S, [{ label: 'system', w: 118 }, { label: 'tools', w: 98 }, { label: 'question 1', w: 164 }, ...ANS.map(label => ({ label, case: 'keep' })), ...NEW.map(label => ({ label, case: 'keep' }))], { x0: 250, size: 26, pad: 20, minW: 52 });
   const SEG = L.slice(0, 3), AP = L.slice(3, 10), NP = L.slice(10);
   const XC = AP[6].r + 3;  // where the cache row ends: the first difference
 
   // ================================================================ b1: the conversation so far, and four new tokens
-  const kicker = S.text('case A: continue the chat', { x: 70, y: 150, size: 30, weight: 750, color: 'ink' });
+  const kicker = S.text('case A: continue the chat', { x: 960, y: 150, size: 30, weight: 750, anchor: 'middle', color: 'ink' });   // centred
   rise(kicker, T('b1~Case') - 0.1, 6);
   const score = ch16Score(S, { rows: [{ case: 'time t', hit: 0, pre: 777 }, { case: 'A', hit: 784, pre: 4, at: T('b2~Hit') + 0.6 }] });
   void score;
@@ -36,7 +36,7 @@ V.scene('ch16_s03', S => {
   const arr = L.map((c, i) => {
     const isNew = i >= 10, passT = cur.passAt(c.r);
     const plan = isNew ? [[0, 'blue'], [tHit + 0.06 * (i - 10), 'amber']] : [[0, 'blue'], [passT, 'teal', 0.25]];
-    const cell = ch16Cell(S, { x: c.x, y: AY, w: c.w, h: H, label: c.label, size: 26, plan }, rowA);
+    const cell = ch16Cell(S, { x: c.x, y: AY, w: c.w, h: H, label: c.label, case: c.case, size: 26, plan }, rowA);
     const at = i < 3 ? 0.8 + 0.12 * i : i < 10 ? tAns[i - 3] : tNew[i - 10];
     K.track(cell, [K.K(at, { x: i < 3 ? -24 : 30, o: 0 }), K.K(at + 0.35, { x: 0, o: 1, e: 'power3.out' })]);
     if (i < 3) cell.check(passT);
@@ -68,7 +68,7 @@ V.scene('ch16_s03', S => {
   const rowC = S.g();
   const tWrit = T('b2~cached') - 0.1;
   const cache = L.slice(0, 10).map((c, i) => {
-    const cell = ch16Cell(S, { x: c.x, y: CY, w: c.w, h: H, label: c.label, size: 26, plan: [[0, 'teal']] }, rowC);
+    const cell = ch16Cell(S, { x: c.x, y: CY, w: c.w, h: H, label: c.label, case: c.case, size: 26, plan: [[0, 'teal']] }, rowC);
     const at = i < 3 ? tB2 + 0.1 * i : tWrit + 0.16 * (i - 3);
     K.track(cell, [K.K(at, { y: i < 3 ? 0 : -26, o: 0 }), K.K(at + 0.3, { y: 0, o: 1, e: i < 3 ? 'power2.out' : 'back.out(1.8)' })]);
     if (i >= 3) {

@@ -4,8 +4,8 @@ Full docs: lib/README.md and the doc comment above each function. Helpers return
 ## tokens (lib/tokens.js)
 - `libTokenize(text, o = {splits: {}}) -> string[]`  
   Splits text into plausible LLM tokens: each word with its leading space is one token, punctuation is its own token, and words named in splits break into pieces with their capitalisation kept (e.g.
-- `libToken(S, o = {text:'', x, y, anchor:'middle'|'start', size:30, h, w, minW, padX, r, state:'token', mono, weight:600, id, idPos:'below'|'above'|'inline', idPrefix:'ID ', idSize, idColor, idHidden, icon, iconColor, frame, frameTone, hidden, decorative}, parent) -> <g>`  
-  One token chip: a rounded blue pill with an opaque base, in a colour state.
+- `libToken(S, o = {text:'', x, y, anchor:'middle'|'start', size:30, h, w, minW, padX, r, state:'token', mono, weight:600, id, idPos:'below'|'above'|'inline', idPrefix:'ID ', idSize, idColor, idHidden, icon, iconColor, frame, frameTone, hidden, decorative, case:'keep'|'label'}, parent) -> <g>`  
+  One token chip: a rounded blue pill with an opaque base, in a colour state. Its text is shown as written (a token); case: 'label' for a chip that names something.
   Helpers: .pop .in .out .flyIn([x,y]) .moveTo([x,y]) .moveBy(dx,dy) .travel(pathD|<path>, {appear}) .setState(state) .swap(text,{state}) .pulse .glow({tone,hold}) .unglow .glowId .showId .stripe(tones) .badge(text) .textOff .textOn. Every helper returns a tween or timeline.
 - `libTokenStrip(S, o = {x, y, tokens:[str|{t,id,state,w,icon}], size:30, h, gap:10, padX, w, minW, maxW, lineGap, align:'start'|'middle', vertical, state, shades, mono, weight, ids, idPos, idSize, slots:0, slotW, joined, hidden, window:{n|w,label,size,tone,dashed,pad}, decorative}, parent) -> <g>`  
   A row of token chips, the film's basic picture of text.

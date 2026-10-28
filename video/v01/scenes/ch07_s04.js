@@ -33,13 +33,13 @@ V.scene('ch07_s04', S => {
   // ================================================================ b2: fox is ID 4271, a row number
   S.add(ch07Fade(cnt, 1, 0.4, { d: 0.4 }), T('b2') - 0.1);
   const PY = TB.rows[0].cy, PX = 250;
-  const pill1 = S.pill('fox', { x: PX, y: PY, tone: 'struct', size: 32, h: 60 });
-  const wFox = S.measure('fox', { size: 32, weight: 600 }), wDot = S.measure(' · ', { size: 32, weight: 600 }), wId = S.measure('ID 4271', { size: 32, weight: 600 });
+  const pill1 = S.pill('fox', { x: PX, y: PY, tone: 'struct', size: 32, h: 60, case: 'keep' });
+  const wFox = S.measure('fox', { size: 32, weight: 600, case: 'keep' }), wDot = S.measure(' · ', { size: 32, weight: 600 }), wId = S.measure('ID 4271', { size: 32, weight: 600 });
   const W2 = wFox + wDot + wId + 48;
   const pill2 = S.g();
   S.rect({ x: PX - W2 / 2, y: PY - 30, w: W2, h: 60, r: 16, fill: '#0c1326' }, pill2);
   S.rect({ x: PX - W2 / 2, y: PY - 30, w: W2, h: 60, r: 16, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.7, sw: 2 }, pill2);
-  S.text([{ t: 'fox' }, { t: ' · ', c: 'muted' }, { t: 'ID 4271' }], { x: PX, y: PY + 1, size: 32, weight: 600, anchor: 'middle', color: 'ink' }, pill2);
+  S.text([{ t: 'fox' }, { t: ' · ', c: 'muted' }, { t: 'ID 4271' }], { x: PX, y: PY + 1, size: 32, weight: 600, anchor: 'middle', color: 'ink', case: 'keep' }, pill2);
   const idX = PX - W2 / 2 + 24 + wFox + wDot;
   const idGlow = S.rect({ x: idX - 8, y: PY - 24, w: wId + 16, h: 48, r: 10, fill: 'white', opacity: 0 }, pill2);
   idGlow.setAttribute('data-audit', 'ignore');

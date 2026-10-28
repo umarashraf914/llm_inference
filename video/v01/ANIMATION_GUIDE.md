@@ -22,7 +22,7 @@ takeaway. Smaller API examples: `video/dev/scenes/ch01_s0*.js`. Run everything f
 python3 tools/build_icons.py                          # after adding icon ids
 python3 tools/render.py v01 stills ch05_s02           # end + middle of every beat, and a contact sheet
 python3 tools/render.py v01 stills ch05_s02 --at 12.5,14 --debug   # specific times, with a 120px grid
-python3 tools/render.py v01 audit ch05                # overlapping / off-screen / tiny text, text on lines
+python3 tools/render.py v01 audit ch05                # overlapping / off-screen / tiny / crowded text, text on lines or icons
 ```
 
 Stills land in `v01/build/stills/<scene>/` and `<scene>_sheet.jpg`. **Look at them** (Read the PNG)
@@ -70,9 +70,21 @@ the beat start: check the warnings printed by `stills`.
 
 **Primitives** — `S.rect({x,y,w,h,r,fill,stroke,sw,dash,opacity,filter})`, `S.circle({x,y,r,…})`,
 `S.line({x1,y1,x2,y2,stroke,sw,dash})`, `S.path({d,stroke,sw,fill})`, `S.g()`,
-`S.text(str | [{t,c,w,f,s}], {x,y,size,weight,color,anchor,family:'sans'|'display'|'mono',ls,maxW})`
+`S.text(str | [{t,c,w,f,s}], {x,y,size,weight,color,anchor,family:'sans'|'display'|'mono',ls,maxW,case})`
 (vertically centred on y), `S.para(str,{x,y,w,size,lh})` (wrapped), `S.icon(id,{x,y,size,color})`
-(centred), `S.measure(str,{size,weight,family})`.
+(centred), `S.measure(str,{size,weight,family,case})`.
+
+**Case.** Write every string as you would say it, in lower case; the engine sets labels in Title Case
+('run the whole model' → 'Run the Whole Model'), and keeps capitals, units (ms, GB/s), acronyms and
+single-letter quantities as written. Text that is data rather than a label must stay as written:
+tokens, example sentences, chat messages, quoted answers, code. Draw it with `case: 'keep'` (and
+measure it with the same option); `libToken`, the chat window and mono text already do. A `libToken`
+chip that names something ('your question') takes `case: 'label'`. Counters and typing effects are cased
+like the text they write into, so a scene never capitalises a string itself. A phrase broken over lines of
+the same style is still one phrase: draw `V.caseLines(['nothing else about', 'the architecture'])` with
+`case: 'keep'` ('Nothing Else About' / 'the Architecture'), or use `S.para`. A second line in a smaller or
+muted style is a caption of its own and starts with a capital. A name with a one-letter subscript is drawn
+with a real subscript: `S.text(V.subs('W_K', 30), { x, y, size: 30 })`.
 
 **Components**
 - `S.heading(title,{y,size,sub})` → `.titleEl .subEl` — scene title band (y≈130–160).
@@ -125,7 +137,8 @@ wrap the element in a `S.g()` holder and xform the holder instead (ch01_s01 does
 ## Art direction
 
 **The look.** Dark, deep navy stage with a soft moving light (already there). Crisp, generous
-typography (Inter; JetBrains Mono for numbers). Opaque cards with a tinted gradient and soft shadow.
+typography (Poppins, labels in Title Case; JetBrains Mono for numbers). Opaque cards with a tinted
+gradient and soft shadow.
 Colour only where it means something. Calm, confident motion. Think Apple keynote meets
 3Blue1Brown: every frame is clean enough to pause on.
 
@@ -135,6 +148,13 @@ a cache hit; blue `struct` = structure, containers, tokens, neutral data; violet
 secondary contrast (negative values, a second series). Text is `ink` (white) or `muted` (grey).
 
 **Composition.**
+- Compose each frame like a slide, from the centre out: plan it from everything it will hold, centre
+  that whole block on the screen (with a heading, in the space under it; with a takeaway, in the space
+  above it), centre a group of boxes as a group and each box's contents in its box. Never start at the
+  top left and draw until the drawing ends. A picture that is alone for a while sits at the centre and
+  moves to its place when its partner arrives; a layout that fills beat by beat keeps each stage
+  centred with a camera offset (`S.xset(S.camera, …)`, then `fx.cam`) or one group's offset, moved only
+  when content arrives or leaves. `tools/compose.py v01 chNN` measures each beat's frame and box.
 - Use the frame. The main object of a scene should span roughly 50–80% of the width. Nothing
   important smaller than it needs to be; no postage-stamp diagrams in a sea of navy.
 - One focal point at a time. When the narration moves on, dim (`fx.dim`, 0.2–0.35) what is no longer
@@ -160,10 +180,38 @@ secondary contrast (negative values, a second series). Text is `ink` (white) or 
   (1.2–1.8 s, power2.inOut).
 - Never let two things fight for attention in the same half-second.
 
-**Icons.** `fluent:*` (full colour) for real-world objects: laptop, office-building, globe, books,
-stopwatch, money-bag, gear, light-bulb. `ph:*-duotone` for symbols in UI style: cpu, database,
-memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids with
+**Icons.** From the library in `icons/` (its README says which set for what), and its kit first:
+`icons/kit/sheets/` shows the 655 icons picked for these lectures, by topic. Brands: `lobe:<brand>-color`
+for AI labs and tools, `logos:` for other technology. Real-world things and ideas: `fluent-emoji:`
+(robot, brain, rocket, stopwatch, money-bag, truck, fire, snowflake). Interface ideas: `fluent-color:`
+(chat, agents, database, document). Symbols in diagrams, tinted by meaning: `ph:*-duotone` (cpu,
+database, timer, arrows, check-circle, x-circle). Keep one family per frame, and check an icon on the
+films' background first: `python3 tools/build_icons.py --sheet out.jpg <ids>`. Find ids with
 `python3 tools/build_icons.py --search <word>`, then run `build_icons.py` (no args) to bundle.
+
+**Joining pictures.** The user spotted these faults in V01 and the audit cannot see them, so plan
+them and check them in a `--debug` still.
+- A line meets each picture at the centre of the *whole* picture: a server with its cache stacked on it,
+  a laptop with its base, a card with its badge, an icon by its middle. Lay it out as ch04_s06 does: fix
+  one centre line first (`LY`), work out each whole picture's height from its parts, centre every
+  picture on that line and run the wire along it. A device's `.port()` is the edge of the device alone;
+  once parts are added to it, take the centre from the whole.
+- A wire always meets something. If its target arrives later, draw the target's place from the start
+  (ch04_s06: the cache's place is a dotted outline until the notes arrive).
+- Arrows that fan out leave one point and run straight, level where they can, and each lands on
+  something drawn, never in empty space. A badge sits on its arrow with its label beside it, not across
+  the line. When a loop ends, its arrows, badges and labels dim together (ch04_s05).
+- Pictures under a row of cards or name plates are each centred under their own card, and all share
+  one centre line. Lay them out as ch03_s02 does: take each card's centre (`MID[i]`), fix one centre
+  line (`DY`), and place every picture from those two numbers, never from a guessed x or y. What is
+  centred is the picture that stays, not a token passing through. The user saw ch03_s02's pictures
+  under Router, Scheduler, Memory Manager and Kernels each at its own height and off its card.
+  `python3 tools/columns.py v01 chNN` (or `all`) lists every picture off its card's centre or off its
+  row's line: places to look at, not verdicts (a bar chart's bars share a baseline on purpose).
+- Place one thing beside another from `S.measure` of the first, with a gap, never at a guessed offset
+  (ch04_s02's "15 s" and its token counter, ch02_s03's "first of many" tag, ch11_s01's decode pill).
+  A label that explains part of another sits under that part, found by measuring the parts (ch16_s08:
+  "7 + 7 + 4" under the 18 it adds up to).
 
 ## Technical rules (these bite)
 
@@ -173,9 +221,23 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
 - Use `fromTo` (not `from`) for anything that animates the same property more than once.
 - Text that changes value: `fx.count` (numbers) or `fx.swap` (words). Do not set `textContent`
   outside the timeline.
-- Text must not straddle the edge of a filled shape and must not sit on a line or curve: the audit
-  checks both. Put labels inside a card, or clearly outside it with ≥ 12 px clearance; route lines
-  around labels. Mark deliberate exceptions with `el.setAttribute('data-audit','ignore')`.
+- Text must not straddle the edge of a filled shape and must not sit on a line, a curve or an icon:
+  the audit checks all three. Put labels inside a card, or clearly outside it with ≥ 12 px clearance;
+  route lines around labels. The audit measures the glyphs themselves (not the line box), and also flags
+  a label that touches the inside edge of its box (`text-tight`: size the box from `S.measure`), two
+  labels that meet end to end on one line (`text-touch`), and a label flush against a box or disc beside
+  it (`text-touches-box`). Mark deliberate exceptions with `el.setAttribute('data-audit','ignore')`; for
+  things in flight, only while they move. `V.audit({ touchGap: 8 })` sweeps for near-misses.
+- A line that joins two pictures meets each at its visual centre: the centre of the whole composite
+  (a server with its cache stack, a laptop with its base, a card), not of one part of it (see "Joining
+  pictures").
+- Make room for the largest value a counter reaches, not its first (22,000 tokens/s once reached the
+  card beside it), and let a label inside a growing bar wait until the bar can hold it.
+- A label belongs to the picture it is on: a stopwatch on the H100's chart shows the H100's time.
+- After any change of face, size or case, audit every scene again: a wider face moves every label.
+  Before a release, sweep for near misses with `python3 tools/render.py v01 audit all --touch-gap 8`, and
+  widen the gap wherever a viewer would see two things nearly touching (one sample in mid-motion is
+  usually not that).
 - `S.text(..., {maxW})` shrinks text to fit and warns: if it shrinks more than ~15%, make the box
   bigger or the words shorter.
 - Many particles cost render time: keep `S.flow` to ≤ 8 simultaneous paths and `every ≥ 0.06`.
@@ -198,6 +260,8 @@ memory, hard-drives, lightning, timer, arrows, check-circle, x-circle. Find ids 
    narration that the storyboard puts on screen is on screen and correct.
 2. Contact sheet reads as a story: you can follow the argument from the stills alone.
 3. Full-size stills: nothing overlaps, nothing clips, nothing is tiny, alignment is clean,
-   spacing is even, colour means what it should.
+   spacing is even, colour means what it should. Lines meet whole pictures at their centres and arrows
+   land on something (a `--debug` still shows it; the audit cannot).
 4. `python3 tools/render.py v01 audit <chapter>` → `AUDIT CLEAN`, and no warnings from `stills`.
-5. It looks designed, not assembled: consistent margins, a clear focal point, deliberate motion.
+5. It looks designed, not assembled: consistent margins, a clear focal point, deliberate motion, and
+   every beat's frame composed from the centre out (`python3 tools/compose.py v01 <scene>`).

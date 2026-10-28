@@ -11,19 +11,21 @@
        '16-bit arithmetic, H100; weights only'.
    b5  'the ridge: next chapter'; the table dims; three lines: 'operations = 2 × parameters', 'bytes =
        parameters × bytes per weight', 'their ratio: maths or memory?' and a white box '1'.
-   Layout: table x 110-1150, header row y 300, rows y 380 / 460 / 540 / 620 (32, 16, 8, 4-bit); bars from
-   x 860 at 70 px per op/byte; teal column x 1400-1820; batching diagram y 150-280. */
+   Layout: header centred. Table x 110-1340, header row y 300, rows y 380 / 460 / 540 / 620 (32, 16, 8, 4-bit);
+   bars from x 880 at 70 px per op/byte. The batching diagram (b3) and then the teal column (b4) take the right,
+   centred on x 1610. All of it is one pane: the table alone centred (+235, +70), left to +5 when the diagram
+   comes, and up 70 at 'payoff' to make room for the three lines. */
 V.scene('ch10_s08', S => {
   const K = ch10Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
-  const hd = S.text('The coincidence is specific to 16 bits', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hd = S.text('The coincidence is specific to 16 bits', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   hide(hd);
   fade(hd, 0, 1, 0.3, 0.5);
   // ================================================================ the table
   const COL = { lab: 130, bpw: 360, model: 560, ops: 715, bar: 880 }, HY = 300, RY = { 32: 380, 16: 460, 8: 540, 4: 620 }, UNIT = 70;
   const head = S.g();
   [['bytes / weight', COL.bpw], ['model', COL.model], ['operations', COL.ops], ['ops per byte', COL.bar]].forEach(([s, x]) => S.text(s, { x, y: HY, size: 24, weight: 650, color: 'muted' }, head));
-  S.path({ d: `M110,${HY + 26} H1150`, stroke: 'white', strokeOpacity: 0.18, sw: 2 }, head);
+  S.path({ d: `M110,${HY + 26} H1340`, stroke: 'white', strokeOpacity: 0.18, sw: 2 }, head);   // to the end of '4 per byte'
   hide(head);
   fade(head, 0, 1, 0.5, 0.4);
   const ROWS = [
@@ -61,7 +63,7 @@ V.scene('ch10_s08', S => {
   // the operations never move; the coral steps down
   const tNev = T('b2~never') - 0.1;
   [32, 16, 8, 4].forEach((b, i) => { pulse(rows[b].opsGlow, tNev + 0.1 * i, 0.3, 0.6); });
-  const quant = S.pill('quantization: fewer bits per weight', { x: 1180, y: RY[4] + 70, tone: 'neutral', size: 24, h: 44, anchor: 'start', color: 'ink' });
+  const quant = S.pill('quantization: fewer bits per weight', { x: 725, y: RY[4] + 70, tone: 'neutral', size: 24, h: 44, color: 'ink' });   // centred under the table
   hide(quant);
   fade(quant, 0, 1, T('b2~quantization') - 0.1, 0.35);
 
@@ -69,19 +71,21 @@ V.scene('ch10_s08', S => {
   const tB3 = T('b3') - 0.1;
   fade(quant, 1, 0, tB3, 0.3);
   [32, 16, 8, 4].forEach(b => fade([rows[b].bpw, rows[b].model], 1, 0.3, tB3, 0.4));
-  const bat = S.g();
-  const src = [1330, 178];
+  // the batching diagram at the right, centred on x 1610 and on the rows; the teal column takes its place in b4
+  const TCX = 1610, bat = S.g();
+  const src = [TCX - 135, 470];
   S.text('read', { x: src[0], y: src[1] - 30, size: 22, weight: 700, anchor: 'middle', color: 'bytes' }, bat);
-  [138, 178, 218].forEach((y, i) => {
-    const p = S.path({ d: `M${src[0] + 10},${src[1]} C${src[0] + 120},${src[1]} ${1480},${y} 1560,${y}`, stroke: 'bytes', sw: 2.5 }, bat);
+  [430, 470, 510].forEach((y, i) => {
+    const p = S.path({ d: `M${src[0] + 10},${src[1]} C${src[0] + 120},${src[1]} ${src[0] + 150},${y} ${src[0] + 230},${y}`, stroke: 'bytes', sw: 2.5 }, bat);
     p.setAttribute('data-audit', 'ignore');
     K.draw(p, 400, tB3 + 0.3 + 0.1 * i, 0.4);
-    S.icon('ph:user-circle-duotone', { x: 1590, y, size: 36, color: 'struct' }, bat);
+    S.icon('ph:user-circle-duotone', { x: src[0] + 260, y, size: 36, color: 'struct' }, bat);
   });
   S.circle({ x: src[0], y: src[1], r: 8, fill: 'bytes' }, bat);
-  const batL = S.text('batching: tokens share one read', { x: 1300, y: 268, size: 24, weight: 700, color: 'helps' }, bat);
+  const batL = S.text('batching: tokens share one read', { x: TCX, y: 566, size: 24, weight: 700, anchor: 'middle', color: 'helps' }, bat);
   hide(bat);
   fade(bat, 0, 1, tB3 + 0.2, 0.4);
+  fade(bat, 1, 0, tSettle, 0.3);
   const share = S.text('× tokens sharing: 1', { x: COL.bar, y: RY[16] + 38, size: 22, weight: 650, family: 'mono', color: 'helps' });
   hide(share);
   fade(share, 0, 1, tStretch - 0.1, 0.3);
@@ -90,12 +94,11 @@ V.scene('ch10_s08', S => {
   void batL;
 
   // ================================================================ b4: tokens per read to reach 295
-  const TCX = 1610;
   const colH = S.text('tokens per read to reach 295', { x: TCX, y: HY + 28, size: 22, weight: 700, anchor: 'middle', color: 'helps' });
   const colBg = S.rect({ x: 1440, y: HY + 50, w: 340, h: 300, r: 14, fill: 'helps', fillOpacity: 0.07, stroke: 'helps', strokeOpacity: 0.4, sw: 1.5 });
   hide([colH, colBg]);
   fade([colBg, colH], 0, 1, tSettle + 0.2, 0.4);
-  const foot = S.text('16-bit arithmetic, H100; weights only', { x: 130, y: 690, size: 22, weight: 600, color: 'muted' });
+  const foot = S.text('16-bit arithmetic, H100; weights only', { x: 725, y: 690, size: 22, weight: 600, anchor: 'middle', color: 'muted' });   // centred under the table
   hide(foot);
   fade(foot, 0, 1, tSettle + 0.5, 0.4);
   const cell = (b, s, cue, off = 0) => { const e = S.text(s, { x: TCX, y: RY[b], size: 34, weight: 800, family: 'mono', anchor: 'middle', color: 'helps' }); hide(e); fade(e, 0, 1, T(cue) - 0.1 + off, 0.35); return e; };
@@ -110,15 +113,22 @@ V.scene('ch10_s08', S => {
   pulse(hGlow, tB5, 0.3, 0.9);
   fade(ridge, 0, 1, tB5 + 0.3, 0.4);
   const tPay = T('b5~payoff') - 0.1;
-  const tableAll = [head, ...Object.values(rows).map(r => r.g), bat, colH, colBg, foot, ridge];
+  const tableAll = [head, ...Object.values(rows).map(r => r.g), colH, colBg, foot, ridge];
   fade(tableAll, 1, 0.25, tPay, 0.5);
   fade(cells, 1, 0.25, tPay, 0.5);
+  // the table and everything beside it as one pane: centred alone, left when the diagram comes, up for the lines
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && e !== hd).forEach(e => pane.appendChild(e));
+  whole(t => pane.setAttribute('transform', `translate(${lerp(235, 5, EIO(cl((t - tB3) / 0.7))).toFixed(1)},${(70 * (1 - EIO(cl((t - tPay) / 0.6)))).toFixed(1)})`));
   const L = (parts, y, cue, size = 38) => { const e = S.text(parts.map(([t, c]) => ({ t, c })), { x: 960, y, size, weight: 750, anchor: 'middle' }); hide(e); fade(e, 0, 1, T(cue) - 0.1, 0.4); return e; };
   L([['operations = ', 'compute'], ['2', 'compute'], [' × ', 'ink'], ['parameters', 'struct']], 790, 'b5~one');
   L([['bytes = ', 'bytes'], ['parameters', 'struct'], [' × bytes per weight', 'bytes']], 852, 'b5~one#2');
+  // the last line and its answer box as one unit, centred
+  const lw = S.measure('their ratio: maths or memory?', { size: 38, weight: 750 });
   const last = L([['their ratio: maths or memory?', 'ink']], 914, 'b5~their');
+  last.setAttribute('transform', `translate(${-(30 + 64) / 2},0)`);
   const one = S.g();
-  const lx = 960 + S.measure('their ratio: maths or memory?', { size: 38, weight: 750 }) / 2 + 30;
+  const lx = 960 - (30 + 64) / 2 + lw / 2 + 30;
   S.rect({ x: lx, y: 914 - 32, w: 64, h: 64, r: 12, fill: '#0c1326', stroke: 'white', sw: 3 }, one);
   S.text('1', { x: lx + 32, y: 916, size: 40, weight: 800, family: 'mono', anchor: 'middle', color: 'ink' }, one);
   hide(one);

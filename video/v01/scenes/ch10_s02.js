@@ -14,8 +14,8 @@
 V.scene('ch10_s02', S => {
   const K = ch10Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
-  const hd = S.text('Why one runs in parallel and one cannot', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
-  const tim = S.text('same model, same chip: the difference is timing', { x: 110, y: 186, size: 28, weight: 600, color: 'muted' });
+  const hd = S.text('Why one runs in parallel and one cannot', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  const tim = S.text('same model, same chip: the difference is timing', { x: 960, y: 186, size: 28, weight: 600, anchor: 'middle', color: 'muted' });
   hide([hd, tim]);
   fade(hd, 0, 1, 0.3, 0.5);
   fade(tim, 0, 1, T('b1~Timing') - 0.1, 0.4);
@@ -58,7 +58,7 @@ V.scene('ch10_s02', S => {
 
   // ================================================================ b2: a chain
   const tB2 = T('b2') - 0.1;
-  const chipC = S.text('earlier: each token needs the one before', { x: 110, y: 1004, size: 24, weight: 600, color: 'muted' });
+  const chipC = S.text('earlier: each token needs the one before', { x: 960, y: 1004, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
   hide(chipC);
   fade(chipC, 0, 1, T('b2~met') - 0.1, 0.4);
   fade(chipC, 1, 0, T('b2~chain') + 0.3, 0.4);
@@ -87,9 +87,11 @@ V.scene('ch10_s02', S => {
 
   // ================================================================ b3: independent work, never a chain
   const tB3 = T('b3') - 0.1;
+  // the camera eases toward the grid and back; when the grid has gone, the two rows (x 130-1180) move to the centre
   whole(t => {
     const k = EIO(cl((t - tB3) / 1.0)) * (1 - EIO(cl((t - T('b3~one') + 0.1) / 0.9))), z = lerp(1, 1.06, k);
-    world.setAttribute('transform', `translate(${(1550 - 1550 * z).toFixed(1)},${(560 - 560 * z).toFixed(1)}) scale(${z.toFixed(4)})`);
+    const cx = 305 * EIO(cl((t - T('b3~one') - 0.2) / 0.8));
+    world.setAttribute('transform', `translate(${(1550 - 1550 * z + cx).toFixed(1)},${(560 - 560 * z).toFixed(1)}) scale(${z.toFixed(4)})`);
   });
   K.ignore(world, tB3, 1.1);
   // the time strip under the grid

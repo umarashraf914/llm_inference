@@ -118,7 +118,10 @@ the figure disproves.
 - Fixed canvas width; choose the height to fit.
 - At least 20px of padding inside every container, on every side.
 - Labels inside boxes: vertically centred. Container labels: top-left.
-- Check that a label fits its box before drawing it.
+- Check that a label fits its box before drawing it, and that it keeps at least 6px from the labels and
+  boxes beside it.
+- A connector between two drawings meets each at the centre of the whole drawing (a box with things
+  stacked on it is one picture). Arrows that fan out leave one point, and each lands on something drawn.
 - Four colours maximum, each with a fixed meaning, stated in a key at the top. Keep the meanings
   stable across a series.
 

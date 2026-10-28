@@ -16,14 +16,15 @@ V.scene('ch08_s02', S => {
   const clock = (a, b, fn) => S.add(ch08Drive(b - a, k => fn(a + k * (b - a))), a);
   const fade = (els, a, b, at, d = 0.45) => S.add(ch08Fade(els, a, b, { d }), at);
 
-  // headers, top-left
-  const hA = S.text('A plain average counts everything equally', { x: 120, y: 150, size: 46, weight: 700, family: 'display', color: 'ink' });
-  const hB = S.text([{ t: 'A weighted average lets ' }, { t: 'some count more', c: 'compute' }], { x: 120, y: 150, size: 46, weight: 700, family: 'display', color: 'ink' });
+  // headers, centred at the top
+  const hA = S.text('A plain average counts everything equally', { x: 960, y: 150, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  const hB = S.text([{ t: 'A weighted average lets ' }, { t: 'some count more', c: 'compute' }], { x: 960, y: 150, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch08Hide([hA, hB]);
   fade(hA, 0, 1, 0.8, 0.6);
 
   // ================================================================ the tiles, chips, bars
-  const VALS = [10, 20, 30], TX = [330, 560, 790], TY = 360;
+  // the tiles (x 174-787) and the equation box (x 1082-1742) make one row, centred; the number line under them too
+  const VALS = [10, 20, 30], TX = [252, 482, 712], TY = 360;
   const tiles = VALS.map((v, i) => {
     const g = S.g();
     S.rect({ x: TX[i] - 75, y: TY - 55, w: 150, h: 110, r: 18, fill: '#0c1326' }, g);
@@ -65,7 +66,7 @@ V.scene('ch08_s02', S => {
   [WT.f1, WT.f2, WT.f3].forEach((t, i) => { fade(W0[i], 1, 0, t, 0.2); fade(W1[i], 0, 1, t + 0.15, 0.3); });
 
   // ================================================================ the equation box and the number line
-  const EB = { x: 1160, y: 300, w: 660, h: 160, cx: 1490, cy: 380 };
+  const EB = { x: 1082, y: 300, w: 660, h: 160, cx: 1412, cy: 380 };
   const eqBox = S.g();
   S.card({ x: EB.x, y: EB.y, w: EB.w, h: EB.h, tone: 'compute', r: 22 }, eqBox);
   ch08Hide(eqBox);
@@ -159,8 +160,8 @@ V.scene('ch08_s02', S => {
   // the separation: values above the divider, how much each counts below it
   const lblV = S.text('what the values are', { x: TX[1], y: 268, size: 30, weight: 650, anchor: 'middle', color: 'struct' });
   const lblW = S.text('how much each counts', { x: TX[2] + 110, y: CY + 1, size: 30, weight: 650, color: 'compute' });
-  const div = S.line({ x1: TX[0] - 110, y1: 432, x2: 960, y2: 432, stroke: 'ink', strokeOpacity: 0.5, sw: 2 });
-  const attn = S.pill('attention', { x: 1046, y: 432, tone: 'struct', size: 28, h: 48 });
+  const div = S.line({ x1: TX[0] - 110, y1: 432, x2: 882, y2: 432, stroke: 'ink', strokeOpacity: 0.5, sw: 2 });
+  const attn = S.pill('attention', { x: 968, y: 432, tone: 'struct', size: 28, h: 48 });
   ch08Hide([lblV, lblW, attn]);
   S.set(div, { autoAlpha: 0 }, 0);
   fade(lblV, 0, 1, T('b4~What') - 0.1);

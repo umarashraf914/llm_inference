@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """Bundle the film's fonts into engine/fonts/ as WOFF2, with the @font-face rules the stage loads.
 
-The films were first rendered against system-installed fonts (Debian fonts-inter 4.0, fonts-jetbrains-mono
-2.304), so a machine without them laid text out differently. This copies those exact files (compressed,
-glyphs unchanged) next to the engine, so every machine measures and draws the same text:
+Every machine must measure and draw text alike, so the faces travel with the engine (glyphs unchanged):
 
-  Inter, Inter Display   weights 400-900, upright and italic (the scenes ask for 400-850)
-  JetBrains Mono         weights 400-800, upright and italic
-  DejaVu Sans (Mono)     only the few symbols the three families lack (⋮ ⁻ ⅔ ∝ …), declared as part of each
-                         family with a unicode-range, so they never fall through to whatever the OS has
+  Poppins                labels and titles (since October 2026): weights 400-900, upright and italic, the latin and
+                         latin-ext subsets of @fontsource/poppins (Google Fonts, OFL) as published. Each face claims
+                         its own weight and CSS takes the nearest (550 -> 600, 650 -> 700). Glyphs it lacks (arrows,
+                         ≈ ≤ ≠, superscripts, ⅔) come from Inter: the engine's family lists are 'Poppins', 'Inter'
+  Inter                  the first films' face, now Poppins' fallback: Debian fonts-inter 4.0, weights 400-900,
+                         upright and italic, each claiming the weights Linux fontconfig gave it when the films
+                         were first rendered (550 -> Medium, 650 -> Bold)
+  JetBrains Mono         numbers and code: Debian fonts-jetbrains-mono 2.304, weights 400-800, upright and italic
+  DejaVu Sans (Mono)     only the few symbols Inter and JetBrains Mono lack (⋮ ⁻ ∝ …), declared as part of each
+                         family with a unicode-range, so nothing falls through to whatever the OS has
 
-  python3 video/tools/build_fonts.py        # needs fonttools + brotli and the system fonts above
+  python3 video/tools/build_fonts.py        # needs fonttools + brotli, the system fonts above, and npm
 """
-import io, sys
+import io, re, shutil, subprocess, sys, tarfile, tempfile
 from pathlib import Path
 
 from fontTools import subset
@@ -30,8 +34,10 @@ WEIGHTS = {400: "Regular", 500: "Medium", 600: "SemiBold", 700: "Bold", 800: "Ex
 RANGE = {400: (1, 449), 500: (450, 555), 600: (556, 645), 700: (646, 755), 800: (756, 855), 900: (856, 1000)}
 RANGE_ITALIC = {**RANGE, 400: (1, 455), 500: (456, 555)}
 FAMILIES = [("Inter", INTER, "Inter", ".otf", range(400, 1000, 100)),
-            ("Inter Display", INTER, "InterDisplay", ".otf", range(400, 1000, 100)),
             ("JetBrains Mono", JBM, "JetBrainsMono", ".ttf", range(400, 900, 100))]
+POPPINS = ("Poppins", "@fontsource/poppins@5.3.0", range(400, 1000, 100))
+# Poppins' superscripts and fractions are drawn differently from Inter's: leave them all to Inter, so 10¹⁵ is one design
+NOT_POPPINS = {0xB2, 0xB3, 0xB9, 0xBC, 0xBD, 0xBE}
 
 
 def source(d, stem, ext, w, italic):
@@ -64,6 +70,36 @@ def ranges(cps):
         else:
             out.append([c, c])
     return ", ".join(f"U+{a:X}" if a == b else f"U+{a:X}-{b:X}" for a, b in out)
+
+
+def codepoints(spec):
+    """'U+0000-00FF,U+0131' -> the set of code points"""
+    cps = set()
+    for part in spec.split(","):
+        a, _, b = part.strip()[2:].partition("-")
+        cps |= set(range(int(a, 16), int(b or a, 16) + 1))
+    return cps
+
+
+def fontsource(family, package, weights, css):
+    """A fontsource package's latin and latin-ext WOFF2 files, unchanged, with an @font-face for each face and subset."""
+    n = 0
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.run(["npm", "pack", package, "--silent"], cwd=tmp, check=True, capture_output=True)
+        with tarfile.open(next(Path(tmp).glob("*.tgz"))) as t:
+            t.extractall(tmp, **({"filter": "data"} if hasattr(tarfile, "data_filter") else {}))
+        root = Path(tmp) / "package"
+        for w in weights:
+            for style in ("normal", "italic"):
+                sheet = (root / f"{w}{'-italic' if style == 'italic' else ''}.css").read_text()
+                for file, rng in re.findall(r"/\* [\w-]+?-latin(?:-ext)?-\d+-\w+ \*/.*?src: url\(\./files/([^)]+\.woff2)\)"
+                                            r".*?unicode-range: ([^;]+);", sheet, re.S):
+                    shutil.copy(root / "files" / file, OUT / file)
+                    css.append(f"@font-face {{ font-family: '{family}'; font-weight: {w}; font-style: {style}; font-display: block; "
+                               f"src: url('{file}') format('woff2'); unicode-range: {ranges(codepoints(rng) - NOT_POPPINS)}; }}")
+                    n += 1
+        (OUT / f"LICENSE-{family}.txt").write_text((root / "LICENSE").read_text())
+    return n
 
 
 def used_chars():
@@ -107,13 +143,14 @@ def main():
                        f"src: url('{fb[fam == 'JetBrains Mono', bold]}-symbols.woff2') format('woff2'); unicode-range: {ranges(missing)}; }}")
         css.append(f"@font-face {{ font-family: '{fam}'; font-weight: {w}; font-style: {style}; font-display: block; "
                    f"src: url('{file}') format('woff2'); }}")
+    n = fontsource(*POPPINS, css)
     (OUT / "fonts.css").write_text("\n".join(css) + "\n")
     for lic, dst in [("/usr/share/doc/fonts-inter/copyright", "LICENSE-Inter.txt"),
                      ("/usr/share/doc/fonts-jetbrains-mono/copyright", "LICENSE-JetBrainsMono.txt"),
                      ("/usr/share/doc/fonts-dejavu-core/copyright", "LICENSE-DejaVu.txt")]:
         (OUT / dst).write_text(Path(lic).read_text())
     size = sum(f.stat().st_size for f in OUT.glob("*.woff2"))
-    print(f"{len(faces)} faces + symbol fallback -> {OUT.relative_to(VIDEO)} ({size / 1e6:.1f} MB); "
+    print(f"{POPPINS[0]}: {n} faces and subsets; {len(faces)} faces + symbol fallback -> {OUT.relative_to(VIDEO)} ({size / 1e6:.1f} MB); "
           f"fallback covers {''.join(map(chr, sorted(gaps)))}")
 
 

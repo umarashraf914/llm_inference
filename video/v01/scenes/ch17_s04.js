@@ -21,6 +21,9 @@ V.scene('ch17_s04', S => {
   const hsh = i => { const v = Math.sin(i * 12.9898 + 0.7) * 43758.5453; return v - Math.floor(v); };
 
   // ================================================================ the panels and their gauges
+  // the two panels (y 130-740) are the whole picture until the chip's card comes under them in b2: the camera
+  // holds them 130 px lower, and eases back as the card arrives
+  S.xset(S.camera, { x: 0, y: 130, s: 1 });
   const tPull = T('b4~serving') - 0.1, tSplit = T('b4~split') - 0.1;
   const panel = (x, tone, title, side) => {
     const h = S.g(), g = S.g(null, h);
@@ -124,6 +127,7 @@ V.scene('ch17_s04', S => {
     });
   }
   const tSwap = T('b2~Swap') - 0.1, t200 = T('b2~H#2') - 0.1, tSame = T('b2~same') - 0.1, tFast = T('b2~faster') - 0.1;
+  S.add(S.fx.cam({ d: 0.8, ease: 'power2.inOut' }), tSwap - 0.4);
   const card = S.g(), cardIn = S.g(null, card);
   S.rect({ x: 760, y: 790, w: 400, h: 200, r: 18, fill: '#0c1326', stroke: '#ffffff', strokeOpacity: 0.3, sw: 2 }, cardIn);
   S.icon('ph:cpu-duotone', { x: 806, y: 836, size: 44, color: 'muted' }, cardIn);
@@ -213,14 +217,15 @@ V.scene('ch17_s04', S => {
   route.setAttribute('data-audit', 'ignore');
   K.draw(route, 1200, tHw, 0.5);
   const kvB = S.g();
-  S.rect({ x: -88, y: -22, w: 176, h: 44, r: 12, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, kvB);
+  const KVW = Math.round(S.measure('keys and values', { size: 24, weight: 750 }) + 36);
+  S.rect({ x: -KVW / 2, y: -22, w: KVW, h: 44, r: 12, fill: 'url(#card-helps)', stroke: 'helps', sw: 2.5 }, kvB);
   S.text('keys and values', { x: 0, y: 1, size: 24, weight: 750, anchor: 'middle', color: 'ink' }, kvB);
   kvB.setAttribute('data-audit', 'ignore');
   whole(t => {
     const u = EIO(cl((t - tHw - 0.3) / 1.1)), b = 1 - u;
     const x = b * b * b * 440 + 3 * b * b * u * 520 + 3 * b * u * u * 1400 + u * u * u * 1480, y = b * b * b * 750 + 3 * b * b * u * 840 + 3 * b * u * u * 840 + u * u * u * 750;
     kvB.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
-    setO(kvB, t > tHw + 0.3 ? 1 : 0);
+    setO(kvB, t > tHw + 0.3 ? 1 - cl((u - 0.82) / 0.18) : 0);   // delivered: it fades into the decode machines, never parks on their border
   });
   const kvT = S.pill('KV transfer', { x: 960, y: 868, tone: 'helps', size: 24, h: 40 });
   rise(kvT, tHw + 0.4, 6);

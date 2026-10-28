@@ -280,7 +280,8 @@ function ch14Matrix(S, o = {}, parent) {
 function ch14Tag(S, text, o = {}, parent) {
   const size = o.size ?? CH14.tag, h = o.h ?? Math.round(size * 1.75), padX = o.padX ?? 16;
   const iconSize = o.iconSize ?? Math.round(size * 1.15), ig = o.icon ? iconSize + 10 : 0;
-  const tw = S.measure(text, { size, weight: o.weight ?? 550 });
+  const segs = /_\w/.test(text) ? V.subs(text, size) : null;      // 'same W_K': a real subscript, not an underscore
+  const tw = segs ? segs.reduce((a, sg) => a + S.measure(sg.t, { size: sg.s || size, weight: o.weight ?? 550 }), 0) : S.measure(text, { size, weight: o.weight ?? 550 });
   const w = padX * 2 + ig + tw;
   const anchor = o.anchor || 'middle';
   const x = anchor === 'middle' ? (o.x ?? 0) - w / 2 : anchor === 'end' ? (o.x ?? 0) - w : (o.x ?? 0);
@@ -296,7 +297,7 @@ function ch14Tag(S, text, o = {}, parent) {
   } else if (o.icon) {
     g.iconEl = S.icon(o.icon, { x: x + padX + iconSize / 2, y: o.y ?? 0, size: iconSize, color: o.iconColor || 'muted' }, g);
   }
-  g.label = S.text(text, { x: x + padX + ig, y: (o.y ?? 0) + 1, size, weight: o.weight ?? 550, color: o.color || 'muted' }, g);
+  g.label = S.text(segs || text, { x: x + padX + ig, y: (o.y ?? 0) + 1, size, weight: o.weight ?? 550, color: o.color || 'muted' }, g);
   Object.assign(g, { w, h, l: x, r: x + w, t: y, b: y + h, cx: x + w / 2, cy: o.y ?? 0 });
   return g;
 }

@@ -8,7 +8,8 @@
        (a tiny glyph of tokens joined by arcs; 'comes next').
    b4  a teal tick and '70B example' on the second card; the cards fade and the '=' becomes a teal '≠'; the
        badges dim: 'vectors alone carry no order'.
-   Layout: row A slots x 180-820, row B slots x 1100-1740, pills y 330, strips y 400; bins y 700-880. */
+   Layout: row A slots x 180-820, row B slots x 1100-1740, pills y 400, strips y 462; bins y 770-950;
+   option cards x 620-1300, y 690-912. */
 V.scene('ch07_s07', S => {
   const { fx } = S;
   const T = s => S.t(s);
@@ -17,14 +18,14 @@ V.scene('ch07_s07', S => {
   const head = ch07Heading(S);
   S.add(head.show('same words, different order'), 'b1~still-0.1');
 
-  const PY = 330, SY = 392;
+  const PY = 400, SY = 462;                                       // every beat's body centred under the heading
   const A = ['the', 'dog', 'bit', 'the', 'man'], B = ['the', 'man', 'bit', 'the', 'dog'];
   const AX = [180, 340, 500, 660, 820], BX = [1100, 1260, 1420, 1580, 1740];
   const SN = 6, SCW = 16, SW = SN * (SCW + 3) - 3, SH = 22;
 
   // pills, and under each pill a holder with the token's strip
   const mk = (words, xs, row) => words.map((w, k) => {
-    const pill = S.pill(w, { x: xs[k], y: PY, tone: 'struct', size: 30, h: 54 });
+    const pill = S.pill(w, { x: xs[k], y: PY, tone: 'struct', size: 30, h: 54, case: 'keep' });
     const hold = S.g();
     const inner = S.g(null, hold);
     ch07Vec(S, { token: w, n: SN, cw: SCW, ch: SH, gap: 3, anchor: 'start', x: xs[k] - SW / 2, y: SY }, inner);
@@ -64,7 +65,7 @@ V.scene('ch07_s07', S => {
   ringFlash([RA[1], RB[4]], T('b2~row') + 0.15);
   ringFlash([RA[4], RB[1]], T('b2~wherever') + 0.3);
   // the bins
-  const binX = [(AX[0] + AX[4]) / 2, (BX[0] + BX[4]) / 2], BY0 = 700, BY1 = 880, BWd = 420;
+  const binX = [(AX[0] + AX[4]) / 2, (BX[0] + BX[4]) / 2], BY0 = 770, BY1 = 950, BWd = 420;
   const bins = binX.map(cx => {
     const g = S.g();
     S.path({ d: `M${cx - BWd / 2},${BY0} L${cx - BWd / 2 + 30},${BY1} H${cx + BWd / 2 - 30} L${cx + BWd / 2},${BY0}`, stroke: 'muted', sw: 4, fill: '#121a2e' }, g);
@@ -113,33 +114,36 @@ V.scene('ch07_s07', S => {
   });
   const tBadge = T('b3~sits') + 0.1;
   [RA, RB].forEach((row, r) => row.forEach((p, k) => S.add(ch07Fade(badges[r * 5 + k], 0, 1, { d: 0.3, dy0: -10, dy1: 0 }), tBadge + 0.12 * k)));
-  // two option cards, bottom right
-  const card = (y, text) => {
+  // two option cards, one above the other, centred under the rows; card 2's words and glyph centred as one
+  const OPX = 620, OPW = 680, O2X = 960 - (S.measure('apply it inside attention', { size: 30, weight: 650 }) + 30 + 140) / 2;
+  const card = (y, text, x) => {
     const g = S.g();
-    S.card({ x: 1080, y, w: 680, h: 96, tone: 'helps', r: 18 }, g);
-    S.text(text, { x: 1112, y: y + 48, size: 30, weight: 650, color: 'ink' }, g);
+    S.card({ x: OPX, y, w: OPW, h: 96, tone: 'helps', r: 18 }, g);
+    S.text(text, { x: x ?? 960, y: y + 48, size: 30, weight: 650, anchor: x ? 'start' : 'middle', color: 'ink' }, g);
     ch07Hide(g);
     return g;
   };
-  const opt1 = card(620, 'add it in at the start'), opt2 = card(746, 'apply it inside attention');
+  const opt1 = card(690, 'add it in at the start'), opt2 = card(816, 'apply it inside attention', O2X);
   S.add(ch07Fade(opt1, 0, 1, { d: 0.45, dy0: 14, dy1: 0 }), 'b3~added-0.1');
   S.add(ch07Fade(opt2, 0, 1, { d: 0.45, dy0: 14, dy1: 0 }), 'b3~inside-0.1');
   // a tiny glyph of tokens joined by arcs, on the second card
   const glyph = S.g();
-  const GX = [1530, 1572, 1614, 1656], GY = 812;
+  const G0 = O2X + S.measure('apply it inside attention', { size: 30, weight: 650 }) + 30 + 7;
+  const GX = [0, 1, 2, 3].map(k => G0 + 42 * k), GY = 882;
   GX.forEach(x => S.circle({ x, y: GY, r: 7, fill: 'struct' }, glyph));
   [[0, 3], [1, 3], [2, 3]].forEach(([a, b]) => S.path({ d: `M${GX[a]},${GY - 9} Q${(GX[a] + GX[b]) / 2},${GY - 40 + 6 * a} ${GX[b]},${GY - 9}`, stroke: 'struct', strokeOpacity: 0.8, sw: 2 }, glyph));
   glyph.querySelectorAll('path').forEach(e => e.setAttribute('data-audit', 'ignore'));
   ch07Hide(glyph);
   S.add(ch07Fade(glyph, 0, 1, { d: 0.4 }), 'b3~look-0.1');
-  const next = S.text('comes next', { x: 1760, y: 866, size: 22, weight: 600, anchor: 'end', color: 'muted' });
+  const next = S.text('comes next', { x: (GX[0] + GX[3]) / 2, y: 936, size: 22, weight: 600, anchor: 'middle', color: 'muted' });   // under the glyph
   ch07Hide(next);
   S.add(ch07Fade(next, 0, 1, { d: 0.4 }), 'b3~comes-0.1');
 
   // ================================================================ b4: ours does the second; no order alone
   const tick = S.g();
-  S.path({ d: `M${1440},${770} l12,13 l22,-26`, stroke: 'helps', sw: 4.5 }, tick);
-  S.text('70B example', { x: 1486, y: 772, size: 22, weight: 700, color: 'helps' }, tick);
+  // under the second card, at its left: its own row, clear of the card's text and the glyph
+  S.path({ d: `M${O2X},${932} l10,11 l19,-23`, stroke: 'helps', sw: 4 }, tick);
+  S.text('70B example', { x: O2X + 36, y: 936, size: 22, weight: 700, color: 'helps' }, tick);
   ch07Hide(tick);
   S.add(ch07Fade(tick, 0, 1, { d: 0.4 }), 'b4~Our-0.1');
   const tE = T('b4~Easy') - 0.1;
@@ -149,7 +153,7 @@ V.scene('ch07_s07', S => {
   S.add(gsap.fromTo(ne, { scale: 0.8, transformOrigin: '50% 50%' }, { scale: 1, duration: 0.5, ease: 'back.out(2.4)', transformOrigin: '50% 50%', immediateRender: false }), tE + 0.25);
   const tV = T('b4~vectors') - 0.1;
   S.add(ch07Fade(badges, 1, 0.3, { d: 0.5 }), tV);
-  const close = S.text([{ t: 'vectors alone carry ' }, { t: 'no order', c: 'helps' }], { x: 960, y: 600, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  const close = S.text([{ t: 'vectors alone carry ' }, { t: 'no order', c: 'helps' }], { x: 960, y: 670, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch07Hide(close);
   S.add(ch07Fade(close, 0, 1, { d: 0.6, dy0: 12, dy1: 0 }), tV + 0.2);
 });

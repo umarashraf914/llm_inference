@@ -130,7 +130,7 @@ V.scene('ch15_s01', S => {
   const cardL = jobCard(CARD.lx, 'During a turn', 'it grows.', 'One new entry per token, no lookup.', slabIcon);
   const cardR = jobCard(CARD.rx, 'At the start of a turn', 'it is searched.', 'Either the prompt matches, or it does not.', lensIcon);
   S.add(fx.in(cardL.card, { from: 'up', d: 0.6 }), 'b1~nothing-0.15');
-  S.add(fx.in(cardL.parts, { from: 'up', d: 0.55, stagger: 0.1 }), 'b1~nothing');
+  S.add(fx.in(cardL.parts, { from: 'up', dist: 12, d: 0.55, stagger: 0.1 }), 'b1~nothing');   // a short rise keeps the last line inside the card
   S.add(fx.dim(ansLabel, { to: 0.45 }), 'b1~nothing');
 
   // ---------------------------------------------------------------- b2: the next message arrives; one search
@@ -157,7 +157,7 @@ V.scene('ch15_s01', S => {
 
   // the server asks
   S.add(fx.in(cardR.card, { from: 'up', d: 0.6 }), 'b2~server-0.15');
-  S.add(fx.in(cardR.parts, { from: 'up', d: 0.55, stagger: 0.1 }), 'b2~server');
+  S.add(fx.in(cardR.parts, { from: 'up', dist: 12, d: 0.55, stagger: 0.1 }), 'b2~server');
   S.add(fx.dim([cardL.dimG], { to: 0.4 }), 'b2~server');
   S.add(fx.dim([t2Dim], { to: 0.45 }), 'b2~server+0.2');
   const ask = libBubble(S, { text: '?', x: MCX, y: 434, size: 36, weight: 700, tone: 'neutral', side: 'left', hidden: true });

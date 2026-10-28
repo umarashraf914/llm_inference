@@ -9,14 +9,15 @@
        they glide into the HBM (warm: still resident); grey blocks push them out (cold: evicted).
    b4  the database with the text; the dashed outlines vanish; prefill rebuilds six blocks from the text.
    b5  everything dims; 'a vague sense of readiness' struck; 'how many arriving tokens are already held here?'
-   Layout: bars x 380-1780, y 250 / 430 (h 40), row labels x 70; plate y 342; after the tilt the upper tier is
-   scaled 0.8 about (960, 100). Lower tier: blocks row y 560, database (300, 770), gear (760, 770), package
-   x 1196-1784, y 560-880 with two HBM stacks of 2 × 5 slots. */
+   Layout: bars x 396-1796, y 250 / 430 (h 40), row labels x 70; plate y 342; after the tilt the upper tier is
+   scaled 0.8 about (960, 100). Lower tier: blocks row y 560, database (300, 720), gear (760, 720), package
+   x 1196-1784, y 560-880 with two HBM stacks of 2 × 5 slots. In b1-b2 the upper tier is alone, so it sits 200
+   lower, centred; it rises into the top band as it shrinks (b3). */
 V.scene('ch16_s01', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
   const rise = (e, at, dy = 12, d = 0.4) => { hide(e); S.add(K.drive(d, k => { setO(e, k); e.setAttribute('transform', `translate(0,${(dy * (1 - E('power3.out')(k))).toFixed(1)})`); }), at); };
-  const BX = 380, BW = 1400, BH = 40, Y1 = 250, Y2 = 430, U = BW / 1032;
+  const BX = 396, BW = 1400, BH = 40, Y1 = 250, Y2 = 430, U = BW / 1032;
   const fmt = n => Math.round(n).toLocaleString('en-US');
 
   // ================================================================ b1: warm is a count
@@ -32,7 +33,7 @@ V.scene('ch16_s01', S => {
     cnt0.textContent = fmt(1032 * E('power2.out')(cl((t - tCount - 0.15) / 0.8)));
     const k = cl((t - tCount) / 0.3), out = EIO(cl((t - tCount - 1.25) / 0.5));
     setO(cnt0, k * (1 - out));
-    cnt0.setAttribute('transform', `translate(${(420 * out).toFixed(1)},${(-200 * out).toFixed(1)})`);
+    cnt0.setAttribute('transform', `translate(${(420 * out).toFixed(1)},0)`);   // toward the upper bar (the tier sits 200 lower in b1-b2)
   });
   // the weather conversation, top left throughout
   const wIcon = S.icon('ph:cloud-sun-duotone', { x: 96, y: 152, size: 56, color: 'muted' });
@@ -175,27 +176,34 @@ V.scene('ch16_s01', S => {
   const coldT = S.pill('cold: evicted', { x: 1490, y: 966, tone: 'neutral', size: 26, h: 44 });
   rise(coldT, tEv + 0.6, 8);
 
+  // the upper tier, centred while alone (b1-b2), rises into the top band as it shrinks (b3)
+  const tier = S.g();
+  S.main.insertBefore(tier, wIcon);
+  [wIcon, wLab, upper, sameG, flash].forEach(e => tier.appendChild(e));
+  whole(t => tier.setAttribute('transform', `translate(0,${(200 * (1 - EIO(cl((t - tTilt) / 0.9)))).toFixed(1)})`));
+
   // ================================================================ b4: only the text survives
   const db = S.g();
-  S.icon('ph:database-duotone', { x: 300, y: 770, size: 130, color: 'struct' }, db);
-  S.icon('ph:file-text-duotone', { x: 300, y: 790, size: 40, color: '#a9cbff' }, db);
+  // the row database → prefill → package runs through the package's centre (y 720), so the arrow meets it square on
+  S.icon('ph:database-duotone', { x: 300, y: 720, size: 130, color: 'struct' }, db);
+  S.icon('ph:file-text-duotone', { x: 300, y: 740, size: 40, color: '#a9cbff' }, db);
   rise(db, T('b4~small') - 0.15, 10);
-  const dbT = S.pill('text: small, kept', { x: 300, y: 880, tone: 'struct', size: 24, h: 42 });
+  const dbT = S.pill('text: small, kept', { x: 300, y: 830, tone: 'struct', size: 24, h: 42 });
   rise(dbT, T('b4~database') - 0.1, 6);
   fade(coldT, 1, 0, T('b4~stopped') - 0.2, 0.3);
   const tReb = T('b4~prefill') - 0.1;
   const gear = S.g();
   S.icon('ph:gear-six-duotone', { x: 0, y: 0, size: 96, color: 'compute' }, gear);
-  whole(t => gear.setAttribute('transform', `translate(760,770) rotate(${(240 * EIO(cl((t - tReb - 0.3) / 2.6))).toFixed(1)})`));
+  whole(t => gear.setAttribute('transform', `translate(760,720) rotate(${(240 * EIO(cl((t - tReb - 0.3) / 2.6))).toFixed(1)})`));
   const gearG = S.g();
   gearG.appendChild(gear);
   rise(gearG, tReb, 8);
-  const gearL = S.text('prefill', { x: 760, y: 846, size: 26, weight: 800, anchor: 'middle', color: 'compute' });
+  const gearL = S.text('prefill', { x: 760, y: 796, size: 26, weight: 800, anchor: 'middle', color: 'compute' });
   rise(gearL, tReb + 0.15, 6);
-  const gearT = S.text('text in, keys and values out', { x: 760, y: 888, size: 24, weight: 650, anchor: 'middle', color: 'muted' });
+  const gearT = S.text('text in, keys and values out', { x: 760, y: 838, size: 24, weight: 650, anchor: 'middle', color: 'muted' });
   rise(gearT, tReb + 0.6, 6);
-  const a1 = S.path({ d: 'M372,770 H700 M688,760 L701,770 L688,780', stroke: 'struct', sw: 3 });
-  const a2 = S.path({ d: 'M820,770 H1184 M1172,760 L1185,770 L1172,780', stroke: 'bytes', sw: 3 });
+  const a1 = S.path({ d: 'M372,720 H700 M688,710 L701,720 L688,730', stroke: 'struct', sw: 3 });
+  const a2 = S.path({ d: 'M820,720 H1184 M1172,710 L1185,720 L1172,730', stroke: 'bytes', sw: 3 });
   [a1, a2].forEach(p => p.setAttribute('data-audit', 'ignore'));
   K.draw(a1, 360, tReb + 0.1, 0.4);
   K.draw(a2, 400, tReb + 0.55, 0.4);

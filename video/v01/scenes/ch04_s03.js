@@ -66,7 +66,7 @@ V.scene('ch04_s03', S => {
       const g = S.g();
       g.base = S.rect({ x: 0, y: y - PH / 2, w: 90, h: PH, r: 10, fill: '#0c1326' }, g);
       g.body = S.rect({ x: 0, y: y - PH / 2, w: 90, h: PH, r: 10, fill: 'url(#card-struct)', stroke: 'struct', sw: 2 }, g);
-      if (k === 0) g.lbl = S.text('Sunny', { x: 0, y: y + 1, size: 24, anchor: 'middle', weight: 600, color: 'ink' }, g);
+      if (k === 0) g.lbl = S.text('Sunny', { x: 0, y: y + 1, size: 22, anchor: 'middle', weight: 600, color: 'ink' }, g);
       return g;
     };
     const arr = ignore(S.g());
@@ -194,7 +194,7 @@ V.scene('ch04_s03', S => {
   S.add(gsap.fromTo(dump, { autoAlpha: 0, y: -120 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'bounce.out' }), 'b5~all-0.1');
   const nothing = S.g();
   S.rect({ x: xS(0), y: YG - 18, w: 15000 * SECS.k - 4, h: 36, r: 6, fill: 'faint', fillOpacity: 0.35 }, nothing);
-  S.text('15 s of nothing', { x: xS(7500), y: YG + 1, size: 28, anchor: 'middle', weight: 700, color: 'ink' }, nothing);
+  S.text('15 s of nothing', { x: xS(7500), y: YG + 1, size: 25, anchor: 'middle', weight: 700, color: 'ink' }, nothing);
   S.set(nothing, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(nothing, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, yoyo: true, repeat: 2 }), 'b5~notice-0.3');
 

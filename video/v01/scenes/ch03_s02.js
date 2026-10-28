@@ -12,6 +12,9 @@ V.scene('ch03_s02', S => {
   const CX = [0, 1, 2, 3].map(i => 960 - (4 * CW + 3 * GAP) / 2 + i * (CW + GAP));   // card left edges
   const MID = CX.map(x => x + CW / 2);
   const SUBY = CY + CH + 36;                                  // the one sub-label line
+  // each card's demo is centred under it, and the four share one centre line, midway between the sub-labels
+  // and the frame's foot (the user: pictures not centred under their boxes, not in line with each other)
+  const DY = 680;
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
 
   // ---------------------------------------------------------------- the panel and five empty outlines
@@ -61,19 +64,23 @@ V.scene('ch03_s02', S => {
     S.add(gsap.to([arrows[i].line, arrows[i].head], { attr: { stroke: S.tone(tone) }, duration: 0.35 }), at);
 
   // ---------------------------------------------------------------- b1: the request waits; Router picks the machine
-  const RY = 670;
-  const req = ignore(libToken(S, { text: 'request', x: 270, y: RY, size: 24, hidden: true }));
+  // the router's picture: three wires fanning from a hub to three servers, centred under its card from the
+  // hub to the servers' far side; the request waits on the hub, over the wires, until it rides the chosen one
+  const RY = DY, FAN = 110;
+  const HUB = MID[0] - (FAN + 117) / 2;                       // 117: the 7 px before a server, and its 110 px
+  const req = ignore(libToken(S, { text: 'request', x: HUB, y: RY, size: 24, hidden: true, case: 'label' }));
   S.add(req.pop({ d: 0.5 }), 'b1~request');
   light(0, 'b1~router-0.1');
-  const SVX = 470, SVY = [RY - 76, RY, RY + 76];
+  const SVX = HUB + FAN + 62, SVY = [RY - 76, RY, RY + 76];
   const routerDemo = S.g();
-  const fan = SVY.map(y => ignore(S.line({ x1: 340, y1: RY, x2: SVX - 62, y2: y, stroke: 'faint', sw: 2.5 }, routerDemo)));
+  const fan = SVY.map(y => ignore(S.line({ x1: HUB, y1: RY, x2: SVX - 62, y2: y, stroke: 'faint', sw: 2.5 }, routerDemo)));
   const servers = SVY.map((y, k) => libServer(S, { x: SVX, y, w: 110, detail: 'min', seed: 5 + k }, routerDemo));
   S.set([...fan, ...servers], { autoAlpha: 0 }, 0);
   S.add(gsap.set(fan, { autoAlpha: 1 }), 'b1~router+0.1');
   S.add(fx.draw(fan, { d: 0.45, stagger: 0.08 }), 'b1~router+0.1');
   S.add(fx.in(servers, { from: 'left', d: 0.4, dist: 20, stagger: 0.1 }), 'b1~router+0.2');
-  const pick = S.arrow({ x1: 340, y1: RY, x2: SVX - 60, y2: RY, color: 'struct', sw: 4, head: 14 }, routerDemo);
+  const pick = S.arrow({ x1: HUB, y1: RY, x2: SVX - 60, y2: RY, color: 'struct', sw: 4, head: 14 }, routerDemo);
+  req.parentNode.appendChild(req);                              // the request sits over the hub's wires
   S.set(pick, { autoAlpha: 0 }, 0);
   S.add(gsap.set(pick, { autoAlpha: 1 }), 'b1~picks');
   S.add(fx.drawArrow(pick, { d: 0.4 }), 'b1~picks');
@@ -86,11 +93,11 @@ V.scene('ch03_s02', S => {
   // ---------------------------------------------------------------- b1: Scheduler batches it with seven others
   light(1, 'b1~scheduler-0.1');
   lightArrow(0, 'b1~scheduler');
-  const batch = ch03Batch(S, { x: MID[1], y: 720, h: 26, gap: 6, pad: 10, label: 'batch', labelSize: 24 });
+  const batch = ch03Batch(S, { x: MID[1], y: DY, h: 26, gap: 6, pad: 10, label: 'batch', labelSize: 24 });
   const trayParts = [batch.firstChild, batch.tray, batch.labelEl];
   S.set(trayParts, { autoAlpha: 0 }, 0);
   S.set(batch.chips, { autoAlpha: 0 }, 0);
-  const LOOSE = [[690, 610], [790, 585], [860, 620], [935, 582], [612, 572], [780, 650], [930, 660], [680, 668]];
+  const LOOSE = [[690, 570], [790, 545], [860, 580], [935, 542], [612, 532], [780, 610], [930, 620], [680, 628]];   // above the tray
   S.add(req.moveTo(LOOSE[0], { d: 0.7, ease: 'power2.inOut' }), 'b1~batches-0.3');
   S.add(servers[1].unglow({ d: 0.4 }), 'b1~batches');
   batch.chips.slice(1).forEach((c, k) => { S.add(c.moveTo(LOOSE[k + 1], { d: 0.01 }), 0.02); });
@@ -111,7 +118,7 @@ V.scene('ch03_s02', S => {
   light(2, 'b2~memory-0.1');
   lightArrow(1, 'b2~memory');
   const memDemo = S.g();
-  const chips = [MID[2] - 78, MID[2] + 78].map((x, k) => libChip(S, { x, y: 690, size: 54, hbm: 1, state: 'idle', seed: 21 + k }, memDemo));
+  const chips = [MID[2] - 78, MID[2] + 78].map((x, k) => libChip(S, { x, y: DY, size: 54, hbm: 1, state: 'idle', seed: 21 + k }, memDemo));
   S.set(chips, { autoAlpha: 0 }, 0);
   chips.forEach((c, k) => { S.add(gsap.set(c, { autoAlpha: 1 }), T('b2~decides') + k * 0.15); S.add(c.drawOn({ d: 0.7 }), T('b2~decides') + k * 0.15); });
   // eight coral weight tiles, two for each memory stack
@@ -119,7 +126,7 @@ V.scene('ch03_s02', S => {
   chips.forEach(c => c.stacks.forEach(st => [0, 1].forEach(j => slots.push({ x: st.x + 3, y: st.y + 3 + j * (st.h - 6) / 2, w: st.w - 6, h: (st.h - 6) / 2 - 3 }))));
   const tw = slots[0].w, th = slots[0].h, rowW = 8 * tw + 7 * 12;
   const tiles = slots.map((sl, k) => {
-    const x0 = MID[2] - rowW / 2 + k * (tw + 12), y0 = 572;
+    const x0 = MID[2] - rowW / 2 + k * (tw + 12), y0 = DY - 118;
     const t = S.rect({ x: x0, y: y0, w: tw, h: th, r: 2, fill: 'url(#card-bytes)', stroke: 'bytes', sw: 1.5 }, memDemo);
     t.__to = [sl.x - x0, sl.y - y0];
     return t;
@@ -137,7 +144,7 @@ V.scene('ch03_s02', S => {
   const INP = [2, 1, 5, 1, 1], WTS = [0.13, -0.7, 0.02, 1.44, -0.3];
   const PROD = INP.map((x, i) => Math.round(x * WTS[i] * 100) / 100);       // 0.26, −0.7, 0.1, 1.44, −0.3 → 0.8
   const SUM = Math.round(PROD.reduce((a, b) => a + b, 0) * 100) / 100;
-  const KX = CX[3], KY = i => 572 + i * 32;
+  const KX = MID[3] - 169, KY = i => DY - 64 + i * 32;        // the table, KX + 18 to KX + 320, centred under its card
   const mini = S.g();
   const cell = (x, y, w, text, tone, color, g) => {
     const c = S.g(null, g);
@@ -163,14 +170,14 @@ V.scene('ch03_s02', S => {
   S.add(fx.draw(brace, { d: 0.3 }), 'b2~do-0.1');
   S.add(fx.in(out, { from: 'left', dist: 12, d: 0.3 }), 'b2~do+0.15');
   // 'arithmetic': the picture tiles into a dense grid of the same operation, too fast to follow
-  const GR = { x: KX + 12, y: 548, cols: 14, rows: 12, cw: 18, ch: 13, gx: 4, gy: 5 };
+  const GR = { x: MID[3] - 152, y: DY - 106, cols: 14, rows: 12, cw: 18, ch: 13, gx: 4, gy: 5 };   // 304 x 211, centred
   const grid = ignore(S.g());
   const gcells = [];
   for (let r = 0; r < GR.rows; r++) for (let c = 0; c < GR.cols; c++)
     gcells.push(S.rect({ x: GR.x + c * (GR.cw + GR.gx), y: GR.y + r * (GR.ch + GR.gy), w: GR.cw, h: GR.ch, r: 2, fill: 'compute', fillOpacity: 0.18 }, grid));
   S.set(grid, { autoAlpha: 0 }, 0);
   const ARITH = T('b2~arithmetic');
-  S.add(gsap.to(mini, { autoAlpha: 0, scale: 0.6, transformOrigin: `${KX + 160}px 636px`, duration: 0.4, ease: 'power2.in' }), ARITH - 0.1);
+  S.add(gsap.to(mini, { autoAlpha: 0, scale: 0.6, transformOrigin: `${KX + 169}px ${DY}px`, duration: 0.4, ease: 'power2.in' }), ARITH - 0.1);
   S.add(gsap.to(grid, { autoAlpha: 1, duration: 0.4 }), ARITH + 0.1);
   // deterministic shimmer: each frame lights a different seeded set of cells
   const hash = (a, b) => { let h = (a * 374761393 + b * 668265263) >>> 0; h = ((h ^ (h >>> 13)) * 1274126177) >>> 0; return (h ^ (h >>> 16)) / 4294967296; };

@@ -9,6 +9,10 @@ V.scene('ch05_s04', S => {
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
   const fmt = v => Math.round(v).toLocaleString('en-US');
 
+  // the camera keeps each stage centred: the chip and the token (y 130-590) 170 px lower in b1, with the
+  // millisecond strip 75 in b2, the full layout in b3, and 120 higher once only the division and the budget remain
+  S.xset(S.camera, { x: 0, y: 170, s: 1 });
+
   // ---------------------------------------------------------------- b1: the chip and its rate; the token and its count
   const CHX = 300, CHY = 360;
   const chipG = S.g();
@@ -28,7 +32,7 @@ V.scene('ch05_s04', S => {
   const tok = ch05Token(S, { x: TX, y: 160, size: 30, hidden: true });
   S.add(tok.pop({ d: 0.45 }), 'b1~token-0.3');
   const mad = S.g();
-  const RY = i => 236 + i * 40, IX = 1330, WXc = 1430, ADD = { x: 1620, y: 270, w: 190, h: 76 };
+  const RY = i => 236 + i * 40, IX = 1330, WXc = 1430, ADD = { x: 1620, y: 270, w: 214, h: 76 };
   const times = [], tiles = [];
   for (let i = 0; i < 5; i++) {
     S.rect({ x: IX - 25, y: RY(i) - 15, w: 50, h: 30, r: 6, fill: 'url(#card-struct)', stroke: 'struct', sw: 1.5 }, mad);
@@ -65,6 +69,7 @@ V.scene('ch05_s04', S => {
 
   // ---------------------------------------------------------------- b2: divide: a trillion every millisecond; a tenth of that is 0.1 ms
   const SP = { x: 460, y: 680, w: 1000, h: 50 };
+  S.add(fx.cam({ x: 960, y: 465, scale: 1, d: 0.8, ease: 'power2.inOut' }), T('b2') - 0.3);
   const strip = S.g();
   S.rect({ x: SP.x, y: SP.y - SP.h / 2, w: SP.w, h: SP.h, r: 6, fill: '#0c1326', stroke: 'ink', strokeOpacity: 0.6, sw: 2 }, strip);
   for (let k = 1; k < 10; k++) S.line({ x1: SP.x + k * 100, y1: SP.y - SP.h / 2, x2: SP.x + k * 100, y2: SP.y + SP.h / 2, stroke: 'ink', strokeOpacity: 0.35, sw: 1.5 }, strip);
@@ -92,6 +97,7 @@ V.scene('ch05_s04', S => {
 
   // ---------------------------------------------------------------- b3: thirty milliseconds; the arithmetic in bursts; packed together, 0.1 ms
   const B3 = T('b3') - 0.1;
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), B3 + 0.1);
   S.add(gsap.to([strip, fills[0], one], { autoAlpha: 0, scale: 0.6, transformOrigin: '960px 680px', duration: 0.45, ease: 'power2.in' }), B3);
   S.add(fx.out([spec, really], { d: 0.3, stagger: 0 }), B3);
   const TL = { x0: 210, y: 880, h: 48, px: CH05.PX_PER_MS };
@@ -137,6 +143,7 @@ V.scene('ch05_s04', S => {
   S.add(gsap.fromTo(mc, { v: 0 }, { v: 299, duration: 1.0, ease: 'power2.out', immediateRender: false, onUpdate: () => { more.textContent = mc.v >= 298.5 ? "≈ 300 more tokens' worth" : `${fmt(mc.v)}`; } }), 'b4~three');
   // the two numbers meet in the middle: 10¹¹ ÷ 10¹⁵ = 0.1 ms
   const Q = T('b4~one') - 0.1;
+  S.add(fx.cam({ x: 960, y: 660, scale: 1, d: 0.9, ease: 'power2.inOut' }), Q + 0.2);
   const divO = S.g(), div = S.g(null, divO);          // divO animates; div is placed
   const dy = 470;
   const d1 = ch05Pow(S, 11, { x: 0, y: dy, size: 60, anchor: 'start', tone: 'compute', family: 'mono' }, div);

@@ -24,7 +24,88 @@
   };
   const TONES = ['compute', 'bytes', 'helps', 'struct', 'violet', 'neutral'];
   const color = c => (c == null ? TONE.ink : (TONE[c] || c));
-  const FAMILY = { sans: 'Inter', display: 'Inter Display', mono: 'JetBrains Mono' };
+  // ---------------------------------------------------------------- type
+  // The families text is set in, and the case of its words. A page may try other type before the engine loads by
+  // setting window.__TYPE = {sans, display, scale, textCase}, to compare faces on real frames.
+  // A face's missing glyphs come from the bundled Inter (and Inter's from DejaVu), so every machine draws the same.
+  const TYPE = Object.assign({ sans: 'Poppins', display: 'Poppins', mono: 'JetBrains Mono', scale: 1, textCase: 'title' },
+    window.__TYPE || {});
+  const FAMILY = { sans: TYPE.sans, display: TYPE.display, mono: TYPE.mono };
+  const FALLBACK = { sans: 'Inter', display: 'Inter', mono: 'JetBrains Mono' };
+  /** the CSS family list for 'sans' | 'display' | 'mono' (or a family name) */
+  const familyCss = fam => {
+    const f = FAMILY[fam];
+    if (!f) return fam;
+    return f === FALLBACK[fam] ? `'${f}'` : `'${f}', '${FALLBACK[fam]}'`;
+  };
+  /** the size a face is drawn at for a requested size: faces wider than Inter can be drawn a little smaller */
+  const drawSize = (size, fam) => (fam === 'mono' || !TYPE.scale || TYPE.scale === 1 ? size : +(size * TYPE.scale).toFixed(2));
+
+  // The case of words. 'title': every word starts with a capital except the short joining words inside a phrase
+  // (a, an, the, and, of, to, in, on, at, by, for, per, …: APA style); 'start': every word does; 'as-written'.
+  // A word stays exactly as written when it already has a capital, a digit or a symbol inside it (KV, GPU, H100,
+  // fp16, d_model, tok/s, e.g.), when it is a unit (ms, ns, s) or a single letter standing for a quantity (n, x, t);
+  // so does all text in mono, and text drawn with case: 'keep' (tokens, chat and prompt text, example sentences).
+  // A text's case applies to whatever it later shows too (counters, typing), so a scene sets words once, as written.
+  const MINOR = new Set('a an the and as but for if nor or yet at by in of on per to via vs vs.'.split(' '));
+  // a joining word that ends a phrase is a particle and takes a capital ('read the prompt in', 'always on'); not
+  // 'of' or 'the': a label set on two lines can end its first line with those
+  const PARTICLE = new Set('in on to for at by via yet'.split(' '));
+  const UNIT = new Set(('ms ns µs μs ps s min hr h kb mb gb tb kib mib gib tib kbps mbps gbps flop flops tok toks '
+    + 'hz khz mhz ghz w kw mw nm mm cm km px pt fps rpm etc').split(' '));
+  const BREAK = /[:;!?.—–·→←|=]$/;          // a word after one of these starts a new phrase
+  const caseMode = (o = {}) => {
+    const m = !o.case || o.case === 'label' ? TYPE.textCase : o.case;
+    return (o.family || 'sans') === 'mono' ? 'keep' : (m === 'as-written' ? 'keep' : m);
+  };
+  function casePart(core, first, end, mode, part) {
+    if (!/^\p{Ll}/u.test(core)) return core;                               // a capital, digit or symbol first
+    if (/[\p{Lu}0-9_/\\@#$%^&*=+<>~.]/u.test(core.slice(1))) return core;   // KV-style, fp16, d_model, tok/s, e.g
+    if (core.length === 1 && core !== 'a') return core;                    // n, x, t: quantities
+    if (UNIT.has(core)) return core;
+    if (mode === 'title' && !first && MINOR.has(core) && !(end && PARTICLE.has(core)) && !(part && core === 'if')) return core;
+    return core[0].toUpperCase() + core.slice(1);
+  }
+  function caseWord(w, first, end, mode) {
+    const [, lead, core, trail] = /^([^\p{L}\p{N}]*)(.*?)([^\p{L}0-9]*)$/u.exec(w);
+    if (!core) return w;
+    // a compound takes a capital on its first part, and on later parts as a word would: token-by-token -> Token-by-Token
+    const parts = core.split('-');
+    const out = parts.map((q, i) => (q ? casePart(q, first || (i === 0 && parts.length > 1), end && i === parts.length - 1, mode, i > 0) : q)).join('-');
+    return lead + out + trail;
+  }
+  function caseText(str, o = {}) {
+    const s = String(str), mode = caseMode(o);
+    if (mode === 'keep') return s;
+    const parts = s.split(/(\s+)/);
+    const lastWord = parts.reduce((k, x, i) => (i % 2 === 0 && /\p{L}/u.test(x) ? i : k), -1);
+    let started = false, prev = '';
+    const out = parts.map((x, i) => {
+      if (i % 2 || x === '') return x;
+      const letters = /\p{L}/u.test(x);
+      // a phrase starts at the text's first word or number ('+ a few' -> '+ A Few'; '1 of 5' stays), or after : · →
+      const first = !started || BREAK.test(prev);
+      // the word ends a phrase: punctuation after it, or it is the text's last word
+      const end = /[:;!?,]$/.test(x) || i === lastWord;   // a particle before a comma is an adverb: "Text In, Keys Out"
+      const y = letters ? caseWord(x, first, end, mode) : x;
+      if (letters || /\p{N}/u.test(x)) started = true;
+      prev = x;
+      return y;
+    }).join('');
+    return out.length === s.length ? out : s;
+  }
+
+  /** segments for names with one-letter subscripts: subs('W_Q, W_K', 24) → W with a small, lowered Q, and so on */
+  function subs(str, size, o = {}) {
+    return String(str).split(/_(\w)/).map((t, i) => (i % 2 ? { t, s: Math.round(size * 0.68), b: +(size * 0.24).toFixed(1), ...o } : { t, ...o })).filter(x => x.t);
+  }
+
+  /** lines that make one phrase: cased as one text, split where they were ('Nothing Else About' / 'the Architecture') */
+  function caseLines(lines, o = {}) {
+    const words = caseText(lines.join(' '), o).split(' ');
+    let k = 0;
+    return lines.map(l => { const n = l.trim().split(/\s+/).length, s = words.slice(k, k + n).join(' '); k += n; return s; });
+  }
 
   function hexA(hex, a) {
     const h = color(hex).replace('#', '');
@@ -48,12 +129,14 @@
   }
 
   // ---------------------------------------------------------------- text measurement
+  const TEXT_CONTENT = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
   const mctx = document.createElement('canvas').getContext('2d');
   function measure(str, o = {}) {
-    const size = o.size || 32, weight = o.weight || 500, fam = FAMILY[o.family || 'sans'] || o.family;
-    mctx.font = `${weight} ${size}px "${fam}"`;
-    const m = mctx.measureText(String(str));
-    return m.width + (o.ls || 0) * size * Math.max(0, String(str).length - 1);
+    const fam = o.family || 'sans', size = drawSize(o.size || 32, fam), weight = o.weight || 500;
+    const s = caseText(str, o);
+    mctx.font = `${weight} ${size}px ${familyCss(fam)}`;
+    const m = mctx.measureText(s);
+    return m.width + (o.ls || 0) * size * Math.max(0, s.length - 1);
   }
 
   // ---------------------------------------------------------------- formatting
@@ -236,7 +319,8 @@
     }, p || S.main);
 
     /**
-     * Text. str may be a string or an array of segments {t, c, w, f, s, o}.
+     * Text. str may be a string or an array of segments {t, c, w, f, s, o, b} (b: lower by b px, a subscript;
+     * negative raises). V.subs('W_Q, W_K') gives the segments for names with one-letter subscripts.
      * o: {x, y, size, weight, color, anchor: start|middle|end, family: sans|display|mono,
      *     ls (em), opacity, maxW (shrinks to fit and warns), baseline: middle|alphabetic|hanging}
      */
@@ -244,51 +328,66 @@
       const size0 = o.size || 32;
       let size = size0;
       const fam = o.family || 'sans';
-      const plain = Array.isArray(str) ? str.map(s => s.t).join('') : String(str);
+      const raw = Array.isArray(str) ? str.map(s => s.t).join('') : String(str);
+      // the case is set over the whole text (segments too), so 'first word' means the text's first word
+      const plain = caseText(raw, o);
       if (o.maxW) {
-        const w = measure(plain, { size, weight: o.weight || 500, family: fam, ls: o.ls });
+        const w = measure(plain, { size, weight: o.weight || 500, family: fam, ls: o.ls, case: 'keep' });
         if (w > o.maxW) {
           size = Math.floor(size * o.maxW / w);
           if (size < size0 * 0.85) S.warn(`text "${plain.slice(0, 40)}" shrunk ${size0}→${size}px to fit ${o.maxW}px`);
         }
       }
       const t = el('text', {
-        x: o.x || 0, y: o.y || 0, 'font-size': size, 'font-weight': o.weight || 500,
+        x: o.x || 0, y: o.y || 0, 'font-size': drawSize(size, fam), 'font-weight': o.weight || 500,
         fill: color(o.color || 'ink'), 'text-anchor': o.anchor || 'start',
         'dominant-baseline': o.baseline || 'middle', opacity: o.opacity,
         'letter-spacing': o.ls ? `${o.ls}em` : undefined,
-        'font-family': FAMILY[fam] ? `'${FAMILY[fam]}'` : fam,
+        'font-family': familyCss(fam),
         class: fam === 'mono' ? 'mono' : (o.tnum ? 'tnum' : undefined),
         style: o.italic ? { fontStyle: 'italic' } : undefined,
       }, p || S.main);
       if (Array.isArray(str)) {
+        let at = 0;
         for (const s of str) {
+          const n = String(s.t).length, piece = plain.slice(at, at + n);
+          at += n;
           el('tspan', {
-            text: s.t, fill: s.c ? color(s.c) : undefined, 'font-weight': s.w, 'font-size': s.s,
-            'font-family': s.f ? `'${FAMILY[s.f] || s.f}'` : undefined, opacity: s.o,
+            text: s.f === 'mono' ? s.t : piece, fill: s.c ? color(s.c) : undefined, 'font-weight': s.w,
+            'font-size': s.s ? drawSize(s.s, s.f || fam) : undefined,
+            'font-family': s.f ? familyCss(s.f) : undefined, opacity: s.o,
+            'baseline-shift': s.b ? `${-s.b}px` : undefined,
           }, t);
         }
       } else {
         t.textContent = plain;
       }
-      t.__size = size; t.__family = fam; t.__weight = o.weight || 500; t.__plain = plain;
+      // whatever the text shows later (a counter, a typewriter) is cased the same way
+      if (caseMode({ case: o.case, family: fam }) !== 'keep') {
+        Object.defineProperty(t, 'textContent', {
+          configurable: true,
+          get() { return TEXT_CONTENT.get.call(this); },
+          set(v) { TEXT_CONTENT.set.call(this, caseText(v, { case: o.case, family: fam })); },
+        });
+      }
+      t.__size = size; t.__family = fam; t.__weight = o.weight || 500; t.__plain = plain; t.__raw = raw;
       return t;
     };
 
     /** Wrapped paragraph. o: {x, y, w, size, lh (line-height multiplier), anchor, color, weight}. Returns <g> with .lines and .height */
     S.para = (str, o = {}, p) => {
       const size = o.size || 32, lh = (o.lh || 1.3) * size, maxW = o.w || 800;
-      const words = String(str).split(/\s+/);
+      const words = caseText(str, o).split(/\s+/);         // cased as one text, then broken into lines
       const lines = [];
       let line = '';
       for (const w of words) {
         const test = line ? line + ' ' + w : w;
-        if (measure(test, { size, weight: o.weight || 400, family: o.family }) > maxW && line) { lines.push(line); line = w; }
+        if (measure(test, { size, weight: o.weight || 400, family: o.family, case: 'keep' }) > maxW && line) { lines.push(line); line = w; }
         else line = test;
       }
       if (line) lines.push(line);
       const g = el('g', null, p || S.main);
-      lines.forEach((ln, i) => S.text(ln, { ...o, y: (o.y || 0) + i * lh, maxW: undefined }, g));
+      lines.forEach((ln, i) => S.text(ln, { ...o, y: (o.y || 0) + i * lh, maxW: undefined, case: 'keep' }, g));
       g.lines = [...g.children];
       g.height = lines.length * lh;
       return g;
@@ -370,7 +469,7 @@
     S.pill = (text, o = {}, p) => {
       const h = o.h || 56, size = o.size || 28, padX = o.padX ?? 22, tone = o.tone || 'struct';
       const fam = o.mono ? 'mono' : 'sans';
-      const tw = measure(text, { size, weight: o.weight || 600, family: fam });
+      const tw = measure(text, { size, weight: o.weight || 600, family: fam, case: o.case });
       const w = o.w || tw + padX * 2;
       const x = (o.anchor || 'middle') === 'middle' ? o.x - w / 2 : o.x;
       const y = o.y - h / 2;
@@ -384,7 +483,7 @@
         stroke: c, strokeOpacity: style === 'solid' ? 0 : style === 'ghost' ? 0.35 : 0.7, sw: 2, dash: style === 'ghost' ? '6 6' : undefined,
       }, g);
       g.label = S.text(text, {
-        x: x + w / 2, y: o.y + 1, size, weight: o.weight || 600, anchor: 'middle', family: fam,
+        x: x + w / 2, y: o.y + 1, size, weight: o.weight || 600, anchor: 'middle', family: fam, case: o.case,
         color: style === 'solid' ? '#0a0f1e' : (o.color || (style === 'ghost' ? 'muted' : 'ink')),
       }, g);
       Object.assign(g, { w, h, x, y, cx: x + w / 2, cy: o.y, l: x, r: x + w, t: y, b: y + h, text });
@@ -394,7 +493,7 @@
     /** A row of pills, laid out left to right (or centred). o: {x, y, gap, align: middle|start, ...pill} Returns array (with .w) */
     S.pills = (items, o = {}, p) => {
       const gap = o.gap ?? 14, size = o.size || 28, padX = o.padX ?? 22, fam = o.mono ? 'mono' : 'sans';
-      const widths = items.map(t => o.w || measure(t, { size, weight: o.weight || 600, family: fam }) + padX * 2);
+      const widths = items.map(t => o.w || measure(t, { size, weight: o.weight || 600, family: fam, case: o.case }) + padX * 2);
       const total = widths.reduce((a, b) => a + b, 0) + gap * (items.length - 1);
       let x = (o.align || 'middle') === 'middle' ? o.x - total / 2 : o.x;
       const g = el('g', null, p || S.main);
@@ -1013,6 +1112,22 @@
     return o;
   }
 
+  // Where a text's glyphs actually reach: its line box (r) narrowed to the ink, measured in the canvas. A face's
+  // line box is much taller than its letters (Poppins: 1.4 em), so boxes can meet where no glyphs do.
+  function inkBox(t, r) {
+    const ctm = t.getScreenCTM();
+    const txt = t.textContent;
+    if (!ctm || Math.abs(ctm.b) > 1e-3 || Math.abs(ctm.c) > 1e-3 || !txt.trim()) return r;   // rotated: keep the box
+    const cs = getComputedStyle(t);
+    mctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const m = mctx.measureText(txt);
+    const box = m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
+    if (!box) return r;
+    const k = r.height / box, base = r.top + m.fontBoundingBoxAscent * k;
+    const top = base - m.actualBoundingBoxAscent * k, bottom = base + m.actualBoundingBoxDescent * k;
+    return { left: r.left, right: r.right, width: r.width, top, bottom, height: bottom - top };
+  }
+
   function audit(o = {}) {
     const issues = [];
     const texts = [...document.querySelectorAll('#film text')];
@@ -1031,7 +1146,7 @@
       if (px < (o.minPx || 20)) issues.push({ kind: 'small', text: label, px: Math.round(px) });
       if (r.left < SAFE - 24 || r.top < SAFE - 40 || r.right > W - SAFE + 24 || r.bottom > H - SAFE + 24)
         issues.push({ kind: 'offscreen', text: label, box: [r.left, r.top, r.right, r.bottom].map(Math.round) });
-      vis.push({ t, r, label, op });
+      vis.push({ t, r, ink: inkBox(t, r), label, op });
     }
     // text that straddles the edge of a filled shape (half on a card, half off it) reads as a mistake
     const shapes = [];
@@ -1052,6 +1167,7 @@
       const st = s.getAttribute('stroke');
       if (!st || st === 'none' || s.closest('defs, pattern') || s.closest('[data-audit="ignore"]')) continue;
       if (effOpacity(s) * parseFloat(s.getAttribute('stroke-opacity') || '1') < 0.3) continue;
+      if (/^0(px)?\s*[, ]/.test(getComputedStyle(s).strokeDasharray || '')) continue;   // drawn on to 0%: nothing shows yet
       const box = s.getBoundingClientRect();
       if (box.width < 1 && box.height < 1) continue;
       let L = 0;
@@ -1066,10 +1182,23 @@
       }
       strokePts.push({ s, pts, box });
     }
+    // icons, by the box of their glyph: a label set against one with no gap reads as a collision
+    const icons = [];
+    for (const s of document.querySelectorAll('#scene-root svg')) {
+      const g = s.parentNode;
+      if (!g || !g.__icon || g.closest('[data-audit="ignore"]') || effOpacity(g) < 0.3) continue;
+      const r = s.getBoundingClientRect();
+      if (r.width >= 4 && r.height >= 4) icons.push({ id: g.__icon, r });
+    }
     for (const v of vis) {
       if (v.t.closest('#kicker')) continue;
-      const a = v.r;
-      const core = { left: a.left + 2, right: a.right - 2, top: a.top + a.height * 0.22, bottom: a.bottom - a.height * 0.22 };
+      const a = v.ink;
+      for (const { id, r } of icons) {
+        const ix = Math.min(a.right + 2, r.right) - Math.max(a.left - 2, r.left);
+        const iy = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
+        if (ix > 0 && iy > 0.25 * Math.min(a.height, r.height)) { issues.push({ kind: 'text-on-icon', text: v.label, icon: id }); break; }
+      }
+      const core = { left: a.left + 2, right: a.right - 2, top: a.top + a.height * 0.15, bottom: a.bottom - a.height * 0.15 };
       for (const { s, pts, box } of strokePts) {
         if (s.parentNode === v.t.parentNode && s.__strike) continue;
         if (box.right < core.left || box.left > core.right || box.bottom < core.top || box.top > core.bottom) continue;
@@ -1079,6 +1208,23 @@
         }
       }
       for (const { s, r } of shapes) {
+        // a label set flush against a box beside it (a chip or bar after a word) reads as one blob
+        if (v.label.length > 2 && s.tagName === 'circle' && r.width >= 18 && !/pglow/.test(s.getAttribute('fill'))) {
+          // a disc: the true gap from its rim to the nearest point of the label
+          const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
+          const gap = Math.hypot(Math.max(a.left, Math.min(cx, a.right)) - cx, Math.max(a.top, Math.min(cy, a.bottom)) - cy) - r.width / 2;
+          if (gap > -3 && gap < (o.touchGap ?? 4)) {
+            issues.push({ kind: 'text-touches-box', text: v.label, shape: 'circle' });
+            break;
+          }
+        }
+        if (v.label.length > 2 && s.tagName === 'rect' && Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top) >= 0.5 * a.height) {
+          const gR = r.left - a.right, gL = a.left - r.right;
+          if ((gR > -3 && gR < (o.touchGap ?? 4)) || (gL > -3 && gL < (o.touchGap ?? 4))) {
+            issues.push({ kind: 'text-touches-box', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
+            break;
+          }
+        }
         const ix = Math.min(core.right, r.right) - Math.max(core.left, r.left);
         const iy = Math.min(core.bottom, r.bottom) - Math.max(core.top, r.top);
         if (ix <= 1 || iy <= 1) continue;
@@ -1087,25 +1233,32 @@
           issues.push({ kind: 'crosses-shape-edge', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
           break;
         }
+        // inside, but touching an edge: the box is too small for its label
+        if (s.tagName === 'rect' && (Math.min(a.left - r.left, r.right - a.right) < (o.tightX ?? 3) || Math.min(a.top - r.top, r.bottom - a.bottom) < (o.tightY ?? 2))) {
+          issues.push({ kind: 'text-tight', text: v.label, shape: (s.parentNode.textContent || s.tagName).trim().slice(0, 30) || s.tagName });
+          break;
+        }
       }
     }
     for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
-      const a = vis[i].r, b = vis[j].r;
+      const a = vis[i].ink, b = vis[j].ink;            // the glyphs themselves, not their line boxes
       const ix = Math.min(a.right, b.right) - Math.max(a.left, b.left);
       const iy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-      if (ix <= 2 || iy <= 2) continue;
-      // text boxes include line-gap padding; require real overlap of the glyph cores
-      const coreA = a.height * 0.7, coreB = b.height * 0.7;
-      if (iy < Math.min(coreA, coreB) * 0.35) continue;
-      const area = ix * iy, small = Math.min(a.width * a.height, b.width * b.height);
-      if (area / small > 0.12) issues.push({ kind: 'overlap', a: vis[i].label, b: vis[j].label, frac: +(area / small).toFixed(2) });
+      const small = Math.min(a.width * a.height, b.width * b.height), frac = ix > 0 && iy > 0 ? ix * iy / small : 0;
+      if (ix > 2 && iy > 2 && frac > 0.12) { issues.push({ kind: 'overlap', a: vis[i].label, b: vis[j].label, frac: +frac.toFixed(2) }); continue; }
+      // two labels on one line that meet or just overlap end to end ('Feed-Forward 1Feed-Forward 2'); punctuation,
+      // short marks and word pieces (a lower-case start) may
+      if (ix > -(o.touchGap ?? 3) && iy > 0.5 * Math.min(a.height, b.height) && vis[i].label.length > 2 && vis[j].label.length > 2) {
+        const [l, r] = a.left < b.left ? [vis[i].label, vis[j].label] : [vis[j].label, vis[i].label];
+        if (!/^[,.;:!?)%’'”·×÷=+−\-\p{Ll}]/u.test(r) && !/[(‘'“$]$/.test(l)) issues.push({ kind: 'text-touch', a: l, b: r });
+      }
     }
     return issues;
   }
 
   // ================================================================ public api
   const V = {
-    W, H, SAFE, TONE, fmt, scene, scenes, color, hexA, measure, rand,
+    W, H, SAFE, TONE, fmt, scene, scenes, color, hexA, measure, rand, caseText, caseLines, subs, familyCss, TYPE,
     async load(id, timing, opts = {}) {
       await document.fonts.ready;
       const film = document.getElementById('film');

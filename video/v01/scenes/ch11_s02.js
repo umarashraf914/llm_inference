@@ -12,12 +12,18 @@ V.scene('ch11_s02', S => {
   const K = ch11Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
   // ================================================================ b1: the formula
+  // the formula card (y 150-330) is alone through b1: the camera holds it on the screen's middle, 300 px down;
+  // with the rows and pills under it (b2-b3) the whole sits 105 px down
+  S.xset(S.camera, { x: 0, y: 300, s: 1 });
   const card = S.g();
-  S.rect({ x: 540, y: 150, w: 840, h: 180, r: 22, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.25, sw: 2 }, card);
-  const ai = S.text('arithmetic intensity =', { x: 574, y: 241, size: 38, weight: 750, color: 'ink' }, card);
-  const num = S.text('operations performed', { x: 1185, y: 202, size: 32, weight: 750, anchor: 'middle', color: 'compute' }, card);
-  const bar = S.path({ d: 'M1030,241 H1340', stroke: 'ink', sw: 3 }, card);
-  const den = S.text('bytes moved', { x: 1185, y: 282, size: 32, weight: 750, anchor: 'middle', color: 'bytes' }, card);
+  // the fraction measured from its words: the bar spans the numerator, the card holds both with room
+  const wAi = S.measure('arithmetic intensity =', { size: 36, weight: 750 }), wNum = S.measure('operations performed', { size: 30, weight: 750 });
+  const FX = Math.round(574 + wAi + 30 + wNum / 2), CARD_W = Math.round(FX + wNum / 2 + 36 - 540);
+  S.rect({ x: 540, y: 150, w: CARD_W, h: 180, r: 22, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.25, sw: 2 }, card);
+  const ai = S.text('arithmetic intensity =', { x: 574, y: 241, size: 36, weight: 750, color: 'ink' }, card);
+  const num = S.text('operations performed', { x: FX, y: 202, size: 30, weight: 750, anchor: 'middle', color: 'compute' }, card);
+  const bar = S.path({ d: `M${Math.round(FX - wNum / 2 - 8)},241 H${Math.round(FX + wNum / 2 + 8)}`, stroke: 'ink', sw: 3 }, card);
+  const den = S.text('bytes moved', { x: FX, y: 282, size: 30, weight: 750, anchor: 'middle', color: 'bytes' }, card);
   hide([card, ai, num, den]);
   fade(card, 0, 1, T('b1~ratio') - 0.2, 0.5);
   // 'arithmetic intensity =' types in
@@ -25,7 +31,7 @@ V.scene('ch11_s02', S => {
   fade(ai, 0, 1, tAi, 0.05);
   whole(t => { const n = Math.round(aiText.length * cl((t - tAi) / 0.6)); ai.textContent = aiText.slice(0, Math.max(1, n)); });
   fade(num, 0, 1, T('b1~operations') - 0.1, 0.35);
-  K.draw(bar, 310, T('b1~bytes') - 0.15, 0.3);
+  K.draw(bar, Math.round(wNum + 16), T('b1~bytes') - 0.15, 0.3);
   S.add(K.drive(0.4, k => { setO(den, k); den.setAttribute('transform', `translate(0,${(-24 * (1 - E('power2.out')(k))).toFixed(1)})`); }), T('b1~bytes') + 0.1);
   const chipQ = S.g();
   S.icon('ph:cpu-duotone', { x: 488, y: 240, size: 48, color: 'compute' }, chipQ);
@@ -33,8 +39,9 @@ V.scene('ch11_s02', S => {
   hide(chipQ);
   fade(chipQ, 0, 1, T('b1~number') - 0.1, 0.35);
   const watch = S.g();
-  S.icon('ph:timer-duotone', { x: 1434, y: 240, size: 48, color: 'muted' }, watch);
-  const cross = S.path({ d: 'M1406,212 L1462,268', stroke: 'muted', sw: 4 }, watch);
+  const WX = 540 + CARD_W + 54;
+  S.icon('ph:timer-duotone', { x: WX, y: 240, size: 48, color: 'muted' }, watch);
+  const cross = S.path({ d: `M${WX - 28},212 L${WX + 28},268`, stroke: 'muted', sw: 4 }, watch);
   cross.setAttribute('data-audit', 'ignore');
   hide(watch);
   const tBef = T('b1~before') - 0.1;
@@ -43,6 +50,7 @@ V.scene('ch11_s02', S => {
 
   // ================================================================ b2: high and low intensity
   const tB2 = T('b2') - 0.1;
+  S.add(S.fx.cam({ x: 960, y: 435, scale: 1, d: 0.8, ease: 'power2.inOut' }), tB2 - 0.2);
   fade(chipQ, 1, 0, tB2, 0.3);
   const LY = [520, 720];
   const lanes = LY.map(y => {

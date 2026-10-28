@@ -40,7 +40,7 @@ V.scene('ch13_s07', S => {
   const box = (y, text) => {
     const g = S.g(null, nat);
     S.rect({ x: NX - 130, y: y - 23, w: 260, h: 46, r: 10, stroke: 'muted', strokeOpacity: 0.7, sw: 2, dash: '7 6' }, g);
-    S.text(text, { x: NX, y: y + 1, size: 24, weight: 650, anchor: 'middle', color: 'muted' }, g);
+    S.text(V.subs(text, 24), { x: NX, y: y + 1, size: 24, weight: 650, anchor: 'middle', color: 'muted' }, g);   // W_Q → W with a subscript Q
     return g;
   };
   const wq = box(780, 'W_Q, W_K, W_V'), emb = box(856, 'embedding');

@@ -64,14 +64,15 @@ V.scene('ch08_s09', S => {
   };
 
   // ================================================================ b1: header, key, ledger card
-  const hd1 = S.text('Add it up,', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
-  const hd2 = S.text('check against the advertised size', { x: 110, y: 186, size: 32, weight: 600, color: 'muted' });
+  const hd1 = S.text('Add it up,', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
+  const hd2 = S.text('check against the advertised size', { x: 960, y: 186, size: 32, weight: 600, anchor: 'middle', color: 'muted' });
   ch08Hide([hd1, hd2]);
   fade([hd1, hd2], 0, 1, 0.5, 0.5, 0.25);
   fade([hd1, hd2], 1, 0, T('b3') - 0.1, 0.4);
-  const key = S.g();
-  S.icon('ph:book-open-duotone', { x: 124, y: 1008, size: 30, color: 'muted' }, key);
-  S.text('shapes: published 70B model (Llama 3 70B)', { x: 150, y: 1008, size: 22, weight: 600, color: 'muted' }, key);
+  const key = S.g();                                                 // the source, centred along the foot
+  const keyX = 960 - (30 + 11 + S.measure('shapes: published 70B model (Llama 3 70B)', { size: 22, weight: 600 })) / 2;
+  S.icon('ph:book-open-duotone', { x: keyX + 15, y: 1008, size: 30, color: 'muted' }, key);
+  S.text('shapes: published 70B model (Llama 3 70B)', { x: keyX + 41, y: 1008, size: 22, weight: 600, color: 'muted' }, key);
   ch08Hide(key);
   fade(key, 0, 1, T('b1~published') - 0.1, 0.5);
   // the ledger card
@@ -81,12 +82,15 @@ V.scene('ch08_s09', S => {
   S.text('Per layer', { x: NX, y: LY + 50, size: 34, weight: 750, family: 'display', color: 'ink' }, card);
   S.path({ d: `M${NX},${LY + 84} H${LX + LW - 32}`, stroke: 'white', strokeOpacity: 0.18, sw: 2 }, card);
   const tCard = T('b1~add') - 0.1;
-  track(card, [K(tCard, { x: 560, o: 0 }), K(tCard + 0.8, { x: 0, o: 1, e: 'power3.out' })]);
+  // alone in b1, the card comes in centred (CX0) and moves to its place on the right as W_Q comes (b2)
+  const CX0 = 960 - (LX + LW / 2), tAside = T('b2~W') - 0.1;
+  track(card, [K(tCard, { x: CX0 + 560, o: 0 }), K(tCard + 0.8, { x: CX0, o: 1, e: 'power3.out' }),
+    K(tAside - 0.8, { x: CX0, o: 1 }), K(tAside, { x: 0, o: 1, e: 'power2.inOut' })]);
   const RY = [LY + 130, LY + 190, LY + 250, LY + 310];
   const row = (name, val, y) => {
     const g = S.g(null, card);
     if (name.length === 1) ch08W(S, name, { x: NX, y, size: 34, anchor: 'start' }, g);
-    else S.text(name, { x: NX, y, size: 26, weight: 650, color: 'ink' }, g);
+    else S.text(name, { x: NX, y, size: 24, weight: 650, color: 'ink' }, g);   // 24: 'feed-forward, per layer' clears its value
     g.val = S.text(val, { x: VX, y, size: 30, weight: 650, family: 'mono', anchor: 'end', color: 'compute' }, g);
     ch08Hide(g);
     return g;

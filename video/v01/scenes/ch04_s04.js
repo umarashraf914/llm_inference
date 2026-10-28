@@ -11,6 +11,11 @@ V.scene('ch04_s04', S => {
 
   // ---------------------------------------------------------------- b1: the ledger, bytes on the wire for one full turn
   const led = S.g();
+  // alone in b1, the ledger (x 140-820, y 177-720) sits at the centre of the frame (ledW); it moves to the left
+  // half as the machine arrives on the right in b2
+  const ledW = S.g();
+  ledW.appendChild(led);
+  S.set(ledW, { x: 480, y: 90 }, 0);
   const title = S.text('Bytes on the wire, one full turn', { x: 140, y: 196, size: 36, weight: 700, color: 'ink' }, led);
   const legend = S.text('1 byte ≈ 1 letter  ·  1 KB = 1,000 bytes', { x: 140, y: 240, size: 24, weight: 550, color: 'muted' }, led);
   S.set([title, legend], { autoAlpha: 0 }, 0);
@@ -42,6 +47,7 @@ V.scene('ch04_s04', S => {
   // ---------------------------------------------------------------- b2: inside the machine, every token reads all 140 GB
   const B2 = T('b2~Inside') - 0.1;
   S.add(gsap.to(led, { opacity: 0.6, duration: 0.5 }), B2);
+  S.add(gsap.fromTo(ledW, { x: 480, y: 90 }, { x: 0, y: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), B2 - 0.3);
   const gpu = S.gpu({ x: 1380, y: 450, scale: 0.95, stacks: 3, labels: false });
   const wLbl = S.text('140 GB of weights', { x: 1380, y: gpu.t - 28, size: 30, anchor: 'middle', weight: 650, color: 'bytes' });
   S.set([gpu, wLbl], { autoAlpha: 0 }, 0);
@@ -110,8 +116,11 @@ V.scene('ch04_s04', S => {
   const BL = T('b4~Blaming') - 0.15;
   S.add(fx.out([dot, dotT, ratio, line, km, nts], { d: 0.4, stagger: 0 }), BL);
   S.add(gsap.to([gpu, wLbl, perTok, h200, ...eq1.parts, ...eq2.parts], { autoAlpha: 0, duration: 0.4 }), BL);
-  const tN = S.pill('network: kilobytes', { x: 690, y: 500, h: 64, size: 32, tone: 'neutral', style: 'soft' });
-  const tM = S.pill('inside the machine: terabytes', { x: 1250, y: 500, h: 64, size: 32, tone: 'bytes', style: 'soft' });
+  // the two pills, 130 px apart, as one pair centred on the screen
+  const pillW = t => S.measure(t, { size: 32, weight: 600 }) + 44;
+  const PL = 960 - (pillW('network: kilobytes') + 130 + pillW('inside the machine: terabytes')) / 2;
+  const tN = S.pill('network: kilobytes', { x: PL, y: 500, h: 64, size: 32, tone: 'neutral', style: 'soft', anchor: 'start' });
+  const tM = S.pill('inside the machine: terabytes', { x: PL + tN.w + 130, y: 500, h: 64, size: 32, tone: 'bytes', style: 'soft', anchor: 'start' });
   const never = S.text('the network was never the constraint', { x: 960, y: 620, size: 40, anchor: 'middle', weight: 700, family: 'display', color: 'ink' });
   S.set([tN, tM, never], { autoAlpha: 0 }, 0);
   S.add(fx.pop(tN, { d: 0.45 }), BL + 0.4);

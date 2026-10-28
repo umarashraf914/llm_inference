@@ -22,7 +22,7 @@ V.scene('ch16_s02', S => {
   const WORDS = ['What', 'is', 'the', 'capital', 'of', 'France', '?'];
 
   // ================================================================ b1: one preamble for every conversation
-  const kicker = S.text('a smaller example, token by token', { x: 70, y: 150, size: 28, weight: 700, color: 'muted' });
+  const kicker = S.text('a smaller example, token by token', { x: 960, y: 150, size: 28, weight: 700, anchor: 'middle', color: 'muted' });   // centred
   rise(kicker, T('b1~smaller') - 0.1, 6);
   const tRow = T('b1~service') - 0.15, tFill = T('b2~all') - 0.05, tHatch = T('b3~preamble') + 0.2;
   const arrL = S.text('arriving', { x: 230, y: AY + 1, size: 26, weight: 750, anchor: 'end', color: 'muted' });
@@ -63,7 +63,7 @@ V.scene('ch16_s02', S => {
   const wordAt = ['What', 'is', 'the', 'capital', 'of', 'France'].map(w => T(`b2~${w}`) - 0.1);
   wordAt.push(wordAt[5] + 0.3);
   const pills = WORDS.map((w, i) => {
-    const c = ch16Cell(S, { x: PX(i), y: AY, w: PW, label: w, plan: [[0, 'blue'], [tFill + 0.3 + 0.1 * i, 'amber']] }, rowA);
+    const c = ch16Cell(S, { x: PX(i), y: AY, w: PW, label: w, case: 'keep', plan: [[0, 'blue'], [tFill + 0.3 + 0.1 * i, 'amber']] }, rowA);
     K.track(c, [K.K(wordAt[i], { x: 30, o: 0 }), K.K(wordAt[i] + 0.35, { x: 0, o: 1, e: 'power3.out' })]);
     return c;
   });

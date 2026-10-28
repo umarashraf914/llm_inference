@@ -32,7 +32,7 @@ const CH05 = {
  * (helpers .pop .in .out .moveTo .flyIn .pulse .glow ..., geometry .cx .cy .l .r .t .b .w .h).
  */
 function ch05Token(S, o = {}, parent) {
-  return libToken(S, { text: 'one token', size: CH05.TOKEN_SIZE, ...o }, parent);
+  return libToken(S, { text: 'one token', size: CH05.TOKEN_SIZE, case: 'label', ...o }, parent);
 }
 
 /**

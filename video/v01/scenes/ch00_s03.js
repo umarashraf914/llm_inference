@@ -29,10 +29,14 @@ V.scene('ch00_s03', {
     const mixC = (a, b, w) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * w)).join(',')})`;
 
     // ---------------------------------------------------------------- numbers, checked
-    // the wall: 14 courses of two 110 x 40 bricks = 28 bricks, 220 x 560 px (x 1300-1520, y 320-880);
-    // area 123,200 px², the grey strip's 1,495 x 80 = 119,600 px² (+3%), so the restack does not exaggerate
+    // the wall: 14 courses of two 110 x 40 bricks = 28 bricks, 220 x 560 px (y 320-880);
+    // area 123,200 px², the grey strip's 1,495 x 80 = 119,600 px² (+3%), so the restack does not exaggerate.
+    // The last frame is the title and the wall, 160 px apart, as one group centred on the screen.
     const NP = 28, COURSES = 14, BW = 110, BH = 40;
-    const WALL = { x0: 1300, x1: 1520, top: 320, floor: 880 };
+    const TITLE = { size: 110, weight: 700, family: 'display' };
+    const wTitle = S.measure('The Memory Wall', TITLE);
+    const TX = Math.round(960 - (wTitle + 160 + 2 * BW) / 2);
+    const WALL = { x0: TX + Math.round(wTitle) + 160, x1: TX + Math.round(wTitle) + 160 + 2 * BW, top: 320, floor: 880 };
     const xs = B.x0 + B.sliverMs * B.pxPerMs;                  // 215: the sliver's right edge
     const PW = (B.x1 - xs) / NP;                               // 53.39 px per piece
     if (COURSES * 2 !== NP || WALL.x1 - WALL.x0 !== 2 * BW || WALL.floor - WALL.top !== COURSES * BH || B.y + B.h + DY !== WALL.floor)
@@ -195,9 +199,9 @@ V.scene('ch00_s03', {
     };
     if (depT(NP - 1) + FD > S.t('b3~has') + 0.02) S.warn('ch00_s03: the wall finishes after "has"');
 
-    // the '?' rides up on the top course to (1410, 270)
+    // the '?' rides up on the top course, to 50 px above the wall's middle
     const Q0 = { x: B.q[0], y: B.q[1] };                       // its own (bar) coordinates
-    const QF = { x: 1410, y: 270 - DY };
+    const QF = { x: WALL.x0 + BW, y: 270 - DY };
 
     // a token runs along the floor, past the sliver, and stops dead against the wall's left face
     const tokG = S.g();
@@ -214,12 +218,11 @@ V.scene('ch00_s03', {
     // ---------------------------------------------------------------- b4: The Memory Wall
     const TT = S.t('b4');
     fade(qHolder, 1, 0, 0.3, TT);
-    const TITLE = { size: 110, weight: 700, family: 'display' };
     const words = ['The', 'Memory', 'Wall'];
     const tdefs = S.el('defs', null, S.main);
     const titleG = S.g();
     words.forEach((w, k) => {
-      const x = 160 + (k ? S.measure(words.slice(0, k).join(' ') + ' ', TITLE) : 0);
+      const x = TX + (k ? S.measure(words.slice(0, k).join(' ') + ' ', TITLE) : 0);
       const ww = S.measure(w, TITLE);
       const cp = S.el('clipPath', { id: `ch00s03-title-${k}` }, tdefs);
       const cr = S.rect({ x: x - 12, y: 330 - 95, w: 0, h: 190, fill: '#fff' }, cp);
@@ -230,8 +233,7 @@ V.scene('ch00_s03', {
       hide(txt);                                               // clipped to nothing until then; hidden so the audit agrees
       S.set(txt, { autoAlpha: 1 }, TT + 0.15 * k);
     });
-    const wTitle = S.measure('The Memory Wall', TITLE);
-    if (160 + wTitle > WALL.x0 - 120) S.warn(`ch00_s03: title ends at ${Math.round(160 + wTitle)}, too close to the wall`);
+    if (TX + wTitle > WALL.x0 - 120) S.warn(`ch00_s03: title ends at ${Math.round(TX + wTitle)}, too close to the wall`);
     // 'wall': the bricks pulse coral once
     let gd = '';
     for (let j = 0; j < NP; j++) { const b = brick(j); gd += `M${b.x + 1.5},${b.y + DY + 1.5}h${BW - 3}v${BH - 3}h${-(BW - 3)}z`; }

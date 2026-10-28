@@ -45,7 +45,7 @@ V.scene('ch10_s01', S => {
     S.rect({ x: 110, y: L.y, w: 1700, h: LH, r: 26, fill: '#0b1224', fillOpacity: 0.7, stroke: 'struct', strokeOpacity: 0.55, sw: 2 }, g);
     const tw = S.measure(L.name, { size: 36, weight: 750 });
     S.text(L.name, { x: 144, y: L.y + 42, size: 36, weight: 750, family: 'display', color: 'ink' }, g);
-    g.sub = S.text(L.sub, { x: 144 + tw + 4, y: L.y + 44, size: 28, weight: 600, color: 'muted' }, g);
+    g.sub = S.text(L.sub.trim(), { x: 144 + tw + 12, y: L.y + 44, size: 28, weight: 600, color: 'muted' }, g);   // SVG drops the leading space
     hide(g.sub);
     fade(g.sub, 0, 1, T(L.cue) - 0.1, 0.45);
     return g;

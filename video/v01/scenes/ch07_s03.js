@@ -49,8 +49,10 @@ V.scene('ch07_s03', S => {
   const station = (c, title, glyph) => {
     const g = S.g();
     S.card({ x: c.l, y: CARD_T, w: c.w, h: CARD_B - CARD_T, tone: 'neutral', title: '' }, g);
-    glyph(c.l + 48, HEAD_Y, g);
-    g.titleEl = S.text(title, { x: c.l + 80, y: HEAD_Y, size: 34, weight: 650, color: 'ink' }, g);
+    // the glyph (about 44 px) and the title, centred in the card as one
+    const x0 = c.cx - (44 + 12 + S.measure(title, { size: 34, weight: 650 })) / 2;
+    glyph(x0 + 22, HEAD_Y, g);
+    g.titleEl = S.text(title, { x: x0 + 56, y: HEAD_Y, size: 34, weight: 650, color: 'ink' }, g);
     ch07Hide(g);
     return g;
   };
@@ -96,7 +98,7 @@ V.scene('ch07_s03', S => {
   S.add(fx.drawArrow(arrowG[1].arrow, { d: 0.5 }), 'b1~text+0.1');
 
   // the sentence, two lines, left-aligned in the Text card; it types on with a caret
-  const TS = { size: 36, weight: 500 };
+  const TS = { size: 36, weight: 500, case: 'keep' };   // the sentence being typed, as written
   const LINES = [['the', 'quick', 'brown'], ['fox', 'jumps']];
   const LINE_Y = [CY - 26, CY + 26];
   const lineStr = LINES.map(l => l.join(' '));

@@ -18,7 +18,7 @@ V.scene('ch00_s01', {
       'light reaches your eyes from every direction, and the whole sky glows blue.';
     const chat = libChatWindow(S, {
       x: 300, y: 130, w: 1320, h: 630, title: '', question: 'Why is the sky blue?', qSize: 34, qRight: 1500,
-      answer: ANSWER, splits: { wavelengths: ['wave', 'lengths'] }, size: 36, lineH: 54, iconX: 360, ax: 400, aw: 1110,
+      answer: ANSWER, splits: { wavelengths: ['wave', 'lengths'] }, size: 36, lineH: 54, iconX: 360, ax: 400, aw: 1170,
     }, stage);
     const kb = chat.find(' blues');                // the freeze point
     const N = kb + 1;                              // tokens streamed at true speed (74)

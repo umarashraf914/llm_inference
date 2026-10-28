@@ -53,13 +53,17 @@ V.scene('ch13_s01', S => {
   S.add(gsap.set(head, { autoAlpha: 1 }), 'b1~the conversation-0.1');
   S.add(fx.type(head.titleEl, { d: 1.3 }), 'b1~the conversation-0.1');
 
-  // the staircase: its empty silhouette appears on "grows"
-  const st = ch13Staircase(S, { x: ST.x, y: ST.y, size: ST.size });
+  // the staircase: its empty silhouette appears on "grows", centred with its tags. While a label stands at its
+  // left (b2-b3) the staircase, tags and label move right as one (+165), centred; back as the cards rise.
+  const stairG = S.g();
+  S.add(gsap.fromTo(stairG, { x: 0 }, { x: 165, duration: 0.6, ease: 'power2.inOut', immediateRender: false }), 'b2-0.05');
+  S.add(gsap.fromTo(stairG, { x: 165 }, { x: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), 'b3~redone-0.35');
+  const st = ch13Staircase(S, { x: ST.x, y: ST.y, size: ST.size }, stairG);
   S.add(st.showGuide({ stagger: 0.13 }), 'b1~grows-0.15');
 
   // ---------------------------------------------------------------- b2: one row per decode step
   const R = st.rows;
-  const rowLabel = S.text('one row = one decode step', { x: LABEL_R, y: R[0].y, size: 28, anchor: 'end', color: 'muted', weight: 550 });
+  const rowLabel = S.text('one row = one decode step', { x: LABEL_R, y: R[0].y, size: 28, anchor: 'end', color: 'muted', weight: 550 }, stairG);
   S.add(st.enter(0, { d: 0.55, stagger: 0.08 }), 'b2~Each row-0.1');
   S.add(fx.in(rowLabel, { from: 'right', d: 0.6 }), 'b2~row+0.15');
   // the newest token is the one computed in this step
@@ -99,7 +103,7 @@ V.scene('ch13_s01', S => {
   S.add(st.forget(0, { d: 0.9 }), 'b3~no memory');
   S.add(st.forget(1, { d: 0.5 }), 'b3~no memory');
   const gapY = (R[0].y + R[1].y) / 2 - 6;
-  const carried = S.text('nothing carried over', { x: LABEL_R, y: gapY, size: 28, anchor: 'end', color: 'muted', weight: 550 });
+  const carried = S.text('nothing carried over', { x: LABEL_R, y: gapY, size: 28, anchor: 'end', color: 'muted', weight: 550 }, stairG);
   S.add(fx.in(carried, { from: 'right', d: 0.6 }), 'b3~memory+0.25');
   // "its work on earlier tokens": step 2 starts from scratch; every arc is drawn fresh, every earlier token re-read
   S.add(gsap.fromTo(R[1].g, { opacity: 0.28 }, { opacity: 1, duration: 0.5, ease: 'power2.out', immediateRender: false }), 'b3~So-0.1');

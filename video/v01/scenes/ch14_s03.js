@@ -13,7 +13,9 @@
        79 different; all but the lane and one padlocked W_K dims; the two-line caption.
    Layout: lanes x 160 + 170 j, pills y 900, lanes y 220-870; slab 1 x 80-930, y 640-800; slab 2 y 300-360;
    blend box (840, 575); combine (840, 505); '+' (840, 452); panel x 1180-1870, y 340-720; grid columns 1080 /
-   1560 ('=' at 1320), rows 'layer 2' y 280-540 and 'layer 1' y 580-840. */
+   1560 ('=' at 1320), rows 'layer 2' y 280-540 and 'layer 1' y 580-840. The lanes hold the left; the right column
+   (the panel in b1, the header and caption in b2-b3) centres on x 1525, so lanes and column are one centred
+   pair. b5's picture is drawn around x 900 and moved 145 left, centred. */
 V.scene('ch14_s03', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
@@ -50,13 +52,13 @@ V.scene('ch14_s03', S => {
   const WTS = [0.1, 0.3, 0.1, 0.2, 0.3];
   const tBl = T('b1~blends') - 0.1;
   const keys = [0, 1, 2, 3, 4].map(j => S.icon('ph:key-duotone', { x: LX(j), y: 776, size: 28, color: 'struct' }, att));
-  const qI = S.icon('ph:magnifying-glass-duotone', { x: 886, y: 700, size: 38, color: 'ink' }, att);
-  const qGlow = S.circle({ x: 886, y: 700, r: 30, fill: 'url(#pglow-struct)', opacity: 0 }, att);
+  const qI = S.icon('ph:magnifying-glass-duotone', { x: 902, y: 726, size: 32, color: 'ink' }, att);   // clear of the '0.3' above bar 5
+  const qGlow = S.circle({ x: 900, y: 724, r: 26, fill: 'url(#pglow-struct)', opacity: 0 }, att);
   qGlow.setAttribute('data-audit', 'ignore');
   att.insertBefore(qGlow, qI);
   pulse(qGlow, tBl, 1, 0.8);
   const dashes = [0, 1, 2, 3, 4].map(j => {
-    const p = S.path({ d: `M870,712 C${lerp(870, LX(j), 0.4)},${740} ${LX(j) + 20},${748} ${LX(j) + 10},${760}`, stroke: 'ink', strokeOpacity: 0.55, sw: 1.8, dash: '4 5' }, att);
+    const p = S.path({ d: `M893,733 C${lerp(893, LX(j), 0.4)},${752} ${LX(j) + 20},${752} ${LX(j) + 10},${760}`, stroke: 'ink', strokeOpacity: 0.55, sw: 1.8, dash: '4 5' }, att);
     p.setAttribute('data-audit', 'ignore');
     hide(p);
     fade(p, 0, 1, tBl + 0.1 + 0.05 * (4 - j), 0.3);
@@ -160,8 +162,8 @@ V.scene('ch14_s03', S => {
     return g;
   };
   strands(4, 434, tComb + 1.2, lane5);
-  const hd1 = S.text('What layer 1 hands upward', { x: 1300, y: 150, size: 42, weight: 750, anchor: 'middle', color: 'ink' });
-  const hd2 = S.text('at position 5', { x: 1300, y: 200, size: 30, weight: 600, anchor: 'middle', color: 'muted' });
+  const hd1 = S.text('What layer 1 hands upward', { x: 1525, y: 470, size: 42, weight: 750, anchor: 'middle', color: 'ink' });
+  const hd2 = S.text('at position 5', { x: 1525, y: 520, size: 30, weight: 600, anchor: 'middle', color: 'muted' });
   rise(hd1, T('b2~what') - 0.1);
   rise(hd2, T('b2~what') + 0.2);
   fade([hd1, hd2], 1, 0, tB4, 0.4);
@@ -175,7 +177,7 @@ V.scene('ch14_s03', S => {
 
   // ================================================================ b3: every lane carries its context
   [0, 1, 2, 3].forEach(j => strands(j, 634, tB3 + 0.2 + 0.25 * j, lanes));
-  const cap = S.text('the purpose of the layer', { x: 1400, y: 560, size: 44, weight: 800, anchor: 'middle', color: 'ink' });
+  const cap = S.text('the purpose of the layer', { x: 1525, y: 640, size: 44, weight: 800, anchor: 'middle', color: 'ink' });
   rise(cap, T('b3~purpose') - 0.1);
   fade(cap, 1, 0, tB4, 0.35);
 
@@ -274,5 +276,9 @@ V.scene('ch14_s03', S => {
   const c2 = S.text('through the stream, never the weights', { x: 1460, y: 870, size: 28, weight: 650, anchor: 'middle', color: 'muted' });
   rise(c1, tNever + 0.3);
   rise(c2, tNever + 0.6);
+  // b5's picture (the lane, its keys, W_K and the caption) centred as one
+  const b5G = S.g();
+  [st, Wk, c1, c2].forEach(e => b5G.appendChild(e));
+  b5G.setAttribute('transform', 'translate(-145,0)');
   void bands; void lane; void tB2;
 });

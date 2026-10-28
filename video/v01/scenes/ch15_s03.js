@@ -13,7 +13,9 @@
    b5  'skip and resume?' crossed out; amber outlines 'prefill again'; the footnote; a teal block and an amber
        block; the heading 'a prefix rule, / not a search for pieces'; 'why the rule is unforgiving'.
    Layout: pills y 300 at x 300 + 200 i; tray x 220-1580, y 380-440 (slots 90 × 44); arriving row y 620;
-   counter x 1600-1820; bottom band y 860-940; blocks y 770. */
+   counter x 1600-1820; bottom band y 860-940; blocks y 770. The rows are one pane, centred below the heading as
+   the frame changes: alone in b1-b2 (+100, +180); up for the icons in b3 (+100, 0); in b4-b5, with the arriving
+   row, the counter at the right and the blocks, (+25, +100). The icons, headings and footnote stay put. */
 V.scene('ch15_s03', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1, tB5 = T('b5') - 0.1;
@@ -110,7 +112,7 @@ V.scene('ch15_s03', S => {
     else K.track(g, [K.K(tRoom + 0.08 * Math.abs(i - 4), { y: -70, o: 0 }), K.K(tRoom + 0.08 * Math.abs(i - 4) + 0.4, { y: 0, o: 1, e: 'bounce.out' })], PX(i), 410);
   });
   fade([pills[5], pills[6]].map(p => p.firstChild), 0.35, 1, tRoom + 0.3, 0.4);
-  const settled = S.text('settled', { x: PX(4) + 66, y: 352, size: 24, weight: 750, color: 'bytes' });
+  const settled = S.text('settled', { x: PX(4) - 64, y: 352, size: 24, weight: 750, anchor: 'end', color: 'bytes' });   // left of the tile, clear of the wall
   rise(settled, tPerm + 0.4, 6);
   fade(settled, 1, 0, tSafe, 0.25);
   // a value that could still change is turned away
@@ -121,15 +123,15 @@ V.scene('ch15_s03', S => {
   ghost.setAttribute('data-audit', 'ignore');
   whole(t => {
     const k = EIO(cl((t - tCould) / 0.8)), back = EIO(cl((t - tCould - 1.3) / 0.6));
-    const x = lerp(1900, 1660, k) + 260 * back, y = 530;
+    const x = lerp(1900, 1560, k) + 360 * back, y = 530;   // clear of the right edge with the pane's +100
     ghost.setAttribute('transform', `translate(${x.toFixed(1)},${y})`);
     stripes.setAttribute('transform', `translate(${(6 * Math.sin(t * 9)).toFixed(1)},0)`);
     setO(ghost, t > tCould && back < 1 ? 1 : 0);
   });
-  const gx = S.path({ d: 'M1636,506 L1684,554 M1684,506 L1636,554', stroke: 'muted', sw: 4 });
+  const gx = S.path({ d: 'M1536,506 L1584,554 M1584,506 L1536,554', stroke: 'muted', sw: 4 });
   gx.setAttribute('data-audit', 'ignore');
   K.draw(gx, 150, tCould + 0.8, 0.25);
-  const gTag = S.pill('could still change', { x: 1660, y: 604, tone: 'neutral', size: 22, h: 34 });
+  const gTag = S.pill('could still change', { x: 1560, y: 604, tone: 'neutral', size: 22, h: 34 });
   rise(gTag, tCould + 0.9, 6);
   fade([gx, gTag], 1, 0, tSafe + 0.2, 0.3);
   const safeT = S.g();
@@ -146,7 +148,7 @@ V.scene('ch15_s03', S => {
   const brL2 = S.text('valid while these are unchanged', { x: (PX(0) + PX(4)) / 2, y: 492, size: 26, weight: 750, anchor: 'middle', color: 'helps' }, brG);
   rise(brL2, tEv + 0.3, 8);
   [0, 1, 2, 3, 4].forEach(i => {
-    const e = S.text('=', { x: PX(i) - 66, y: 300, size: 28, weight: 800, anchor: 'middle', color: 'helps' });
+    const e = S.text('=', { x: PX(i) - 76, y: 300, size: 28, weight: 800, anchor: 'middle', color: 'helps' });
     hide(e);
     fade(e, 0, 1, tEv + 0.06 * i, 0.2);
     fade(e, 1, 0, tEv + 1.4, 0.4);
@@ -284,5 +286,12 @@ V.scene('ch15_s03', S => {
   rise(blocks, tH3 + 0.3, 10);
   const why = S.text('why the rule is unforgiving', { x: 960, y: 222, size: 26, weight: 650, anchor: 'middle', color: 'muted' });
   rise(why, tNot, 6);
-  void heads; void pills; void lows; void lerp;
+  // the rows as one pane (see the header)
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && !heads.includes(e) && e !== why && e !== band && e !== foot).forEach(e => pane.appendChild(e));
+  whole(t => {
+    const k3 = EIO(cl((t - tB3) / 0.8)), k4 = EIO(cl((t - tB4) / 0.8));
+    pane.setAttribute('transform', `translate(${(100 - 75 * k4).toFixed(1)},${(180 - 180 * k3 + 100 * k4).toFixed(1)})`);
+  });
+  void pills; void lows;
 });

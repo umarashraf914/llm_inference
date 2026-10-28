@@ -19,7 +19,7 @@ V.scene('ch16_s05', S => {
   const CW = ['770', 'What', 'is', 'the', 'capital', 'of', 'France', '?'];
   const AW = ['770', 'Tell', 'me', 'the', 'capital', 'of', 'France', 'please'];
   const BW = ['770', 'What', 'is', 'the', 'capital', 'of', 'Japan', '?'];
-  const m = w => S.measure(w, { size: SZ, weight: 650 });
+  const m = w => S.measure(w, { size: SZ, weight: 650, case: 'keep' });
   const colW = CW.map((w, i) => (i === 0 ? 130 : Math.max(76, Math.round(Math.max(m(w), m(AW[i]), m(BW[i])) + 44))));
   const total = colW.reduce((a, b) => a + b, 0) + GAP * 7, X0 = Math.round(960 - total / 2 + 60);
   const COLX = colW.map((w, i) => X0 + colW.slice(0, i).reduce((a, b) => a + b, 0) + GAP * i);
@@ -27,10 +27,9 @@ V.scene('ch16_s05', S => {
   const XD = COLR(0) + GAP / 2;
 
   // ================================================================ b1: the whole phrase in common, the first token not
-  const kicker = S.text('case C: a minute later, same words reordered', { x: 70, y: 150, size: 30, weight: 750, color: 'ink' });
+  const kicker = S.text('case C: a minute later, same words reordered', { x: 960, y: 140, size: 30, weight: 750, anchor: 'middle', color: 'ink' });   // centred, its tag under it
   rise(kicker, T('b1~Case') - 0.1, 6);
-  const kw = S.measure('case C: a minute later, same words reordered', { size: 30, weight: 750 });
-  const seen = S.pill('seen earlier', { x: 70 + kw + 30 + S.measure('seen earlier', { size: 24, weight: 600 }) / 2 + 22, y: 150, tone: 'neutral', size: 24, h: 42 });
+  const seen = S.pill('seen earlier', { x: 960, y: 192, tone: 'neutral', size: 24, h: 42 });
   hide(seen);
   const tSeen = T('b1~pair') - 0.1;
   whole(t => setO(seen, cl((t - tSeen) / 0.15) * (1 - cl((t - tSeen - 1.6) / 0.4)) * (t < tSeen + 0.6 ? 0.6 + 0.4 * Math.abs(Math.sin(t * 18)) : 1)));
@@ -45,7 +44,7 @@ V.scene('ch16_s05', S => {
   const wordAt = ['Tell', 'me', 'the#2', 'capital', 'of', 'France', 'please'].map(w => T(`b1~${w}`) - 0.1);
   const arr = AW.map((w, i) => {
     const plan = i === 0 ? [[0, 'blue'], [tPass, 'teal', 0.25]] : [[0, 'blue'], [tAll + 0.08 * (i - 1), 'amber']];
-    const c = ch16Cell(S, { x: COLX[i], y: AY, w: colW[i], h: H, r: 18, label: w, size: i === 0 ? 30 : SZ, plan }, rowA);
+    const c = ch16Cell(S, { x: COLX[i], y: AY, w: colW[i], h: H, r: 18, label: w, case: 'keep', size: i === 0 ? 30 : SZ, plan }, rowA);
     const at = i === 0 ? 0.7 : wordAt[i - 1];
     K.track(c, [K.K(at, { x: 30, o: 0 }), K.K(at + 0.35, { x: 0, o: 1, e: 'power3.out' })]);
     if (i === 0) c.check(tPass);
@@ -53,7 +52,7 @@ V.scene('ch16_s05', S => {
   });
   const cache = CW.map((w, i) => {
     const plan = i === 0 ? [[0, 'blue'], [tPass, 'teal', 0.25]] : [[0, 'blue']];
-    const c = ch16Cell(S, { x: COLX[i], y: CY, w: colW[i], h: H, r: 18, label: w, size: i === 0 ? 30 : SZ, plan }, rowC);
+    const c = ch16Cell(S, { x: COLX[i], y: CY, w: colW[i], h: H, r: 18, label: w, case: 'keep', size: i === 0 ? 30 : SZ, plan }, rowC);
     rise(c, 0.7 + 0.06 * i, 8, 0.35);
     return c;
   });
@@ -110,7 +109,7 @@ V.scene('ch16_s05', S => {
   const rowB = S.g();
   const bRow = BW.map((w, i) => {
     const plan = i === 0 ? [[0, 'teal']] : i <= 5 ? [[0, 'blue'], [tFive + 0.07 * i, 'teal', 0.25]] : [[0, 'blue'], [tFive + 0.5, 'amber']];
-    return ch16Cell(S, { x: COLX[i], y: BY, w: colW[i], h: H, r: 18, label: w, size: i === 0 ? 30 : SZ, plan }, rowB);
+    return ch16Cell(S, { x: COLX[i], y: BY, w: colW[i], h: H, r: 18, label: w, case: 'keep', size: i === 0 ? 30 : SZ, plan }, rowB);
   });
   K.track(rowB, [K.K(tB3 + 0.2, { y: -40, o: 0 }), K.K(tB3 + 0.8, { y: 0, o: 1, e: 'power3.out' })]);
   const bracket = (y, at) => {

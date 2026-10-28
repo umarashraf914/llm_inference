@@ -106,4 +106,12 @@ V.scene('ch06_s11', S => {
   S.add(gsap.fromTo(extA, { attr: { y2: yA(2022) } }, { attr: { y2: yA(2024) }, duration: 0.9, ease: 'power2.out', immediateRender: false }), tExt);
   S.add(gsap.fromTo(extM, { attr: { y2: yM(2022) } }, { attr: { y2: yM(2024) }, duration: 0.9, ease: 'power2.out', immediateRender: false }), tExt);
   S.add(gsap.fromTo(gLbl, { scale: 1, transformOrigin: '0% 50%' }, { scale: 1.16, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut', transformOrigin: '0% 50%', immediateRender: false }), 'b3~factor-0.1');
+
+  // alone in b1, the chart (x 89-1290) sits centred, 270 px right; it moves left to make room for the gap's
+  // reading on its right as b2 begins (the corner tag stays in its corner)
+  const chart = S.g();
+  [...S.main.children].filter(e => e !== chart && e !== corner).forEach(e => chart.appendChild(e));
+  S.main.insertBefore(chart, S.main.firstChild);
+  S.set(chart, { x: 270 }, 0);
+  S.add(gsap.fromTo(chart, { x: 270 }, { x: 0, duration: 0.8, ease: 'power2.inOut', immediateRender: false }), T('b2') - 0.3);
 });

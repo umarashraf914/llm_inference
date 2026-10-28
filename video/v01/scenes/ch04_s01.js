@@ -14,7 +14,7 @@ V.scene('ch04_s01', S => {
 
   // ---------------------------------------------------------------- layout (wide shot = camera at rest)
   const CW = { x: 100, y: 150, w: 440, h: 340 };      // the chat window, floating above the laptop
-  const LAP = { x: 320, y: 700, w: 300 };             // the laptop (lid top 594, deck bottom 806)
+  const LAP = { x: 320, y: 650, w: 300 };             // the laptop, its middle on the cable (lid top 544, deck bottom 756)
   const SRV = { x: 1620, y: 650, w: 300 };            // the server, in its data centre
   const CAB = { x1: 478, x2: SRV.x - SRV.w / 2, y: 650 };   // the cable: device end → server port
   const UPY = 565, DNY = 712;                         // the Up lane and the Down lane
@@ -47,7 +47,10 @@ V.scene('ch04_s01', S => {
   const lidT = LAP.y - (LAP.w * 0.708) / 2, lidL = LAP.x - LAP.w * 0.42, lidR = LAP.x + LAP.w * 0.42;
   [[CW.x + 34, lidL + 10], [CW.x + CW.w - 34, lidR - 10]].forEach(([a, b]) =>
     S.line({ x1: a, y1: CW.y + CW.h + 6, x2: b, y2: lidT - 4, stroke: 'struct', sw: 1.5, strokeOpacity: 0.32, dash: '4 7' }, tether));
-  const lap = libDevice(S, { x: LAP.x, y: LAP.y, w: LAP.w, label: 'your device' });
+  const lap = libDevice(S, { x: LAP.x, y: LAP.y, w: LAP.w });
+  // the two names share one row, under the taller picture (the hall)
+  const LABEL_Y = 508 + 330 + 34;
+  lap.labelEl = S.text('your device', { x: LAP.x, y: LABEL_Y, size: 30, anchor: 'middle', weight: 650 }, lap);
 
   const chatG = S.g();
   const mkChat = () => libChatWindow(S, {
@@ -72,7 +75,7 @@ V.scene('ch04_s01', S => {
 
   // ---------------------------------------------------------------- the server, its data centre, the cable (HUD)
   const dc = S.g(null, S.hud);
-  const B = { x: 1432, y: 474, w: 376, h: 330 };
+  const B = { x: 1432, y: 508, w: 376, h: 330 };       // the hall: with its roof units (from B.y - 46) its middle is the cable's
   S.rect({ x: B.x, y: B.y, w: B.w, h: B.h, r: 10, fill: 'url(#hw-hall)', stroke: '#ffffff', strokeOpacity: 0.22, sw: 2 }, dc);
   S.rect({ x: B.x - 10, y: B.y - 12, w: B.w + 20, h: 14, r: 4, fill: '#1a2440', stroke: '#ffffff', strokeOpacity: 0.22, sw: 1.5 }, dc);
   [B.x + 92, B.x + B.w - 92].forEach(ux => {
@@ -92,7 +95,7 @@ V.scene('ch04_s01', S => {
   const srvIn = S.g(null, S.hud);                     // slides in (fx.in)
   const srvHolder = S.g(null, srvIn);                 // moves and scales (fx.xform)
   const srv = libServer(S, { x: SRV.x, y: SRV.y, w: SRV.w, spinner: true }, srvHolder);
-  const srvLabel = S.text('the server', { x: SRV.x, y: 838, size: 30, anchor: 'middle', weight: 650 }, dc);
+  const srvLabel = S.text('the server', { x: SRV.x, y: LABEL_Y, size: 30, anchor: 'middle', weight: 650 }, dc);
   S.xset(srvHolder, { x: 0, y: 0, s: 1, ox: SRV.x, oy: SRV.y });
   const spinPaths = [...srv.spinnerRot.querySelectorAll('path')];
   const spinTint = (from, to, at) => S.add(gsap.fromTo(spinPaths, { attr: { stroke: S.tone(from) } }, { attr: { stroke: S.tone(to) }, duration: 0.3, immediateRender: false }), at);

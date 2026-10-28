@@ -37,7 +37,7 @@ V.scene('ch18_s03', S => {
     const g = S.g(null, parent);
     S.rect({ x, y: 102, w, h: 56, r: 12, fill: '#0c1326' }, g);
     g.r = S.rect({ x, y: 102, w, h: 56, r: 12, fill: `url(#card-${tone})`, stroke: tone, sw: 2.5 }, g);
-    g.t = S.text(label, { x: x + w / 2, y: EY + 1, size: 34, weight: 700, anchor: 'middle', color: 'ink' }, g);
+    g.t = S.text(label, { x: x + w / 2, y: EY + 1, size: 31, weight: 700, anchor: 'middle', color: 'ink' }, g);   // 31: room inside each box
     return g;
   };
   const tps = S.text('tokens per second', { x: 500, y: EY + 1, size: 34, weight: 750, anchor: 'end', color: 'ink' }, eq);
@@ -45,7 +45,7 @@ V.scene('ch18_s03', S => {
   const bA = box(560, 200, 'bandwidth', 'bytes');
   const div1 = S.text('÷', { x: 822, y: EY + 1, size: 38, weight: 750, anchor: 'middle', color: 'ink' }, eq);
   const bB = box(885, 290, 'bytes per token', 'bytes');
-  const bBt2 = S.text('bytes per read', { x: 1030, y: EY + 1, size: 34, weight: 700, anchor: 'middle', color: 'ink' }, bB);
+  const bBt2 = S.text('bytes per read', { x: 1030, y: EY + 1, size: 31, weight: 700, anchor: 'middle', color: 'ink' }, bB);
   const lpar = S.text('(', { x: 862, y: EY - 2, size: 46, weight: 500, anchor: 'middle', color: 'ink' }, eq);
   const div2 = S.text('÷', { x: 1238, y: EY + 1, size: 38, weight: 750, anchor: 'middle', color: 'ink' }, eq);
   const bC = box(1265, 465, 'tokens sharing each read', 'struct');

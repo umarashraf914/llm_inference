@@ -11,15 +11,19 @@
        ('schematic').
    b5  the small chip's counters run up ×2 then ×10 with fixed bars ('bar scale × 2', '× 10'); the badge's 10
        never changes: 'scale-free'.
-   Layout: table x 110-1000 (rows y 300 / 500, amber bars from x 330, coral from x 600); chart x 1160-1760,
-   y 300-900. */
+   Layout: table x 120-820 (rows y 300 / 500, amber bars from x 330, coral from x 600), the statements and the
+   card centred under it (x 470); chart x 1160-1760, y 300-900. The ghost roof is centred while alone (-500, -120);
+   the table alone is centred (+490, +170) and slides to +25 as the chart comes in at (+25, -85), the two
+   columns on one centre line. */
 V.scene('ch11_s06', S => {
   const K = ch11Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const X = i => 1160 + Math.log10(i) * 280, Y = v => 900 - Math.log10(v / 10) * 280;
 
   // ================================================================ b1: two toy chips
-  const ghost = S.path({ d: 'M1160,800 L1440,520 H1760', stroke: 'muted', strokeOpacity: 0.4, sw: 3 });
-  const ring = S.circle({ x: 1440, y: 520, r: 22, fill: 'none', stroke: 'white', sw: 3, opacity: 0 });
+  const g0 = S.g();             // the ghost roof, alone and centred
+  g0.setAttribute('transform', 'translate(-500,-120)');
+  const ghost = S.path({ d: 'M1160,800 L1440,520 H1760', stroke: 'muted', strokeOpacity: 0.4, sw: 3 }, g0);
+  const ring = S.circle({ x: 1440, y: 520, r: 22, fill: 'none', stroke: 'white', sw: 3, opacity: 0 }, g0);
   ring.setAttribute('data-audit', 'ignore');
   pulse(ring, T('b1~corner') - 0.2, 1, 0.8);
   fade(ghost, 1, 0, T('b1~Two') - 0.1, 0.4);
@@ -98,7 +102,7 @@ V.scene('ch11_s06', S => {
   const tRat = T('b2~ratio') - 0.1;
   fade([bdgS, bdgB], 1, 0, tRat + 0.2, 0.4);
   tens.forEach((t, i) => {
-    const sx = t === tens[0] ? bdgS.tenX : bdgB.tenX, sy = i ? 561 : 361, cy = i ? Y(1000) : Y(500);
+    const sx = t === tens[0] ? bdgS.tenX : bdgB.tenX, sy = i ? 561 : 361, cy = (i ? Y(1000) : Y(500)) - 85;   // the chart sits 85 higher
     K.track(t, [K.K(tRat, { x: 0, y: 0 }), K.K(tRat + 0.8, { x: 1440 - sx - 14, y: cy - sy - 30, e: 'power2.inOut' })]);
     fade(t, 1, 0, tRat + 0.9, 0.3);
   });
@@ -128,15 +132,15 @@ V.scene('ch11_s06', S => {
   fade([...p5, ...p20, vline, vTag], 1, 0, tB3r, 0.35);
   fade([chart, small, big, brk], 1, 0.3, tB3r, 0.4);
   fade(rows, 0.4, 1, tB3r, 0.4);
-  const q1 = S.text('ratio → what work it suits', { x: 120, y: 700, size: 32, weight: 750, color: 'ink' });
-  const q2 = S.text('size → how fast', { x: 120, y: 760, size: 32, weight: 750, color: 'ink' });
+  const q1 = S.text('ratio → what work it suits', { x: 470, y: 700, size: 32, weight: 750, anchor: 'middle', color: 'ink' });
+  const q2 = S.text('size → how fast', { x: 470, y: 760, size: 32, weight: 750, anchor: 'middle', color: 'ink' });
   hide([q1, q2]);
   fade(q1, 0, 1, T('b3~what') - 0.1, 0.35);
   fade(q2, 0, 1, T('b3~absolute') - 0.1, 0.35);
   const tQ = T('b3~Two') - 0.1;
   K.track(q1, [K.K(tQ, { y: 0 }), K.K(tQ + 0.5, { y: -10 })]);
   K.track(q2, [K.K(tQ, { y: 0 }), K.K(tQ + 0.5, { y: 10 })]);
-  const qr = S.path({ d: 'M120,730 H560', stroke: 'muted', sw: 1.5 });
+  const qr = S.path({ d: 'M250,730 H690', stroke: 'muted', sw: 1.5 });
   qr.setAttribute('data-audit', 'ignore');
   K.draw(qr, 440, tQ + 0.3, 0.4);
 
@@ -147,10 +151,12 @@ V.scene('ch11_s06', S => {
   fade([chart, small, brk], 0.3, 1, tB4, 0.4);
   const tE = T('b4~eighty') - 0.1;
   const card = S.g();
-  S.rect({ x: 110, y: 662, w: 470, h: 160, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.2, sw: 2 }, card);
-  const c1 = S.text('compute × 80', { x: 136, y: 700, size: 28, weight: 750, family: 'mono', color: 'compute' }, card);
-  const c2 = S.text('bandwidth × 17', { x: 136, y: 742, size: 28, weight: 750, family: 'mono', color: 'bytes' }, card);
-  const c3 = S.text('80 ÷ 17 ≈ 4.7', { x: 136, y: 788, size: 30, weight: 800, family: 'mono', color: 'ink' }, card);
+  // sized to its lines and centred under the table
+  const cw = Math.max(S.measure('bandwidth × 17', { size: 28, weight: 750, family: 'mono' }), S.measure('80 ÷ 17 ≈ 4.7', { size: 30, weight: 800, family: 'mono' })) + 52;
+  S.rect({ x: 470 - cw / 2, y: 662, w: cw, h: 160, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.2, sw: 2 }, card);
+  const c1 = S.text('compute × 80', { x: 470 - cw / 2 + 26, y: 700, size: 28, weight: 750, family: 'mono', color: 'compute' }, card);
+  const c2 = S.text('bandwidth × 17', { x: 470 - cw / 2 + 26, y: 742, size: 28, weight: 750, family: 'mono', color: 'bytes' }, card);
+  const c3 = S.text('80 ÷ 17 ≈ 4.7', { x: 470 - cw / 2 + 26, y: 788, size: 30, weight: 800, family: 'mono', color: 'ink' }, card);
   hide([card, c1, c2, c3]);
   fade(card, 0, 1, tE, 0.3);
   fade(c1, 0, 1, tE, 0.3);
@@ -199,5 +205,12 @@ V.scene('ch11_s06', S => {
   const sf = S.text('scale-free', { x: 120, y: 430, size: 32, weight: 800, color: 'ink' });
   hide(sf);
   fade(sf, 0, 1, T('b5~many') - 0.1, 0.4);
-  void lerp; void E; void bdgB; void setO;
+  // the chart's column, and the table's: alone and centred, then left of the chart, on one centre line
+  const chG = S.g(), tblG = S.g();
+  [chart, small, big, brk, vline, vTag, vGlow, ...p5, ...p20, mk, mkT, sch].forEach(e => chG.appendChild(e));
+  chG.setAttribute('transform', 'translate(25,-85)');
+  [...S.main.children].filter(e => e !== chG && e !== tblG && e !== g0).forEach(e => tblG.appendChild(e));
+  const tSl = T('b2') - 0.65;
+  whole(t => { const k = EIO(cl((t - tSl) / 0.7)); tblG.setAttribute('transform', `translate(${lerp(490, 25, k).toFixed(1)},${lerp(170, 0, k).toFixed(1)})`); });
+  void E; void bdgB; void setO; void ghost;
 });

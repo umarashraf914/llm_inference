@@ -8,13 +8,18 @@ V.scene('ch03_s06', S => {
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
 
   // ---------------------------------------------------------------- b1: the operator and its system prompt
-  const op = S.g();
-  S.icon('ph:buildings-duotone', { x: 500, y: 222, size: 76, color: 'muted' }, op);
-  const opLbl = S.text('operator', { x: 500, y: 292, size: 26, anchor: 'middle', weight: 600, color: 'muted' }, op);
+  // the operator and its card: one group (icon 76, 42 px, card 440), centred above the slab to come
+  // alone in b1, the two sit on the screen's middle (topG, 300 px down); they rise as the slab arrives below
+  const OPX = 719;
+  const topG = S.g();
+  S.set(topG, { y: 300 }, 0);
+  const op = S.g(null, topG);
+  S.icon('ph:buildings-duotone', { x: OPX, y: 222, size: 76, color: 'muted' }, op);
+  const opLbl = S.text('operator', { x: OPX, y: 292, size: 26, anchor: 'middle', weight: 600, color: 'muted' }, op);
   S.set(op, { autoAlpha: 0 }, 0);
   S.add(fx.in(op, { from: 'up', d: 0.5 }), 0.3);
-  const CARD = { x: 580, y: 170, w: 440, h: 124 };
-  const card = S.g();
+  const CARD = { x: OPX + 80, y: 170, w: 440, h: 124 };
+  const card = S.g(null, topG);
   S.rect({ x: CARD.x, y: CARD.y, w: CARD.w, h: CARD.h, r: 16, fill: '#0c1326', filter: 'url(#shadow)' }, card);
   const cardBg = S.rect({ x: CARD.x, y: CARD.y, w: CARD.w, h: CARD.h, r: 16, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.25, sw: 2 }, card);
   S.icon('ph:file-text-duotone', { x: CARD.x + 40, y: CARD.y + 42, size: 40, color: 'ink' }, card);
@@ -51,6 +56,7 @@ V.scene('ch03_s06', S => {
   S.text('140 GB of weights', { x: 960, y: SL.y + SL.h / 2 + 1, size: 40, anchor: 'middle', weight: 700, color: 'ink' }, plate);
   S.set(plate, { autoAlpha: 0 }, 0);
   const WT = T('b2~weights') - 0.1;
+  S.add(gsap.fromTo(topG, { y: 300 }, { y: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), WT - 0.75);
   S.add(gsap.fromTo(cr, { attr: { width: 0 } }, { attr: { width: SL.w + 16 }, duration: 0.9, ease: 'power2.inOut', immediateRender: false }), WT);
   S.add(fx.in(plate, { from: 'scale', scale: 0.9, d: 0.45 }), WT + 0.7);
   const same = S.text('identical for every user, every request, forever', { x: 960, y: SL.y + SL.h + 54, size: 30, anchor: 'middle', weight: 650, color: 'ink' });
@@ -82,17 +88,17 @@ V.scene('ch03_s06', S => {
   S.icon('ph:lock-simple-duotone', { x: SL.x + SL.w, y: SL.y - 2, size: 44, color: 'ink' }, lock);
   S.set(lock, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(lock, { autoAlpha: 0, y: -60 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'bounce.out' }), T('b2~before') + 0.15);
-  // 'none of it': the card flies at the slab and bounces off
+  // 'none of it': the card flies down at the slab and bounces off
   const NONE = T('b2~None') - 0.1;
   S.add(fx.out(tline, { d: 0.4 }), NONE);
-  S.add(gsap.to(card, { x: 250, y: 110, rotation: 6, transformOrigin: '50% 50%', duration: 0.32, ease: 'power2.in' }), NONE);
+  S.add(gsap.to(card, { x: -60, y: 110, rotation: 6, transformOrigin: '50% 50%', duration: 0.32, ease: 'power2.in' }), NONE);
   S.add(gsap.to(card, { x: 0, y: 0, rotation: 0, transformOrigin: '50% 50%', duration: 0.6, ease: 'back.out(2.2)' }), NONE + 0.32);
   const hit = ignore(S.rect({ x: SL.x - 6, y: SL.y - 6, w: SL.w + 12, h: SL.h + 12, r: 14, stroke: 'ink', sw: 4 }));
   S.set(hit, { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(hit, { autoAlpha: 0.9 }, { autoAlpha: 0, duration: 0.5, ease: 'power2.out', immediateRender: false }), NONE + 0.32);
   S.call(() => card.setAttribute('data-audit', 'ignore'), NONE);
   S.call(() => card.removeAttribute('data-audit'), NONE + 1.0);
-  const head = S.text('The weights do not know your system prompt', { x: 1180, y: 118, size: 38, anchor: 'middle', weight: 700, family: 'display', color: 'ink' });
+  const head = S.text('The weights do not know your system prompt', { x: 960, y: 118, size: 38, anchor: 'middle', weight: 700, family: 'display', color: 'ink' });
   S.set(head, { autoAlpha: 0 }, 0);
   S.add(fx.in(head, { from: 'down', d: 0.5, dist: 24 }), T('b2~model') - 0.2);
 
@@ -108,7 +114,7 @@ V.scene('ch03_s06', S => {
   const PILLS = ['system prompt', 'conversation', 'your question'];
   let px = ST.x + 16;
   const pills = PILLS.map((t, i) => {
-    const p = libToken(S, { text: t, x: px, y: ST.y + ST.h / 2, size: 26, anchor: 'start', state: i === 2 ? 'token' : 'token' });
+    const p = libToken(S, { text: t, x: px, y: ST.y + ST.h / 2, size: 26, anchor: 'start', state: 'token', case: 'label' });
     px += p.w + 12;
     S.set(p, { autoAlpha: 0 }, 0);
     return p;
@@ -157,5 +163,7 @@ V.scene('ch03_s06', S => {
   S.add(gsap.to(stripLbl, { y: -16, duration: 0.3 }), CW + 0.2);
   S.add(fx.swap(runLbl, 'the only input'), 'b4~only-0.1');
   const take = S.takeaway('the context window is the only input', { tone: 'struct' });
+  // the picture rises 70 px as the takeaway comes, so it stays centred in the space above it
+  S.add(fx.cam({ x: 960, y: 610, scale: 1, d: 0.7, ease: 'power2.inOut' }), 'b4~is its-0.5');
   S.add(fx.in(take, { from: 'up', d: 0.5 }), 'b4~is its-0.2');
 });

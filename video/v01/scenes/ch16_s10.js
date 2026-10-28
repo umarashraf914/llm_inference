@@ -14,7 +14,9 @@
        ticks flicker only on the variable end; ghost strips share the teal front; 'order matters: stable first,
        variable last'.
    Layout: row y 330 from x 140 (slots 70 wide, numbers y 286); the stack scales rows 0.75 about (140, 330), row k
-   at y 230 + 54 k; bars x 360-1560, y 772 / 840; plate y 930; band x 260-1660, y 520. */
+   at y 230 + 54 k; bars x 360-1560, y 772 / 840; plate y 930; band x 260-1660, y 520. The row and then the stack
+   with its bars are one pane: in b1 the row sits 230 lower, centred below the header; as it pulls out into the
+   stack (b2) the pane rises into place and moves 134 right, so the stack and bars are centred. */
 V.scene('ch16_s10', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1;
@@ -117,6 +119,11 @@ V.scene('ch16_s10', S => {
   S.text('edit with care', { x: X0 + 336, y: 169, size: 28, weight: 750, color: 'compute' }, warn);
   rise(warn, tCare, 8);
   fade(head, 1, 0, tCare - 0.4, 0.3);
+
+  // the row, then the stack and its bars, as one pane (see the header)
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && e !== head && e !== plate).forEach(e => pane.appendChild(e));
+  whole(t => { const p = EIO(cl((t - tStack) / 1.0)); pane.setAttribute('transform', `translate(${(134 * p).toFixed(1)},${(230 * (1 - p)).toFixed(1)})`); });
 
   // ================================================================ b4: stable first, variable last
   fade([top, stack, topU, b1, b2, plate, warn], 1, 0, tB4, 0.45);

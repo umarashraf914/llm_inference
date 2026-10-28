@@ -6,6 +6,8 @@
 V.scene('ch04_s02', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
+  // the camera keeps the map and the chart centred: 110 px lower with the first chart (b1-b2), 45 with the second
+  S.xset(S.camera, { x: 0, y: 110, s: 1 });
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
   const GREY = '#7c879e';
 
@@ -89,6 +91,7 @@ V.scene('ch04_s02', S => {
 
   // ---------------------------------------------------------------- b3: the chart moves up; a 500-token answer, either way, in seconds
   const B3 = T('b3') - 0.15;
+  S.add(fx.cam({ x: 960, y: 495, scale: 1, d: 0.8, ease: 'power2.inOut' }), B3 - 0.2);
   S.add(fx.out([map, ...pins, ax1, ratio, caveat], { d: 0.4, stagger: 0 }), B3);
   S.xset(chart1, { x: 0, y: 0, s: 1, ox: 960, oy: 485 });
   S.add(fx.xform(chart1, { x: 0, y: 236 - 485, s: 0.7 }, { d: 0.8, ease: 'power3.inOut' }), B3 + 0.2);
@@ -129,8 +132,9 @@ V.scene('ch04_s02', S => {
   const cableGlow = S.line({ x1: C2.x0, y1: C2.y1 - 27, x2: C2.x0 + 15 * C2.px, y2: C2.y1 - 27, stroke: 'helps', sw: 14, cap: 'round', strokeOpacity: 0 }, cable);
   const cableL = S.line({ x1: C2.x0, y1: C2.y1 - 27, x2: C2.x0 + 15 * C2.px, y2: C2.y1 - 27, stroke: 'helps', sw: 4, cap: 'round', strokeOpacity: 0.7 }, cable);
   ignore(cable);
-  const t1 = S.text('15 s', { x: C2.x0 + 15 * C2.px + 16, y: C2.y1 + 1, size: 30, weight: 650, family: 'mono', color: 'ink' });
-  const cnt = S.counter({ x: C2.x0 + 15 * C2.px + 96, y: C2.y1 + 1, size: 26, value: 0, color: 'muted', family: 'mono', weight: 600, anchor: 'start' });
+  const T1 = { x: C2.x0 + 15 * C2.px + 16, size: 30, weight: 650, family: 'mono' };
+  const t1 = S.text('15 s', { ...T1, y: C2.y1 + 1, color: 'ink' });
+  const cnt = S.counter({ x: T1.x + S.measure('15 s', T1) + 24, y: C2.y1 + 1, size: 26, value: 0, color: 'muted', family: 'mono', weight: 600, anchor: 'start' });
   const in1 = inset(C2.y1, [[30, 'struct']]);
   const zoomCap = S.text('zoomed in: the first half second, 1 ms = 1 px', { x: IN.x - 6, y: C2.y1 - 40, size: 22, weight: 550, color: 'muted' });
   S.set(zoomCap, { autoAlpha: 0 }, 0);

@@ -10,7 +10,9 @@
    b4  caption 'question and capability: one phenomenon'; the strip t1 XX t3 t4 t5 with cache cells, cracked from
        XX to the end: 'why the prefix rule exists'.
    Layout: rows y 360 / 700, slot centres x 200 / 380 / 560; W_K glyphs at x 700; stacks x 800-1040, layer 1 bar at
-   y 440 (top) / 780 (bottom), 26 px pitch; icons x 1140; probe pill (1620, 520); strip y 900, cells y 950. */
+   y 440 (top) / 780 (bottom), 26 px pitch; icons x 1140; probe pill (1620, 520); strip y 900, cells y 950.
+   The picture grows to the right, so it is centred as it grows: b1's rows alone (x 128-780) moved +506; with the
+   stacks and labels (to x 1452) +170; in place (0) from b3, the probe on the right. */
 V.scene('ch14_s05', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1, tB4 = T('b4') - 0.1;
@@ -117,10 +119,15 @@ V.scene('ch14_s05', S => {
   // icons grey out while blind
   whole(t => { const b = cl((t - tBlind) / 0.4) * (1 - cl((t - tBack) / 0.25)); [wave, coin].forEach(ic => ic.setAttribute('opacity', (1 - 0.6 * b).toFixed(3))); });
 
+  // b1-b2 as one pane, centred as it grows (see the header)
+  const pane = S.g();
+  [...S.main.children].filter(e => e !== pane && e !== hdr).forEach(e => pane.appendChild(e));
+  whole(t => pane.setAttribute('transform', `translate(${(506 - 336 * EIO(cl((t - tB2) / 0.8)) - 170 * EIO(cl((t - tB3) / 0.7))).toFixed(1)},0)`));
+
   // ================================================================ b3: how the model tells them apart
   const probe = S.g();
   const later = S.g(null, probe);
-  libToken(S, { text: 'a later word', x: 1620, y: 520, size: 28, state: 'token', icon: 'ph:magnifying-glass-duotone' }, later);
+  libToken(S, { text: 'a later word', x: 1620, y: 520, size: 28, state: 'token', icon: 'ph:magnifying-glass-duotone', case: 'label' }, later);
   K.track(later, [K.K(tB3 + 0.2, { x: 220, o: 0 }), K.K(tB3 + 0.7, { x: 0, o: 1, e: 'power3.out' })]);
   const look = ch14Tag(S, 'looking for water', { x: 1620, y: 584, size: 22 }, probe);
   rise(look, tB3 + 0.7, 10);

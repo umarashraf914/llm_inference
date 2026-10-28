@@ -1,0 +1,3491 @@
+{
+ "about": "The icons picked for the films, by topic: each concept's first icon is the first choice, the rest are alternatives. Ids are tools/iconlib.py's. Sheets and SVG files: python3 video/tools/build_icons.py --kit",
+ "topics": [
+  {
+   "id": "ai-labs",
+   "title": "AI labs and their models",
+   "note": "LobeHub logos, in colour where the brand has one; one-colour marks are drawn in the scene's ink.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "openai",
+     "icons": [
+      "lobe:openai",
+      "lobe:openai-text"
+     ]
+    },
+    {
+     "name": "anthropic",
+     "icons": [
+      "lobe:anthropic",
+      "lobe:anthropic-text"
+     ]
+    },
+    {
+     "name": "claude",
+     "icons": [
+      "lobe:claude-color",
+      "lobe:claude-text"
+     ]
+    },
+    {
+     "name": "google",
+     "icons": [
+      "lobe:google-color",
+      "lobe:google-brand-color"
+     ]
+    },
+    {
+     "name": "gemini",
+     "icons": [
+      "lobe:gemini-color",
+      "lobe:gemini-text"
+     ]
+    },
+    {
+     "name": "gemma",
+     "icons": [
+      "lobe:gemma-color"
+     ]
+    },
+    {
+     "name": "deepmind",
+     "icons": [
+      "lobe:deepmind-color"
+     ]
+    },
+    {
+     "name": "meta and llama",
+     "icons": [
+      "lobe:meta-color",
+      "lobe:meta-brand-color"
+     ]
+    },
+    {
+     "name": "meta ai",
+     "icons": [
+      "lobe:metaai-color"
+     ]
+    },
+    {
+     "name": "mistral",
+     "icons": [
+      "lobe:mistral-color",
+      "lobe:mistral-text"
+     ]
+    },
+    {
+     "name": "deepseek",
+     "icons": [
+      "lobe:deepseek-color",
+      "lobe:deepseek-text"
+     ]
+    },
+    {
+     "name": "qwen",
+     "icons": [
+      "lobe:qwen-color",
+      "lobe:qwen-text"
+     ]
+    },
+    {
+     "name": "alibaba",
+     "icons": [
+      "lobe:alibaba-color"
+     ]
+    },
+    {
+     "name": "kimi",
+     "icons": [
+      "lobe:kimi-color"
+     ]
+    },
+    {
+     "name": "moonshot",
+     "icons": [
+      "lobe:moonshot"
+     ]
+    },
+    {
+     "name": "zhipu",
+     "icons": [
+      "lobe:zhipu-color"
+     ]
+    },
+    {
+     "name": "glm",
+     "icons": [
+      "lobe:chatglm-color"
+     ]
+    },
+    {
+     "name": "minimax",
+     "icons": [
+      "lobe:minimax-color"
+     ]
+    },
+    {
+     "name": "xai",
+     "icons": [
+      "lobe:xai"
+     ]
+    },
+    {
+     "name": "grok",
+     "icons": [
+      "lobe:grok"
+     ]
+    },
+    {
+     "name": "microsoft",
+     "icons": [
+      "lobe:microsoft-color"
+     ]
+    },
+    {
+     "name": "copilot",
+     "icons": [
+      "lobe:copilot-color"
+     ]
+    },
+    {
+     "name": "nvidia",
+     "icons": [
+      "lobe:nvidia-color",
+      "lobe:nvidia-text"
+     ]
+    },
+    {
+     "name": "cohere",
+     "icons": [
+      "lobe:cohere-color"
+     ]
+    },
+    {
+     "name": "perplexity",
+     "icons": [
+      "lobe:perplexity-color"
+     ]
+    },
+    {
+     "name": "amazon nova",
+     "icons": [
+      "lobe:nova-color"
+     ]
+    },
+    {
+     "name": "apple",
+     "icons": [
+      "lobe:apple"
+     ]
+    },
+    {
+     "name": "ibm",
+     "icons": [
+      "lobe:ibm"
+     ]
+    },
+    {
+     "name": "bytedance",
+     "icons": [
+      "lobe:bytedance-color"
+     ]
+    },
+    {
+     "name": "doubao",
+     "icons": [
+      "lobe:doubao-color"
+     ]
+    },
+    {
+     "name": "baidu",
+     "icons": [
+      "lobe:baidu-color"
+     ]
+    },
+    {
+     "name": "hunyuan",
+     "icons": [
+      "lobe:hunyuan-color"
+     ]
+    },
+    {
+     "name": "yi",
+     "icons": [
+      "lobe:yi-color"
+     ]
+    },
+    {
+     "name": "stepfun",
+     "icons": [
+      "lobe:stepfun-color"
+     ]
+    },
+    {
+     "name": "ai2",
+     "icons": [
+      "lobe:ai2-color"
+     ]
+    },
+    {
+     "name": "falcon",
+     "icons": [
+      "lobe:tii-color"
+     ]
+    },
+    {
+     "name": "stability",
+     "icons": [
+      "lobe:stability-color"
+     ]
+    },
+    {
+     "name": "midjourney",
+     "icons": [
+      "lobe:midjourney"
+     ]
+    },
+    {
+     "name": "sora",
+     "icons": [
+      "lobe:sora-color"
+     ]
+    },
+    {
+     "name": "dall-e",
+     "icons": [
+      "lobe:dalle-color"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ai-stack",
+   "title": "Inference engines, AI clouds and tools",
+   "note": "LobeHub logos.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "vllm",
+     "icons": [
+      "lobe:vllm-color",
+      "thesvg:vllm"
+     ]
+    },
+    {
+     "name": "hugging face",
+     "icons": [
+      "lobe:huggingface-color",
+      "lobe:huggingface-text"
+     ]
+    },
+    {
+     "name": "ollama",
+     "icons": [
+      "lobe:ollama"
+     ]
+    },
+    {
+     "name": "lm studio",
+     "icons": [
+      "lobe:lmstudio"
+     ]
+    },
+    {
+     "name": "llama.cpp",
+     "icons": [
+      "thesvg-color:llama-cpp-server"
+     ]
+    },
+    {
+     "name": "together ai",
+     "icons": [
+      "lobe:together-color"
+     ]
+    },
+    {
+     "name": "fireworks",
+     "icons": [
+      "lobe:fireworks-color"
+     ]
+    },
+    {
+     "name": "groq",
+     "icons": [
+      "lobe:groq"
+     ]
+    },
+    {
+     "name": "cerebras",
+     "icons": [
+      "lobe:cerebras-color"
+     ]
+    },
+    {
+     "name": "sambanova",
+     "icons": [
+      "lobe:sambanova-color"
+     ]
+    },
+    {
+     "name": "replicate",
+     "icons": [
+      "lobe:replicate"
+     ]
+    },
+    {
+     "name": "deepinfra",
+     "icons": [
+      "lobe:deepinfra-color"
+     ]
+    },
+    {
+     "name": "baseten",
+     "icons": [
+      "lobe:baseten"
+     ]
+    },
+    {
+     "name": "anyscale",
+     "icons": [
+      "lobe:anyscale-color"
+     ]
+    },
+    {
+     "name": "openrouter",
+     "icons": [
+      "lobe:openrouter-color"
+     ]
+    },
+    {
+     "name": "aws bedrock",
+     "icons": [
+      "lobe:bedrock-color"
+     ]
+    },
+    {
+     "name": "aws",
+     "icons": [
+      "lobe:aws-color"
+     ]
+    },
+    {
+     "name": "azure",
+     "icons": [
+      "lobe:azure-color"
+     ]
+    },
+    {
+     "name": "azure ai",
+     "icons": [
+      "lobe:azureai-color"
+     ]
+    },
+    {
+     "name": "vertex ai",
+     "icons": [
+      "lobe:vertexai-color"
+     ]
+    },
+    {
+     "name": "google cloud",
+     "icons": [
+      "lobe:googlecloud-color"
+     ]
+    },
+    {
+     "name": "cloudflare",
+     "icons": [
+      "lobe:cloudflare-color"
+     ]
+    },
+    {
+     "name": "workers ai",
+     "icons": [
+      "lobe:workersai-color"
+     ]
+    },
+    {
+     "name": "lambda",
+     "icons": [
+      "lobe:lambda"
+     ]
+    },
+    {
+     "name": "nebius",
+     "icons": [
+      "lobe:nebius"
+     ]
+    },
+    {
+     "name": "crusoe",
+     "icons": [
+      "lobe:crusoe-color"
+     ]
+    },
+    {
+     "name": "modal",
+     "icons": [
+      "thesvg-color:modal"
+     ]
+    },
+    {
+     "name": "novita",
+     "icons": [
+      "lobe:novita-color"
+     ]
+    },
+    {
+     "name": "langchain",
+     "icons": [
+      "lobe:langchain-color"
+     ]
+    },
+    {
+     "name": "langgraph",
+     "icons": [
+      "lobe:langgraph"
+     ]
+    },
+    {
+     "name": "llamaindex",
+     "icons": [
+      "lobe:llamaindex-color"
+     ]
+    },
+    {
+     "name": "mcp",
+     "icons": [
+      "lobe:mcp"
+     ]
+    },
+    {
+     "name": "unsloth",
+     "icons": [
+      "lobe:unsloth-color"
+     ]
+    },
+    {
+     "name": "weights and biases",
+     "icons": [
+      "lobe:wandb-color"
+     ]
+    },
+    {
+     "name": "colab",
+     "icons": [
+      "lobe:colab-color"
+     ]
+    },
+    {
+     "name": "github copilot",
+     "icons": [
+      "lobe:githubcopilot"
+     ]
+    },
+    {
+     "name": "cursor",
+     "icons": [
+      "lobe:cursor"
+     ]
+    },
+    {
+     "name": "claude code",
+     "icons": [
+      "lobe:claudecode-color"
+     ]
+    },
+    {
+     "name": "codex",
+     "icons": [
+      "lobe:codex-color"
+     ]
+    },
+    {
+     "name": "windsurf",
+     "icons": [
+      "lobe:windsurf"
+     ]
+    },
+    {
+     "name": "comfyui",
+     "icons": [
+      "lobe:comfyui-color"
+     ]
+    },
+    {
+     "name": "gradio",
+     "icons": [
+      "lobe:gradio-color"
+     ]
+    },
+    {
+     "name": "dify",
+     "icons": [
+      "lobe:dify-color"
+     ]
+    },
+    {
+     "name": "n8n",
+     "icons": [
+      "lobe:n8n-color"
+     ]
+    },
+    {
+     "name": "open webui",
+     "icons": [
+      "lobe:openwebui"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "chips-and-clouds",
+   "title": "Chip makers, clouds and platforms",
+   "note": "Full-colour logos where they read on the dark background; brands drawn in dark ink use their one-colour mark, tinted.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "nvidia",
+     "icons": [
+      "lobe:nvidia-color",
+      "lobe:nvidia-text",
+      "thesvg:nvidia"
+     ]
+    },
+    {
+     "name": "amd",
+     "icons": [
+      "simple-icons:amd",
+      "thesvg-color:amd"
+     ]
+    },
+    {
+     "name": "intel",
+     "icons": [
+      "simple-icons:intel",
+      "thesvg-color:intel"
+     ]
+    },
+    {
+     "name": "apple",
+     "icons": [
+      "simple-icons:apple"
+     ]
+    },
+    {
+     "name": "arm",
+     "icons": [
+      "simple-icons:arm",
+      "thesvg-color:arm"
+     ]
+    },
+    {
+     "name": "qualcomm",
+     "icons": [
+      "simple-icons:qualcomm"
+     ]
+    },
+    {
+     "name": "samsung",
+     "icons": [
+      "simple-icons:samsung"
+     ]
+    },
+    {
+     "name": "sk hynix",
+     "icons": [
+      "thesvg-color:sk-hynix"
+     ]
+    },
+    {
+     "name": "broadcom",
+     "icons": [
+      "simple-icons:broadcom"
+     ]
+    },
+    {
+     "name": "risc-v",
+     "icons": [
+      "simple-icons:riscv"
+     ]
+    },
+    {
+     "name": "raspberry pi",
+     "icons": [
+      "logos:raspberry-pi"
+     ]
+    },
+    {
+     "name": "google",
+     "icons": [
+      "logos:google-icon"
+     ]
+    },
+    {
+     "name": "aws",
+     "icons": [
+      "lobe:aws-color"
+     ]
+    },
+    {
+     "name": "azure",
+     "icons": [
+      "logos:microsoft-azure"
+     ]
+    },
+    {
+     "name": "google cloud",
+     "icons": [
+      "logos:google-cloud"
+     ]
+    },
+    {
+     "name": "oracle",
+     "icons": [
+      "logos:oracle"
+     ]
+    },
+    {
+     "name": "ibm",
+     "icons": [
+      "lobe:ibm",
+      "thesvg-color:ibm"
+     ]
+    },
+    {
+     "name": "digitalocean",
+     "icons": [
+      "logos:digital-ocean-icon"
+     ]
+    },
+    {
+     "name": "cloudflare",
+     "icons": [
+      "logos:cloudflare-icon"
+     ]
+    },
+    {
+     "name": "vercel",
+     "icons": [
+      "simple-icons:vercel"
+     ]
+    },
+    {
+     "name": "kubernetes",
+     "icons": [
+      "logos:kubernetes"
+     ]
+    },
+    {
+     "name": "docker",
+     "icons": [
+      "logos:docker-icon"
+     ]
+    },
+    {
+     "name": "linux",
+     "icons": [
+      "logos:linux-tux"
+     ]
+    },
+    {
+     "name": "ubuntu",
+     "icons": [
+      "logos:ubuntu"
+     ]
+    },
+    {
+     "name": "ray",
+     "icons": [
+      "thesvg-color:ray"
+     ]
+    },
+    {
+     "name": "mlflow",
+     "icons": [
+      "simple-icons:mlflow"
+     ]
+    },
+    {
+     "name": "redis",
+     "icons": [
+      "logos:redis"
+     ]
+    },
+    {
+     "name": "postgresql",
+     "icons": [
+      "logos:postgresql"
+     ]
+    },
+    {
+     "name": "aws ec2",
+     "icons": [
+      "logos:aws-ec2"
+     ]
+    },
+    {
+     "name": "aws s3",
+     "icons": [
+      "logos:aws-s3"
+     ]
+    },
+    {
+     "name": "chrome",
+     "icons": [
+      "logos:chrome"
+     ]
+    },
+    {
+     "name": "android",
+     "icons": [
+      "logos:android-icon"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "code-and-files",
+   "title": "Languages, frameworks and files",
+   "note": "Model files, code and formats.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "python",
+     "icons": [
+      "logos:python"
+     ]
+    },
+    {
+     "name": "pytorch",
+     "icons": [
+      "logos:pytorch-icon"
+     ]
+    },
+    {
+     "name": "tensorflow",
+     "icons": [
+      "logos:tensorflow"
+     ]
+    },
+    {
+     "name": "jax",
+     "icons": [
+      "logos:jax"
+     ]
+    },
+    {
+     "name": "numpy",
+     "icons": [
+      "logos:numpy"
+     ]
+    },
+    {
+     "name": "jupyter",
+     "icons": [
+      "logos:jupyter"
+     ]
+    },
+    {
+     "name": "onnx",
+     "icons": [
+      "thesvg-color:onnx"
+     ]
+    },
+    {
+     "name": "c",
+     "icons": [
+      "logos:c"
+     ]
+    },
+    {
+     "name": "c++",
+     "icons": [
+      "logos:c-plusplus"
+     ]
+    },
+    {
+     "name": "cuda file",
+     "icons": [
+      "vscode-icons:file-type-cuda"
+     ]
+    },
+    {
+     "name": "rust",
+     "icons": [
+      "simple-icons:rust"
+     ]
+    },
+    {
+     "name": "go",
+     "icons": [
+      "logos:go"
+     ]
+    },
+    {
+     "name": "javascript",
+     "icons": [
+      "logos:javascript"
+     ]
+    },
+    {
+     "name": "typescript",
+     "icons": [
+      "logos:typescript-icon"
+     ]
+    },
+    {
+     "name": "bash",
+     "icons": [
+      "logos:bash-icon"
+     ]
+    },
+    {
+     "name": "git",
+     "icons": [
+      "logos:git-icon"
+     ]
+    },
+    {
+     "name": "github",
+     "icons": [
+      "lobe:github"
+     ]
+    },
+    {
+     "name": "hugging face",
+     "icons": [
+      "logos:hugging-face-icon"
+     ]
+    },
+    {
+     "name": "safetensors",
+     "icons": [
+      "vscode-icons:file-type-safetensors"
+     ]
+    },
+    {
+     "name": "json",
+     "icons": [
+      "vscode-icons:file-type-json"
+     ]
+    },
+    {
+     "name": "yaml",
+     "icons": [
+      "vscode-icons:file-type-yaml"
+     ]
+    },
+    {
+     "name": "toml",
+     "icons": [
+      "vscode-icons:file-type-toml"
+     ]
+    },
+    {
+     "name": "markdown",
+     "icons": [
+      "vscode-icons:file-type-markdown"
+     ]
+    },
+    {
+     "name": "csv",
+     "icons": [
+      "vscode-icons:file-type-csv"
+     ]
+    },
+    {
+     "name": "text",
+     "icons": [
+      "vscode-icons:file-type-text"
+     ]
+    },
+    {
+     "name": "log",
+     "icons": [
+      "vscode-icons:file-type-log"
+     ]
+    },
+    {
+     "name": "binary",
+     "icons": [
+      "vscode-icons:file-type-binary"
+     ]
+    },
+    {
+     "name": "config",
+     "icons": [
+      "vscode-icons:file-type-config"
+     ]
+    },
+    {
+     "name": "pdf",
+     "icons": [
+      "vscode-icons:file-type-pdf2"
+     ]
+    },
+    {
+     "name": "zip",
+     "icons": [
+      "vscode-icons:file-type-zip"
+     ]
+    },
+    {
+     "name": "database file",
+     "icons": [
+      "vscode-icons:file-type-db"
+     ]
+    },
+    {
+     "name": "sql",
+     "icons": [
+      "vscode-icons:file-type-sql"
+     ]
+    },
+    {
+     "name": "python file",
+     "icons": [
+      "vscode-icons:file-type-python"
+     ]
+    },
+    {
+     "name": "notebook",
+     "icons": [
+      "vscode-icons:file-type-jupyter"
+     ]
+    },
+    {
+     "name": "shell",
+     "icons": [
+      "vscode-icons:file-type-shell"
+     ]
+    },
+    {
+     "name": "docker file",
+     "icons": [
+      "vscode-icons:file-type-docker"
+     ]
+    },
+    {
+     "name": "image file",
+     "icons": [
+      "vscode-icons:file-type-image"
+     ]
+    },
+    {
+     "name": "video file",
+     "icons": [
+      "vscode-icons:file-type-video"
+     ]
+    },
+    {
+     "name": "audio file",
+     "icons": [
+      "vscode-icons:file-type-audio"
+     ]
+    },
+    {
+     "name": "file",
+     "icons": [
+      "vscode-icons:default-file"
+     ]
+    },
+    {
+     "name": "folder",
+     "icons": [
+      "vscode-icons:default-folder"
+     ]
+    },
+    {
+     "name": "open folder",
+     "icons": [
+      "vscode-icons:default-folder-opened"
+     ]
+    },
+    {
+     "name": "code",
+     "icons": [
+      "fluent-color:code-block-48",
+      "fluent-color:code-24"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "machines",
+   "title": "Computers, chips and the machine room",
+   "note": "No colour set draws a GPU: the films draw hardware with lib/hardware.js; for a small mention use a one-colour glyph (ph, solar), tinted.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "laptop",
+     "icons": [
+      "fluent-emoji:laptop",
+      "fluent-color:laptop-48"
+     ]
+    },
+    {
+     "name": "desktop",
+     "icons": [
+      "fluent-emoji:desktop-computer"
+     ]
+    },
+    {
+     "name": "phone",
+     "icons": [
+      "fluent-emoji:mobile-phone",
+      "fluent-color:phone-48"
+     ]
+    },
+    {
+     "name": "devices",
+     "icons": [
+      "fluent-color:phone-laptop-32"
+     ]
+    },
+    {
+     "name": "keyboard",
+     "icons": [
+      "fluent-emoji:keyboard"
+     ]
+    },
+    {
+     "name": "mouse",
+     "icons": [
+      "fluent-emoji:computer-mouse"
+     ]
+    },
+    {
+     "name": "printer",
+     "icons": [
+      "fluent-emoji:printer"
+     ]
+    },
+    {
+     "name": "television",
+     "icons": [
+      "fluent-emoji:television"
+     ]
+    },
+    {
+     "name": "chip",
+     "icons": [
+      "streamline-color:computer-chip-1",
+      "streamline-flex-color:computer-chip-1",
+      "solar:cpu-bolt-bold-duotone"
+     ]
+    },
+    {
+     "name": "ai chip",
+     "icons": [
+      "streamline-color:ai-chip-spark",
+      "streamline-flex-color:ai-chip-robot",
+      "streamline-flex-color:artificial-intelligence-brain-chip"
+     ]
+    },
+    {
+     "name": "gpu",
+     "icons": [
+      "ph:graphics-card-duotone",
+      "hugeicons:gpu",
+      "mdi:expansion-card"
+     ]
+    },
+    {
+     "name": "memory stick",
+     "icons": [
+      "streamline-cyber-color:computer-ram",
+      "ph:memory-duotone"
+     ]
+    },
+    {
+     "name": "ssd",
+     "icons": [
+      "streamline-color:hard-drive-1",
+      "streamline-plump-color:hard-drive-2"
+     ]
+    },
+    {
+     "name": "hard disk",
+     "icons": [
+      "streamline-color:hard-disk"
+     ]
+    },
+    {
+     "name": "floppy disk",
+     "icons": [
+      "fluent-emoji:floppy-disk"
+     ]
+    },
+    {
+     "name": "disc",
+     "icons": [
+      "fluent-emoji:optical-disk",
+      "fluent-emoji:computer-disk"
+     ]
+    },
+    {
+     "name": "usb drive",
+     "icons": [
+      "streamline-color:usb-drive"
+     ]
+    },
+    {
+     "name": "server",
+     "icons": [
+      "streamline-color:database-server-1",
+      "streamline-color:database-server-2",
+      "streamline-cyber-color:server",
+      "solar:server-square-bold-duotone"
+     ]
+    },
+    {
+     "name": "database",
+     "icons": [
+      "fluent-color:database-48",
+      "streamline-color:database"
+     ]
+    },
+    {
+     "name": "cloud",
+     "icons": [
+      "fluent-emoji:cloud",
+      "fluent-color:cloud-48"
+     ]
+    },
+    {
+     "name": "network",
+     "icons": [
+      "streamline-color:network"
+     ]
+    },
+    {
+     "name": "router",
+     "icons": [
+      "streamline-color:wifi-router",
+      "streamline-flex-color:router-wifi-network"
+     ]
+    },
+    {
+     "name": "wifi",
+     "icons": [
+      "fluent-color:wifi-24"
+     ]
+    },
+    {
+     "name": "antenna",
+     "icons": [
+      "fluent-emoji:satellite-antenna"
+     ]
+    },
+    {
+     "name": "satellite",
+     "icons": [
+      "fluent-emoji:satellite"
+     ]
+    },
+    {
+     "name": "battery",
+     "icons": [
+      "fluent-emoji:battery",
+      "fluent-emoji:low-battery"
+     ]
+    },
+    {
+     "name": "plug",
+     "icons": [
+      "fluent-emoji:electric-plug"
+     ]
+    },
+    {
+     "name": "power",
+     "icons": [
+      "streamline-plump-color:button-power-1",
+      "streamline-kameleon-color:power"
+     ]
+    },
+    {
+     "name": "cable",
+     "icons": [
+      "streamline-plump-color:cable-split"
+     ]
+    },
+    {
+     "name": "usb port",
+     "icons": [
+      "streamline-flex-color:usb-port"
+     ]
+    },
+    {
+     "name": "fan",
+     "icons": [
+      "ph:fan-duotone"
+     ]
+    },
+    {
+     "name": "circuit",
+     "icons": [
+      "flat-color-icons:circuit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ai-ideas",
+   "title": "AI and the model",
+   "note": "Fluent Emoji for things, Fluent Color for interface ideas.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "robot",
+     "icons": [
+      "fluent-emoji:robot",
+      "fluent-color:bot-24"
+     ]
+    },
+    {
+     "name": "ai",
+     "icons": [
+      "fluent-emoji:sparkles",
+      "fluent-color:bot-sparkle-24"
+     ]
+    },
+    {
+     "name": "brain",
+     "icons": [
+      "fluent-emoji:brain"
+     ]
+    },
+    {
+     "name": "agents",
+     "icons": [
+      "fluent-color:agents-48"
+     ]
+    },
+    {
+     "name": "chat",
+     "icons": [
+      "fluent-color:chat-48",
+      "fluent-emoji:speech-balloon"
+     ]
+    },
+    {
+     "name": "thinking",
+     "icons": [
+      "fluent-emoji:thought-balloon",
+      "fluent-emoji:thinking-face"
+     ]
+    },
+    {
+     "name": "writing",
+     "icons": [
+      "fluent-emoji:writing-hand",
+      "fluent-emoji:memo"
+     ]
+    },
+    {
+     "name": "text",
+     "icons": [
+      "fluent-emoji:input-latin-letters",
+      "fluent-emoji:input-latin-lowercase"
+     ]
+    },
+    {
+     "name": "numbers",
+     "icons": [
+      "fluent-emoji:input-numbers",
+      "fluent-emoji:input-symbols"
+     ]
+    },
+    {
+     "name": "prediction",
+     "icons": [
+      "fluent-emoji:crystal-ball"
+     ]
+    },
+    {
+     "name": "sampling",
+     "icons": [
+      "fluent-emoji:game-die",
+      "fluent-emoji:slot-machine"
+     ]
+    },
+    {
+     "name": "magic",
+     "icons": [
+      "fluent-emoji:magic-wand"
+     ]
+    },
+    {
+     "name": "goal",
+     "icons": [
+      "fluent-emoji:bullseye"
+     ]
+    },
+    {
+     "name": "attention",
+     "icons": [
+      "fluent-emoji:eyes",
+      "fluent-emoji:eye"
+     ]
+    },
+    {
+     "name": "search",
+     "icons": [
+      "fluent-emoji:magnifying-glass-tilted-left",
+      "fluent-color:search-sparkle-48"
+     ]
+    },
+    {
+     "name": "knowledge",
+     "icons": [
+      "fluent-emoji:books",
+      "fluent-color:book-database-32"
+     ]
+    },
+    {
+     "name": "learning",
+     "icons": [
+      "fluent-emoji:graduation-cap",
+      "fluent-color:book-open-lightbulb-32"
+     ]
+    },
+    {
+     "name": "idea",
+     "icons": [
+      "fluent-emoji:light-bulb",
+      "fluent-color:lightbulb-filament-48"
+     ]
+    },
+    {
+     "name": "puzzle",
+     "icons": [
+      "fluent-emoji:puzzle-piece",
+      "fluent-color:puzzle-piece-48"
+     ]
+    },
+    {
+     "name": "structure",
+     "icons": [
+      "fluent-color:molecule-48",
+      "fluent-emoji:dna"
+     ]
+    },
+    {
+     "name": "tools",
+     "icons": [
+      "fluent-emoji:hammer-and-wrench",
+      "fluent-color:wrench-screwdriver-32"
+     ]
+    },
+    {
+     "name": "toolbox",
+     "icons": [
+      "fluent-emoji:toolbox",
+      "fluent-color:toolbox-32"
+     ]
+    },
+    {
+     "name": "settings",
+     "icons": [
+      "fluent-emoji:gear",
+      "fluent-color:settings-48"
+     ]
+    },
+    {
+     "name": "options",
+     "icons": [
+      "fluent-color:options-48"
+     ]
+    },
+    {
+     "name": "language",
+     "icons": [
+      "fluent-emoji:globe-with-meridians",
+      "fluent-color:cloud-words-48"
+     ]
+    },
+    {
+     "name": "voice",
+     "icons": [
+      "fluent-color:mic-48",
+      "fluent-emoji:studio-microphone"
+     ]
+    },
+    {
+     "name": "image",
+     "icons": [
+      "fluent-color:image-48",
+      "fluent-emoji:framed-picture"
+     ]
+    },
+    {
+     "name": "video",
+     "icons": [
+      "fluent-color:video-48",
+      "fluent-emoji:movie-camera"
+     ]
+    },
+    {
+     "name": "slides",
+     "icons": [
+      "fluent-color:slide-text-sparkle-48"
+     ]
+    },
+    {
+     "name": "list",
+     "icons": [
+      "fluent-color:text-bullet-list-square-48",
+      "fluent-color:apps-list-detail-32"
+     ]
+    },
+    {
+     "name": "form",
+     "icons": [
+      "fluent-color:form-48"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "data-and-memory",
+   "title": "Documents, storage and memory",
+   "note": "",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "document",
+     "icons": [
+      "fluent-emoji:page-facing-up",
+      "fluent-color:document-text-48"
+     ]
+    },
+    {
+     "name": "page",
+     "icons": [
+      "fluent-emoji:page-with-curl"
+     ]
+    },
+    {
+     "name": "note",
+     "icons": [
+      "fluent-emoji:memo",
+      "fluent-color:notebook-32"
+     ]
+    },
+    {
+     "name": "clipboard",
+     "icons": [
+      "fluent-emoji:clipboard",
+      "fluent-color:clipboard-48"
+     ]
+    },
+    {
+     "name": "folder",
+     "icons": [
+      "fluent-emoji:file-folder",
+      "fluent-emoji:open-file-folder"
+     ]
+    },
+    {
+     "name": "cabinet",
+     "icons": [
+      "fluent-emoji:file-cabinet"
+     ]
+    },
+    {
+     "name": "box of cards",
+     "icons": [
+      "fluent-emoji:card-file-box"
+     ]
+    },
+    {
+     "name": "lookup table",
+     "icons": [
+      "fluent-emoji:card-index",
+      "fluent-emoji:card-index-dividers"
+     ]
+    },
+    {
+     "name": "tabs",
+     "icons": [
+      "fluent-emoji:bookmark-tabs"
+     ]
+    },
+    {
+     "name": "book",
+     "icons": [
+      "fluent-emoji:closed-book",
+      "fluent-emoji:open-book",
+      "fluent-emoji:ledger"
+     ]
+    },
+    {
+     "name": "tag",
+     "icons": [
+      "fluent-emoji:label"
+     ]
+    },
+    {
+     "name": "pin",
+     "icons": [
+      "fluent-emoji:pushpin",
+      "fluent-emoji:round-pushpin"
+     ]
+    },
+    {
+     "name": "clip",
+     "icons": [
+      "fluent-emoji:paperclip",
+      "fluent-emoji:linked-paperclips"
+     ]
+    },
+    {
+     "name": "cut",
+     "icons": [
+      "fluent-emoji:scissors"
+     ]
+    },
+    {
+     "name": "package",
+     "icons": [
+      "fluent-emoji:package"
+     ]
+    },
+    {
+     "name": "queue in",
+     "icons": [
+      "fluent-emoji:inbox-tray"
+     ]
+    },
+    {
+     "name": "queue out",
+     "icons": [
+      "fluent-emoji:outbox-tray"
+     ]
+    },
+    {
+     "name": "message",
+     "icons": [
+      "fluent-emoji:envelope",
+      "fluent-emoji:incoming-envelope",
+      "fluent-color:mail-48"
+     ]
+    },
+    {
+     "name": "delete",
+     "icons": [
+      "fluent-emoji:wastebasket"
+     ]
+    },
+    {
+     "name": "reuse",
+     "icons": [
+      "fluent-emoji:recycling-symbol"
+     ]
+    },
+    {
+     "name": "table",
+     "icons": [
+      "fluent-color:table-48"
+     ]
+    },
+    {
+     "name": "vault",
+     "icons": [
+      "fluent-color:vault-24"
+     ]
+    },
+    {
+     "name": "history",
+     "icons": [
+      "fluent-color:history-48"
+     ]
+    },
+    {
+     "name": "blocks",
+     "icons": [
+      "fluent-emoji:brick"
+     ]
+    },
+    {
+     "name": "log",
+     "icons": [
+      "fluent-emoji:receipt"
+     ]
+    },
+    {
+     "name": "news",
+     "icons": [
+      "fluent-emoji:newspaper",
+      "fluent-color:news-28"
+     ]
+    },
+    {
+     "name": "scroll",
+     "icons": [
+      "fluent-emoji:scroll"
+     ]
+    },
+    {
+     "name": "key",
+     "icons": [
+      "fluent-emoji:key",
+      "fluent-emoji:old-key"
+     ]
+    },
+    {
+     "name": "lock",
+     "icons": [
+      "fluent-emoji:locked",
+      "fluent-emoji:unlocked",
+      "fluent-emoji:locked-with-key"
+     ]
+    },
+    {
+     "name": "link",
+     "icons": [
+      "fluent-emoji:link",
+      "fluent-color:link-32"
+     ]
+    },
+    {
+     "name": "chain",
+     "icons": [
+      "fluent-emoji:chains",
+      "fluent-emoji:broken-chain"
+     ]
+    },
+    {
+     "name": "library",
+     "icons": [
+      "fluent-color:library-32"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "time-and-speed",
+   "title": "Time, speed and waiting",
+   "note": "",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "stopwatch",
+     "icons": [
+      "fluent-emoji:stopwatch"
+     ]
+    },
+    {
+     "name": "timer",
+     "icons": [
+      "fluent-emoji:timer-clock"
+     ]
+    },
+    {
+     "name": "alarm",
+     "icons": [
+      "fluent-emoji:alarm-clock",
+      "fluent-color:clock-alarm-48"
+     ]
+    },
+    {
+     "name": "clock",
+     "icons": [
+      "fluent-emoji:mantelpiece-clock",
+      "fluent-color:clock-48"
+     ]
+    },
+    {
+     "name": "hourglass",
+     "icons": [
+      "fluent-emoji:hourglass-not-done",
+      "fluent-emoji:hourglass-done"
+     ]
+    },
+    {
+     "name": "watch",
+     "icons": [
+      "fluent-emoji:watch"
+     ]
+    },
+    {
+     "name": "calendar",
+     "icons": [
+      "fluent-emoji:spiral-calendar",
+      "fluent-emoji:calendar",
+      "fluent-color:calendar-48"
+     ]
+    },
+    {
+     "name": "schedule",
+     "icons": [
+      "fluent-color:calendar-clock-24"
+     ]
+    },
+    {
+     "name": "rocket",
+     "icons": [
+      "fluent-emoji:rocket"
+     ]
+    },
+    {
+     "name": "racing car",
+     "icons": [
+      "fluent-emoji:racing-car"
+     ]
+    },
+    {
+     "name": "fast train",
+     "icons": [
+      "fluent-emoji:high-speed-train",
+      "fluent-emoji:bullet-train"
+     ]
+    },
+    {
+     "name": "airplane",
+     "icons": [
+      "fluent-emoji:airplane",
+      "fluent-emoji:airplane-departure"
+     ]
+    },
+    {
+     "name": "running",
+     "icons": [
+      "fluent-emoji:person-running"
+     ]
+    },
+    {
+     "name": "walking",
+     "icons": [
+      "fluent-emoji:person-walking"
+     ]
+    },
+    {
+     "name": "turtle",
+     "icons": [
+      "fluent-emoji:turtle"
+     ]
+    },
+    {
+     "name": "snail",
+     "icons": [
+      "fluent-emoji:snail"
+     ]
+    },
+    {
+     "name": "sloth",
+     "icons": [
+      "fluent-emoji:sloth"
+     ]
+    },
+    {
+     "name": "rabbit",
+     "icons": [
+      "fluent-emoji:rabbit"
+     ]
+    },
+    {
+     "name": "fast forward",
+     "icons": [
+      "fluent-emoji:fast-forward-button",
+      "fluent-color:fast-forward-circle-24"
+     ]
+    },
+    {
+     "name": "play pause stop",
+     "icons": [
+      "fluent-emoji:play-button",
+      "fluent-emoji:pause-button",
+      "fluent-emoji:stop-button"
+     ]
+    },
+    {
+     "name": "repeat",
+     "icons": [
+      "fluent-emoji:repeat-button",
+      "fluent-emoji:clockwise-vertical-arrows",
+      "fluent-color:arrow-sync-24"
+     ]
+    },
+    {
+     "name": "gauge",
+     "icons": [
+      "fluent-color:gauge-32"
+     ]
+    },
+    {
+     "name": "finish",
+     "icons": [
+      "fluent-emoji:chequered-flag"
+     ]
+    },
+    {
+     "name": "idle",
+     "icons": [
+      "fluent-emoji:sleeping-face",
+      "fluent-emoji:zzz"
+     ]
+    },
+    {
+     "name": "traffic light",
+     "icons": [
+      "fluent-emoji:vertical-traffic-light",
+      "fluent-emoji:horizontal-traffic-light"
+     ]
+    },
+    {
+     "name": "blocked",
+     "icons": [
+      "fluent-emoji:construction"
+     ]
+    },
+    {
+     "name": "road",
+     "icons": [
+      "fluent-emoji:motorway"
+     ]
+    },
+    {
+     "name": "railway",
+     "icons": [
+      "fluent-emoji:railway-track"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "money-and-business",
+   "title": "Money, cost and business",
+   "note": "",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "money",
+     "icons": [
+      "fluent-emoji:money-bag",
+      "fluent-emoji:dollar-banknote"
+     ]
+    },
+    {
+     "name": "coin",
+     "icons": [
+      "fluent-emoji:coin",
+      "fluent-color:coin-multiple-48"
+     ]
+    },
+    {
+     "name": "dollar",
+     "icons": [
+      "fluent-emoji:heavy-dollar-sign"
+     ]
+    },
+    {
+     "name": "spending",
+     "icons": [
+      "fluent-emoji:money-with-wings"
+     ]
+    },
+    {
+     "name": "card",
+     "icons": [
+      "fluent-emoji:credit-card"
+     ]
+    },
+    {
+     "name": "bill",
+     "icons": [
+      "fluent-emoji:receipt",
+      "fluent-color:receipt-32"
+     ]
+    },
+    {
+     "name": "savings",
+     "icons": [
+      "fluent-color:savings-32"
+     ]
+    },
+    {
+     "name": "growth",
+     "icons": [
+      "fluent-emoji:chart-increasing",
+      "fluent-color:data-trending-48"
+     ]
+    },
+    {
+     "name": "decline",
+     "icons": [
+      "fluent-emoji:chart-decreasing"
+     ]
+    },
+    {
+     "name": "bar chart",
+     "icons": [
+      "fluent-emoji:bar-chart",
+      "fluent-color:data-bar-vertical-ascending-24"
+     ]
+    },
+    {
+     "name": "pie chart",
+     "icons": [
+      "fluent-color:data-pie-32"
+     ]
+    },
+    {
+     "name": "line chart",
+     "icons": [
+      "fluent-color:data-line-32"
+     ]
+    },
+    {
+     "name": "scatter",
+     "icons": [
+      "fluent-color:data-scatter-32"
+     ]
+    },
+    {
+     "name": "area chart",
+     "icons": [
+      "fluent-color:data-area-32"
+     ]
+    },
+    {
+     "name": "poll",
+     "icons": [
+      "fluent-color:poll-32"
+     ]
+    },
+    {
+     "name": "value",
+     "icons": [
+      "fluent-emoji:gem-stone"
+     ]
+    },
+    {
+     "name": "balance",
+     "icons": [
+      "fluent-emoji:balance-scale"
+     ]
+    },
+    {
+     "name": "shopping",
+     "icons": [
+      "fluent-emoji:shopping-cart"
+     ]
+    },
+    {
+     "name": "store",
+     "icons": [
+      "fluent-emoji:convenience-store",
+      "fluent-color:building-store-24"
+     ]
+    },
+    {
+     "name": "bank",
+     "icons": [
+      "fluent-emoji:bank"
+     ]
+    },
+    {
+     "name": "office",
+     "icons": [
+      "fluent-emoji:office-building",
+      "fluent-color:building-48"
+     ]
+    },
+    {
+     "name": "factory",
+     "icons": [
+      "fluent-emoji:factory"
+     ]
+    },
+    {
+     "name": "work",
+     "icons": [
+      "fluent-emoji:briefcase",
+      "fluent-color:briefcase-48"
+     ]
+    },
+    {
+     "name": "deal",
+     "icons": [
+      "fluent-emoji:handshake"
+     ]
+    },
+    {
+     "name": "ticket",
+     "icons": [
+      "fluent-emoji:ticket"
+     ]
+    },
+    {
+     "name": "gift",
+     "icons": [
+      "fluent-color:gift-24"
+     ]
+    },
+    {
+     "name": "winner",
+     "icons": [
+      "fluent-emoji:trophy",
+      "fluent-color:trophy-48"
+     ]
+    },
+    {
+     "name": "certificate",
+     "icons": [
+      "fluent-color:certificate-32"
+     ]
+    },
+    {
+     "name": "premium",
+     "icons": [
+      "fluent-color:premium-32"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "people",
+   "title": "People and how they feel",
+   "note": "",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "person",
+     "icons": [
+      "fluent-color:person-48"
+     ]
+    },
+    {
+     "name": "people",
+     "icons": [
+      "fluent-color:people-48"
+     ]
+    },
+    {
+     "name": "team",
+     "icons": [
+      "fluent-color:people-team-48",
+      "fluent-color:people-community-48"
+     ]
+    },
+    {
+     "name": "developer",
+     "icons": [
+      "fluent-emoji:technologist"
+     ]
+    },
+    {
+     "name": "scientist",
+     "icons": [
+      "fluent-emoji:scientist"
+     ]
+    },
+    {
+     "name": "teacher",
+     "icons": [
+      "fluent-emoji:teacher"
+     ]
+    },
+    {
+     "name": "student",
+     "icons": [
+      "fluent-emoji:student"
+     ]
+    },
+    {
+     "name": "office worker",
+     "icons": [
+      "fluent-emoji:office-worker"
+     ]
+    },
+    {
+     "name": "detective",
+     "icons": [
+      "fluent-emoji:detective"
+     ]
+    },
+    {
+     "name": "builder",
+     "icons": [
+      "fluent-emoji:construction-worker"
+     ]
+    },
+    {
+     "name": "factory worker",
+     "icons": [
+      "fluent-emoji:factory-worker"
+     ]
+    },
+    {
+     "name": "judge",
+     "icons": [
+      "fluent-emoji:judge"
+     ]
+    },
+    {
+     "name": "guard",
+     "icons": [
+      "fluent-emoji:guard"
+     ]
+    },
+    {
+     "name": "feedback",
+     "icons": [
+      "fluent-color:person-feedback-48"
+     ]
+    },
+    {
+     "name": "conversation",
+     "icons": [
+      "fluent-color:people-chat-48"
+     ]
+    },
+    {
+     "name": "thinking",
+     "icons": [
+      "fluent-emoji:thinking-face"
+     ]
+    },
+    {
+     "name": "happy",
+     "icons": [
+      "fluent-emoji:grinning-face",
+      "fluent-emoji:star-struck"
+     ]
+    },
+    {
+     "name": "confused",
+     "icons": [
+      "fluent-emoji:confused-face",
+      "fluent-emoji:face-with-spiral-eyes"
+     ]
+    },
+    {
+     "name": "amazed",
+     "icons": [
+      "fluent-emoji:astonished-face",
+      "fluent-emoji:exploding-head"
+     ]
+    },
+    {
+     "name": "tired",
+     "icons": [
+      "fluent-emoji:weary-face"
+     ]
+    },
+    {
+     "name": "asleep",
+     "icons": [
+      "fluent-emoji:sleeping-face"
+     ]
+    },
+    {
+     "name": "hot",
+     "icons": [
+      "fluent-emoji:hot-face"
+     ]
+    },
+    {
+     "name": "cold",
+     "icons": [
+      "fluent-emoji:cold-face"
+     ]
+    },
+    {
+     "name": "nerd",
+     "icons": [
+      "fluent-emoji:nerd-face"
+     ]
+    },
+    {
+     "name": "hello",
+     "icons": [
+      "fluent-emoji:waving-hand"
+     ]
+    },
+    {
+     "name": "yes no",
+     "icons": [
+      "fluent-emoji:thumbs-up",
+      "fluent-emoji:thumbs-down"
+     ]
+    },
+    {
+     "name": "applause",
+     "icons": [
+      "fluent-emoji:clapping-hands"
+     ]
+    },
+    {
+     "name": "question",
+     "icons": [
+      "fluent-emoji:person-raising-hand"
+     ]
+    },
+    {
+     "name": "strength",
+     "icons": [
+      "fluent-emoji:flexed-biceps"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "signals",
+   "title": "Status, signals and emphasis",
+   "note": "",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "yes",
+     "icons": [
+      "fluent-emoji:check-mark-button",
+      "fluent-color:checkmark-circle-48"
+     ]
+    },
+    {
+     "name": "no",
+     "icons": [
+      "fluent-emoji:cross-mark",
+      "fluent-color:dismiss-circle-48"
+     ]
+    },
+    {
+     "name": "warning",
+     "icons": [
+      "fluent-emoji:warning",
+      "fluent-color:warning-48"
+     ]
+    },
+    {
+     "name": "error",
+     "icons": [
+      "fluent-color:error-circle-48"
+     ]
+    },
+    {
+     "name": "alert",
+     "icons": [
+      "fluent-color:alert-48"
+     ]
+    },
+    {
+     "name": "not allowed",
+     "icons": [
+      "fluent-emoji:no-entry",
+      "fluent-emoji:prohibited"
+     ]
+    },
+    {
+     "name": "stop",
+     "icons": [
+      "fluent-emoji:stop-sign"
+     ]
+    },
+    {
+     "name": "question",
+     "icons": [
+      "fluent-emoji:red-question-mark",
+      "fluent-color:question-circle-48"
+     ]
+    },
+    {
+     "name": "important",
+     "icons": [
+      "fluent-emoji:red-exclamation-mark",
+      "fluent-emoji:double-exclamation-mark"
+     ]
+    },
+    {
+     "name": "information",
+     "icons": [
+      "fluent-emoji:information"
+     ]
+    },
+    {
+     "name": "add",
+     "icons": [
+      "fluent-color:add-circle-32"
+     ]
+    },
+    {
+     "name": "star",
+     "icons": [
+      "fluent-emoji:star",
+      "fluent-emoji:glowing-star",
+      "fluent-color:star-48"
+     ]
+    },
+    {
+     "name": "sparkles",
+     "icons": [
+      "fluent-emoji:sparkles"
+     ]
+    },
+    {
+     "name": "perfect",
+     "icons": [
+      "fluent-emoji:hundred-points"
+     ]
+    },
+    {
+     "name": "hot",
+     "icons": [
+      "fluent-emoji:fire"
+     ]
+    },
+    {
+     "name": "crash",
+     "icons": [
+      "fluent-emoji:collision"
+     ]
+    },
+    {
+     "name": "bomb",
+     "icons": [
+      "fluent-emoji:bomb"
+     ]
+    },
+    {
+     "name": "dizzy",
+     "icons": [
+      "fluent-emoji:dizzy"
+     ]
+    },
+    {
+     "name": "notify",
+     "icons": [
+      "fluent-emoji:bell"
+     ]
+    },
+    {
+     "name": "announce",
+     "icons": [
+      "fluent-emoji:megaphone",
+      "fluent-color:megaphone-loud-32"
+     ]
+    },
+    {
+     "name": "flag",
+     "icons": [
+      "fluent-emoji:triangular-flag",
+      "fluent-color:flag-48"
+     ]
+    },
+    {
+     "name": "place",
+     "icons": [
+      "fluent-color:pin-48"
+     ]
+    },
+    {
+     "name": "like",
+     "icons": [
+      "fluent-emoji:red-heart",
+      "fluent-color:heart-48"
+     ]
+    },
+    {
+     "name": "medals",
+     "icons": [
+      "fluent-emoji:1st-place-medal",
+      "fluent-emoji:2nd-place-medal",
+      "fluent-emoji:3rd-place-medal"
+     ]
+    },
+    {
+     "name": "crown",
+     "icons": [
+      "fluent-emoji:crown"
+     ]
+    },
+    {
+     "name": "award",
+     "icons": [
+      "fluent-color:ribbon-star-32"
+     ]
+    },
+    {
+     "name": "protected",
+     "icons": [
+      "fluent-emoji:shield",
+      "fluent-color:shield-checkmark-48"
+     ]
+    },
+    {
+     "name": "secure",
+     "icons": [
+      "fluent-color:lock-shield-48"
+     ]
+    },
+    {
+     "name": "lights",
+     "icons": [
+      "fluent-emoji:green-circle",
+      "fluent-emoji:yellow-circle",
+      "fluent-emoji:red-circle"
+     ]
+    },
+    {
+     "name": "arrows",
+     "icons": [
+      "fluent-emoji:up-arrow",
+      "fluent-emoji:down-arrow",
+      "fluent-emoji:right-arrow",
+      "fluent-emoji:left-right-arrow"
+     ]
+    },
+    {
+     "name": "buttons",
+     "icons": [
+      "fluent-emoji:new-button",
+      "fluent-emoji:up-button",
+      "fluent-emoji:ok-button",
+      "fluent-emoji:sos-button"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "energy-and-heat",
+   "title": "Energy, heat and the weather",
+   "note": "Warm and cold (the cache), power and cooling.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "electricity",
+     "icons": [
+      "fluent-emoji:high-voltage"
+     ]
+    },
+    {
+     "name": "battery",
+     "icons": [
+      "fluent-emoji:battery",
+      "fluent-emoji:low-battery"
+     ]
+    },
+    {
+     "name": "plug",
+     "icons": [
+      "fluent-emoji:electric-plug"
+     ]
+    },
+    {
+     "name": "light",
+     "icons": [
+      "fluent-emoji:light-bulb"
+     ]
+    },
+    {
+     "name": "fire",
+     "icons": [
+      "fluent-emoji:fire"
+     ]
+    },
+    {
+     "name": "cold",
+     "icons": [
+      "fluent-emoji:snowflake",
+      "fluent-color:weather-snowflake-48",
+      "fluent-emoji:ice"
+     ]
+    },
+    {
+     "name": "temperature",
+     "icons": [
+      "fluent-emoji:thermometer"
+     ]
+    },
+    {
+     "name": "sun",
+     "icons": [
+      "fluent-emoji:sun",
+      "fluent-color:weather-sunny-low-48"
+     ]
+    },
+    {
+     "name": "night",
+     "icons": [
+      "fluent-emoji:crescent-moon"
+     ]
+    },
+    {
+     "name": "cloud",
+     "icons": [
+      "fluent-emoji:cloud"
+     ]
+    },
+    {
+     "name": "water",
+     "icons": [
+      "fluent-emoji:droplet",
+      "fluent-emoji:water-wave"
+     ]
+    },
+    {
+     "name": "wind",
+     "icons": [
+      "fluent-emoji:wind-face",
+      "fluent-emoji:dashing-away"
+     ]
+    },
+    {
+     "name": "fuel",
+     "icons": [
+      "fluent-emoji:fuel-pump",
+      "fluent-emoji:oil-drum"
+     ]
+    },
+    {
+     "name": "factory",
+     "icons": [
+      "fluent-emoji:factory"
+     ]
+    },
+    {
+     "name": "radioactive",
+     "icons": [
+      "fluent-emoji:radioactive"
+     ]
+    },
+    {
+     "name": "recycle",
+     "icons": [
+      "fluent-emoji:recycling-symbol"
+     ]
+    },
+    {
+     "name": "growth",
+     "icons": [
+      "fluent-emoji:seedling"
+     ]
+    },
+    {
+     "name": "earth",
+     "icons": [
+      "fluent-emoji:globe-showing-europe-africa"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "movement-and-places",
+   "title": "Moving things, and places",
+   "note": "Delivery and transport for bandwidth; buildings for where work happens.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "truck",
+     "icons": [
+      "fluent-emoji:delivery-truck",
+      "fluent-emoji:articulated-lorry"
+     ]
+    },
+    {
+     "name": "ship",
+     "icons": [
+      "fluent-emoji:ship"
+     ]
+    },
+    {
+     "name": "plane",
+     "icons": [
+      "fluent-emoji:airplane"
+     ]
+    },
+    {
+     "name": "train",
+     "icons": [
+      "fluent-emoji:locomotive",
+      "fluent-emoji:railway-car"
+     ]
+    },
+    {
+     "name": "bus",
+     "icons": [
+      "fluent-emoji:bus"
+     ]
+    },
+    {
+     "name": "car",
+     "icons": [
+      "fluent-emoji:automobile"
+     ]
+    },
+    {
+     "name": "bicycle",
+     "icons": [
+      "fluent-emoji:bicycle"
+     ]
+    },
+    {
+     "name": "scooter",
+     "icons": [
+      "fluent-emoji:motor-scooter"
+     ]
+    },
+    {
+     "name": "parcel",
+     "icons": [
+      "fluent-emoji:package"
+     ]
+    },
+    {
+     "name": "postbox",
+     "icons": [
+      "fluent-emoji:postbox"
+     ]
+    },
+    {
+     "name": "mailbox",
+     "icons": [
+      "fluent-emoji:closed-mailbox-with-raised-flag",
+      "fluent-emoji:closed-mailbox-with-lowered-flag"
+     ]
+    },
+    {
+     "name": "post office",
+     "icons": [
+      "fluent-emoji:post-office"
+     ]
+    },
+    {
+     "name": "house",
+     "icons": [
+      "fluent-emoji:house",
+      "fluent-color:home-48"
+     ]
+    },
+    {
+     "name": "office",
+     "icons": [
+      "fluent-emoji:office-building"
+     ]
+    },
+    {
+     "name": "government",
+     "icons": [
+      "fluent-color:building-government-32"
+     ]
+    },
+    {
+     "name": "city",
+     "icons": [
+      "fluent-color:building-multiple-24"
+     ]
+    },
+    {
+     "name": "road",
+     "icons": [
+      "fluent-emoji:motorway"
+     ]
+    },
+    {
+     "name": "bridge",
+     "icons": [
+      "fluent-emoji:bridge-at-night"
+     ]
+    },
+    {
+     "name": "map",
+     "icons": [
+      "fluent-emoji:world-map"
+     ]
+    },
+    {
+     "name": "compass",
+     "icons": [
+      "fluent-emoji:compass"
+     ]
+    },
+    {
+     "name": "location",
+     "icons": [
+      "fluent-emoji:round-pushpin",
+      "fluent-color:location-ripple-24"
+     ]
+    },
+    {
+     "name": "world",
+     "icons": [
+      "fluent-emoji:globe-with-meridians",
+      "fluent-color:planet-32",
+      "fluent-color:globe-24"
+     ]
+    },
+    {
+     "name": "satellite",
+     "icons": [
+      "fluent-emoji:satellite"
+     ]
+    },
+    {
+     "name": "lift",
+     "icons": [
+      "fluent-emoji:elevator"
+     ]
+    },
+    {
+     "name": "ladder",
+     "icons": [
+      "fluent-emoji:ladder"
+     ]
+    },
+    {
+     "name": "door",
+     "icons": [
+      "fluent-emoji:door"
+     ]
+    },
+    {
+     "name": "anchor",
+     "icons": [
+      "fluent-emoji:anchor"
+     ]
+    },
+    {
+     "name": "send",
+     "icons": [
+      "fluent-color:send-48",
+      "fluent-color:send-clock-32"
+     ]
+    },
+    {
+     "name": "share",
+     "icons": [
+      "fluent-color:share-ios-48"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "math-and-science",
+   "title": "Maths, measurement and science",
+   "note": "",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "abacus",
+     "icons": [
+      "fluent-emoji:abacus"
+     ]
+    },
+    {
+     "name": "ruler",
+     "icons": [
+      "fluent-emoji:straight-ruler",
+      "fluent-emoji:triangular-ruler"
+     ]
+    },
+    {
+     "name": "scale",
+     "icons": [
+      "fluent-emoji:balance-scale"
+     ]
+    },
+    {
+     "name": "plus minus",
+     "icons": [
+      "fluent-emoji:plus",
+      "fluent-emoji:minus"
+     ]
+    },
+    {
+     "name": "times divide",
+     "icons": [
+      "fluent-emoji:multiply",
+      "fluent-emoji:divide"
+     ]
+    },
+    {
+     "name": "equals",
+     "icons": [
+      "fluent-emoji:heavy-equals-sign"
+     ]
+    },
+    {
+     "name": "infinity",
+     "icons": [
+      "fluent-emoji:infinity"
+     ]
+    },
+    {
+     "name": "number",
+     "icons": [
+      "fluent-color:number-symbol-square-32",
+      "fluent-emoji:input-numbers"
+     ]
+    },
+    {
+     "name": "keycaps",
+     "icons": [
+      "fluent-emoji:keycap-0",
+      "fluent-emoji:keycap-1",
+      "fluent-emoji:keycap-2",
+      "fluent-emoji:keycap-8"
+     ]
+    },
+    {
+     "name": "hundred",
+     "icons": [
+      "fluent-emoji:hundred-points"
+     ]
+    },
+    {
+     "name": "calculator",
+     "icons": [
+      "flat-color-icons:calculator"
+     ]
+    },
+    {
+     "name": "dice",
+     "icons": [
+      "fluent-emoji:game-die"
+     ]
+    },
+    {
+     "name": "magnifier",
+     "icons": [
+      "fluent-emoji:magnifying-glass-tilted-right"
+     ]
+    },
+    {
+     "name": "telescope",
+     "icons": [
+      "fluent-emoji:telescope"
+     ]
+    },
+    {
+     "name": "microscope",
+     "icons": [
+      "fluent-emoji:microscope"
+     ]
+    },
+    {
+     "name": "test tube",
+     "icons": [
+      "fluent-emoji:test-tube"
+     ]
+    },
+    {
+     "name": "lab",
+     "icons": [
+      "fluent-emoji:alembic"
+     ]
+    },
+    {
+     "name": "dna",
+     "icons": [
+      "fluent-emoji:dna"
+     ]
+    },
+    {
+     "name": "magnet",
+     "icons": [
+      "fluent-emoji:magnet"
+     ]
+    },
+    {
+     "name": "compass",
+     "icons": [
+      "fluent-emoji:compass"
+     ]
+    },
+    {
+     "name": "chart",
+     "icons": [
+      "fluent-emoji:bar-chart",
+      "fluent-color:chart-multiple-32"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "flags",
+   "title": "Flags, for languages",
+   "note": "Circle Flags: country codes, and lang- codes for languages.",
+   "cols": 8,
+   "concepts": [
+    {
+     "name": "english",
+     "icons": [
+      "circle-flags:lang-en-us",
+      "circle-flags:gb"
+     ]
+    },
+    {
+     "name": "french",
+     "icons": [
+      "circle-flags:fr"
+     ]
+    },
+    {
+     "name": "german",
+     "icons": [
+      "circle-flags:de"
+     ]
+    },
+    {
+     "name": "spanish",
+     "icons": [
+      "circle-flags:es"
+     ]
+    },
+    {
+     "name": "italian",
+     "icons": [
+      "circle-flags:it"
+     ]
+    },
+    {
+     "name": "portuguese",
+     "icons": [
+      "circle-flags:lang-pt-br",
+      "circle-flags:pt"
+     ]
+    },
+    {
+     "name": "chinese",
+     "icons": [
+      "circle-flags:cn"
+     ]
+    },
+    {
+     "name": "japanese",
+     "icons": [
+      "circle-flags:jp"
+     ]
+    },
+    {
+     "name": "korean",
+     "icons": [
+      "circle-flags:kr"
+     ]
+    },
+    {
+     "name": "hindi",
+     "icons": [
+      "circle-flags:in"
+     ]
+    },
+    {
+     "name": "russian",
+     "icons": [
+      "circle-flags:ru"
+     ]
+    },
+    {
+     "name": "arabic",
+     "icons": [
+      "circle-flags:lang-ar",
+      "circle-flags:sa"
+     ]
+    },
+    {
+     "name": "turkish",
+     "icons": [
+      "circle-flags:tr"
+     ]
+    },
+    {
+     "name": "vietnamese",
+     "icons": [
+      "circle-flags:vn"
+     ]
+    },
+    {
+     "name": "thai",
+     "icons": [
+      "circle-flags:th"
+     ]
+    },
+    {
+     "name": "indonesian",
+     "icons": [
+      "circle-flags:id"
+     ]
+    },
+    {
+     "name": "dutch",
+     "icons": [
+      "circle-flags:nl"
+     ]
+    },
+    {
+     "name": "polish",
+     "icons": [
+      "circle-flags:pl"
+     ]
+    },
+    {
+     "name": "swedish",
+     "icons": [
+      "circle-flags:se"
+     ]
+    },
+    {
+     "name": "ukrainian",
+     "icons": [
+      "circle-flags:ua"
+     ]
+    },
+    {
+     "name": "hebrew",
+     "icons": [
+      "circle-flags:il"
+     ]
+    },
+    {
+     "name": "greek",
+     "icons": [
+      "circle-flags:gr"
+     ]
+    },
+    {
+     "name": "urdu",
+     "icons": [
+      "circle-flags:pk"
+     ]
+    },
+    {
+     "name": "bengali",
+     "icons": [
+      "circle-flags:bd"
+     ]
+    },
+    {
+     "name": "swahili",
+     "icons": [
+      "circle-flags:ke"
+     ]
+    },
+    {
+     "name": "european union",
+     "icons": [
+      "circle-flags:eu"
+     ]
+    },
+    {
+     "name": "united nations",
+     "icons": [
+      "circle-flags:un"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "glyphs",
+   "title": "One-colour symbols for diagrams",
+   "note": "Phosphor duotone (the films' glyph style), tinted by the scene; the colour sets above are for pictures.",
+   "cols": 10,
+   "concepts": [
+    {
+     "name": "arrow right",
+     "icons": [
+      "ph:arrow-right-duotone"
+     ]
+    },
+    {
+     "name": "arrows",
+     "icons": [
+      "ph:arrows-left-right-duotone"
+     ]
+    },
+    {
+     "name": "plus",
+     "icons": [
+      "ph:plus-duotone"
+     ]
+    },
+    {
+     "name": "minus",
+     "icons": [
+      "ph:minus-duotone"
+     ]
+    },
+    {
+     "name": "check",
+     "icons": [
+      "ph:check-circle-duotone"
+     ]
+    },
+    {
+     "name": "cross",
+     "icons": [
+      "ph:x-circle-duotone"
+     ]
+    },
+    {
+     "name": "equals",
+     "icons": [
+      "ph:equals-duotone"
+     ]
+    },
+    {
+     "name": "play",
+     "icons": [
+      "ph:play-duotone"
+     ]
+    },
+    {
+     "name": "pause",
+     "icons": [
+      "ph:pause-duotone"
+     ]
+    },
+    {
+     "name": "repeat",
+     "icons": [
+      "ph:repeat-duotone"
+     ]
+    },
+    {
+     "name": "shuffle",
+     "icons": [
+      "ph:shuffle-duotone"
+     ]
+    },
+    {
+     "name": "link",
+     "icons": [
+      "ph:link-duotone"
+     ]
+    },
+    {
+     "name": "eye",
+     "icons": [
+      "ph:eye-duotone"
+     ]
+    },
+    {
+     "name": "hidden",
+     "icons": [
+      "ph:eye-slash-duotone"
+     ]
+    },
+    {
+     "name": "lock",
+     "icons": [
+      "ph:lock-simple-duotone"
+     ]
+    },
+    {
+     "name": "key",
+     "icons": [
+      "ph:key-duotone"
+     ]
+    },
+    {
+     "name": "search",
+     "icons": [
+      "ph:magnifying-glass-duotone"
+     ]
+    },
+    {
+     "name": "filter",
+     "icons": [
+      "ph:funnel-duotone"
+     ]
+    },
+    {
+     "name": "sliders",
+     "icons": [
+      "ph:sliders-horizontal-duotone"
+     ]
+    },
+    {
+     "name": "gear",
+     "icons": [
+      "ph:gear-six-duotone"
+     ]
+    },
+    {
+     "name": "stack",
+     "icons": [
+      "ph:stack-duotone"
+     ]
+    },
+    {
+     "name": "queue",
+     "icons": [
+      "ph:queue-duotone"
+     ]
+    },
+    {
+     "name": "tree",
+     "icons": [
+      "ph:tree-structure-duotone"
+     ]
+    },
+    {
+     "name": "graph",
+     "icons": [
+      "ph:graph-duotone"
+     ]
+    },
+    {
+     "name": "branch",
+     "icons": [
+      "ph:git-branch-duotone"
+     ]
+    },
+    {
+     "name": "function",
+     "icons": [
+      "ph:function-duotone"
+     ]
+    },
+    {
+     "name": "sigma",
+     "icons": [
+      "ph:sigma-duotone"
+     ]
+    },
+    {
+     "name": "infinity",
+     "icons": [
+      "ph:infinity-duotone"
+     ]
+    },
+    {
+     "name": "percent",
+     "icons": [
+      "ph:percent-duotone"
+     ]
+    },
+    {
+     "name": "hash",
+     "icons": [
+      "ph:hash-duotone"
+     ]
+    },
+    {
+     "name": "braces",
+     "icons": [
+      "ph:brackets-curly-duotone"
+     ]
+    },
+    {
+     "name": "terminal",
+     "icons": [
+      "ph:terminal-window-duotone"
+     ]
+    },
+    {
+     "name": "cpu",
+     "icons": [
+      "ph:cpu-duotone"
+     ]
+    },
+    {
+     "name": "gpu",
+     "icons": [
+      "ph:graphics-card-duotone"
+     ]
+    },
+    {
+     "name": "memory",
+     "icons": [
+      "ph:memory-duotone"
+     ]
+    },
+    {
+     "name": "drive",
+     "icons": [
+      "ph:hard-drive-duotone"
+     ]
+    },
+    {
+     "name": "database",
+     "icons": [
+      "ph:database-duotone"
+     ]
+    },
+    {
+     "name": "cloud",
+     "icons": [
+      "ph:cloud-duotone"
+     ]
+    },
+    {
+     "name": "globe",
+     "icons": [
+      "ph:globe-duotone"
+     ]
+    },
+    {
+     "name": "wifi",
+     "icons": [
+      "ph:wifi-high-duotone"
+     ]
+    },
+    {
+     "name": "plug",
+     "icons": [
+      "ph:plug-duotone"
+     ]
+    },
+    {
+     "name": "lightning",
+     "icons": [
+      "ph:lightning-duotone"
+     ]
+    },
+    {
+     "name": "battery",
+     "icons": [
+      "ph:battery-full-duotone"
+     ]
+    },
+    {
+     "name": "thermometer",
+     "icons": [
+      "ph:thermometer-duotone"
+     ]
+    },
+    {
+     "name": "flame",
+     "icons": [
+      "ph:fire-duotone"
+     ]
+    },
+    {
+     "name": "snowflake",
+     "icons": [
+      "ph:snowflake-duotone"
+     ]
+    },
+    {
+     "name": "clock",
+     "icons": [
+      "ph:clock-duotone"
+     ]
+    },
+    {
+     "name": "timer",
+     "icons": [
+      "ph:timer-duotone"
+     ]
+    },
+    {
+     "name": "hourglass",
+     "icons": [
+      "ph:hourglass-medium-duotone"
+     ]
+    },
+    {
+     "name": "user",
+     "icons": [
+      "ph:user-duotone"
+     ]
+    },
+    {
+     "name": "users",
+     "icons": [
+      "ph:users-three-duotone"
+     ]
+    },
+    {
+     "name": "robot",
+     "icons": [
+      "ph:robot-duotone"
+     ]
+    },
+    {
+     "name": "brain",
+     "icons": [
+      "ph:brain-duotone"
+     ]
+    },
+    {
+     "name": "sparkle",
+     "icons": [
+      "ph:sparkle-duotone"
+     ]
+    },
+    {
+     "name": "chat",
+     "icons": [
+      "ph:chat-circle-dots-duotone"
+     ]
+    },
+    {
+     "name": "file",
+     "icons": [
+      "ph:file-text-duotone"
+     ]
+    },
+    {
+     "name": "folder",
+     "icons": [
+      "ph:folder-duotone"
+     ]
+    },
+    {
+     "name": "package",
+     "icons": [
+      "ph:package-duotone"
+     ]
+    },
+    {
+     "name": "truck",
+     "icons": [
+      "ph:truck-duotone"
+     ]
+    },
+    {
+     "name": "rocket",
+     "icons": [
+      "ph:rocket-duotone"
+     ]
+    },
+    {
+     "name": "warning",
+     "icons": [
+      "ph:warning-duotone"
+     ]
+    },
+    {
+     "name": "prohibit",
+     "icons": [
+      "ph:prohibit-duotone"
+     ]
+    },
+    {
+     "name": "question",
+     "icons": [
+      "ph:question-duotone"
+     ]
+    },
+    {
+     "name": "info",
+     "icons": [
+      "ph:info-duotone"
+     ]
+    },
+    {
+     "name": "star",
+     "icons": [
+      "ph:star-duotone"
+     ]
+    },
+    {
+     "name": "flag",
+     "icons": [
+      "ph:flag-duotone"
+     ]
+    },
+    {
+     "name": "trophy",
+     "icons": [
+      "ph:trophy-duotone"
+     ]
+    }
+   ]
+  }
+ ]
+}

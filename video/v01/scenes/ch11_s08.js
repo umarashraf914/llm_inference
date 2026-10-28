@@ -14,7 +14,9 @@
    b4  a 'SIMPLIFIED' stamp across the three cards; 'arithmetic starved' (coral, left of the ridge) and 'memory bus
        starved' (amber, right); the roof pulses: 'since 2009'.
    b5  the cards brighten under the stamp; takeaway 'trust it where it applies'.
-   Layout: cards 480 x 150 at x 400 / 960 / 1520, y 160-310; one illustration at a time in y 380-880. */
+   Layout: cards 480 x 150 at x 400 / 960 / 1520, y 160-310; one illustration at a time in y 380-880, each
+   centred: the memory picture (x 480-1805) moved 182 left, the lanes (x 606-1555) 121 left; the roofline's
+   legend centred under it. */
 V.scene('ch11_s08', S => {
   const K = ch11Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
 
@@ -50,6 +52,7 @@ V.scene('ch11_s08', S => {
 
   // ================================================================ b1: one memory level, ignoring the cache hierarchy
   const ill1 = S.g();
+  ill1.setAttribute('transform', 'translate(-182,0)');   // HBM (x 480) to the server's tag (x 1805), centred
   const hbm = S.g(null, ill1);
   for (let i = 0; i < 5; i++) {
     S.rect({ x: 480, y: 548 + i * 30, w: 160, h: 24, r: 5, fill: 'url(#solid-bytes)', stroke: '#060a14', sw: 1.5 }, hbm);
@@ -122,6 +125,7 @@ V.scene('ch11_s08', S => {
 
   // ================================================================ b2a: launch latency
   const ill2a = S.g();
+  ill2a.setAttribute('transform', 'translate(-121,0)');  // the lane names (x 606) to 'time' (x 1555), centred
   const LANES = [[560, 'ideal', 700], [680, 'real', 860]];
   LANES.forEach(([y, name]) => {
     S.text(name, { x: 676, y, size: 28, weight: 700, anchor: 'end', color: 'ink' }, ill2a);
@@ -271,8 +275,9 @@ V.scene('ch11_s08', S => {
   });
   whole(t => dotG.style.opacity = (1 - 0.45 * cl((t - tStarve) / 0.5)).toFixed(3));
   const real = S.g(null, ill3);
-  const realP = S.pill('real workloads', { x: 1520, y: 820, tone: 'neutral', size: 24, h: 44 }, real);
-  S.circle({ x: realP.l - 24, y: 820, r: 8, fill: 'neutral', stroke: '#060a14', sw: 2 }, real);
+  // the legend, its dot and pill as one unit centred under the chart (the dot sits 32 px left of the pill)
+  const realP = S.pill('real workloads', { x: 960 + 16, y: 930, tone: 'neutral', size: 24, h: 44 }, real);
+  S.circle({ x: realP.l - 24, y: 930, r: 8, fill: 'neutral', stroke: '#060a14', sw: 2 }, real);
   hide(real);
   fade(real, 0, 1, tDots + 0.3, 0.35);
   fade(real, 1, 0, tB4, 0.35);

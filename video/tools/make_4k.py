@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Render a released film in 4K on this computer and save it as one video file in Downloads.
+"""Render a released film in 4K on this computer and save it as one video file in the repository folder, under
+rendered/ (git leaves that folder alone: rendered video never goes into git).
 
   python video/tools/make_4k.py              # asks which film and which version (the latest unless you pick another)
-  python video/tools/make_4k.py v01          # V01's latest version -> Downloads/V01_The_Memory_Wall_4K_version1.mp4
+  python video/tools/make_4k.py v01          # V01's latest version -> rendered/V01_The_Memory_Wall_4K_version4.mp4
   python video/tools/make_4k.py v01 --version 1
   python video/tools/make_4k.py --list       # the films, where each came from, and their versions
 
@@ -15,24 +16,30 @@ work on other films or on the engine never changes it.
 
 - Each computer sets itself up on its first run: a private Python environment in video/.venv (Playwright with its
   own Chromium, numpy, a bundled ffmpeg), GSAP from npm, and a check of the graphics card and hardware video
-  encoder (NVIDIA NVENC, Apple VideoToolbox) against the software path. Whatever matches the software look and is
-  faster is used from then on. The result stays on that computer: --recheck redoes it, --cpu renders in software
-  for one run.
+  encoder (NVIDIA NVENC, Apple VideoToolbox) against the software path. The card draws from then on if it matches
+  the software look and is faster; the hardware encoder is used if it is as good as x264 and its files about as
+  small. The result stays on that computer: --recheck redoes it, --cpu renders in software for one run.
 - Narration: from the repository (video/vNN/narration, kept up to date by git pull); failing that, the film's
   narration pack (V01_narration_pack.zip for V01) from Downloads, the Desktop or the home folder; failing that, it
   is synthesised here with Kokoro (Python 3.13 or older, and a 350 MB voice model).
 - Rendering takes from under an hour on a big workstation to several hours on a small computer. Stop it at any time
-  (Ctrl+C, or close the window) and run the same command again: finished scenes are kept.
+  (Ctrl+C, or close the window) and run the same command again: finished scenes are kept. It leaves room for other
+  work, keeping memory in use under 80%; on Windows its processes opt out of the power saving that moves background
+  work onto a hybrid processor's power-saving cores.
 
   --version N        render this version of the film (default: its latest)
   --working-copy     render the film's files as they are now, released or not (a draft)
   --list             list the films and their versions, and stop
-  --out PATH         where to save the film (default: your Downloads folder)
-  --workers N        scenes rendered at once (default: from CPU cores, memory and the encoder)
+  --out PATH         where to save the film (default: rendered/ in the repository folder)
+  --workers N        scenes rendered at once (default: up to three quarters of the CPU threads, each started only
+                     while memory in use, other programs included, stays under 80%: more start as memory frees)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
   --recheck          check the graphics card and video encoder again
+  --check            check the graphics card and video encoder again, report, and stop (no rendering)
   --narration ZIP    use this narration pack instead of the repository's narration
-  --preset P         x264 preset: slow (default), medium (faster, slightly larger file)
+  --preset P         x264 preset (default: fast where the graphics card draws, so the processor only encodes;
+                     slow where the processor draws too). On this film fast makes files the same size as slow, at
+                     the same quality, in half the processor time
   --only ch18 ...    just these chapters, as a quick test (saved as ..._4K_ch18.mp4)
   --keep-segments    keep the per-scene 4K files after the film is assembled
 """
@@ -44,6 +51,7 @@ VIDEO = TOOLS.parent
 FILM = NAME = PACK = None             # the film being rendered: see use_film()
 VENV = VIDEO / ".venv"
 CACHE = VIDEO / ".cache" / "segments"   # rendered scenes by fingerprint, kept across versions (tools/scenekeys.py)
+RENDERED = VIDEO.parent / "rendered"     # the finished films, in the repository folder (ignored by git)
 CACHE_DAYS = 90                          # a cached scene unused this long is deleted
 REQS = ["playwright==1.56.0", "numpy", "imageio-ffmpeg", "certifi"]
 TTS_REQS = ["kokoro-onnx==0.6.1"]
@@ -54,6 +62,9 @@ KOKORO = {"kokoro-v1.0.onnx": "7d5df8ecf7d4b1878015a32686053fd0eebe2bc3772346087
 # memory per scene rendering at once: Chromium at 3840x2160 (~0.6 GB) plus its encoder (x264 ~1.8 GB, measured;
 # the hardware encoders keep their buffers on the graphics card or media engine)
 GB_PER_WORKER = {"x264": 2.6, "nvenc": 1.0, "videotoolbox": 1.0}
+GB_GPU_DRAWING = 2.0    # more when Chromium draws on the graphics card: its GPU process and the memory it shares with
+                        # the card (measured: 18 scenes at once on an RTX 5000 Ada, with NVENC, held about 50 GB)
+MEMORY_TARGET = 0.8     # as many scenes at once as keep memory in use, other programs included, under this share
 ENCODERS = {"x264": "x264", "nvenc": "NVIDIA NVENC", "videotoolbox": "Apple VideoToolbox"}
 
 
@@ -83,6 +94,7 @@ def venv_python():
 # ---------------------------------------------------------------- which film, which version
 sys.path.insert(0, str(TOOLS))
 import films  # noqa: E402  (standard library only: the menu works before the environment exists)
+from machine import biggest_programs, memory_gb, process_alive  # noqa: E402  (standard library only too)
 
 
 def ask(question, options, default):
@@ -164,7 +176,7 @@ def inner_argv(a, folder, version):
     if a.only:
         argv += ["--only", *a.only]
     return argv + [f for f, on in (("--keep-segments", a.keep_segments), ("--cpu", a.cpu),
-                                   ("--recheck", a.recheck or a.gpu_recheck)) if on]
+                                   ("--recheck", a.recheck or a.gpu_recheck), ("--check", a.check)) if on]
 
 
 def use_film(film_dir, meta, version):
@@ -382,37 +394,75 @@ def ensure_narration(given):
 
 
 # ---------------------------------------------------------------- machine
-def memory_gb():
-    try:
-        if os.name == "nt":
-            import ctypes
-
-            class MS(ctypes.Structure):
-                _fields_ = [("len", ctypes.c_ulong), ("load", ctypes.c_ulong)] + [(n, ctypes.c_ulonglong) for n in
-                            ("total", "avail", "ptotal", "pavail", "vtotal", "vavail", "xavail")]
-            m = MS(); m.len = ctypes.sizeof(MS)
-            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m))
-            return m.total / 2 ** 30
-        return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2 ** 30
-    except (OSError, ValueError, AttributeError):
-        return None
-
-
 def describe_machine():
-    mem = memory_gb()
+    mem, _ = memory_gb()
     system = {"Darwin": "macOS", "Windows": "Windows"}.get(platform.system(), platform.system())
     return f"{system} ({platform.machine()}), {os.cpu_count()} logical CPUs" + (f", {mem:.0f} GB memory" if mem else "")
 
 
-def default_workers(encoder="x264"):
-    # a worker keeps about 1.3 cores busy (Chromium drawing and JPEG-ing 8 MP frames, less when the GPU draws; the
-    # encoder behind it), so cores and memory set how many scenes render at once
+def scene_gb(encoder="x264", gpu=None):
+    """Memory one scene takes while it renders: its browser, its encoder, the graphics card's share."""
+    return GB_PER_WORKER[encoder] + (GB_GPU_DRAWING if gpu else 0)
+
+
+def default_workers(encoder="x264", gpu=None):
+    """(most scenes at once, what sets that, how many memory allows now). A worker keeps about 1.3 cores busy
+    (Chromium drawing and JPEG-ing 8 MP frames, less when the GPU draws; the encoder behind it), so three quarters
+    of the processor's threads, at most 32. render.py starts each scene only while memory in use, counting what is
+    already open, stays under MEMORY_TARGET of the total, so the computer stays usable for other work, and a render
+    that begins with little memory free speeds up as other programs close."""
     cores = os.cpu_count() or 2
-    w = max(1, round(cores * 0.75))
-    mem = memory_gb()
-    if mem:
-        w = min(w, max(1, int((mem - 3) // GB_PER_WORKER[encoder])))
-    return min(w, 32)
+    w, why = max(1, round(cores * 0.75)), f"for {cores} logical CPUs"
+    if w > 32:
+        w, why = 32, "at most 32"
+    total, avail = memory_gb()
+    now = w
+    if total:
+        in_use = total - avail if avail is not None else 3
+        now = max(1, min(w, int((MEMORY_TARGET * total - in_use) // scene_gb(encoder, gpu))))
+    return w, why, now
+
+
+def say_memory(now, most):
+    """Memory is short: say how short, and which programs hold it, so they can be closed."""
+    total, avail = memory_gb()
+    if not total or avail is None:
+        return
+    print(f"   Only about {now} of the {most} can start now: {total - avail:.0f} of {total:.0f} GB of memory is in use. "
+          f"More start as memory frees.")
+    top = [f"{name}{f' ({k} of them)' if k > 1 else ''} {gb:.1f} GB" for name, gb, k in biggest_programs() if gb >= 0.5]
+    if top:
+        print("   Holding the most memory now: " + "; ".join(top) + ".")
+        print("   Many browser, encoder or python processes are usually an earlier render still running or left behind:"
+              " close its window, or end them in Task Manager (Activity Monitor on a Mac), or restart the computer.")
+
+
+class render_lock:
+    """One render at a time on a computer: a second would halve the speed of both, and both would write the same
+    scene cache. The lock is a file naming this process; one left by a render that stopped is taken over."""
+    path = CACHE.parent / "render.lock"
+
+    def __enter__(self):
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            held = json.loads(self.path.read_text())
+        except (OSError, ValueError):
+            held = None
+        if held and held.get("pid") != os.getpid() and process_alive(held["pid"]):
+            sys.exit(f"\nAnother render is running on this computer (process {held['pid']}, started {held['started']}"
+                     f": {held.get('what', '')}). Let it finish, or stop it (Ctrl+C in its window), then run this "
+                     f"again. If none is running, delete {self.path} and run this again.")
+        self.path.write_text(json.dumps({"pid": os.getpid(), "started": time.strftime("%Y-%m-%d %H:%M"),
+                                         "what": f"{NAME}"}))
+        return self
+
+    def __exit__(self, *exc):
+        try:
+            if json.loads(self.path.read_text()).get("pid") == os.getpid():
+                self.path.unlink()
+        except (OSError, ValueError):
+            pass
+        return False
 
 
 def keep_awake():
@@ -426,20 +476,20 @@ def keep_awake():
 
 def render_profile(recheck):
     """How this computer renders (gpu_check.check): worked out on its first run and remembered, so every later run,
-    and a resumed one above all, renders the same way."""
+    and a resumed one above all, renders the same way. A changed check (gpu_check.VERSION) runs again once."""
     import gpu_check
     memo = VENV / "render-profile.json"
-    if memo.exists() and not recheck:
-        try:
-            prof = json.loads(memo.read_text())
-        except ValueError:
-            prof = {}
-        if prof.get("version") == gpu_check.VERSION:
-            step("This computer renders as its first-run check found (--recheck redoes it):")
-            for line in prof["report"]:
-                print("   " + line)
-            return prof
-    step("Checking this computer's graphics card and video encoder against software (a minute or two, once)")
+    try:
+        before = json.loads(memo.read_text()) if memo.exists() else None
+    except ValueError:
+        before = None
+    if before and not recheck and before.get("version") == gpu_check.VERSION:
+        step("This computer renders as its first-run check found (--recheck redoes it):")
+        for line in before["report"]:
+            print("   " + line)
+        return before
+    again = " again, as the check has changed since this computer last ran it" if before and not recheck else ""
+    step(f"Checking this computer's graphics card and video encoder against software{again} (a few minutes, once)")
     try:
         prof = gpu_check.check(FILM, json.loads((FILM / "build" / "timing.json").read_text()),
                                say=lambda m: print("   " + m, flush=True), keep=FILM / "build" / "gpu_check")
@@ -447,6 +497,9 @@ def render_profile(recheck):
         print(f"   the check failed ({e}); rendering in software this time")
         return {"gpu": None, "encoder": "x264"}
     memo.write_text(json.dumps(prof))
+    if before and (before.get("gpu"), before.get("encoder")) != (prof["gpu"], prof["encoder"]):
+        print("   That is a change, so the next render draws every scene again once (scenes are reused only when "
+              "drawn and encoded the same way).")
     return prof
 
 
@@ -466,7 +519,7 @@ def prune_cache():
 
 def seg_dir(gpu, encoder):
     # one folder per way of rendering, so a resumed run never mixes scenes drawn or encoded differently
-    profile = f"{gpu or 'cpu'}-{encoder}"
+    profile = f"{(gpu or 'cpu').replace(':', '-')}-{encoder}"
     return FILM / "build" / ("segments_4k" if profile == "cpu-x264" else f"segments_4k_{profile}")
 
 
@@ -480,12 +533,13 @@ def main(argv):
     ap.add_argument("--out")
     ap.add_argument("--workers", type=int)
     ap.add_argument("--narration")
-    ap.add_argument("--preset", default="slow")
+    ap.add_argument("--preset")                    # default: fast where the GPU draws, else slow
     ap.add_argument("--crf", default="18")
     ap.add_argument("--only", nargs="+", metavar="CHAPTER")
     ap.add_argument("--keep-segments", action="store_true")
     ap.add_argument("--cpu", action="store_true")
     ap.add_argument("--recheck", action="store_true")
+    ap.add_argument("--check", action="store_true")
     ap.add_argument("--gpu", action="store_true", help=argparse.SUPPRESS)            # (the default now)
     ap.add_argument("--gpu-recheck", action="store_true", help=argparse.SUPPRESS)    # (old name of --recheck)
     a = ap.parse_args(argv)
@@ -505,31 +559,47 @@ def main(argv):
     ensure_narration(a.narration)
     from ffbin import frames_and_fps
 
+    if a.check:
+        prof = render_profile(True)            # says too whether that changes how this computer renders
+        print(f"\nSaved: from now on this computer draws {'on the GPU (' + prof['gpu'] + ')' if prof['gpu'] else 'in software'}"
+              f" and encodes with {ENCODERS[prof['encoder']]}.")
+        return
     prof = {"gpu": None, "encoder": "x264"} if a.cpu else render_profile(a.recheck or a.gpu_recheck)
     gpu, encoder = prof["gpu"], prof["encoder"]
     seg = seg_dir(gpu, encoder)
 
     name = NAME + ("_" + "_".join(a.only) if a.only else "")
-    out = Path(a.out).expanduser().resolve() if a.out else downloads() / f"{name}.mp4"
+    out = Path(a.out).expanduser().resolve() if a.out else RENDERED / f"{name}.mp4"
+    out.parent.mkdir(parents=True, exist_ok=True)
     timing = json.loads((FILM / "build" / "timing.json").read_text())
     order = [s for s in timing["order"] if not a.only or s.split("_")[0] in a.only]
     if not order:
         sys.exit(f"no chapters match {a.only}")
     frames = sum(round(timing["scenes"][s]["duration"] * 30) for s in order)
-    workers = a.workers or default_workers(encoder)
-    for where in {seg.parent, out.parent if out.parent.exists() else downloads()}:
+    if a.workers:
+        workers, why, now = a.workers, "as asked", a.workers
+    else:
+        workers, why, now = default_workers(encoder, gpu)
+    for where in {seg.parent, out.parent}:
         free = shutil.disk_usage(where).free / 1e9
         need = 4 + frames / 166140 * 6
         if free < need:
             print(f"warning: only {free:.0f} GB free on the drive holding {where}; about {need:.0f} GB is needed")
 
     keep_awake()
-    how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {ENCODERS[encoder]}"
+    preset = a.preset or ("fast" if gpu else "slow")
+    how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {ENCODERS[encoder]}" + (
+        f" ({preset})" if encoder == "x264" else "")
+    pace = [] if a.workers else ["--memory-share", MEMORY_TARGET, "--scene-gb", f"{scene_gb(encoder, gpu):.1f}"]
+    many = f"{workers} at a time ({why})" if a.workers else f"up to {workers} at a time ({why}) as memory allows"
     step(f"Rendering {len(order)} scenes ({frames:,} frames, {frames / 30 / 60:.0f} min of film) at 3840x2160, "
-         f"{workers} at a time, {how}. Stop any time; run the same command to resume.")
-    run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,
-         "--cache", CACHE, "--workers", workers, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
-        env=dict(env(), PRESET=a.preset, CRF=str(a.crf)))
+         f"{many}, {how}. Stop any time; run the same command to resume.")
+    if not a.workers and now < workers / 2:
+        say_memory(now, workers)
+    with render_lock():
+        run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,
+             "--cache", CACHE, "--workers", workers, *pace, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
+            env=dict(env(), PRESET=preset, CRF=str(a.crf)))
 
     step(f"Assembling the film: picture, narration (two audio tracks), subtitles, chapters -> {out}")
     run([sys.executable, TOOLS / "assemble.py", FILM, "--name", name, "--segments", seg, "--out", out, *(["--only", *a.only] if a.only else [])])

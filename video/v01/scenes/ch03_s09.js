@@ -6,6 +6,8 @@
 V.scene('ch03_s09', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
+  // the whole picture sits 80 px lower until b5, so it is centred (the chips and the grid start high)
+  S.xset(S.camera, { x: 0, y: 80, s: 1 });
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
   const BX = 160, BW = 1600, BY = 720, BH = 36;           // the context window bar
   const X = tok => BX + tok * BW / 200000;                // 80,000 → 800, 2,000 → 16 px, 3,200 → 25.6 px
@@ -188,12 +190,13 @@ V.scene('ch03_s09', S => {
 
   // ---------------------------------------------------------------- b5: progressive disclosure, forced by arithmetic
   S.add(fx.out([plugin, plugLbl, dim], { d: 0.4, stagger: 0 }), 'b5-0.1');
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), 'b5-0.3');   // back up, making room for the takeaway
   const take = S.takeaway('progressive disclosure', { tone: 'helps' });
   S.add(fx.in(take, { from: 'up', d: 0.5 }), 'b5~progressive-0.1');
   const R2 = 850;
   const chat = S.rect({ x: BX, y: R2 - 12, w: 0, h: 24, fill: 'struct', fillOpacity: 0.9 });
   const chatLbl = S.text('ten turns of chat: 2,000 tokens', { x: BX + 36, y: R2 + 1, size: 28, weight: 600, color: 'ink' });
-  const illus = S.pill('illustrative', { x: BX + 36 + S.measure('ten turns of chat: 2,000 tokens', { size: 28, weight: 600 }) + 80, y: R2, h: 36, size: 22, tone: 'neutral', style: 'outline' });
+  const illus = S.pill('illustrative', { x: BX + 36 + S.measure('ten turns of chat: 2,000 tokens', { size: 28, weight: 600 }) + 18, y: R2, h: 36, size: 22, tone: 'neutral', style: 'outline', anchor: 'start' });
   S.set([chat, chatLbl, illus], { autoAlpha: 0 }, 0);
   const CONV = T('b5~than') - 0.1;
   S.add(gsap.set(chat, { autoAlpha: 1 }), CONV);

@@ -6,34 +6,41 @@ V.scene('ch02_s02', S => {
   const X0 = 200, U = 1000 / 140;          // px per GB
 
   // ---------------------------------------------------------------- b1: bytes, two per weight, 140 GB
-  const fileIcon = S.icon('ph:file-duotone', { x: 260, y: 165, size: 110, color: 'struct' });
+  // composed on the centre line: the file (then its tiles) above, the words (then the sum) below
+  const fileIcon = S.icon('ph:file-duotone', { x: 960, y: 400, size: 110, color: 'struct' });
   S.add(fx.pop(fileIcon, { from: 0.6 }), 0.2);
   const tiles = S.g();
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) S.rect({ x: 205 + c * 22, y: 135 + r * 22, w: 18, h: 18, r: 3, fill: 'url(#card-bytes)', stroke: 'bytes', sw: 1.2 }, tiles);
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) S.rect({ x: 960 - 64 + c * 22, y: 369 + r * 22, w: 18, h: 18, r: 3, fill: 'url(#card-bytes)', stroke: 'bytes', sw: 1.2 }, tiles);
   tiles.setAttribute('data-audit', 'ignore');
   S.set(tiles, { autoAlpha: 0 }, 0);
   S.add(gsap.to(fileIcon, { autoAlpha: 0, scale: 1.3, transformOrigin: '50% 50%', duration: 0.3 }), 'b1~counted-0.4');
   S.add(gsap.fromTo(tiles, { autoAlpha: 0, scale: 0.4, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(1.6)' }), 'b1~counted-0.2');
-  const cap = S.text('file sizes: counted in bytes', { x: 420, y: 140, size: 30, color: 'muted', weight: 550 });
-  const two = S.text('2 bytes', { x: 420, y: 200, size: 30, family: 'mono', color: 'bytes', weight: 650 });
-  const later = S.text('why two: later', { x: 560, y: 200, size: 24, color: 'muted', weight: 550 });
-  S.add(fx.in(cap, { from: 'left', d: 0.4 }), 'b1~counted');
+  const cap = S.text('file sizes: counted in bytes', { x: 960, y: 510, size: 30, anchor: 'middle', color: 'muted', weight: 550 });
+  // '2 bytes', then 'why two: later': one line, centred
+  const w2 = S.measure('2 bytes', { size: 30, weight: 650, family: 'mono' }), wLater = S.measure('why two: later', { size: 24, weight: 550 });
+  const L2 = 960 - (w2 + 28 + wLater) / 2;
+  const two = S.text('2 bytes', { x: L2, y: 570, size: 30, family: 'mono', color: 'bytes', weight: 650 });
+  const later = S.text('why two: later', { x: L2 + w2 + 28, y: 570, size: 24, color: 'muted', weight: 550 });
+  S.add(fx.in(cap, { from: 'up', d: 0.4 }), 'b1~counted');
   S.add(fx.pulse(tiles.children[7], { scale: 1.8, d: 0.6 }), 'b1~each weight');
   S.add(fx.in([two, later], { from: 'left', d: 0.4, stagger: 0.15 }), 'b1~takes');
   S.add(fx.out([cap, two, later], { d: 0.3 }), 'b1~seventy-0.3');
-  const eq = S.equation([{ t: '70,000,000,000 weights', tone: 'ink' }, { t: '× 2 bytes', tone: 'bytes' }, { t: '= 140,000,000,000 bytes', tone: 'ink' }], { x: 1010, y: 165, size: 36 });
+  const eq = S.equation([{ t: '70,000,000,000 weights', tone: 'ink' }, { t: '× 2 bytes', tone: 'bytes' }, { t: '= 140,000,000,000 bytes', tone: 'ink' }], { x: 960, y: 510, size: 36 });
   S.add(fx.in(eq.parts[0], { from: 'up', d: 0.4 }), 'b1~seventy');
   S.add(fx.in(eq.parts[1], { from: 'up', d: 0.4 }), 'b1~make');
   S.add(fx.in(eq.parts[2], { from: 'up', d: 0.4 }), 'b1~a hundred');
   S.add(fx.swap(eq.parts[2], '= 140 GB'), 'b1~gigabytes-0.1');
-  const gbNote = S.text('1 GB = 1 billion bytes', { x: 1500, y: 214, size: 24, anchor: 'end', color: 'muted', weight: 550 });
+  // the last part shortens, so the sum slides to stay centred
+  const wShort = S.measure('= 140 GB', { size: 36, weight: 600 });
+  S.add(gsap.fromTo(eq, { x: 0 }, { x: (eq.parts[2].w - wShort) / 2, duration: 0.45, ease: 'power2.inOut', immediateRender: false }), 'b1~gigabytes-0.1');
+  const gbNote = S.text('1 GB = 1 billion bytes', { x: 960, y: 568, size: 24, anchor: 'middle', color: 'muted', weight: 550 });
   S.add(fx.in(gbNote, { from: 'up', d: 0.35 }), 'b1~gigabytes+0.2');
   // the tiles compress into the solid block, the model, 1,000 px = 140 GB
   const modelG = S.g();
   const model = S.rect({ x: X0, y: 235, w: 140 * U, h: 50, r: 6, fill: 'url(#bar-bytes)' }, modelG);
   const modelLbl = S.text('140 GB', { x: X0 + 140 * U + 18, y: 261, size: 30, family: 'mono', weight: 650, color: 'bytes' }, modelG);
   S.set(model, { autoAlpha: 0 }, 0);
-  S.add(gsap.to(tiles, { autoAlpha: 0, y: 100, duration: 0.4, ease: 'power2.in' }), 'b1~gigabytes+0.3');
+  S.add(gsap.to(tiles, { autoAlpha: 0, y: -120, duration: 0.45, ease: 'power2.in' }), 'b1~gigabytes+0.3');   // up, into the block
   S.add(gsap.fromTo(model, { autoAlpha: 0, attr: { width: 130 } }, { autoAlpha: 1, attr: { width: 140 * U }, duration: 0.8, ease: 'power3.out' }), 'b1~gigabytes+0.5');
   S.add(fx.in(modelLbl, { from: 'left', d: 0.4 }), 'b1~gigabytes+1.0');
 

@@ -19,12 +19,15 @@ film has its own folder, `video/v01/` for lecture 1 and so on, so making one fil
 each keeps every version it has been released in: `video/vNN/film.json` lists them with their dates and notes,
 beside the lecture, atlas and transcript the film was made from. A version renders from exactly the files it
 was released with, the shared engine included, so later work can never change it; changing a film means
-releasing a new version, and the old ones stay renderable.
+releasing a new version, and the old ones stay renderable. How a film is made, and the rules learned from
+V01's faults so that none of them happens again, are in
+[`.claude/skills/lecture-film/SKILL.md`](.claude/skills/lecture-film/SKILL.md).
 
 **To render**, double-click `make_film.bat` (Windows) or `make_film.command` (Mac) at the top of the repository.
 It updates from GitHub and asks which film and which version (press Enter for the newest film's latest
-version), then renders it into Downloads as, for example, `V01_The_Memory_Wall_4K_version1.mp4`. From a
-terminal: `python video/tools/make_4k.py` for the same questions, `make_4k.py v01` for V01's latest version,
+version), then renders it into the `rendered` folder of the repository, beside the launchers, as for example
+`rendered/V01_The_Memory_Wall_4K_version4.mp4` (git leaves that folder alone: rendered video never goes into
+git). From a terminal: `python video/tools/make_4k.py` for the same questions, `make_4k.py v01` for V01's latest version,
 `make_4k.py v01 --version 1` for a particular one, `make_4k.py --list` to see them all.
 
 **Changing a film** costs only what changed. Note the moments you want different, with the film's timestamps
@@ -38,16 +41,24 @@ this, about 2 to 3 GB a film, and deletes those unused for 90 days.)
 **Each computer sets itself up** on its first run, and remembers what it found:
 
 - a private Python environment in `video/.venv` with Playwright's Chromium, numpy and a bundled ffmpeg;
-- a one-minute check of the graphics card and hardware video encoder (NVIDIA NVENC on Windows, Apple
-  VideoToolbox on a Mac). They draw and encode test frames alongside the software path, and are used only if
-  they match its look and are faster. `--recheck` redoes the check; `--cpu` renders in software for one run;
-- as many scenes at once as its cores and memory allow.
+- a check, a few minutes long, of the graphics card and hardware video encoder (NVIDIA NVENC on Windows, Apple
+  VideoToolbox on a Mac). They draw and encode test frames alongside the software path. The card draws only if
+  it matches the software look and is faster; the hardware encoder is used only if it is as good as x264 and
+  its files about as small (NVENC once made V01 19 GB where x264 makes 2 GB, for no visible gain). Several
+  ways of drawing on the card are tried, each with a time limit, and
+  the report says how far each got. `--check` redoes the check and stops; `--recheck` redoes it and renders;
+  `--cpu` renders in software for one run;
+- as many scenes at once as its processor and memory allow: each scene starts only while memory in use (other
+  programs included) stays under 80%, so the computer stays usable for other work, and a render that starts short
+  of memory speeds up as programs close (it names the biggest ones at the start). On Windows its processes also opt
+  out of the power saving that moves background work onto a hybrid processor's power-saving cores. One render runs
+  at a time: a second one is refused.
 
 **Narration** travels with the repository: `video/vNN/narration/` holds the film's timing and each scene's
 audio (Opus, about 50 MB a film), and a run decodes it again whenever `git pull` brings a change. A narration
 pack zip (`V01_narration_pack.zip`) in Downloads still works when there is none.
 
-The result, `Downloads/V01_The_Memory_Wall_4K.mp4` for V01 (about 2 GB), has two audio tracks (with and
+The result, `rendered/V01_The_Memory_Wall_4K_version4.mp4` for V01 (about 2 GB), has two audio tracks (with and
 without the ambient music), soft English subtitles and chapter markers. A run prints a running estimate; stop
 it at any time and run it again to carry on. Keep about 10 GB free. `--only ch18` renders one chapter as a
 quick test; `--help` lists the other options.

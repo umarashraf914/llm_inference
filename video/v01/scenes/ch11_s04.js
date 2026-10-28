@@ -10,7 +10,9 @@
    b4  'bandwidth: 3.35 trillion bytes/s'; coral dots at 3.35, 33.5, 335 with '× 10 across, × 10 up'.
    b5  'bytes/s × ops/byte = ops/s' (bytes struck); the coral slant through the dots to the corner (938, 151);
        'bandwidth × intensity' along it; a ghost slant lifts 80 px and settles back.
-   Layout: axes x 320-1320 along y 900, up x 320 to y 150; sidebar x 1400-1820 (header y 180, line y 270). */
+   Layout: axes x 320-1320 along y 900, up x 320 to y 150; sidebar x 1420-1838 (header y 180, line y 270), its
+   lines centred on x 1629. The chart alone is centred (+173); at b3 it moves to -65 and the sidebar comes in
+   beside it at -65, the pair centred. */
 V.scene('ch11_s04', S => {
   const K = ch11Kit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const roof = ch11Roof(S, {});
@@ -89,7 +91,8 @@ V.scene('ch11_s04', S => {
   fade([xT, yT], 1, 0, tLog, 0.4);
   fade([roof.xTicks, roof.yTicks], 0, 1, tLog + 0.3, 0.5);
   fade([roof.xTitle, roof.yTitle], 0, 1, tLog + 0.5, 0.5);
-  const side = S.text('H100', { x: 1420, y: 180, size: 40, weight: 800, family: 'display', color: 'ink' });
+  const SCX = 1629;              // the sidebar's axis: its lines centre on it
+  const side = S.text('H100', { x: SCX, y: 180, size: 40, weight: 800, family: 'display', anchor: 'middle', color: 'ink' });
   hide(side);
   fade(side, 0, 1, T('b3~H') - 0.1, 0.4);
   const flat = S.path({ d: roof.flatD, stroke: 'compute', sw: 5 });
@@ -111,7 +114,7 @@ V.scene('ch11_s04', S => {
   }));
 
   // ================================================================ b4: the slanted ceiling, point by point
-  const bwL = S.text('bandwidth: 3.35 trillion bytes/s', { x: 1420, y: 270, size: 26, weight: 700, color: 'bytes' });
+  const bwL = S.text('bandwidth: 3.35 trillion bytes/s', { x: SCX, y: 270, size: 26, weight: 700, anchor: 'middle', color: 'bytes' });
   hide(bwL);
   fade(bwL, 0, 1, T('b4~bandwidth') - 0.1, 0.35);
   const DOTS = [[1, 3.35, '3.35'], [10, 33.5, '33.5'], [100, 335, '335']];
@@ -139,10 +142,10 @@ V.scene('ch11_s04', S => {
   fade(bwL, 1, 0, tMul, 0.3);
   const ueq = S.g();
   const US = 26, parts = ['bytes/s × ops/', 'byte', ' = ops/s'];
-  S.text([{ t: 'bytes', c: 'bytes' }, { t: '/s × ops/', c: 'ink' }, { t: 'byte', c: 'bytes' }, { t: ' = ops/s', c: 'compute' }], { x: 1420, y: 270, size: US, weight: 700, family: 'mono' }, ueq);
-  const w = s => S.measure(s, { size: US, weight: 700, family: 'mono' });
-  const s1 = S.path({ d: `M1416,270 H${1424 + w('bytes')}`, stroke: 'muted', sw: 3 }, ueq);
-  const x2 = 1420 + w(parts[0]);
+  const w = s => S.measure(s, { size: US, weight: 700, family: 'mono' }), UX = SCX - w(parts.join('')) / 2;
+  S.text([{ t: 'bytes', c: 'bytes' }, { t: '/s × ops/', c: 'ink' }, { t: 'byte', c: 'bytes' }, { t: ' = ops/s', c: 'compute' }], { x: UX, y: 270, size: US, weight: 700, family: 'mono' }, ueq);
+  const s1 = S.path({ d: `M${UX - 4},270 H${UX + 4 + w('bytes')}`, stroke: 'muted', sw: 3 }, ueq);
+  const x2 = UX + w(parts[0]);
   const s2 = S.path({ d: `M${x2 - 4},270 H${x2 + w('byte') + 4}`, stroke: 'muted', sw: 3 }, ueq);
   [s1, s2].forEach(p => { p.setAttribute('data-audit', 'ignore'); K.draw(p, 120, tMul + 0.6, 0.3); });
   hide(ueq);
@@ -165,5 +168,11 @@ V.scene('ch11_s04', S => {
     ghost.setAttribute('transform', `translate(0,${(-80 * up).toFixed(1)})`);
     setO(ghost, cl((t - tLift) / 0.2) * (1 - cl((t - tLift - 1.9) / 0.3)));
   });
+  // the chart alone, centred; at b3 it moves left and the sidebar comes in beside it, the pair centred
+  const side3 = [side, bwL, ueq], chartG = S.g(), sideG = S.g();
+  [...S.main.children].filter(e => e !== chartG && e !== sideG && !side3.includes(e)).forEach(e => chartG.appendChild(e));
+  side3.forEach(e => sideG.appendChild(e));
+  sideG.setAttribute('transform', 'translate(-65,0)');
+  whole(t => chartG.setAttribute('transform', `translate(${lerp(173, -65, EIO(cl((t - T('b3') + 0.1) / 0.7))).toFixed(1)},0)`));
   void pulse;
 });

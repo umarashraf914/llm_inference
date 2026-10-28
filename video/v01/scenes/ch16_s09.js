@@ -10,7 +10,9 @@
    b3  the bill fades; the arrows pulse into the shared block, 'the one block everybody shares'; 'warm because
        shared, cheap because warm'.
    Layout: left half x 120-820 (users y 360, block y 530, tiles y 620); right half x 1000-1860 (tag y 350, pill
-   y 440, price bars y 540 / 608); bill x 120, y 772-870; bill bars x 820-1820, y 800 / 866; bottom line y 960. */
+   y 440, price bars y 540 / 608); bill x 120, y 772-870; bill bars x 820-1820, y 800 / 866; bottom line y 960.
+   The two halves (x 134-1690 as drawn) are moved 48 right, centred as a pair; the bill and the bottom line are
+   centred as drawn. */
 V.scene('ch16_s09', S => {
   const K = libKit(S), { T, cl, E, EIO, whole, setO, hide, fade } = K;
   const tB3 = T('b3') - 0.1;
@@ -102,4 +104,8 @@ V.scene('ch16_s09', S => {
   whole(t => blk.setAttribute('stroke', S.tone(t > tW + 1.2 ? 'helps' : 'struct')));
   const end = S.text('warm because shared, cheap because warm', { x: 960, y: 960, size: 36, weight: 800, anchor: 'middle', color: 'ink' });
   rise(end, T('b3~shared') - 0.1, 10);
+  // the two halves, centred as a pair (see the header)
+  const halves = S.g();
+  [...S.main.children].filter(e => e !== halves && e !== bill && e !== end).forEach(e => halves.appendChild(e));
+  halves.setAttribute('transform', 'translate(48,0)');
 });

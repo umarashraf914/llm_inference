@@ -35,7 +35,7 @@ V.scene('ch09_s02', S => {
   const mix = (c1, c2, k) => { const p = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)); const a = p(c1), b = p(c2); return '#' + a.map((v, i) => Math.round(lerp(v, b[i], k)).toString(16).padStart(2, '0')).join(''); };
 
   // headers: one line, replaced on each change
-  const head = (txt, at, until) => { const h = S.text(txt, { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' }); hide(h); fade(h, 0, 1, at, 0.45); if (until) fade(h, 1, 0, until - 0.05, 0.3); return h; };
+  const head = (txt, at, until) => { const h = S.text(txt, { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' }); hide(h); fade(h, 0, 1, at, 0.45); if (until) fade(h, 1, 0, until - 0.05, 0.3); return h; };
 
   // ================================================================ b1: the package from above
   const holder = S.g();
@@ -92,7 +92,9 @@ V.scene('ch09_s02', S => {
   const sixFill = sites[SIXTH].fill;
   sixFill.querySelectorAll('rect, path').forEach(e => { e.setAttribute('stroke', MUTED); if (e.tagName === 'rect') e.setAttribute('fill', '#1b2133'); });
   fade(sixFill, 0, 0.5, tAr + 0.7, 0.4);
-  const sixTag = S.pill('sixth stack, not enabled', { x: PCX + PW / 2 + 22, y: sites[SIXTH].cy, tone: 'neutral', size: 22, h: 40, anchor: 'start' });
+  // under the package, at its right end (the grey stack's side), so the package stays the centred picture
+  const sixW = S.measure('sixth stack, not enabled', { size: 22, weight: 600 }) + 44;
+  const sixTag = S.pill('sixth stack, not enabled', { x: PCX + PW / 2 - sixW, y: PCY + PH / 2 + 40, tone: 'neutral', size: 22, h: 40, anchor: 'start' });
   hide(sixTag);
   fade(sixTag, 0, 1, tAr + 0.9, 0.4);
   // the camera: into the bottom-left stack and back
@@ -133,9 +135,10 @@ V.scene('ch09_s02', S => {
   fade(cnt, 0, 1, tFive - 0.05, 0.25);
   whole(t => { cnt.textContent = `${16 * Math.max(1, Math.min(5, 1 + Math.floor((t - tFive) / 0.18)))} GB`; });
   const spec = S.g();
-  S.rect({ x: 1440, y: 300, w: 425, h: 92, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.22, sw: 2 }, spec);
-  S.text([{ t: 'Memory capacity: ', c: 'muted' }, { t: '80 GB', c: 'ink', f: 'mono' }], { x: 1478, y: 347, size: 26, weight: 650 }, spec);
-  const tick = S.icon('ph:check-circle-duotone', { x: 1830, y: 346, size: 34, color: 'helps' }, spec);
+  // the spec card, centred above the package (the top band is free until b3's headers)
+  S.rect({ x: 748, y: 190, w: 425, h: 92, r: 16, fill: '#0c1326', stroke: 'white', strokeOpacity: 0.22, sw: 2 }, spec);
+  S.text([{ t: 'Memory capacity: ', c: 'muted' }, { t: '80 GB', c: 'ink', f: 'mono' }], { x: 786, y: 237, size: 26, weight: 650 }, spec);
+  const tick = S.icon('ph:check-circle-duotone', { x: 1138, y: 236, size: 34, color: 'helps' }, spec);
   hide([spec, tick]);
   const tSpec = T('b2~eighty') - 0.1;
   S.add(drive(0.6, k => { const e = E('power3.out')(k); spec.setAttribute('transform', `translate(${lerp(200, 0, e).toFixed(1)},0)`); setO(spec, k); }), tSpec);
@@ -169,7 +172,7 @@ V.scene('ch09_s02', S => {
   fade(el, 0, 1, tSits + 0.3, 0.6);
   const dim = S.g(null, el);
   S.path({ d: `M${STX + STW + 4},580 H${DX - 4} M${STX + STW + 14},572 L${STX + STW + 4},580 L${STX + STW + 14},588 M${DX - 14},572 L${DX - 4},580 L${DX - 14},588`, stroke: 'ink', sw: 2 }, dim);
-  S.text('millimetres', { x: (STX + STW + DX) / 2, y: 552, size: 24, weight: 650, anchor: 'middle', color: 'ink' }, dim);
+  S.text('millimetres', { x: (STX + STW + DX) / 2, y: 552, size: 21, weight: 650, anchor: 'middle', color: 'ink' }, dim);   // 21: clear of the stack
   hide(dim);
   fade(dim, 0, 1, T('b3~millimetres') - 0.1, 0.4);
   // the fan: 48 hair-thin wires stand for 5,120; recomputed each frame so the stack can be dragged in b4

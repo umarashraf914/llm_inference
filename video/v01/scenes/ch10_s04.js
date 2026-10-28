@@ -15,7 +15,7 @@ V.scene('ch10_s04', S => {
   // ================================================================ b1: one layer's matrices
   const panel = S.g();
   S.rect({ x: 110, y: 220, w: 790, h: 500, r: 22, fill: '#0b1224', stroke: 'struct', strokeOpacity: 0.55, sw: 2 }, panel);
-  S.text('one layer: all matrix multiplies', { x: 140, y: 262, size: 28, weight: 700, color: 'ink' }, panel);
+  S.text('one layer: all matrix multiplies', { x: 505, y: 262, size: 28, weight: 700, anchor: 'middle', color: 'ink' }, panel);   // centred in the panel
   hide(panel);
   fade(panel, 0, 1, 0.4, 0.5);
   const TW = 160, TH = 100;
@@ -28,7 +28,7 @@ V.scene('ch10_s04', S => {
     let d = '';
     for (let r = 0; r < 4; r++) for (let c = 0; c < 7; c++) if (rnd() > 0.45) d += `M${x + 14 + c * 19},${y + 14 + r * 19}h13v13h-13Z`;
     S.path({ d, fill: 'struct', fillOpacity: 0.35 }, g).setAttribute('data-audit', 'ignore');
-    S.text(name, { x: x + TW / 2, y: y + TH + 26, size: 24, weight: 650, anchor: 'middle', color: 'ink' }, g);
+    S.text(name, { x: x + TW / 2, y: y + TH + 26, size: 21, weight: 650, anchor: 'middle', color: 'ink' }, g);   // 21: 'feed-forward 1' and '2' stay apart
     g.x2 = S.pill('× 2', { x: x + TW - 38, y: y + 26, tone: 'compute', size: 20, h: 32, style: 'solid', mono: true }, g);
     hide(g.x2);
     Object.assign(g, { cx: x + TW / 2, cy: y + TH / 2, cue });
@@ -105,7 +105,7 @@ V.scene('ch10_s04', S => {
   hide(params);
   fade(params, 0, 1, T('b2~projection') + 0.3, 0.4);
   // the formula
-  const FY = 860, FS = 40;
+  const FY = 860, FS = 36;
   const parts = [['operations per token', 'ink', 'b2~operations'], ['=', 'ink', 'b2~are'], ['2', 'compute', 'b2~twice'], ['×', 'ink', 'b2~the#3'], ['parameter count', 'struct', 'b2~parameter']];
   const widths = parts.map(([s]) => S.measure(s, { size: FS, weight: 750 })), gap = 18;
   let fx = 505 - (widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1)) / 2;
@@ -133,9 +133,15 @@ V.scene('ch10_s04', S => {
   });
   K.ignore(tag, tTag, 0.9);
   const own = S.g();
-  S.text('nothing else about', { x: PT[0] + 80, y: PT[1] + 66, size: 24, weight: 600, anchor: 'middle', color: 'muted' }, own);
-  S.text('the architecture', { x: PT[0] + 80, y: PT[1] + 96, size: 24, weight: 600, anchor: 'middle', color: 'muted' }, own);
+  V.caseLines(['nothing else about', 'the architecture']).forEach((ln, j) => S.text(ln, { x: PT[0] + 80, y: PT[1] + 66 + 30 * j, size: 24, weight: 600, anchor: 'middle', color: 'muted', case: 'keep' }, own));
   hide(own);
   fade(own, 0, 1, T('b3~on#2') - 0.1, 0.4);
   void qE; void lerp;
+
+  // ================================================================ the pane: everything
+  // The panel (x 110-900, y 220-720) is alone through b1: the pane holds it centred, and moves to the full layout
+  // (panel left, stack right, formula under them) just before the tiles merge (b2)
+  const pane = S.g();
+  [...S.layers.main.children].filter(e => e !== pane).forEach(e => pane.appendChild(e));
+  whole(t => { const k = 1 - EIO(cl((t - tAdd + 0.9) / 0.8)); pane.setAttribute('transform', `translate(${(455 * k).toFixed(1)},${(70 * k).toFixed(1)})`); });
 });

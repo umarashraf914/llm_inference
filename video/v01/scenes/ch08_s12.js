@@ -47,7 +47,7 @@ V.scene('ch08_s12', S => {
   });
   const small = (s, x, y, o = {}) => S.text(s, { x, y, size: 22, weight: 600, anchor: 'middle', color: 'muted', ...o });
 
-  const hd = S.text('From a vector to a word', { x: 110, y: 130, size: 46, weight: 700, family: 'display', color: 'ink' });
+  const hd = S.text('From a vector to a word', { x: 960, y: 130, size: 46, weight: 700, family: 'display', anchor: 'middle', color: 'ink' });
   ch08Hide(hd);
   fade(hd, 0, 1, 0.3, 0.5);
   fade(hd, 1, 0, T('b4') - 0.2, 0.4);
@@ -58,7 +58,7 @@ V.scene('ch08_s12', S => {
   let rx = 140;
   const row = S.g();
   const pills = WORDS.map(w => {
-    const pw = S.measure(w, { size: 24, weight: 600 }) + 44, p = S.pill(w, { x: rx + pw / 2, y: RY, tone: 'struct', size: 24, h: 40 }, row);
+    const pw = S.measure(w, { size: 24, weight: 600, case: 'keep' }) + 44, p = S.pill(w, { x: rx + pw / 2, y: RY, tone: 'struct', size: 24, h: 40, case: 'keep' }, row);
     p.cxx = rx + pw / 2; rx += pw + 10;
     return p;
   });
@@ -179,8 +179,8 @@ V.scene('ch08_s12', S => {
   whole(t => barEls.forEach((b, i) => { const h = HS[i] * E('power3.out')(cl((t - tSm - 0.2 - 0.04 * i) / 0.6)); b.setAttribute('y', (BB - h).toFixed(1)); b.setAttribute('height', h.toFixed(1)); }));
   fade(bars, 1, 0, tB3, 0.35);
   // the pick: from the tall bar to 'pick one'; b3 to the path's last station, then round to the input row
-  const PICK = 'purred', pkW = S.measure(PICK, { size: 24, weight: 600 }) + 44;
-  const pk = S.pill(PICK, { x: 0, y: 0, tone: 'struct', size: 24, h: 40, style: 'solid' });
+  const PICK = 'purred', pkW = S.measure(PICK, { size: 24, weight: 600, case: 'keep' }) + 44;
+  const pk = S.pill(PICK, { x: 0, y: 0, tone: 'struct', size: 24, h: 40, style: 'solid', case: 'keep' });
   const tPk = T('b2~one') - 0.1, tApp = T('b3~appended') - 0.1;
   const slotX = rowEnd + pkW / 2;
   const P0 = [1040, 640], P1 = [1260, 700], P2 = [1240, RY], P3 = [slotX, RY];
@@ -208,7 +208,8 @@ V.scene('ch08_s12', S => {
   const path = S.g();
   const boxA = S.g(null, path);
   S.rect({ x: 130, y: 600, w: 260, h: 80, r: 14, fill: 'url(#card-struct)', stroke: 'struct', sw: 2 }, boxA);
-  S.text('embedding lookup', { x: 260, y: 641, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, boxA);
+  S.text('embedding', { x: 260, y: 625, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, boxA);
+  S.text('lookup', { x: 260, y: 657, size: 26, weight: 700, anchor: 'middle', color: 'ink' }, boxA);
   S.rect({ x: 816, y: 538, w: 28, h: 204, r: 5, fill: 'none', stroke: 'white', strokeOpacity: 0.55, sw: 2 }, path);   // frames the shrunken matrix
   const arr = (x1, y1, x2, y2) => S.arrow({ x1, y1, x2, y2, color: 'muted', sw: 2.5 }, path);
   const arrows = [arr(260, RY - 24, 260, 688), arr(394, 640, 478, 640), arr(680, 640, 806, 640), arr(852, 640, 984, 640)];
@@ -277,4 +278,18 @@ V.scene('ch08_s12', S => {
   ch08Hide([den, times, slot]);
   fade(den, 0, 1, tBar + 0.4, 0.4);
   fade([times, slot], 0, 1, tBar + 0.8, 0.4, 0.2);
+
+  // ================================================================ the pane: every picture but the header
+  // The picture grows from the left: the stack and its vector (b1), then the projection and the pick (b2),
+  // then the path with its return arrow (b3); the pane holds each beat's picture centred
+  const pane = S.g();
+  [...S.layers.main.children].filter(e => e !== pane && e !== hd).forEach(e => pane.appendChild(e));
+  // measured extents (x, before the pane): b1 130-720; b2 130-1683; b3 130-1582; b4 190-1350, then the number
+  // 480-1480
+  const PK = [[tOP - 0.8, 535], [tOP, 80], [tB4, 80], [tB4 + 0.8, 190], [tColl, 190], [tColl + 0.6, -20]];
+  whole(t => {
+    let x = PK[0][1];
+    for (let i = 1; i < PK.length; i++) if (t > PK[i - 1][0]) x = lerp(PK[i - 1][1], PK[i][1], EIO(cl((t - PK[i - 1][0]) / (PK[i][0] - PK[i - 1][0]))));
+    pane.setAttribute('transform', `translate(${x.toFixed(1)},0)`);
+  });
 });

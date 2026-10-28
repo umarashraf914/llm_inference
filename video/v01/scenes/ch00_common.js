@@ -70,7 +70,7 @@ function ch00Bar(S, o = {}, parent) {
   S.line({ x1: B.x1, y1: B.dimY - 12, x2: B.x1, y2: B.dimY + 12, stroke: 'muted', sw: 2 }, root.dim);
   root.dimLabel = S.text(o.dimText ?? '≈ 30 ms per token', { x: (B.x0 + B.x1) / 2, y: B.dimLabelY, size: B.dimLabelSize, weight: 600, anchor: 'middle', color: 'ink' }, root);
   // what the 30 ms produce
-  root.pill = libToken(S, { text: 'one token', x: B.pill[0], y: B.pill[1], size: 28 }, root);
+  root.pill = libToken(S, { text: 'one token', x: B.pill[0], y: B.pill[1], size: 28, case: 'label' }, root);
   // the open question over the grey
   root.q = S.text('?', { x: B.q[0], y: B.q[1], size: 96, weight: 400, family: 'display', anchor: 'middle', color: 'muted', opacity: 0.7 }, root);
   // the amber tag and its pointer onto the sliver's top

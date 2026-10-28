@@ -16,6 +16,9 @@ V.scene('ch13_s04', S => {
   const tB2 = T('b2') - 0.1, tB3 = T('b3') - 0.1;
 
   // ================================================================ b1: two cards, then the definition
+  // the heading and the two cards (y 98-590) are the whole picture in b1: the camera holds them 150 px lower,
+  // and eases back as the balance arrives under the cards in b2
+  S.xset(S.camera, { x: 0, y: 150, s: 1 });
   const h1 = S.text('A cache is something kept', { x: 960, y: 120, size: 44, weight: 750, anchor: 'middle', color: 'ink' });
   const h2 = S.text('so it need not be made again', { x: 960, y: 172, size: 32, weight: 600, anchor: 'middle', color: 'muted' });
   S.add(fx.type(h1, { d: 0.8 }), T('b1~cache') - 0.15);
@@ -37,20 +40,26 @@ V.scene('ch13_s04', S => {
     S.icon('ph:calculator-duotone', { x, y: 420, size: 92, color: tone }, g);
     return g;
   };
-  const cL = calc(390, 'compute', L), cR = calc(1150, 'helps', R);
+  // each card's body, the calculator and then what it made, is one group centred on the card (x + 280)
+  const CALC = 92, GAP = 56, NOTE = 304;
+  const colL = Math.max(S.measure('37 × 48', { size: 36, weight: 700, family: 'mono' }), S.measure('computed 4×', { size: 24, weight: 650 }));
+  const body = (cardX, colW) => { const l = cardX + 280 - (CALC + GAP + colW) / 2; return [l + CALC / 2, l + CALC + GAP + colW / 2]; };
+  const [CLX, PX] = body(300, colL), [CRX, NX] = body(1060, NOTE);
+  const cL = calc(CLX, 'compute', L), cR = calc(CRX, 'helps', R);
 
   // ================================================================ b2: left, every time; right, once and kept
+  S.add(fx.cam({ d: 0.8, ease: 'power2.inOut' }), tB2 - 0.2);
   const tWork = T('b2~Work') - 0.1;
-  const prob = S.text('37 × 48', { x: 600, y: 410, size: 36, weight: 700, family: 'mono', anchor: 'middle', color: 'ink' }, L);
+  const prob = S.text('37 × 48', { x: PX, y: 410, size: 36, weight: 700, family: 'mono', anchor: 'middle', color: 'ink' }, L);
   hide(prob);
   fade(prob, 0, 1, tWork, 0.35);
   const tal = S.g(null, L), tallyAt = [0, 1, 2, 3].map(i => tWork + 0.3 + 0.75 * i);
-  const comp = S.text('computed 1×', { x: 600, y: 520, size: 24, weight: 650, anchor: 'middle', color: 'compute' }, L);
+  const comp = S.text('computed 1×', { x: PX, y: 520, size: 24, weight: 650, anchor: 'middle', color: 'compute' }, L);
   hide(comp);
   tallyAt.forEach((at, i) => {
     pulse(cL.glow, at, 0.9, 0.5);
     S.add(fx.pulse(cL.lastChild, { scale: 1.12, d: 0.4 }), at);
-    const m = S.path({ d: `M${560 + 20 * i},448 V488`, stroke: 'compute', sw: 4 }, tal);
+    const m = S.path({ d: `M${PX - 30 + 20 * i},448 V488`, stroke: 'compute', sw: 4 }, tal);
     K.draw(m, 44, at + 0.1, 0.2);
   });
   fade(comp, 0, 1, tallyAt[0] + 0.15, 0.25);
@@ -68,25 +77,25 @@ V.scene('ch13_s04', S => {
     g.label = S.text(text, { x: cx - 6, y: cy + 2, size: 26, weight: 700, family: 'mono', anchor: 'middle', color: 'ink' }, g);
     return g;
   };
-  const n1 = note(1440, 380, '37 × 48 = 1,776', R);
+  const n1 = note(NX, 380, '37 × 48 = 1,776', R);
   const tNote = T('b2~note') - 0.1;
-  K.track(n1, [K.K(tNote, { s: 0.6, o: 0 }), K.K(tNote + 0.4, { s: 1, o: 1, e: 'back.out(2)' })], 1440, 380);
+  K.track(n1, [K.K(tNote, { s: 0.6, o: 0 }), K.K(tNote + 0.4, { s: 1, o: 1, e: 'back.out(2)' })], NX, 380);
   const readAt = [0, 1, 2].map(i => T('b2~read') - 0.05 + 0.5 * i);
   readAt.forEach(at => pulse(n1.glow, at, 1, 0.45));
-  const reads = S.text('read 1×', { x: 1440, y: 446, size: 22, weight: 650, anchor: 'middle', color: 'helps' }, R);
+  const reads = S.text('read 1×', { x: NX, y: 446, size: 22, weight: 650, anchor: 'middle', color: 'helps' }, R);
   hide(reads);
   fade(reads, 0, 1, readAt[0], 0.25);
   whole(t => { reads.textContent = `read ${Math.max(1, readAt.filter(a => t >= a).length)}×`; });
   // the second note, never read
   const tAgain = T('b2~read#2') - 0.1;
-  const n2 = note(1440, 512, '52 × 17 = 884', R);
-  K.track(n2, [K.K(tAgain, { s: 0.6, o: 0 }), K.K(tAgain + 0.3, { s: 1, o: 1, e: 'back.out(2)' }), K.K(tAgain + 0.35, { o: 1 }), K.K(tAgain + 0.75, { o: 0.5 }), K.K(tB3 + 0.5, { o: 0.5 }), K.K(tB3 + 0.9, { o: 0 })], 1440, 512);
+  const n2 = note(NX, 512, '52 × 17 = 884', R);
+  K.track(n2, [K.K(tAgain, { s: 0.6, o: 0 }), K.K(tAgain + 0.3, { s: 1, o: 1, e: 'back.out(2)' }), K.K(tAgain + 0.35, { o: 1 }), K.K(tAgain + 0.75, { o: 0.5 }), K.K(tB3 + 0.5, { o: 0.5 }), K.K(tB3 + 0.9, { o: 0 })], NX, 512);
   whole(t => {
     const g = cl((t - tAgain - 0.35) / 0.4), c = S.tone(g > 0.5 ? 'muted' : 'helps');
     n2.body.setAttribute('stroke', c); n2.fold.setAttribute('stroke', c);
     n2.body.setAttribute('fill', g > 0.5 ? '#1a2133' : '#123b36');
   });
-  const waste = S.text('never reused: wasted space', { x: 1440, y: 566, size: 22, weight: 650, anchor: 'middle', color: 'muted' }, R);
+  const waste = S.text('never reused: wasted space', { x: NX, y: 566, size: 22, weight: 650, anchor: 'middle', color: 'muted' }, R);
   hide(waste);
   fade(waste, 0, 1, tAgain + 0.55, 0.3);
   fade(waste, 1, 0, tB3 + 0.5, 0.35);
@@ -97,15 +106,19 @@ V.scene('ch13_s04', S => {
   S.circle({ x: 960, y: 700, r: 8, fill: 'muted' }, bal);
   const beam = S.path({ d: 'M0,0', stroke: 'ink', sw: 5 }, bal);
   const panL = S.g(null, bal), panR = S.g(null, bal);
+  // both weights as wide as the longer label needs, with room inside; the pans a little wider still
+  const WT = { size: 26, weight: 750 };
+  const PW = Math.max(S.measure('space', WT), S.measure('time saved', WT)) + 36, PAN = PW / 2 + 14;
   [panL, panR].forEach(p => {
-    S.path({ d: 'M-70,0 L0,-62 L70,0', stroke: 'muted', sw: 2 }, p);
-    S.path({ d: 'M-84,0 Q0,26 84,0 Z', fill: '#1a2133', stroke: 'muted', sw: 2.5 }, p);
+    S.path({ d: `M${-PAN + 14},0 L0,-62 L${PAN - 14},0`, stroke: 'muted', sw: 2 }, p);
+    S.path({ d: `M${-PAN},0 Q0,26 ${PAN},0 Z`, fill: '#1a2133', stroke: 'muted', sw: 2.5 }, p);
   });
   const space = S.g(null, panL), saved = S.g(null, panR);
-  S.rect({ x: -66, y: -58, w: 132, h: 54, r: 10, fill: 'url(#solid-bytes)' }, space);
-  S.text('space', { x: 0, y: -30, size: 26, weight: 750, anchor: 'middle', color: '#0a0f1e' }, space);
-  S.rect({ x: -80, y: -58, w: 160, h: 54, r: 10, fill: 'url(#solid-helps)' }, saved);
-  S.text('time saved', { x: 0, y: -30, size: 26, weight: 750, anchor: 'middle', color: '#0a0f1e' }, saved);
+  [[space, 'space', 'bytes'], [saved, 'time saved', 'helps']].forEach(([wg, s, tone]) => {
+    S.rect({ x: -PW / 2, y: -58, w: PW, h: 54, r: 10, fill: '#1a2133' }, wg);   // opaque: the strings pass behind
+    S.rect({ x: -PW / 2, y: -58, w: PW, h: 54, r: 10, fill: `url(#solid-${tone})` }, wg);
+    S.text(s, { x: 0, y: -30, ...WT, anchor: 'middle', color: '#0a0f1e' }, wg);
+  });
   bal.setAttribute('data-audit', 'ignore');
   const tDrop = tMem + 0.35;
   K.track(space, [K.K(tDrop, { y: -70, o: 0 }), K.K(tDrop + 0.4, { y: 0, o: 1, e: 'bounce.out' })]);
@@ -129,12 +142,12 @@ V.scene('ch13_s04', S => {
   const STEP = 0.7, t0 = tFly + 0.8;
   const steps = [];
   for (let t = t0; t < S.duration - 0.6; t += STEP) steps.push(t);
-  const flyer = S.rect({ x: 1310, y: 342, w: 260, h: 76, r: 10, fill: '#123b36', stroke: 'helps', sw: 2.5 });
+  const flyer = S.rect({ x: NX - 130, y: 342, w: 260, h: 76, r: 10, fill: '#123b36', stroke: 'helps', sw: 2.5 });
   flyer.setAttribute('data-audit', 'ignore');
   hide(flyer);
   whole(t => {
     const p = EIO(cl((t - tFly) / 0.8));
-    const from = [1310, 342, 260, 76], to = [960 - EW / 2, BASEY - EH, EW, EH];
+    const from = [NX - 130, 342, 260, 76], to = [960 - EW / 2, BASEY - EH, EW, EH];
     ['x', 'y', 'width', 'height'].forEach((a, j) => flyer.setAttribute(a, lerp(from[j], to[j], p).toFixed(1)));
     flyer.setAttribute('fill', p > 0.6 ? S.tone('helps') : '#123b36');
     setO(flyer, t > tFly && t < t0 + 0.05 ? 1 : 0);

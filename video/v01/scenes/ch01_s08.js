@@ -9,7 +9,7 @@ V.scene('ch01_s08', S => {
   const TY = 190;
   const row = S.g();
   let x = 470;
-  WORDS.forEach(w => { const p = S.pill(w, { x, y: TY, h: 56, size: 30, tone: 'struct', anchor: 'start' }, row); x += p.w + 12; });
+  WORDS.forEach(w => { const p = S.pill(w, { x, y: TY, h: 56, size: 30, tone: 'struct', anchor: 'start', case: 'keep' }, row); x += p.w + 12; });
   const slot = S.g(null, row);
   const SL = { x, w: 110 };
   S.rect({ x, y: TY - 28, w: 110, h: 56, r: 16, fill: 'none', stroke: 'ink', sw: 2.5, dash: '8 7' }, slot);
@@ -17,29 +17,40 @@ V.scene('ch01_s08', S => {
   S.add(gsap.fromTo(qm, { opacity: 1 }, { opacity: 0.35, duration: 0.5, yoyo: true, repeat: 15, ease: 'sine.inOut' }), 0.4);
 
   // ---------------------------------------------------------------- b1: the same shares, every time
-  const bars = S.g();
+  // two columns centred as a pair: the shares (and later the tally and the model) on the left around LX,
+  // the spinner on the right
+  const LX = 540;
+  // alone in b1, the shares and their label sit at the centre of the frame (b1g); in b2 they fold into the spinner,
+  // which stands at the centre too; the left column, LX, fills in b3
+  const b1g = S.g();
+  b1g.setAttribute('transform', 'translate(420,100)');
+  const bars = S.g(null, b1g);
   const BR = [{ icon: 'fluent:cat-face', share: 0.745, txt: '74.5%', y: 470 }, { icon: 'fluent:dog-face', share: 0.248, txt: '24.8%', y: 560 }];
   const barEls = BR.map(b => {
     const g = S.g(null, bars);
-    S.icon(b.icon, { x: 196, y: b.y, size: 48 }, g);
-    g.bar = S.rect({ x: 240, y: b.y - 22, w: b.share * 480, h: 44, r: 6, fill: 'url(#bar-struct)' }, g);
-    S.text(b.txt, { x: 240 + b.share * 480 + 16, y: b.y + 1, size: 32, family: 'mono', weight: 650, color: 'struct' }, g);
+    S.icon(b.icon, { x: LX - 224, y: b.y, size: 48 }, g);
+    g.bar = S.rect({ x: LX - 180, y: b.y - 22, w: b.share * 480, h: 44, r: 6, fill: 'url(#bar-struct)' }, g);
+    S.text(b.txt, { x: LX - 180 + b.share * 480 + 16, y: b.y + 1, size: 32, family: 'mono', weight: 650, color: 'struct' }, g);
     return g;
   });
-  const sameLbl = S.text('same shares, every time', { x: 420, y: 396, size: 30, anchor: 'middle', color: 'ink', weight: 600 });
+  const sameLbl = S.text('same shares, every time', { x: LX, y: 396, size: 30, anchor: 'middle', color: 'ink', weight: 600 }, b1g);
   S.add(fx.in(sameLbl, { from: 'up', d: 0.4 }), 'b1~same-0.1');
   S.add(fx.pulse(bars, { scale: 1.04, d: 0.45 }), 'b1~same+0.2');
   S.add(fx.pulse(bars, { scale: 1.04, d: 0.45 }), 'b1~every');
 
   // ---------------------------------------------------------------- b2: a spinner with slices to scale
-  const W = { x: 1260, y: 580, r: 250 };
+  const W = { x: LX + 840, y: 580, r: 250 };
   const SLICES = [
     { deg: 268.2, op: 0.95, icon: 'fluent:cat-face' },
     { deg: 89.3, op: 0.55, icon: 'fluent:dog-face' },
     { deg: 2.44, op: 0.35 },
     { deg: 0.11, op: 0.25 },
   ];
-  const wheelG = S.g();
+  // the spinner, its pointer, label and ring: centred on the screen while it is the only picture, it moves to
+  // its column (SLIDE px right) as the tally arrives on the left in b3
+  const SLIDE = 420;
+  const wheelSet = S.g();
+  const wheelG = S.g(null, wheelSet);
   const wheel = S.g(null, wheelG);
   S.circle({ x: W.x, y: W.y, r: W.r + 8, fill: '#0c1326', stroke: 'struct', sw: 2, strokeOpacity: 0.5 }, wheel);
   let a0 = 0;
@@ -52,14 +63,15 @@ V.scene('ch01_s08', S => {
   });
   S.circle({ x: W.x, y: W.y, r: 22, fill: '#0c1326', stroke: 'ink', sw: 3 }, wheel);
   wheelG.setAttribute('data-audit', 'ignore');
-  const pointer = S.path({ d: `M${W.x - 22},${W.y - W.r - 44} L${W.x + 22},${W.y - W.r - 44} L${W.x},${W.y - W.r + 6} Z`, fill: 'ink', stroke: '#0c1326', sw: 2 });
+  const pointer = S.path({ d: `M${W.x - 22},${W.y - W.r - 44} L${W.x + 22},${W.y - W.r - 44} L${W.x},${W.y - W.r + 6} Z`, fill: 'ink', stroke: '#0c1326', sw: 2 }, wheelSet);
+  S.set(wheelSet, { x: -SLIDE }, 0);
   S.set([wheelG, pointer], { autoAlpha: 0 }, 0);
   S.add(fx.out(sameLbl, { d: 0.3 }), 'b2~proportion-0.2');
   // the bars bend round into the wheel
-  barEls.forEach((g, i) => S.add(gsap.to(g, { x: W.x - 420, y: W.y - BR[i].y, scale: 0.3, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.6, ease: 'power2.in' }), S.t('b2~proportion') + i * 0.08));
+  barEls.forEach((g, i) => S.add(gsap.to(g, { x: W.x - SLIDE - LX - 420, y: W.y - BR[i].y - 100, scale: 0.3, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.6, ease: 'power2.in' }), S.t('b2~proportion') + i * 0.08));
   S.add(gsap.fromTo(wheelG, { autoAlpha: 0, scale: 0.4, rotation: -120, svgOrigin: `${W.x} ${W.y}` }, { autoAlpha: 1, scale: 1, rotation: 0, svgOrigin: `${W.x} ${W.y}`, duration: 0.8, ease: 'power3.out' }), S.t('b2~proportion') + 0.35);
   S.add(gsap.fromTo(pointer, { autoAlpha: 0, y: -30 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'back.out(2)' }), 'b2~spinner');
-  const samp = S.text('sampling', { x: W.x, y: W.y + W.r + 66, size: 34, anchor: 'middle', color: 'ink', weight: 650 });
+  const samp = S.text('sampling', { x: W.x, y: W.y + W.r + 66, size: 34, anchor: 'middle', color: 'ink', weight: 650 }, wheelSet);
   S.add(fx.in(samp, { from: 'up', d: 0.4 }), 'b2~sampling');
 
   // ---------------------------------------------------------------- b3: spin once, spin again, many spins
@@ -72,8 +84,9 @@ V.scene('ch01_s08', S => {
     for (const [t0, d, from, to] of SPINS) { if (t >= t0 + d) th = to; else if (t > t0) { th = from + (to - from) * eo((t - t0) / d); break; } else break; }
     return th;
   };
-  const tally = S.text('', { x: 420, y: 690, size: 30, anchor: 'middle', family: 'mono', weight: 650, color: 'struct' });
-  const tallyCap = S.text('expected, per 1,000 spins', { x: 420, y: 736, size: 24, anchor: 'middle', color: 'muted', weight: 550 });
+  S.add(gsap.fromTo(wheelSet, { x: -SLIDE }, { x: 0, duration: 0.8, ease: 'power3.inOut', immediateRender: false }), T.run - 0.9);
+  const tally = S.text('', { x: LX, y: 690, size: 30, anchor: 'middle', family: 'mono', weight: 650, color: 'struct' });
+  const tallyCap = S.text('expected, per 1,000 spins', { x: LX, y: 736, size: 24, anchor: 'middle', color: 'muted', weight: 550 });
   S.set([tally, tallyCap], { autoAlpha: 0 }, 0);
   S.add(gsap.to(tally, { autoAlpha: 1, duration: 0.3 }), 'b3~time');
   S.add(fx.in(tallyCap, { from: 'up', d: 0.35 }), S.t('b3~time') + 0.4);
@@ -87,25 +100,28 @@ V.scene('ch01_s08', S => {
   S.call(() => paint(0), 0);
   // the winners drop into the slot
   const slotC = SL.x + SL.w / 2;
-  const catPill = S.pill('cat', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct' }, row);
-  const dogPill = S.pill('dog', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct' }, row);
+  const catPill = S.pill('cat', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct', case: 'keep' }, row);
+  const dogPill = S.pill('dog', { x: slotC, y: TY, h: 56, size: 30, tone: 'struct', case: 'keep' }, row);
   S.set([catPill, dogPill], { autoAlpha: 0 }, 0);
   S.add(gsap.fromTo(catPill, { autoAlpha: 0, y: -50 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power3.out' }), T.s1 + 1.15);
   S.add(gsap.to(catPill, { autoAlpha: 0, y: -50, duration: 0.3, ease: 'power2.in' }), T.s2 - 0.15);
   S.add(gsap.fromTo(dogPill, { autoAlpha: 0, y: -50 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power3.out' }), T.s2 + 1.2);
   S.add(gsap.to(qm, { autoAlpha: 0, duration: 0.2 }), T.s1 + 1.1);
 
-  // 'appended': the row shrinks left and the sentence forks
+  // 'appended': the row shrinks and the sentence forks; the fork, the row and its longer branch, is centred
   S.xset(row, { x: 0, y: 0, s: 1, ox: 470, oy: TY });
   S.add(gsap.to(dogPill, { autoAlpha: 0, duration: 0.25 }), T.fork - 0.1);
   S.add(gsap.to(slot, { autoAlpha: 0, duration: 0.25 }), T.fork - 0.1);
-  S.add(fx.xform(row, { x: 160 - 470, s: 0.8 }, { d: 0.7, ease: 'power3.inOut' }), T.fork);
-  const endX = 160 + (SL.x - 12 - 470) * 0.8;          // the row's right end after the move
+  const brW = ws => ws.reduce((a, w) => a + S.measure(w, { size: 26, weight: 600, case: 'keep' }) + 44 + 10, -10);
+  const treeW = (SL.x - 12 - 470) * 0.8 + 56 + Math.max(brW(['cat', 'purring', 'softly']), brW(['dog', 'snoring', 'loudly']));
+  const FX = Math.round(960 - treeW / 2);
+  S.add(fx.xform(row, { x: FX - 470, s: 0.8 }, { d: 0.7, ease: 'power3.inOut' }), T.fork);
+  const endX = FX + (SL.x - 12 - 470) * 0.8;           // the row's right end after the move
   const branch = (y, words, at) => {
     const g = S.g();
     const path = S.path({ d: `M${endX + 6},${TY} C${endX + 30},${TY} ${endX + 20},${y} ${endX + 48},${y}`, stroke: 'struct', sw: 2.5, strokeOpacity: 0.7 }, g);
     let bx = endX + 56;
-    const ps = words.map(w => { const p = S.pill(w, { x: bx, y, h: 46, size: 26, tone: 'struct', anchor: 'start' }, g); bx += p.w + 10; return p; });
+    const ps = words.map(w => { const p = S.pill(w, { x: bx, y, h: 46, size: 26, tone: 'struct', anchor: 'start', case: 'keep' }, g); bx += p.w + 10; return p; });
     S.set(path, { autoAlpha: 0 }, 0);
     S.add(gsap.set(path, { autoAlpha: 1 }), at);
     S.add(fx.draw(path, { d: 0.35 }), at);
@@ -119,12 +135,12 @@ V.scene('ch01_s08', S => {
   S.add(fx.out([tally, tallyCap], { d: 0.35 }), 'b4');
   const model = S.g();
   model.setAttribute('data-audit', 'ignore');
-  const tiles = ch01Tiles(S, { cx: 420, cy: 600, cw: 34, ch: 24, gap: 5, size: 11, parent: model });
-  const lock = S.icon('ph:lock-simple-duotone', { x: 420, y: 520, size: 52, color: 'struct' }, model);
-  const sameModel = S.text('same model', { x: 420, y: 700, size: 30, anchor: 'middle', color: 'muted', weight: 600 });
+  const tiles = ch01Tiles(S, { cx: LX, cy: 600, cw: 34, ch: 24, gap: 5, size: 11, parent: model });
+  const lock = S.icon('ph:lock-simple-duotone', { x: LX, y: 520, size: 52, color: 'struct' }, model);
+  const sameModel = S.text('same model', { x: LX, y: 700, size: 30, anchor: 'middle', color: 'muted', weight: 600 });
   S.add(fx.in(model, { from: 'up', d: 0.5 }), 'b4~nothing-0.1');
   S.add(fx.in(sameModel, { from: 'up', d: 0.4 }), 'b4~model');
-  const ring = S.circle({ x: W.x, y: W.y, r: W.r + 18, fill: 'none', stroke: 'compute', sw: 5 });
+  const ring = S.circle({ x: W.x, y: W.y, r: W.r + 18, fill: 'none', stroke: 'compute', sw: 5 }, wheelSet);
   ring.setAttribute('data-audit', 'ignore');
   S.set(ring, { autoAlpha: 0 }, 0);
   S.add(gsap.set(ring, { autoAlpha: 1 }), 'b4~draw-0.3');

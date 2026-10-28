@@ -6,7 +6,7 @@
    The loop really runs: Sunny in b1, tomorrow…winds in b3, and…evening in b4, stop in b5.
    Layout: the output node (960, 300) sits above the model block (750-1170 × 400-540), joined to it by a short
    dashed riser; every token rises out of the block to the node. Three arrows leave the node: (1) level to the
-   laptop, whose screen centre is on y 300; (2) level right, turning down at x 1640 onto the top of the cache,
+   laptop, whose middle is on y 300; (2) level right, turning down at x 1640 onto the top of the cache,
    a libKVCache stack panel (1528-1752 × 362-580) of ten empty slots that fill from the bottom, one K|V entry a
    turn (the stop token makes none, so one slot stays free); (3) a loop round the block's left side, entering
    its left edge level at y 470. Each badge sits on its arrow, its label above (1, 2) or beside it (3). Copies
@@ -23,7 +23,7 @@ V.scene('ch04_s05', S => {
   const SLOT = k => ({ x: 276 + k * 152, y: 770 }), SW = 140, SH = 52;
   const STACK = { x: 1540, w: 200, cx: 1640, n: 10, ch: 14, gap: 6, pad: 12, top: 362 };
   const LAP = { x: 330, w: 160 };
-  LAP.y = SPOT.y + 0.068 * LAP.w;                         // puts the laptop's screen centre on the arrow's line
+  LAP.y = SPOT.y;                                         // the laptop's middle on the arrow's line, like every device's
   const IN3 = { x: MB.x - 6, y: MB.y + MB.h / 2 };        // where arrow 3 meets the block's left edge
 
   // an arrow along any path: the line, and a head at `end` pointing along the unit vector `dir`

@@ -10,7 +10,7 @@
    b3  the panel splits into a quiet and a busy machine, '1 minute later': yours survive on the quiet one and are
        churned out on the busy one; 'a day later' the panels merge and refill ×1, ×2, ×3; yours are nowhere.
    b4  the camera pans right to a schematic chart: two falling curves, the quoted lifetime, a crossed-out timer
-       step; 'demand for space, not elapsed time'.
+       step; 'demand for space, not elapsed time'. The chart, its labels and that line centre as one block.
    Layout: the world group W pans by -1920 in b4 (the chart is built at world x + 1920). Panel x 404-1516,
    y 300-700, blocks 64 × 46 at (466 + 76 c, 353 + 58 r), 6 rows × 14 columns (schematic). */
 V.scene('ch16_s07', S => {
@@ -208,20 +208,21 @@ V.scene('ch16_s07', S => {
   K.track(W, [K.K(tPan, { x: 0 }), K.K(tPan + 1.1, { x: -1920, e: 'power3.inOut' })]);
   K.ignore(W, tPan, 1.2);
   fade([dayL, nowhere, P1], 1, 0, tB4, 0.4);
-  const OX = 1920, X0 = OX + 360, X1 = OX + 1500, Y0 = 820, Y1 = 360;
+  const OX = 1920, X0 = OX + 360, X1 = OX + 1500, Y0 = 760, Y1 = 300;
   const Xs = u => X0 + (X1 - X0) * u, Ys = p => Y0 - (Y0 - Y1) * p;
   const ch = S.g(null, W);
   S.path({ d: `M${X0},${Y1 - 20} V${Y0} H${X1 + 20}`, stroke: '#ffffff', strokeOpacity: 0.5, sw: 2.5 }, ch);
-  S.text('chance your blocks are still there', { x: X0, y: 284, size: 26, weight: 700, color: 'muted' }, ch);
-  S.text('time since your last message', { x: (X0 + X1) / 2, y: 870, size: 26, weight: 700, anchor: 'middle', color: 'muted' }, ch);
-  S.pill('schematic', { x: X1 - 40, y: 284, tone: 'neutral', size: 22, h: 36 }, ch);
+  S.text('chance your blocks are still there', { x: X0, y: Y1 - 76, size: 26, weight: 700, color: 'muted' }, ch);
+  S.text('time since your last message', { x: (X0 + X1) / 2, y: Y0 + 50, size: 26, weight: 700, anchor: 'middle', color: 'muted' }, ch);
+  S.pill('schematic', { x: X1 - 40, y: Y1 - 76, tone: 'neutral', size: 22, h: 36 }, ch);
   rise(ch, tPan + 0.8, 0, 0.5);
   const curve = (tau) => { let d = ''; for (let i = 0; i <= 80; i++) { const u = i / 80; d += `${i ? 'L' : 'M'}${Xs(u).toFixed(1)},${Ys(Math.exp(-u / tau)).toFixed(1)}`; } return d; };
   const cq = S.path({ d: curve(0.6), stroke: 'helps', sw: 4 }, W), cb = S.path({ d: curve(0.13), stroke: 'compute', sw: 4 }, W);
   [cq, cb].forEach(p => p.setAttribute('data-audit', 'ignore'));
   K.draw(cq, 1400, tPan + 1.2, 1.0);
   K.draw(cb, 1300, tPan + 1.5, 1.0);
-  const lq = S.text('quiet machine', { x: X1 + 16, y: Ys(Math.exp(-1 / 0.6)) + 1, size: 26, weight: 750, color: 'helps' }, W);
+  // the quiet curve's label sits over its end, inside the chart, so the chart and its labels centre as one block
+  const lq = S.text('quiet machine', { x: X1, y: Ys(Math.exp(-0.83 / 0.6)) - 24, size: 26, weight: 750, anchor: 'end', color: 'helps' }, W);
   rise(lq, tPan + 2.0, 6);
   const lb = S.text('busy machine', { x: Xs(0.42), y: Ys(0.2), size: 26, weight: 750, color: 'compute' }, W);
   rise(lb, tPan + 2.3, 6);
@@ -229,7 +230,7 @@ V.scene('ch16_s07', S => {
   const ql = S.path({ d: `M${Xs(0.25)},${Y1 - 10} V${Y0}`, stroke: '#ffffff', strokeOpacity: 0.8, sw: 2.5, dash: '3 7' }, W);
   ql.setAttribute('data-audit', 'ignore');
   K.draw(ql, 480, tFew, 0.4);
-  const qlL = S.text('quoted lifetime: a guideline', { x: Xs(0.25) + 16, y: 430, size: 26, weight: 700, color: 'ink' }, W);
+  const qlL = S.text('quoted lifetime: a guideline', { x: Xs(0.25) + 16, y: Y1 + 70, size: 26, weight: 700, color: 'ink' }, W);
   rise(qlL, tFew + 0.3, 6);
   const tNotT = T('b4~not#2') - 0.1;
   const step = S.path({ d: `M${X0},${Y1} H${Xs(0.25)} V${Y0} H${X1}`, stroke: '#9aa4bd', sw: 3, dash: '10 8' }, W);
@@ -246,6 +247,6 @@ V.scene('ch16_s07', S => {
   fade([stL, sx], 1, 0, tNotT + 1.3, 0.5);
   const tFade = T('b4~fades') - 0.1;
   [cq, cb].forEach(p => { const gl = p.cloneNode(); gl.setAttribute('stroke-width', '12'); gl.setAttribute('stroke-opacity', '0.25'); gl.removeAttribute('stroke-dasharray'); gl.removeAttribute('stroke-dashoffset'); W.insertBefore(gl, p); hide(gl); fade(gl, 0, 1, tFade, 0.5); });
-  const dem = S.text('demand for space, not elapsed time', { x: OX + 930, y: 950, size: 32, weight: 750, anchor: 'middle', color: 'ink' }, W);
+  const dem = S.text('demand for space, not elapsed time', { x: OX + 960, y: Y0 + 130, size: 32, weight: 750, anchor: 'middle', color: 'ink' }, W);
   rise(dem, tFade + 0.4, 8);
 });

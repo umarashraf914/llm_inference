@@ -70,9 +70,9 @@ V.scene('ch06_s13', S => {
 
   // ================================================================ b2: the line
   S.add(fx.out([...tiles, papers], { to: 'down', d: 0.6, dist: 60, stagger: 0.05 }), T('b2') - 0.35);
-  const wordA = S.text('Arithmetic', { x: CXA + CW / 2, y: CY + CH / 2 - 40, size: 76, weight: 750, family: 'display', anchor: 'middle', color: 'compute' });
+  const wordA = S.text('Arithmetic', { x: CXA + CW / 2, y: CY + CH / 2 - 40, size: 66, weight: 750, family: 'display', anchor: 'middle', color: 'compute' });
   const subA = S.text('cheap', { x: CXA + CW / 2, y: CY + CH / 2 + 62, size: 54, weight: 600, anchor: 'middle', color: 'ink' });
-  const wordM = S.text('Data movement', { x: CXM + CW / 2, y: CY + CH / 2 - 40, size: 76, weight: 750, family: 'display', anchor: 'middle', color: 'bytes' });
+  const wordM = S.text('Data movement', { x: CXM + CW / 2, y: CY + CH / 2 - 40, size: 66, weight: 750, family: 'display', anchor: 'middle', color: 'bytes' });
   const subM = S.text('expensive', { x: CXM + CW / 2, y: CY + CH / 2 + 62, size: 54, weight: 600, anchor: 'middle', color: 'ink' });
   [wordA, subA, wordM, subM].forEach(e => S.set(e, { autoAlpha: 0 }, 0));
   S.add(fx.in(fillA, { from: 'fade', d: 0.5 }), 'b2~Arithmetic-0.1');

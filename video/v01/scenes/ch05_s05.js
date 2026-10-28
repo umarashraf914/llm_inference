@@ -7,18 +7,25 @@ V.scene('ch05_s05', S => {
   const { fx } = S;
   const T = spec => S.t(spec);
   const ignore = el => { el.setAttribute('data-audit', 'ignore'); return el; };
-  const NY = 300, BY = 372, DY = 452, PX = 200, US = 44;
+  const NY = 360, BY = 432, DY = 512, PX = 140, US = 44;
+  // b1-b2: the fraction, then the fraction over its rows of tens, are alone: fracG holds the fraction centred
+  // (FX0 px right), then fraction and rows centred (FX) as the rows unfold; it moves to its place on the left as
+  // the ladder arrives on the right in b3
+  const FX0 = 478, FX = 330, fracG = S.g();
+  S.set(fracG, { x: FX0 }, 0);
+  S.add(gsap.fromTo(fracG, { x: FX0 }, { x: FX, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), T('b1~eleven#2') - 1.1);
+  S.add(gsap.fromTo(fracG, { x: FX }, { x: 0, duration: 0.7, ease: 'power2.inOut', immediateRender: false }), T('b3') - 0.6);
 
   // ---------------------------------------------------------------- the fraction: 10¹¹ operations over 10¹⁵ operations per second
-  const num = S.g(), den = S.g();
+  const num = S.g(null, fracG), den = S.g(null, fracG);
   const p11 = ch05Pow(S, 11, { x: PX, y: NY, size: 72, anchor: 'start', tone: 'compute', family: 'mono' }, num);
   const uN = S.text('operations', { x: p11.r + 18, y: NY + 4, size: US, weight: 650, color: 'ink' }, num);
   const p15 = ch05Pow(S, 15, { x: PX, y: DY, size: 72, anchor: 'start', tone: 'compute', family: 'mono' }, den);
   const uD = S.text('operations', { x: p15.r + 18, y: DY + 4, size: US, weight: 650, color: 'ink' }, den);
   const perX = p15.r + 18 + S.measure('operations', { size: US, weight: 650 }) + 16;
-  const uPer = S.text('per second', { x: perX, y: DY + 4, size: US, weight: 650, color: 'ink' }, den);
-  const barW = perX + S.measure('per second', { size: US, weight: 650 }) - PX + 40;
-  const bar = S.line({ x1: PX - 20, y1: BY, x2: PX - 20 + barW, y2: BY, stroke: 'ink', sw: 4, cap: 'round' });
+  const uPer = S.text('per Second', { x: perX, y: DY + 4, size: US, weight: 650, color: 'ink', case: 'keep' }, den);   // continues 'Operations': 'per' stays small
+  const barW = perX + S.measure('per Second', { size: US, weight: 650, case: 'keep' }) - PX + 40;
+  const bar = S.line({ x1: PX - 20, y1: BY, x2: PX - 20 + barW, y2: BY, stroke: 'ink', sw: 4, cap: 'round' }, fracG);
   S.set([num, den, bar], { autoAlpha: 0 }, 0);
   S.add(ch05Wipe(S, num, { d: 0.7 }), 0.4);
   S.add(gsap.set(bar, { autoAlpha: 1 }), 1.1);
@@ -28,9 +35,9 @@ V.scene('ch05_s05', S => {
   S.add(ch05Wipe(S, den, { d: 0.8 }), 1.5);
 
   // ---------------------------------------------------------------- b1: the powers unfold into rows of '10' tiles
-  const TW = 40, TX = 22, PITCH = TW + TX, RX = 140, TY = [610, 690];
+  const TW = 40, TX = 22, PITCH = TW + TX, RX = 140, TY = [670, 750];
   const tileRow = (n, y) => Array.from({ length: n }, (_, k) => {
-    const g = S.g();
+    const g = S.g(null, fracG);
     S.rect({ x: RX + k * PITCH, y: y - 20, w: TW, h: 40, r: 6, fill: 'url(#card-compute)', stroke: 'compute', sw: 1.5 }, g);
     S.text('10', { x: RX + k * PITCH + TW / 2, y: y + 1, size: 22, anchor: 'middle', weight: 700, family: 'mono', color: 'ink' }, g);
     if (k < n - 1) g.x = S.text('×', { x: RX + k * PITCH + TW + TX / 2, y: y + 1, size: 22, anchor: 'middle', weight: 700, color: 'compute' }, g);
@@ -38,14 +45,14 @@ V.scene('ch05_s05', S => {
     return g;
   });
   const top = tileRow(11, TY[0]), bot = tileRow(15, TY[1]);
-  const tBar = ignore(S.line({ x1: RX - 10, y1: (TY[0] + TY[1]) / 2, x2: RX + 15 * PITCH - TX + 10, y2: (TY[0] + TY[1]) / 2, stroke: 'ink', sw: 2.5, strokeOpacity: 0.7 }));
+  const tBar = ignore(S.line({ x1: RX - 10, y1: (TY[0] + TY[1]) / 2, x2: RX + 15 * PITCH - TX + 10, y2: (TY[0] + TY[1]) / 2, stroke: 'ink', sw: 2.5, strokeOpacity: 0.7 }, fracG));
   S.set(tBar, { autoAlpha: 0 }, 0);
-  const c11 = S.text('11 tens', { x: RX + 11 * PITCH - TX + 18, y: TY[0] + 1, size: 26, weight: 600, color: 'muted' });
-  const c15 = S.text('15 tens', { x: RX + 15 * PITCH - TX + 18, y: TY[1] + 1, size: 26, weight: 600, color: 'muted' });
+  const c11 = S.text('11 tens', { x: RX + 11 * PITCH - TX + 18, y: TY[0] + 1, size: 26, weight: 600, color: 'muted' }, fracG);
+  const c15 = S.text('15 tens', { x: RX + 15 * PITCH - TX + 18, y: TY[1] + 1, size: 26, weight: 600, color: 'muted' }, fracG);
   S.set([c11, c15], { autoAlpha: 0 }, 0);
   // the digit string flashes; its zeros light one at a time with the tile beneath
-  const DSX = PX, cw = S.measure('0', { size: 34, weight: 600, family: 'mono' }), DSY = 214;
-  const digs = '100,000,000,000'.split('').map((ch, i) => S.text(ch, { x: DSX + i * cw, y: DSY, size: 34, weight: 600, family: 'mono', color: 'ink' }));
+  const DSX = PX, cw = S.measure('0', { size: 34, weight: 600, family: 'mono' }), DSY = 274;
+  const digs = '100,000,000,000'.split('').map((ch, i) => S.text(ch, { x: DSX + i * cw, y: DSY, size: 34, weight: 600, family: 'mono', color: 'ink' }, fracG));
   S.set(digs, { autoAlpha: 0 }, 0);
   const UNF = T('b1~eleven#2') - 0.1;
   S.add(gsap.to(digs, { autoAlpha: 1, duration: 0.25 }), UNF);
@@ -76,7 +83,7 @@ V.scene('ch05_s05', S => {
   for (let k = 0; k < 11; k++) {
     const at = k === 0 ? CAN : T('b2~Eleven') - 0.1 + (k - 1) * 0.12;
     [top[k], bot[k]].forEach((t, r) => {
-      const st = ignore(S.line({ x1: RX + k * PITCH - 4, y1: TY[r] + 16, x2: RX + k * PITCH + TW + 4, y2: TY[r] - 16, stroke: 'ink', sw: 3, cap: 'round' }));
+      const st = ignore(S.line({ x1: RX + k * PITCH - 4, y1: TY[r] + 16, x2: RX + k * PITCH + TW + 4, y2: TY[r] - 16, stroke: 'ink', sw: 3, cap: 'round' }, fracG));
       S.set(st, { autoAlpha: 0 }, 0);
       S.add(gsap.set(st, { autoAlpha: 1 }), at);
       S.add(fx.draw(st, { d: 0.18 }), at);
@@ -84,19 +91,19 @@ V.scene('ch05_s05', S => {
       strikes.push(st);
     });
   }
-  const pairs = S.text('', { x: RX + 11 * PITCH - TX + 18, y: TY[0] + 1, size: 26, weight: 650, color: 'ink' });
+  const pairs = S.text('', { x: RX + 11 * PITCH - TX + 18, y: TY[0] + 1, size: 26, weight: 650, color: 'ink' }, fracG);
   const pc = { v: 0 };
   S.add(gsap.to(c11, { autoAlpha: 0, duration: 0.2 }), CAN);
   S.add(gsap.fromTo(pc, { v: 0 }, { v: 11, duration: 0.12 * 10 + 0.4, ease: 'none', immediateRender: false, onUpdate: () => { const n = Math.min(11, Math.floor(pc.v) + 1); pairs.textContent = `${n} pair${n > 1 ? 's' : ''}`; } }), CAN);
   S.set(pairs, { autoAlpha: 0 }, 0);
   S.add(gsap.to(pairs, { autoAlpha: 1, duration: 0.2 }), CAN);
-  const oneT = S.text('1', { x: RX + TW / 2, y: TY[0] + 1, size: 30, anchor: 'middle', weight: 700, family: 'mono', color: 'ink' });
+  const oneT = S.text('1', { x: RX + TW / 2, y: TY[0] + 1, size: 30, anchor: 'middle', weight: 700, family: 'mono', color: 'ink' }, fracG);
   S.set(oneT, { autoAlpha: 0 }, 0);
   S.add(fx.in(oneT, { from: 'fade', d: 0.3 }), T('b2~Eleven') + 1.4);
   const FOUR = T('b2~four') - 0.1;
   S.add(fx.out([pairs, c15], { d: 0.3, stagger: 0 }), FOUR);
   S.add(gsap.fromTo(bot.slice(11), { filter: 'none' }, { filter: 'url(#glow-compute)', duration: 0.4, immediateRender: false }), FOUR);
-  const left4 = S.text('4 left, on the bottom', { x: RX + 13 * PITCH, y: TY[1] + 56, size: 26, anchor: 'middle', weight: 650, color: 'compute' });
+  const left4 = S.text('4 left, on the bottom', { x: RX + 13 * PITCH, y: TY[1] + 56, size: 26, anchor: 'middle', weight: 650, color: 'compute' }, fracG);
   S.set(left4, { autoAlpha: 0 }, 0);
   S.add(fx.in(left4, { from: 'up', d: 0.35, dist: 10 }), FOUR + 0.2);
   const head = S.text('dividing powers of ten: subtract the exponents', { x: 960, y: 150, size: 38, anchor: 'middle', weight: 700, color: 'ink' });
@@ -105,7 +112,7 @@ V.scene('ch05_s05', S => {
   S.add(ch05Wipe(S, head, { d: 0.8 }), 'b2~subtracting-0.1');
 
   // ---------------------------------------------------------------- b3: the ladder: 10^(11−15) = 10⁻⁴ s = 0.0001 s = 0.1 ms
-  const LX = 1200, LY = [300, 470, 590];
+  const LX = 1300, LY = [360, 530, 650];
   const line = (exp, unit, y) => {
     const g = S.g();
     const eq = S.text('=', { x: LX, y, size: 48, weight: 700, color: 'muted' }, g);
@@ -187,25 +194,26 @@ V.scene('ch05_s05', S => {
 
   // ---------------------------------------------------------------- b5: multiply instead: operations² per second, not anything
   const B5 = T('b5') - 0.15;
-  S.add(gsap.to([lc, l2, l3, note], { x: 600, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }), B5);
-  const WP = { x: 1180, y: 250, w: 620, h: 330 };
+  S.add(gsap.to([lc, l2, l3, note], { x: 300, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }), B5);
+  // beside the fraction, centred on its bar; the title centred at the top, the sum centred below it (WC)
+  const WP = { x: 1270, y: BY - 155, w: 560, h: 310 }, XC = WP.x + WP.w / 2, WC = WP.y + 195;
   const wrong = S.g();
   S.rect({ x: WP.x, y: WP.y, w: WP.w, h: WP.h, r: 22, fill: '#0c1326', stroke: 'muted', strokeOpacity: 0.6, sw: 2 }, wrong);
-  S.text('the wrong way', { x: WP.x + 28, y: WP.y + 46, size: 30, weight: 700, color: 'muted' }, wrong);
-  const w1 = S.text('operations × operations', { x: WP.x + WP.w / 2, y: WP.y + 140, size: 36, anchor: 'middle', weight: 650, color: 'muted' }, wrong);
-  const w1b = S.text('per second', { x: WP.x + WP.w / 2, y: WP.y + 190, size: 36, anchor: 'middle', weight: 650, color: 'muted' }, wrong);
-  const w2 = S.text('operations² per second', { x: WP.x + WP.w / 2, y: WP.y + 166, size: 40, anchor: 'middle', weight: 700, color: 'ink' }, wrong);
+  S.text('the wrong way', { x: XC, y: WP.y + 58, size: 30, anchor: 'middle', weight: 700, color: 'muted' }, wrong);
+  const w1 = S.text('operations × operations', { x: XC, y: WC - 15, size: 36, anchor: 'middle', weight: 650, color: 'muted' }, wrong);
+  const w1b = S.text('per Second', { x: XC, y: WC + 35, size: 36, anchor: 'middle', weight: 650, color: 'muted', case: 'keep' }, wrong);
+  const w2 = S.text('operations² per second', { x: XC, y: WC + 14, size: 40, anchor: 'middle', weight: 700, color: 'ink' }, wrong);
   S.set([wrong, w2], { autoAlpha: 0 }, 0);
   S.add(fx.in(wrong, { from: 'right', d: 0.5, dist: 30 }), B5 + 0.4);
   const SQ = T('b5~squared') - 0.1;
-  S.add(gsap.to([w1, w1b], { autoAlpha: 0, scale: 0.85, transformOrigin: `${WP.x + WP.w / 2}px ${WP.y + 166}px`, duration: 0.35 }), SQ);
+  S.add(gsap.to([w1, w1b], { autoAlpha: 0, scale: 0.85, transformOrigin: `${XC}px ${WC}px`, duration: 0.35 }), SQ);
   S.add(gsap.to(w2, { autoAlpha: 1, duration: 0.35 }), SQ + 0.2);
   const xs = S.g();
-  S.path({ d: `M${WP.x + 200},${WP.y + 110} L${WP.x + 420},${WP.y + 230} M${WP.x + 420},${WP.y + 110} L${WP.x + 200},${WP.y + 230}`, stroke: 'muted', sw: 8, cap: 'round' }, xs);
+  S.path({ d: `M${XC - 110},${WC - 60} L${XC + 110},${WC + 60} M${XC + 110},${WC - 60} L${XC - 110},${WC + 60}`, stroke: 'muted', sw: 8, cap: 'round' }, xs);
   ignore(xs);
   S.set(xs, { autoAlpha: 0 }, 0);
   S.add(fx.pop(xs, { d: 0.35, from: 1.6 }), 'b5~duration-0.1');
-  S.add(gsap.to(wrong, { opacity: 0.55, scale: 0.94, transformOrigin: `${WP.x + WP.w / 2}px ${WP.y + WP.h / 2}px`, duration: 0.5 }), 'b5~Something');
+  S.add(gsap.to(wrong, { opacity: 0.55, scale: 0.94, svgOrigin: `${WP.x + WP.w / 2} ${WP.y + WP.h / 2}`, duration: 0.5 }), 'b5~Something');   // shrinks about its own centre
 
   // ---------------------------------------------------------------- b6: three cards under one banner: check the units
   const B6 = T('b6') - 0.15;

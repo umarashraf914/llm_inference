@@ -11,7 +11,10 @@
        the card is struck and dims.
    b4  the pipeline folds into a slab 'layer 1' with a teal tick; 'layer 2' above it with '?'; caption.
    Layout: table x 120-380, y 312-864 (24 rows, 23 px); pipeline y 560: input box x 480-760, '×' 810, W_K at 940,
-   arrow 1022-1146 with the rotation at 1084, key bar at 1262; right third x 1480-1850; bottom band y 760-990. */
+   arrow 1022-1146 with the rotation at 1084, key bar at 1262; the comparison drawn at x 1480-1850; bottom band
+   y 760-990. Composition: the table and the pipeline are one stage, centred as a pair (+222); in b2 the
+   comparison takes the table's place left of the pipeline (-1238), so nothing moves; in b3 the stage moves to
+   +32, the pipeline centred, and the sentences with the prefix-rule card are centred under it (-105). */
 V.scene('ch14_s02', S => {
   const K = libKit(S), { T, cl, lerp, E, EIO, whole, setO, hide, fade, pulse } = K;
   const { fx } = S;
@@ -32,7 +35,7 @@ V.scene('ch14_s02', S => {
   hide(tab);
   fade(tab, 0, 1, 0.7, 0.6);
   const chip = S.g();
-  libToken(S, { text: "token 5's ID", x: TX + 130, y: 262, size: 24, state: 'token' }, chip);
+  libToken(S, { text: "token 5's ID", x: TX + 130, y: 262, size: 24, state: 'token', case: 'label' }, chip);
   rise(chip, 1.1);
   // the pointer runs down the right edge to the row; the row lights
   const tFind = T('b1~starts') - 0.1, rowY = TY + RH * ROW;
@@ -89,7 +92,7 @@ V.scene('ch14_s02', S => {
   S.circle({ x: 1084, y: 560, r: 21, fill: CH14.BASE, stroke: 'ink', sw: 2 }, rot);
   S.icon('ph:arrows-clockwise-bold', { x: 1084, y: 560, size: 26, color: 'ink' }, rot);
   K.track(rot, [K.K(tPos, { s: 1.8, o: 0 }), K.K(tPos + 0.3, { s: 1, o: 1, e: 'power4.in' })], 1084, 560);
-  const posL = S.text('position 5', { x: 1084, y: 606, size: 24, weight: 650, anchor: 'middle', color: 'muted' }, pipe);
+  const posL = S.text('position 5', { x: 1092, y: 608, size: 22, weight: 650, anchor: 'middle', color: 'muted' }, pipe);   // clear of the W_K tile
   hide(posL);
   fade(posL, 0, 1, tPos + 0.3, 0.3);
   const key = ch14Bar(S, { x: 1262, y: 560, n: 8, cw: 24, ch: 46, seed: 11, label: 'key', labelGap: 40 }, pipe);
@@ -196,7 +199,7 @@ V.scene('ch14_s02', S => {
     ws.slice(0, 5).forEach((w, j) => { const p = S.g(null, sent); libToken(S, { text: w, x: sx(j), y, size: 26, w: SW, state: j === 4 ? 'new' : 'token' }, p); K.track(p, [K.K(tOne + 0.3 + 0.05 * j + 0.15 * i, { x: -20, o: 0 }), K.K(tOne + 0.7 + 0.05 * j + 0.15 * i, { x: 0, o: 1, e: 'power3.out' })]); last = p; });
     return last;
   });
-  const corner = ch14Tag(S, 'one-layer model only', { x: 1860, y: 128, anchor: 'end' });
+  const corner = ch14Tag(S, 'one-layer model only', { x: 960, y: 196 });   // under the header, centred
   hide(corner);
   fade(corner, 0, 1, tOne + 0.2, 0.35);
   const card = S.g();
@@ -247,5 +250,12 @@ V.scene('ch14_s02', S => {
   const take = S.takeaway('independent for exactly one layer', { tone: 'helps' });
   hide(take);
   fade(take, 0, 1, tExact + 0.3, 0.5);
+  // the composition (see the header)
+  const stage = S.g();
+  S.main.insertBefore(stage, tab);
+  [tab, chip, pipe, banner, tbl, kvb].forEach(e => stage.appendChild(e));
+  whole(t => stage.setAttribute('transform', `translate(${lerp(222, 32, EIO(cl((t - tB3) / 0.8))).toFixed(1)},0)`));
+  right.setAttribute('transform', 'translate(-1238,0)');
+  [sent, card].forEach(e => e.setAttribute('transform', 'translate(-105,0)'));
   void fx; void tB2;
 });

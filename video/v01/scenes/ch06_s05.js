@@ -21,7 +21,7 @@ V.scene('ch06_s05', S => {
   // ================================================================ the world: s04's final package
   const world = S.g();
   const PS = 1.1, GAP = 16, LX = -(300 + GAP + 130) / 2;         // die's left edge, local (-223)
-  const PX = 1000 + PS * (-300 - LX);                             // same die position as s04's end (915.3)
+  const PX = 960;                                                 // centred, as s04 ends it (die's left edge 714.7)
   const pkg = ch06Package(S, { x: PX, y: 640, s: PS, gap: GAP, wires: 40, wireSw: 0.75 }, world);
   const D = pkg.dieBox, ST = [0, 1, 2].map(i => pkg.stackBox(i));
 
@@ -70,7 +70,7 @@ V.scene('ch06_s05', S => {
   ignoreIn([world], tCD, S.duration);                             // labels grow off the frame
 
   // ================================================================ b1: three cards
-  const CW = 500, CH = 200, CY = 196, CXS = [140, 710, 1280];
+  const CW = 540, CH = 200, CY = 196, CXS = [100, 690, 1280];
   const recipe = (x, y, tone, kind, parent) => {
     const g = S.g(null, parent);
     S.rect({ x: x - 30, y: y - 38, w: 60, h: 76, r: 7, fill: '#0c1326', stroke: tone, sw: 2.2 }, g);
@@ -89,14 +89,16 @@ V.scene('ch06_s05', S => {
     const outer = S.g(), g = S.g(null, outer);
     const x = CXS[k];
     S.card({ x, y: CY, w: CW, h: CH, tone, r: 22 }, g);
-    S.text(l1, { x: x + 30, y: CY + 56, size: s1, weight: 700, color: tone === 'struct' ? 'ink' : tone }, g);
-    S.text(l2, { x: x + 30, y: CY + 56 + s1 * 1.35, size: s2, weight: 550, color: tone === 'struct' ? 'ink' : 'muted' }, g);
+    // the two lines centred, top to bottom in the card and across the room left of the recipe (or the card)
+    const tx = rec ? x + 20 + (CW - 124) / 2 : x + CW / 2, ty = CY + CH / 2 - 14;
+    S.text(l1, { x: tx, y: ty, size: s1, weight: 700, anchor: 'middle', color: tone === 'struct' ? 'ink' : tone }, g);
+    S.text(l2, { x: tx, y: ty + s1 * 1.35, size: s2, weight: 550, anchor: 'middle', color: tone === 'struct' ? 'ink' : 'muted' }, g);
     if (rec) recipe(x + CW - 62, CY + 86, tone, rec, g);
     outer.inner = g;
     return outer;
   };
-  const cAmber = card(0, 'compute', 'Fast logic', 'one kind of silicon process', 36, 26, 'a');
-  const cCoral = card(1, 'bytes', 'Dense storage', 'a different one', 36, 26, 'b');
+  const cAmber = card(0, 'compute', 'Fast logic', 'one kind of silicon process', 36, 24, 'a');
+  const cCoral = card(1, 'bytes', 'Dense storage', 'a different one', 36, 24, 'b');
   const cBlue = card(2, 'struct', 'Nobody has made both', 'work on one piece of silicon', 34, 30, null);
   S.add(fx.in(cAmber, { from: 'left', d: 0.6, dist: 40 }), 'b1~Logic-0.1');
   S.add(fx.in(cCoral, { from: 'up', d: 0.6, dist: 30 }), 'b1~dense-0.1');
@@ -126,7 +128,8 @@ V.scene('ch06_s05', S => {
   const cards = [cAmber, cCoral, cBlue];
   S.add(gsap.to(cards, { opacity: 0.35, duration: 0.5 }), T('b2') - 0.1);
   // the stamp: off-white paper with a scalloped edge and the amber die drawn on it
-  const SP = { x: 300, y: 690, w: 170, h: 204 };
+  // one row, centred with its stamp caption and price label: stamp, 130, block (at full size), 130, tag
+  const SP = { x: 335, y: 690, w: 170, h: 204 };
   const stamp = S.g();
   S.rect({ x: SP.x - SP.w / 2, y: SP.y - SP.h / 2, w: SP.w, h: SP.h, r: 4, fill: '#e9e3d3' }, stamp);
   for (let k = 0; k <= 8; k++) {
@@ -145,7 +148,7 @@ V.scene('ch06_s05', S => {
   S.add(fx.in(stamp, { from: 'up', d: 0.55, dist: 20 }), T('b2') + 0.1);
   S.add(fx.in(stampLbl, { from: 'fade', d: 0.45 }), 'b2~postage-0.1');
   // the 140 GB block grows from a stamp-sized square until it dwarfs it
-  const BK = { x: 490, y: 690 }, BK0 = { w: 150, h: 150 }, BK1 = { w: 760, h: 520 };
+  const BK = { x: 550, y: 690 }, BK0 = { w: 150, h: 150 }, BK1 = { w: 760, h: 520 };
   const blk = S.g();
   const blkR = S.rect({ x: BK.x, y: BK.y - BK0.h / 2, w: BK0.w, h: BK0.h, r: 14, fill: '#2a1218', stroke: 'bytes', sw: 3 }, blk);
   const blkT = S.text('140 GB', { x: BK.x + BK0.w / 2, y: BK.y + 2, size: 40, weight: 700, family: 'mono', anchor: 'middle', color: 'bytes' }, blk);
@@ -159,7 +162,7 @@ V.scene('ch06_s05', S => {
     blkT.setAttribute('x', (BK.x + w / 2).toFixed(2)); blkT.setAttribute('font-size', lerp(40, 96, u).toFixed(2));
   });
   // the price tag: dollar signs spin up out of it; a grey strike crosses the tag, not the label
-  const PT = { x: 1420, y: 690 };
+  const PT = { x: 1488, y: 690 };
   const tagG = S.g();
   S.icon('ph:tag-duotone', { x: PT.x, y: PT.y, size: 96, color: 'muted' }, tagG);
   const anyPrice = S.text('at any price', { x: PT.x + 66, y: PT.y, size: 32, weight: 600, color: 'muted' });
@@ -192,7 +195,7 @@ V.scene('ch06_s05', S => {
   // the label in the gap: 'close ≠ on', then 'the memory wall'
   const plate = (w, y) => S.rect({ x: 960 - w / 2, y: y - 44, w, h: 88, r: 22, fill: '#0b1124', fillOpacity: 0.94, stroke: 'ink', strokeOpacity: 0.2, sw: 2 });
   const lab = S.g();
-  const labPlate = plate(470, 540);
+  const labPlate = plate(Math.round(Math.max(S.measure('close ≠ on', { size: 56, weight: 700, family: 'display' }), S.measure('the memory wall', { size: 52, weight: 700, family: 'display' })) + 64), 540);
   lab.appendChild(labPlate);
   const closeNe = S.text('close ≠ on', { x: 960, y: 542, size: 56, weight: 700, family: 'display', anchor: 'middle', color: 'ink' }, lab);
   const wallT = S.text('the memory wall', { x: 960, y: 542, size: 52, weight: 700, family: 'display', anchor: 'middle', color: 'bytes' }, lab);

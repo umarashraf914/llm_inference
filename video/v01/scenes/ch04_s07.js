@@ -36,15 +36,17 @@ V.scene('ch04_s07', S => {
     g.bg = S.rect({ x, y: CY0, w: CW, h: CH, r: 20, fill: 'url(#card-neutral)', stroke: '#ffffff', strokeOpacity: 0.2, sw: 2 }, g);
     g.lit = S.rect({ x, y: CY0, w: CW, h: CH, r: 20, fill: 'url(#card-struct)', stroke: 'struct', sw: 3 }, g);
     S.set(g.lit, { autoAlpha: 0 }, 0);
-    S.icon(st.icon, { x: x + 40, y: CY0 + 40, size: 40, color: 'ink' }, g);
-    S.text(st.name, { x: x + 70, y: CY0 + 41, size: 28, weight: 700, color: 'ink' }, g);
+    // the card's header, icon and name, centred on the card like everything in it
+    const hl = cx(i) - (45 + S.measure(st.name, { size: 26, weight: 700 })) / 2;
+    S.icon(st.icon, { x: hl + 19, y: CY0 + 40, size: 38, color: 'ink' }, g);
+    S.text(st.name, { x: hl + 45, y: CY0 + 41, size: 26, weight: 700, color: 'ink' }, g);
     g.sub = S.text(st.sub, { x: cx(i), y: SUBY, size: 26, anchor: 'middle', weight: 600, color: 'muted' }, world);
     S.set([g, g.sub], { autoAlpha: 0 }, 0);
     S.add(fx.in(g, { from: 'up', d: 0.45, dist: 14 }), 0.7 + i * 0.15);
     return g;
   });
   // the token, and the stop at each card
-  const tok = libToken(S, { text: 'token', x: 150, y: PATHY, size: 24, hidden: true }, world);
+  const tok = libToken(S, { text: 'token', x: 150, y: PATHY, size: 24, hidden: true, case: 'label' }, world);
   S.add(tok.pop({ d: 0.4 }), 'b1~token-0.2');
   const visit = (i, at) => {
     S.add(tok.moveTo([cx(i), PATHY], { d: 0.55, ease: 'power2.inOut' }), at - 0.2);
@@ -106,8 +108,9 @@ V.scene('ch04_s07', S => {
   S.add(gsap.to(loopIc, { autoAlpha: 1, duration: 0.3 }), T('b2~Decode') + 0.2);
   S.add(gsap.fromTo(loopIc, { rotation: 0, svgOrigin: `${DEMO(4).x} ${DEMO(4).y}` }, { rotation: 1440, svgOrigin: `${DEMO(4).x} ${DEMO(4).y}`, duration: 8, ease: 'none', immediateRender: false }), T('b2~Decode') + 0.2);
   // screen: a teal cable into the laptop
-  const cab = ignore(S.line({ x1: cx(5) - 100, y1: DEMO(5).y, x2: cx(5) - 30, y2: DEMO(5).y, stroke: 'helps', sw: 5, cap: 'round' }, world));
-  const lapIc = S.icon('ph:laptop-duotone', { x: cx(5) + 20, y: DEMO(5).y, size: 60, color: 'ink' }, world);
+  // cable and laptop together centred in the card (cx - 75 to cx + 75)
+  const cab = ignore(S.line({ x1: cx(5) - 75, y1: DEMO(5).y, x2: cx(5) - 5, y2: DEMO(5).y, stroke: 'helps', sw: 5, cap: 'round' }, world));
+  const lapIc = S.icon('ph:laptop-duotone', { x: cx(5) + 45, y: DEMO(5).y, size: 60, color: 'ink' }, world);
   S.set([cab, lapIc], { autoAlpha: 0 }, 0);
   S.add(fx.in([lapIc, cab], { from: 'fade', d: 0.35, stagger: 0.15 }), T('b2~your') + 0.2);
 
@@ -139,10 +142,13 @@ V.scene('ch04_s07', S => {
   S.set(band, { autoAlpha: 0 }, 0);
   S.add(fx.in(band, { from: 'up', d: 0.5, dist: 16 }), UN + 0.4);
   // the camera tilts down to the question
+  // '30 ms', the stopwatch and the '?', 75 px apart: one line, centred
   const QY = 1380, qg = S.g();
-  const ms = S.text('30 ms', { x: 900, y: QY + 30, size: 150, anchor: 'end', weight: 800, family: 'display', color: 'ink' }, qg);
-  const sw = libStopwatch(S, { x: 1050, y: QY - 10, size: 150, span: 60, readout: 'none', tone: 'struct' }, qg);
-  const q = S.text('?', { x: 1250, y: QY + 34, size: 170, anchor: 'middle', weight: 800, family: 'display', color: 'bytes' }, qg);
+  const w30 = S.measure('30 ms', { size: 150, weight: 800, family: 'display' }), wq = S.measure('?', { size: 170, weight: 800, family: 'display' });
+  const QL = 960 - (w30 + 75 + 150 + 75 + wq) / 2;
+  const ms = S.text('30 ms', { x: QL + w30, y: QY + 30, size: 150, anchor: 'end', weight: 800, family: 'display', color: 'ink' }, qg);
+  const sw = libStopwatch(S, { x: QL + w30 + 150, y: QY - 10, size: 150, span: 60, readout: 'none', tone: 'struct' }, qg);
+  const q = S.text('?', { x: QL + w30 + 300 + wq / 2, y: QY + 34, size: 170, anchor: 'middle', weight: 800, family: 'display', color: 'bytes' }, qg);
   S.set([ms, sw, q], { autoAlpha: 0 }, 0);
   const TILT = T('b4~thirty') - 0.6;
   S.add(fx.cam({ x: 960, y: QY - 20, scale: 1, d: 1.4, ease: 'power2.inOut' }), TILT);

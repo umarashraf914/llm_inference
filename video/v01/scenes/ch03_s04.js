@@ -136,7 +136,7 @@ V.scene('ch03_s04', S => {
   const LP = { x: 300, y: 262, w: 1360, h: 468 };
   const lanes = S.g();
   S.rect({ x: LP.x, y: LP.y, w: LP.w, h: LP.h, r: 26, fill: '#0c1326', fillOpacity: 0.96, stroke: '#ffffff', strokeOpacity: 0.14, sw: 2 }, lanes);
-  const LY = i => 318 + i * 46, X0 = 436, STEP = 84, PW = 64, PH = 24, AXY = 696;
+  const LY = i => 318 + i * 46, X0 = 436, STEP = 84, PW = 64, PH = 28, AXY = 696;
   const laneG = S.g(null, lanes);
   const SHADE = i => (i === 2 ? null : ch03Shade(S, i, 7));
   const markers = [], laneLines = [];
@@ -146,7 +146,7 @@ V.scene('ch03_s04', S => {
   }
   const axis = S.g(null, lanes);
   S.arrow({ x1: X0 - 12, y1: AXY, x2: 1610, y2: AXY, color: 'muted', sw: 2.5, head: 12 }, axis);
-  const axisLbl = S.text('time', { x: 1610, y: AXY + 28, size: 24, anchor: 'end', weight: 600, color: 'muted' }, axis);
+  const axisLbl = S.text('time', { x: 1600, y: AXY - 24, size: 24, anchor: 'end', weight: 600, color: 'muted' }, axis);   // above the axis, clear of the panel's edge
   // the tray grows into the panel
   S.xset(lanes, { x: 960 - (LP.x + LP.w / 2), y: SL.y - (LP.y + LP.h / 2), s: 0.2, ox: LP.x + LP.w / 2, oy: LP.y + LP.h / 2 });
   S.set(lanes, { autoAlpha: 0 }, 0);
@@ -176,9 +176,11 @@ V.scene('ch03_s04', S => {
   S.set(longBar, { autoAlpha: 0 }, 0);
   S.add(gsap.set(longBar, { autoAlpha: 1 }), SLOW + 0.3);
   S.add(gsap.fromTo(longBar, { attr: { width: PW } }, { attr: { width: BEND - BX }, duration: TOK - SLOW - 0.3, ease: 'none', immediateRender: false }), SLOW + 0.3);
-  const longLbl = S.text('long request', { x: BX + 18, y: LY(2) + 1, size: 22, weight: 650, color: '#0a0f1e' }, laneG);
+  const longLbl = S.text('long request', { x: BX + 18, y: LY(2) - 1, size: 21, weight: 650, color: '#0a0f1e' }, laneG);
   S.set(longLbl, { autoAlpha: 0 }, 0);
-  S.add(fx.in(longLbl, { from: 'fade', d: 0.3 }), SLOW + 1.3);
+  // the label waits until the growing bar holds it
+  const LBL_W = 18 + S.measure('long request', { size: 21, weight: 650 }) + 18, GROW_D = TOK - SLOW - 0.3;
+  S.add(fx.in(longLbl, { from: 'fade', d: 0.3 }), Math.max(SLOW + 1.3, SLOW + 0.3 + GROW_D * (LBL_W - PW) / (BEND - BX - PW)));
   // the others' next pills stall, then wait (grey hatching)
   const ghosts = [];
   for (let i = 0; i < 8; i++) if (i !== 2) {
@@ -212,7 +214,7 @@ V.scene('ch03_s04', S => {
     S.add(gsap.to(cr, { attr: { width: BEND - BX }, duration: TOK - HOLD - catchUp, ease: 'none' }), HOLD + catchUp);
     hatches.push(g);
   }
-  const waitLbl = S.text('waiting', { x: BX + 16, y: LY(0) + 1, size: 22, weight: 650, color: 'ink' }, laneG);
+  const waitLbl = S.text('waiting', { x: BX + 16, y: LY(0) - 1, size: 21, weight: 650, color: 'ink' }, laneG);
   S.set(waitLbl, { autoAlpha: 0 }, 0);
   S.add(fx.in(waitLbl, { from: 'fade', d: 0.3 }), HOLD + 0.7);
   // everyone's next token comes only when the long one is done

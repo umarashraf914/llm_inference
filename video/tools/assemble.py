@@ -2,7 +2,7 @@
 """Join rendered scene segments and narration into the finished film, with subtitles and chapters.
 
   python3 video/tools/assemble.py video/v01 --name V01_The_Memory_Wall
-  python3 video/tools/assemble.py video/v01 --name V01_The_Memory_Wall_4K --segments video/v01/build/segments_4k --out ~/Downloads/V01_The_Memory_Wall_4K.mp4
+  python3 video/tools/assemble.py video/v01 --name V01_The_Memory_Wall_4K --segments video/v01/build/segments_4k --out rendered/V01_The_Memory_Wall_4K.mp4
 
 Needs build/timing.json (tools/tts.py), build/audio/*.wav and build/segments/*.mp4 (tools/render.py).
 Writes build/<name>.mp4 (H.264 + AAC, soft English subtitles, chapter markers) and build/<name>.srt.

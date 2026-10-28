@@ -7,7 +7,7 @@
    b3  pills fill the outline (20 slots, 'schematic'); it turns solid, 'context length' / 'the window';
        then each new pill pushes the window right and the oldest drop and grey: 'out of reach'.
    b4  the fan pulses with each token; 'not only a storage limit' greys aside; 'a recurring cost'.
-   Slots: x 140 + 70·i, pills 62 wide at y 760; the window is 20 slots (1,400 px). One painter draws the
+   Slots: x 96 + 74·i, pills 68 wide at y 760; the window is 20 slots (1,480 px). One painter draws the
    strip, the window, the fan and the counter from the arrival times. */
 V.scene('ch08_s05', S => {
   const { fx } = S;
@@ -21,7 +21,9 @@ V.scene('ch08_s05', S => {
   const R1 = 290, R2 = 480, BKX = 1080;
   const row = (words, xs, y) => words.map((w, i) => libToken(S, { text: w, x: xs[i], y, size: 34 }));
   const rowA = row(['the', 'river', 'bank'], [620, 830, BKX], R1), rowB = row(['the', 'savings', 'bank'], [600, 830, BKX], R2);
-  const top = S.g();
+  // the two rows (x 555-1196) with their tag centred under them are b1's whole picture: `top` centres it
+  const top = S.g(), TOPX = 85, TOPY = 116;
+  S.set(top, { x: TOPX, y: TOPY }, 0);
   [...rowA, ...rowB].forEach(p => top.appendChild(p));
   const wave = S.icon('ph:waves-bold', { x: BKX + 96, y: R1, size: 40, color: 'struct' }, top);
   const coin = S.icon('ph:coins-bold', { x: BKX + 96, y: R2, size: 38, color: 'struct' }, top);
@@ -40,13 +42,13 @@ V.scene('ch08_s05', S => {
   ch08Vec(S, { token: 'savings', dir: 'row', n: 6, cw: 14, ch: 12, gap: 2, x: BKX, y: R2 - 44 }, stB);
   ch08Hide([stA, stB]);
   fade([stA, stB], 0, 1, tTh + 0.5, 0.4);
-  const same = S.text('same token, different result', { x: BKX + 150, y: (R1 + R2) / 2, size: 30, weight: 650, color: 'ink' }, top);
+  const same = S.text('same token, different result', { x: 875, y: R2 + 150, size: 30, weight: 650, anchor: 'middle', color: 'ink' }, top);
   ch08Hide(same);
   fade(same, 0, 1, T('b1~neighbour') - 0.1);
 
   // ================================================================ b2-b4: the strip and the window
   const t2 = T('b2') - 0.1;
-  S.add(gsap.to(top, { y: -60, opacity: 0, duration: 0.7, ease: 'power2.in' }), t2);
+  S.add(gsap.to(top, { y: TOPY - 60, opacity: 0, duration: 0.7, ease: 'power2.in' }), t2);
   S.add(ch08Ignore(top, 0.8), t2);
   const headA = S.text('Context:', { x: 960, y: 170, size: 54, weight: 750, family: 'display', anchor: 'middle', color: 'struct' });
   const headB = S.text('everything the model can see', { x: 960, y: 236, size: 42, weight: 650, family: 'display', anchor: 'middle', color: 'ink' });
@@ -54,11 +56,11 @@ V.scene('ch08_s05', S => {
   fade(headA, 0, 1, T('b2~Context') - 0.05, 0.5);
   fade(headB, 0, 1, T('b2~everything') - 0.1, 0.5);
   const WORDS = ['Read', 'the', 'notes', 'from', 'our', 'last', 'call', 'and', 'list', 'three', 'risks', 'we', 'face', 'next', 'week', 'with', 'one', 'fix', 'for', 'each', 'and', 'a', 'cost', 'note'];
-  const SX = i => 140 + 70 * i, SY = 760, PW = 62, PH = 40, WIN = 20;
+  const SLOT = 74, SX = i => 96 + SLOT * i, SY = 760, PW = 68, PH = 40, WIN = 20;
   const pills = WORDS.map((w, i) => {
     const g = S.g();
     const bg = S.rect({ x: SX(i) - PW / 2, y: SY - PH / 2, w: PW, h: PH, r: 10, fill: 'url(#card-struct)', stroke: 'struct', strokeOpacity: 0.7, sw: 1.8 }, g);
-    S.text(w, { x: SX(i), y: SY + 1, size: 20, weight: 600, anchor: 'middle', color: 'ink' }, g);
+    S.text(w, { x: SX(i), y: SY + 1, size: 20, weight: 600, anchor: 'middle', color: 'ink', case: 'keep' }, g);
     g.bg = bg;
     g.style.opacity = 0; g.style.visibility = 'hidden';
     return g;
@@ -72,7 +74,7 @@ V.scene('ch08_s05', S => {
   for (let i = 20; i < 24; i++) ta.push(T('b3~fall') - 0.05 + 0.45 * (i - 20));
   const nAt = t => ta.filter(x => x <= t).length;
   // the window: dashed, then solid; it slides right a slot at a time once the strip is longer than it
-  const win = S.rect({ x: SX(0) - PW / 2 - 8, y: SY - PH / 2 - 10, w: WIN * 70 + 2, h: PH + 20, r: 14, stroke: 'ink', strokeOpacity: 0.7, sw: 2.5, dash: '10 8' });
+  const win = S.rect({ x: SX(0) - PW / 2 - 8, y: SY - PH / 2 - 10, w: WIN * SLOT + 2, h: PH + 20, r: 14, stroke: 'ink', strokeOpacity: 0.7, sw: 2.5, dash: '10 8' });
   // its labels hang under its left end (the fan rises above the strip)
   const winLbl = S.text('context length', { x: 0, y: SY + PH / 2 + 34, size: 28, weight: 700, color: 'ink' });
   const winSub = S.text('the window', { x: 0, y: SY + PH / 2 + 66, size: 24, weight: 550, color: 'muted' });
@@ -94,6 +96,7 @@ V.scene('ch08_s05', S => {
   fade(promptBr, 0, 1, T('b2~prompt') - 0.1, 0.4);
   fade(promptBr, 1, 0, T('b2~Each') - 0.1, 0.35);
   const newest = S.text('newest token', { x: 0, y: SY + 46, size: 24, weight: 650, anchor: 'middle', color: 'struct' });
+  const NEWEST_HW = S.measure('newest token', { size: 24, weight: 650 }) / 2;
   ch08Hide(newest);
   fade(newest, 0, 1, T('b2~newest') - 0.1, 0.4);
   const ring = S.rect({ x: 0, y: SY - PH / 2 - 5, w: PW + 10, h: PH + 10, r: 13, stroke: 'white', sw: 2.5 });
@@ -108,28 +111,29 @@ V.scene('ch08_s05', S => {
   const cnt = S.text('looks at: 0', { x: 1830, y: 600, size: 30, weight: 700, family: 'mono', anchor: 'end', color: 'compute' });
   ch08Hide(cnt);
   fade(cnt, 0, 1, tFan, 0.3);
-  const outTag = S.text('out of reach', { x: SX(1.5), y: SY + 146, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
+  const outTag = S.text('out of reach', { x: SX(1.5), y: SY + 206, size: 24, weight: 600, anchor: 'middle', color: 'muted' });
   ch08Hide(outTag);
-  fade(outTag, 0, 1, ta[20] + 0.5, 0.4);
+  fade(outTag, 0, 1, ta[20] + 0.8, 0.4);
   const paint = t => {
     const n = nAt(t), w = Math.max(0, n - WIN);
     // the window slides a slot as each pill pushes in
     let wx = 0;
     for (let i = WIN; i < ta.length; i++) wx += E('power2.inOut')(cl((t - ta[i]) / 0.4));
-    const winX = SX(0) - PW / 2 - 8 + 70 * wx;
+    const winX = SX(0) - PW / 2 - 8 + SLOT * wx;
     win.setAttribute('x', winX.toFixed(1));
     winLbl.setAttribute('x', (winX + 6).toFixed(1)); winSub.setAttribute('x', (winX + 6).toFixed(1));
     pills.forEach((g, i) => {
       const a = cl((t - ta[i]) / 0.25);
-      const drop = i < WIN - 0 + 4 && ta[i + WIN] !== undefined ? E('power2.in')(cl((t - ta[i + WIN]) / 0.45)) : 0;
+      // the oldest drops once the window (and its labels) has slid past it
+      const drop = i < WIN - 0 + 4 && ta[i + WIN] !== undefined ? E('power2.in')(cl((t - ta[i + WIN] - 0.3) / 0.45)) : 0;
       g.style.opacity = (a * (1 - 0.55 * drop)).toFixed(3);
       g.style.visibility = a > 0 ? 'inherit' : 'hidden';
-      g.setAttribute('transform', `translate(${(14 * (1 - a)).toFixed(1)},${(90 * drop).toFixed(1)})`);
+      g.setAttribute('transform', `translate(${(14 * (1 - a)).toFixed(1)},${(150 * drop).toFixed(1)})`);   // below the window's labels
       g.bg.setAttribute('stroke', drop > 0.5 ? S.tone('muted') : S.tone('struct'));
     });
     const nw = Math.max(0, n - 1);
     ring.setAttribute('x', (SX(nw) - PW / 2 - 5).toFixed(1));
-    newest.setAttribute('x', SX(nw).toFixed(1));
+    newest.setAttribute('x', Math.min(SX(nw), 1856 - NEWEST_HW).toFixed(1));   // kept inside the safe area at the far end
     // bracket over the prompt so far
     const x0 = SX(0) - PW / 2, x1 = SX(nw) + PW / 2, yb = SY - PH / 2 - 14;
     pbPath.setAttribute('d', `M${x0},${yb} v-10 H${x1} v10`);

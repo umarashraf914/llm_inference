@@ -10,3 +10,5 @@ video/.versions/
 video/.cache/
 .DS_Store
 *.DS_Store
+# finished films (video/tools/make_4k.py): they stay on the computer that rendered them
+/rendered/

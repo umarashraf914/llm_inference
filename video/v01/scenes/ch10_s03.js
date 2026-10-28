@@ -36,7 +36,7 @@ V.scene('ch10_s03', S => {
   chip.insertBefore(twoGlow, chip.children[1]);
   hide([q, tick]);
   const tQ = T('b1~Exact') - 0.1, tShrink = T('b1~thumb') + 0.1;
-  K.track(chip, [K.K(0.4, { o: 0, s: 0.9 }), K.K(0.9, { o: 1, s: 1 }), K.K(tShrink, { x: 0, y: 0, s: 1 }), K.K(tShrink + 0.8, { x: 110 + (cW + 64) * 0.55 / 2 - 960, y: 140 - 540, s: 0.55 })], 960, 540);
+  K.track(chip, [K.K(0.4, { o: 0, s: 0.9 }), K.K(0.9, { o: 1, s: 1 }), K.K(tShrink, { x: 0, y: 0, s: 1 }), K.K(tShrink + 0.8, { x: 0, y: 140 - 540, s: 0.55 })], 960, 540);   // parks at the top centre, the scene's question
   S.add(K.drive(0.3, k => { setO(q, k); q.setAttribute('transform', `translate(0,${(8 * (1 - E('back.out(2)')(k))).toFixed(1)})`); }), tQ);
   K.ignore(chip, tShrink, 0.8);
 
@@ -62,7 +62,7 @@ V.scene('ch10_s03', S => {
   const tIn = T('b2~six') - 0.1;
   inputs.forEach((g, c) => K.track(g, [K.K(tIn + 0.06 * c, { y: -40, o: 0 }), K.K(tIn + 0.06 * c + 0.4, { y: 0, o: 1, e: 'power3.out' })]));
   const lTok = S.text('the token', { x: MX - 24, y: 380, size: 24, weight: 650, anchor: 'end', color: 'struct' });
-  const lCol = S.text('columns = inputs', { x: MX + 6 * P + 12, y: 380, size: 24, weight: 600, color: 'muted' });
+  const lCol = S.text('columns = inputs', { x: MX + 6 * P - 8, y: 380, size: 24, weight: 600, color: 'muted' });
   const lRow = S.text('rows = outputs', { x: MX - 24, y: MY + 2 * P - 4, size: 24, weight: 600, anchor: 'end', color: 'muted' });
   hide([lTok, lCol, lRow]);
   fade([lTok, lCol, lRow], 0, 1, tIn + 0.4, 0.4, 0.15);
@@ -233,4 +233,11 @@ V.scene('ch10_s03', S => {
   fade(fin, 0, 1, T('b5~no#2') + 0.2, 0.4);
   fade(lOut, 1, 0, T('b5~no#2') - 0.1, 0.3);
   void EIO; void AMB;
+
+  // ================================================================ the pane: all but the question chip
+  // The matrix side (x 100-1000) is alone through b2: the pane holds it centred, and moves to the full layout
+  // (matrix left, workspace and card right) as the first product lifts out (b3)
+  const pane = S.g();
+  [...S.layers.main.children].filter(e => e !== pane && e !== chip).forEach(e => pane.appendChild(e));
+  whole(t => pane.setAttribute('transform', `translate(${(410 * (1 - EIO(cl((t - tLift + 0.8) / 0.8)))).toFixed(1)},0)`));
 });
