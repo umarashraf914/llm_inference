@@ -13,6 +13,12 @@
       "date": "2026-10-27",
       "commit": "e81a1307d24702696c00f0d453e833398f855362",
       "notes": "First release: 22 chapters, 56 minutes, from lecture 2"
+    },
+    {
+      "version": 2,
+      "date": "2026-10-29",
+      "commit": "4f5f755e47eb2521666cfaf8646a83a62786dfb7",
+      "notes": "Version 2: full illustrated figures, center-out composition, and icon library"
     }
   ]
 }
