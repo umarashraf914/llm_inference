@@ -28,7 +28,7 @@
 Scene selectors: a scene id (ch05_s01), a chapter (ch05, includes its title card), or "all".
 Needs build/timing.json from tools/tts.py and scenes/<scene>.js (plus optional scenes/<chapter>_common.js).
 """
-import argparse, base64, json, multiprocessing, os, shutil, subprocess, sys, time, urllib.parse
+import argparse, base64, json, multiprocessing, os, shutil, subprocess, sys, threading, time, urllib.parse
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -385,7 +385,7 @@ def place(src, dst):
 
 
 def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existing=False, gpu=None, encoder="x264",
-             cache=None):
+             cache=None, room=None):
     outdir = Path(outdir) if outdir else film / "build" / "segments"
     outdir.mkdir(parents=True, exist_ok=True)
     if cache:
@@ -414,7 +414,7 @@ def do_video(film, timing, ids, fps, workers, scale=1, outdir=None, skip_existin
             target[s].with_suffix(".json").write_text(json.dumps(
                 {"scene": s, "film": film.name, "globalStart": timing["scenes"][s].get("globalStart", 0)}))
     if todo:
-        render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done)
+        render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done, room)
     if cache:
         for s in ids:
             os.utime(target[s])                 # last used, for pruning
@@ -427,13 +427,47 @@ def clock(s):
     return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
 
 
-def render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done=lambda s: None):
+def memory_room(share, scene_gb, settle=20):
+    """A test for render_all: may another scene start now? Yes while the memory in use, counting what the scenes
+    already running hold, stays under share of the total with one more scene's scene_gb on top (and as much again for
+    every scene started in the last settle seconds, still growing into its memory)."""
+    from machine import memory_gb
+
+    def room(running):
+        """running: the start times of the scenes rendering now."""
+        total, avail = memory_gb()
+        if not total or avail is None:
+            return True
+        growing = sum(1 for t in running if time.time() - t < settle)
+        return share * total - (total - avail) >= scene_gb * (1 + growing)
+    return room
+
+
+def render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, done=lambda s: None, room=None):
+    """Render the scenes todo, up to workers at once; with room (memory_room), another scene starts only while
+    memory allows it, so a render that begins with little memory free speeds up as programs close."""
     jobs = sorted([(str(film), timing["scenes"][s], fps, str(target[s]), scale, gpu, encoder) for s in todo],
                   key=lambda j: -j[1]["duration"])
     total = sum(round(j[1]["duration"] * fps) for j in jobs)
     t0, frames = time.time(), 0
     drawn = multiprocessing.Value("q", 0)       # every frame drawn, finished scenes or not, so the estimate is right early
     seen = [(t0, 0)]                            # (time, frames drawn) at each line, for the speed over the last minute
+    running, stop, freed = {}, threading.Event(), threading.Event()     # running: scene id -> when it started
+
+    def feed():
+        """The jobs, each handed to the pool only once a worker is free and memory allows another scene (the pool
+        takes them from its own thread, so waiting here holds back the next scene and nothing else)."""
+        for job in jobs:
+            while not stop.is_set():
+                now = list(running.values())
+                if len(now) < workers and (not now or room is None or room(now)):
+                    break
+                freed.wait(2)                   # until a scene finishes, or two seconds pass (memory may have freed)
+                freed.clear()
+            if stop.is_set():
+                return
+            running[job[1]["id"]] = time.time()
+            yield job
 
     def progress():
         now, f = time.time(), drawn.value
@@ -448,21 +482,28 @@ def render_all(film, timing, todo, fps, workers, scale, gpu, encoder, target, do
         left = (total - f) / rate
         left = (f"about {left / 3600:.1f} h left" if left >= 5400 else f"about {round(left / 60)} min left" if left >= 90
                 else "under 2 min left" if f < total else "all frames drawn")
-        return f"{clock(el)} | {f:,} of {total:,} frames ({100 * f / total:.0f}%), {rate:.1f} frames/s{recent}, {left}"
+        return (f"{clock(el)} | {f:,} of {total:,} frames ({100 * f / total:.0f}%), {rate:.1f} frames/s{recent}, "
+                f"{len(running)} rendering, {left}")
 
     with Pool(workers, initializer=_share, initargs=(drawn,)) as pool:
-        it, k = pool.imap_unordered(render_one, jobs), 0
-        while k < len(jobs):
-            try:
-                sid, n, dt, ms = it.next(timeout=PROGRESS_EVERY)
-            except multiprocessing.TimeoutError:     # no scene finished in the last minute: say how far the rest are
-                print("   " + progress(), flush=True)
-                continue
-            k += 1
-            done(sid)
-            frames += n
-            print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps; a frame: seek {ms[0]} ms, draw "
-                  f"{ms[1]} ms, to the encoder {ms[2]} ms) | {progress()}", flush=True)
+        it, k = pool.imap_unordered(render_one, feed()), 0
+        try:
+            while k < len(jobs):
+                try:
+                    sid, n, dt, ms = it.next(timeout=PROGRESS_EVERY)
+                except multiprocessing.TimeoutError:     # no scene finished in the last minute: say how far the rest are
+                    print("   " + progress(), flush=True)
+                    continue
+                k += 1
+                running.pop(sid, None)
+                freed.set()
+                done(sid)
+                frames += n
+                print(f"[{k}/{len(jobs)}] {sid}: {n} frames in {dt:.0f}s ({n/dt:.1f} fps; a frame: seek {ms[0]} ms, draw "
+                      f"{ms[1]} ms, to the encoder {ms[2]} ms) | {progress()}", flush=True)
+        finally:
+            stop.set()                          # free the pool's feeding thread, so stopping (Ctrl+C) never hangs
+            freed.set()
     dt = time.time() - t0
     print(f"rendered {len(jobs)} scenes, {frames} frames in {dt/60:.1f} min ({frames/max(dt, 1e-9):.1f} fps overall)")
 
@@ -485,6 +526,9 @@ def main():
     ap.add_argument("--gpu", help="draw on the graphics card: shell or full, optionally :angle[:nosandbox] (see launch_options)")
     ap.add_argument("--encoder", choices=["x264", "nvenc", "videotoolbox"], default="x264")
     ap.add_argument("--cache", help="keep and reuse rendered scenes here, by fingerprint (see tools/scenekeys.py)")
+    ap.add_argument("--memory-share", type=float, help="start another scene only while memory in use stays under this "
+                    "share of the total (with --scene-gb), so up to --workers scenes run as memory allows")
+    ap.add_argument("--scene-gb", type=float, default=2.6, help="memory one scene takes, for --memory-share")
     a = ap.parse_args()
     film = Path(a.film).resolve()
     # keep the icon bundle in step with the scene files (cheap, and self-heals concurrent edits)
@@ -498,7 +542,8 @@ def main():
     elif a.mode == "audit":
         sys.exit(1 if do_audit(film, timing, ids, a.step, a.touch_gap) else 0)
     else:
-        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing, a.gpu, a.encoder, a.cache)
+        room = memory_room(a.memory_share, a.scene_gb) if a.memory_share else None
+        do_video(film, timing, ids, a.fps, a.workers, a.scale, a.out, a.skip_existing, a.gpu, a.encoder, a.cache, room)
 
 
 if __name__ == "__main__":

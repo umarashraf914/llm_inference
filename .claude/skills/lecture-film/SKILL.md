@@ -203,7 +203,13 @@ that. Rendered video never goes into git (`.gitignore` holds `/rendered/`).
   the result. `make_film --check` redoes the check and reports; on the Windows machine the card
   draws. A hardware encoder must be as good as x264 and about as small: NVENC once passed on
   quality alone and made V01 19 GB where x264 makes 2 GB, with no visible gain.
-- Scenes at once: three quarters of the CPU threads, fewer if memory in use would pass 80%.
+- Scenes at once: up to three quarters of the CPU threads, each started only while memory in use
+  stays under 80%, so a render that begins short of memory speeds up as programs close. When memory
+  is short at the start, it names the programs holding it. A V01 render on the Windows machine once
+  crawled at one scene at a time because over 42 of its 64 GB were already in use when it began. One
+  render at a time: a second is refused (`video/.cache/render.lock`).
+- x264 runs its `fast` preset where the GPU draws, and `slow` where the processor draws too. On this
+  film, fast gives the same size and quality as slow in half the processor time.
 - The progress line shows frames per second over the whole run and over the last minute. Each
   finished scene shows a frame's time split into seek, draw and encoder: ask for those lines when
   speed is the question.

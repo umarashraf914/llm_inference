@@ -48,9 +48,11 @@ this, about 2 to 3 GB a film, and deletes those unused for 90 days.)
   ways of drawing on the card are tried, each with a time limit, and
   the report says how far each got. `--check` redoes the check and stops; `--recheck` redoes it and renders;
   `--cpu` renders in software for one run;
-- as many scenes at once as its processor and memory allow, keeping memory in use (other programs included)
-  under 80%, so the computer stays usable for other work while it renders (on Windows its processes also opt out
-  of the power saving that moves background work onto a hybrid processor's power-saving cores).
+- as many scenes at once as its processor and memory allow: each scene starts only while memory in use (other
+  programs included) stays under 80%, so the computer stays usable for other work, and a render that starts short
+  of memory speeds up as programs close (it names the biggest ones at the start). On Windows its processes also opt
+  out of the power saving that moves background work onto a hybrid processor's power-saving cores. One render runs
+  at a time: a second one is refused.
 
 **Narration** travels with the repository: `video/vNN/narration/` holds the film's timing and each scene's
 audio (Opus, about 50 MB a film), and a run decodes it again whenever `git pull` brings a change. A narration

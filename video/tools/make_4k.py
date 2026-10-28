@@ -31,13 +31,15 @@ work on other films or on the engine never changes it.
   --working-copy     render the film's files as they are now, released or not (a draft)
   --list             list the films and their versions, and stop
   --out PATH         where to save the film (default: rendered/ in the repository folder)
-  --workers N        scenes rendered at once (default: three quarters of the CPU threads, fewer where memory in
-                     use, other programs included, would pass 80%)
+  --workers N        scenes rendered at once (default: up to three quarters of the CPU threads, each started only
+                     while memory in use, other programs included, stays under 80%: more start as memory frees)
   --cpu              draw and encode in software this time (the reference look), whatever the check found
   --recheck          check the graphics card and video encoder again
   --check            check the graphics card and video encoder again, report, and stop (no rendering)
   --narration ZIP    use this narration pack instead of the repository's narration
-  --preset P         x264 preset: slow (default), medium (faster, slightly larger file)
+  --preset P         x264 preset (default: fast where the graphics card draws, so the processor only encodes;
+                     slow where the processor draws too). On this film fast makes files the same size as slow, at
+                     the same quality, in half the processor time
   --only ch18 ...    just these chapters, as a quick test (saved as ..._4K_ch18.mp4)
   --keep-segments    keep the per-scene 4K files after the film is assembled
 """
@@ -92,6 +94,7 @@ def venv_python():
 # ---------------------------------------------------------------- which film, which version
 sys.path.insert(0, str(TOOLS))
 import films  # noqa: E402  (standard library only: the menu works before the environment exists)
+from machine import biggest_programs, memory_gb, process_alive  # noqa: E402  (standard library only too)
 
 
 def ask(question, options, default):
@@ -391,52 +394,75 @@ def ensure_narration(given):
 
 
 # ---------------------------------------------------------------- machine
-def memory_gb():
-    """(total memory, memory available to programs now) in GB; either is None where it cannot be read."""
-    total = avail = None
-    try:
-        if os.name == "nt":
-            import ctypes
-
-            class MS(ctypes.Structure):
-                _fields_ = [("len", ctypes.c_ulong), ("load", ctypes.c_ulong)] + [(n, ctypes.c_ulonglong) for n in
-                            ("total", "avail", "ptotal", "pavail", "vtotal", "vavail", "xavail")]
-            m = MS(); m.len = ctypes.sizeof(MS)
-            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m))
-            return m.total / 2 ** 30, m.avail / 2 ** 30
-        total = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2 ** 30
-        if sys.platform == "darwin":            # free pages, and those holding cache the system gives up on demand
-            out = subprocess.run(["vm_stat"], capture_output=True, text=True).stdout
-            page = int(re.search(r"page size of (\d+)", out).group(1))
-            avail = page * sum(map(int, re.findall(r"Pages (?:free|inactive|speculative):\s+(\d+)", out))) / 2 ** 30
-        else:
-            with open("/proc/meminfo") as f:
-                avail = next(int(ln.split()[1]) for ln in f if ln.startswith("MemAvailable:")) / 2 ** 20
-    except (OSError, ValueError, AttributeError, StopIteration):
-        pass
-    return total, avail
-
-
 def describe_machine():
     mem, _ = memory_gb()
     system = {"Darwin": "macOS", "Windows": "Windows"}.get(platform.system(), platform.system())
     return f"{system} ({platform.machine()}), {os.cpu_count()} logical CPUs" + (f", {mem:.0f} GB memory" if mem else "")
 
 
+def scene_gb(encoder="x264", gpu=None):
+    """Memory one scene takes while it renders: its browser, its encoder, the graphics card's share."""
+    return GB_PER_WORKER[encoder] + (GB_GPU_DRAWING if gpu else 0)
+
+
 def default_workers(encoder="x264", gpu=None):
-    """(how many scenes render at once, what sets that number). A worker keeps about 1.3 cores busy (Chromium drawing
-    and JPEG-ing 8 MP frames, less when the GPU draws; the encoder behind it), so three quarters of the processor's
-    threads; fewer where memory in use, counting what is already open, would pass MEMORY_TARGET of the total, so the
-    computer stays usable for other work while it renders."""
+    """(most scenes at once, what sets that, how many memory allows now). A worker keeps about 1.3 cores busy
+    (Chromium drawing and JPEG-ing 8 MP frames, less when the GPU draws; the encoder behind it), so three quarters
+    of the processor's threads, at most 32. render.py starts each scene only while memory in use, counting what is
+    already open, stays under MEMORY_TARGET of the total, so the computer stays usable for other work, and a render
+    that begins with little memory free speeds up as other programs close."""
     cores = os.cpu_count() or 2
     w, why = max(1, round(cores * 0.75)), f"for {cores} logical CPUs"
+    if w > 32:
+        w, why = 32, "at most 32"
     total, avail = memory_gb()
+    now = w
     if total:
         in_use = total - avail if avail is not None else 3
-        fit = max(1, int((MEMORY_TARGET * total - in_use) // (GB_PER_WORKER[encoder] + (GB_GPU_DRAWING if gpu else 0))))
-        if fit < w:
-            w, why = fit, f"keeping memory in use under {MEMORY_TARGET:.0%}"
-    return (32, "at most 32") if w > 32 else (w, why)
+        now = max(1, min(w, int((MEMORY_TARGET * total - in_use) // scene_gb(encoder, gpu))))
+    return w, why, now
+
+
+def say_memory(now, most):
+    """Memory is short: say how short, and which programs hold it, so they can be closed."""
+    total, avail = memory_gb()
+    if not total or avail is None:
+        return
+    print(f"   Only about {now} of the {most} can start now: {total - avail:.0f} of {total:.0f} GB of memory is in use. "
+          f"More start as memory frees.")
+    top = [f"{name}{f' ({k} of them)' if k > 1 else ''} {gb:.1f} GB" for name, gb, k in biggest_programs() if gb >= 0.5]
+    if top:
+        print("   Holding the most memory now: " + "; ".join(top) + ".")
+        print("   Many browser, encoder or python processes are usually an earlier render still running or left behind:"
+              " close its window, or end them in Task Manager (Activity Monitor on a Mac), or restart the computer.")
+
+
+class render_lock:
+    """One render at a time on a computer: a second would halve the speed of both, and both would write the same
+    scene cache. The lock is a file naming this process; one left by a render that stopped is taken over."""
+    path = CACHE.parent / "render.lock"
+
+    def __enter__(self):
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            held = json.loads(self.path.read_text())
+        except (OSError, ValueError):
+            held = None
+        if held and held.get("pid") != os.getpid() and process_alive(held["pid"]):
+            sys.exit(f"\nAnother render is running on this computer (process {held['pid']}, started {held['started']}"
+                     f": {held.get('what', '')}). Let it finish, or stop it (Ctrl+C in its window), then run this "
+                     f"again. If none is running, delete {self.path} and run this again.")
+        self.path.write_text(json.dumps({"pid": os.getpid(), "started": time.strftime("%Y-%m-%d %H:%M"),
+                                         "what": f"{NAME}"}))
+        return self
+
+    def __exit__(self, *exc):
+        try:
+            if json.loads(self.path.read_text()).get("pid") == os.getpid():
+                self.path.unlink()
+        except (OSError, ValueError):
+            pass
+        return False
 
 
 def keep_awake():
@@ -507,7 +533,7 @@ def main(argv):
     ap.add_argument("--out")
     ap.add_argument("--workers", type=int)
     ap.add_argument("--narration")
-    ap.add_argument("--preset", default="slow")
+    ap.add_argument("--preset")                    # default: fast where the GPU draws, else slow
     ap.add_argument("--crf", default="18")
     ap.add_argument("--only", nargs="+", metavar="CHAPTER")
     ap.add_argument("--keep-segments", action="store_true")
@@ -550,7 +576,10 @@ def main(argv):
     if not order:
         sys.exit(f"no chapters match {a.only}")
     frames = sum(round(timing["scenes"][s]["duration"] * 30) for s in order)
-    workers, why = (a.workers, "as asked") if a.workers else default_workers(encoder, gpu)
+    if a.workers:
+        workers, why, now = a.workers, "as asked", a.workers
+    else:
+        workers, why, now = default_workers(encoder, gpu)
     for where in {seg.parent, out.parent}:
         free = shutil.disk_usage(where).free / 1e9
         need = 4 + frames / 166140 * 6
@@ -558,12 +587,19 @@ def main(argv):
             print(f"warning: only {free:.0f} GB free on the drive holding {where}; about {need:.0f} GB is needed")
 
     keep_awake()
-    how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {ENCODERS[encoder]}"
+    preset = a.preset or ("fast" if gpu else "slow")
+    how = f"drawn {'on the GPU' if gpu else 'in software'}, encoded with {ENCODERS[encoder]}" + (
+        f" ({preset})" if encoder == "x264" else "")
+    pace = [] if a.workers else ["--memory-share", MEMORY_TARGET, "--scene-gb", f"{scene_gb(encoder, gpu):.1f}"]
+    many = f"{workers} at a time ({why})" if a.workers else f"up to {workers} at a time ({why}) as memory allows"
     step(f"Rendering {len(order)} scenes ({frames:,} frames, {frames / 30 / 60:.0f} min of film) at 3840x2160, "
-         f"{workers} at a time ({why}), {how}. Stop any time; run the same command to resume.")
-    run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,
-         "--cache", CACHE, "--workers", workers, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
-        env=dict(env(), PRESET=a.preset, CRF=str(a.crf)))
+         f"{many}, {how}. Stop any time; run the same command to resume.")
+    if not a.workers and now < workers / 2:
+        say_memory(now, workers)
+    with render_lock():
+        run([sys.executable, TOOLS / "render.py", FILM, "video", *(a.only or ["all"]), "--scale", "2", "--out", seg,
+             "--cache", CACHE, "--workers", workers, *pace, *(["--gpu", gpu] if gpu else []), "--encoder", encoder],
+            env=dict(env(), PRESET=preset, CRF=str(a.crf)))
 
     step(f"Assembling the film: picture, narration (two audio tracks), subtitles, chapters -> {out}")
     run([sys.executable, TOOLS / "assemble.py", FILM, "--name", name, "--segments", seg, "--out", out, *(["--only", *a.only] if a.only else [])])
