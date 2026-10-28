@@ -86,11 +86,11 @@ function ch01Package(S, o = {}) {
   smGrid.setAttribute('opacity', 0); // hidden initially
 
   // Die center label
-  const dieLabel = S.text('COMPUTE DIE', {
+  const dieLabel = S.text('compute die', {
     x: cx, y: cy - 18, size: 26, anchor: 'middle', weight: 700, family: 'mono', color: 'compute'
   }, die);
   const dieSub = S.text('814 mm² · 80B switches', {
-    x: cx, y: cy + 22, size: 26, anchor: 'middle', weight: 500, family: 'sans', color: 'ink'
+    x: cx, y: cy + 22, size: 24, anchor: 'middle', weight: 500, family: 'sans', color: 'ink'
   }, die);
 
   // 5 Active HBM3 Memory Stacks (3 on left, 2 on right + 1 placeholder slot)
@@ -151,13 +151,13 @@ function ch01Transistor(S, o = {}) {
   const cx = o.cx ?? 960, cy = o.cy ?? 520;
   const w = 500, h = 330;
 
-  // Background schematic card with custom header text
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'struct', title: ''
+  // Background schematic plate
+  const card = S.rect({
+    x: cx - w / 2, y: cy - h / 2, w, h, r: 16,
+    fill: '#0c1424', stroke: '#1d2c4d', sw: 2
   }, g);
-  const cardTitle = S.text('FIELD-EFFECT TRANSISTOR', {
-    x: cx, y: cy - h / 2 + 32, size: 22, anchor: 'middle', weight: 700, color: 'ink'
+  const cardTitle = S.text('field-effect transistor', {
+    x: cx, y: cy - h / 2 + 32, size: 22, anchor: 'middle', weight: 650, color: 'ink'
   }, g);
 
   // Terminals: Source (left) and Drain (right)
@@ -173,10 +173,10 @@ function ch01Transistor(S, o = {}) {
   const sContact = S.circle({ x: cx - 60, y: cy + 40, r: 8, fill: S.tone('struct') }, g);
   const dContact = S.circle({ x: cx + 60, y: cy + 40, r: 8, fill: S.tone('struct') }, g);
 
-  const sourceLabel = S.text('Source', { x: cx - 140, y: cy + 76, size: 22, anchor: 'middle', color: 'muted', weight: 600 }, g);
-  const drainLabel = S.text('Drain', { x: cx + 140, y: cy + 76, size: 22, anchor: 'middle', color: 'muted', weight: 600 }, g);
+  const sourceLabel = S.text('source', { x: cx - 140, y: cy + 76, size: 22, anchor: 'middle', color: 'muted', weight: 600 }, g);
+  const drainLabel = S.text('drain', { x: cx + 140, y: cy + 76, size: 22, anchor: 'middle', color: 'muted', weight: 600 }, g);
 
-  // Gate electrode (top) - well below header text
+  // Gate electrode (top)
   const gateLine = S.line({
     x1: cx, y1: cy - 35, x2: cx, y2: cy - 10,
     stroke: S.tone('compute'), sw: 6
@@ -185,7 +185,7 @@ function ch01Transistor(S, o = {}) {
     x: cx - 50, y: cy - 10, w: 100, h: 14, r: 3,
     fill: S.tone('compute'), stroke: S.tone('compute'), sw: 1
   }, g);
-  const gateLabel = S.text('Gate (Control)', { x: cx, y: cy - 54, size: 22, anchor: 'middle', color: 'compute', weight: 700 }, g);
+  const gateLabel = S.text('gate (control voltage)', { x: cx, y: cy - 54, size: 22, anchor: 'middle', color: 'compute', weight: 650 }, g);
 
   // Moveable switch arm / channel
   const switchArm = S.line({
@@ -194,10 +194,10 @@ function ch01Transistor(S, o = {}) {
   }, g);
 
   // Status badges: 0 · off vs 1 · on
-  const badgeOff = S.pill('0 · OFF (blocking)', {
+  const badgeOff = S.pill('0 · off (blocking)', {
     x: cx, y: cy + 115, h: 42, tone: 'violet', size: 22, weight: 650
   }, g);
-  const badgeOn = S.pill('1 · ON (conducting)', {
+  const badgeOn = S.pill('1 · on (conducting)', {
     x: cx, y: cy + 115, h: 42, tone: 'helps', size: 22, weight: 650
   }, g);
   S.set(badgeOn, { autoAlpha: 0 });

@@ -8,21 +8,21 @@ V.scene('ch01_s02', S => {
   const GX = 960, GY = 520;
 
   // Heading
-  const heading = S.heading('A slab of switches', { y: 120 });
+  const heading = S.heading('A slab of switches', { y: 130 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Transistor schematic builder
+  // ---------------------------------------------------------------- Movement 1 & 2 (b1-b2): Transistor
   const tGroup = S.g();
   const tr = ch01Transistor(S, { cx: GX, cy: GY - 20, parent: tGroup });
 
   // Initially hide transistor components
   S.set(tGroup, { autoAlpha: 0 });
 
-  // ---------------------------------------------------------------- b1: Zoom into single transistor
-  S.add(fx.in(tGroup, { from: 'scale', d: 0.6 }), 'b1~chip');
+  // b1: Zoom into single transistor
+  S.add(fx.in(tGroup, { from: 'fade', d: 0.6 }), 'b1~chip');
   S.add(fx.draw([tr.sourceLine, tr.drainLine, tr.gateLine], { d: 0.5 }), 'b1~switches-0.2');
 
-  // ---------------------------------------------------------------- b2: Voltage pulse & switch snap
+  // b2: Voltage pulse & switch snap
   const vWave = S.circle({ x: tr.cx, y: tr.cy - 120, r: 12, fill: S.tone('compute') });
   vWave.setAttribute('data-audit', 'ignore');
   S.set(vWave, { autoAlpha: 0 });
@@ -40,7 +40,7 @@ V.scene('ch01_s02', S => {
     duration: 0.18, ease: 'back.out(2)'
   }), 'b2~tap');
 
-  // Switch indicators update: OFF -> ON
+  // Switch indicators update: off -> on
   S.add(fx.out(tr.badgeOff, { d: 0.2 }), 'b2~tap-0.05');
   S.add(fx.in(tr.badgeOn, { from: 'fade', d: 0.25 }), 'b2~tap+0.05');
 
@@ -52,20 +52,18 @@ V.scene('ch01_s02', S => {
   S.add(fx.out(tr.badgeOn, { d: 0.2 }), 'b2~position+0.2');
   S.add(fx.in(tr.badgeOff, { from: 'fade', d: 0.2 }), 'b2~position+0.25');
 
-  // ---------------------------------------------------------------- b3: 4 transistors form an adder circuit
-  // Smooth crossfade from single transistor to logic adder
+  // ---------------------------------------------------------------- Movement 3 (b3): 4 transistors form adder
   S.add(fx.out(tGroup, { d: 0.3 }), 'b3-0.1');
 
   const adderGroup = S.g();
-  const aW = 720, aH = 340;
+  const aW = 760, aH = 340;
   const adderCard = S.card({
     x: GX - aW / 2, y: GY - aH / 2 - 20, w: aW, h: aH,
     tone: 'struct', title: ''
   }, adderGroup);
-  const adderTitle = S.text('BINARY HALF-ADDER CIRCUIT', {
-    x: GX, y: GY - aH / 2 + 15, size: 22, anchor: 'middle', weight: 700, color: 'ink'
+  const adderTitle = S.text('binary half-adder circuit', {
+    x: GX, y: GY - aH / 2 + 15, size: 24, anchor: 'middle', weight: 650, color: 'ink'
   }, adderGroup);
-  S.add(fx.in(adderGroup, { from: 'scale', d: 0.5 }), 'b3');
 
   // 4 mini transistor logic symbols inside the adder
   const miniT = [];
@@ -82,7 +80,7 @@ V.scene('ch01_s02', S => {
     miniT.push(mg);
   });
 
-  // Connecting wires within adder (stop cleanly at pill bounds)
+  // Connecting wires within adder
   const wires = S.g(null, adderGroup);
   S.path({ d: `M${GX - 230},${GY - 50} L${GX - 195},${GY - 50}`, stroke: S.tone('struct'), sw: 3 }, wires);
   S.path({ d: `M${GX - 230},${GY + 30} L${GX - 195},${GY + 30}`, stroke: S.tone('struct'), sw: 3 }, wires);
@@ -95,16 +93,16 @@ V.scene('ch01_s02', S => {
   const inA = S.pill('A = 1', { x: GX - 275, y: GY - 50, h: 42, tone: 'compute', size: 22, weight: 700 }, adderGroup);
   const inB = S.pill('B = 1', { x: GX - 275, y: GY + 30, h: 42, tone: 'compute', size: 22, weight: 700 }, adderGroup);
 
-  // Output badges: Sum = 0, Carry = 1
-  const outSum = S.pill('Sum = 0', { x: GX + 260, y: GY - 50, h: 42, tone: 'violet', size: 22, weight: 700 }, adderGroup);
-  const outCarry = S.pill('Carry = 1', { x: GX + 260, y: GY + 30, h: 42, tone: 'helps', size: 22, weight: 700 }, adderGroup);
+  // Output badges: sum = 0, carry = 1
+  const outSum = S.pill('sum = 0', { x: GX + 260, y: GY - 50, h: 42, tone: 'violet', size: 22, weight: 700 }, adderGroup);
+  const outCarry = S.pill('carry = 1', { x: GX + 260, y: GY + 30, h: 42, tone: 'helps', size: 22, weight: 700 }, adderGroup);
 
   const formulaText = S.text('1 + 1 = 10 (binary two)', {
-    x: GX, y: GY + 105, size: 24, anchor: 'middle', family: 'mono', weight: 700, color: 'ink'
+    x: GX, y: GY + 105, size: 24, anchor: 'middle', family: 'mono', weight: 650, color: 'ink'
   }, adderGroup);
 
   S.set(adderGroup, { autoAlpha: 0 });
-  S.add(fx.in(adderGroup, { from: 'scale', d: 0.55 }), 'b3~circuit-0.2');
+  S.add(fx.in(adderGroup, { from: 'fade', d: 0.55 }), 'b3~circuit-0.2');
   S.add(fx.in([inA, inB], { from: 'left', d: 0.4 }), 'b3~binary');
   S.add(fx.pulse(miniT, { scale: 1.08, stagger: 0.08, d: 0.4 }), 'b3~adds');
   S.add(fx.in([outSum, outCarry, formulaText], { from: 'right', d: 0.45 }), 'b3~numbers');
@@ -112,7 +110,7 @@ V.scene('ch01_s02', S => {
   // ---------------------------------------------------------------- b4: Eighty billion multiplier grid
   S.add(fx.out(adderGroup, { d: 0.4 }), 'b4-0.2');
 
-  // Massive grid of repeating circuits tiling the screen
+  // Repeating circuits grid
   const gridHolder = S.g();
   const cols = 28, rows = 14;
   const cw = 56, ch = 34, gap = 8;
@@ -132,7 +130,7 @@ V.scene('ch01_s02', S => {
     }
   }
 
-  // Die frame encasing the 80B grid
+  // Die frame
   const dieFrame = S.rect({
     x: GX - gw / 2 - 20, y: GY - gh / 2 - 10,
     w: gw + 40, h: gh + 40, r: 14,
@@ -142,25 +140,27 @@ V.scene('ch01_s02', S => {
 
   const gpuBanner = S.card({
     x: GX - 270, y: GY - 75, w: 540, h: 150,
-    tone: 'compute', title: 'COMPLETE GPU PROCESSOR DIE', layout: 'top', size: 22
+    tone: 'compute', title: ''
   }, gridHolder);
-  const gpuStat = S.text('80,000,000,000 Transistors', {
+  const bannerTitle = S.text('complete GPU processor die', {
+    x: GX, y: GY - 30, size: 24, anchor: 'middle', weight: 650, color: 'ink'
+  }, gridHolder);
+  const gpuStat = S.text('80,000,000,000 transistors', {
     x: GX, y: GY + 30, size: 30, anchor: 'middle', family: 'mono', weight: 700, color: 'compute'
   }, gridHolder);
 
-  S.set([gridHolder, gpuBanner, gpuStat], { autoAlpha: 0 });
-  S.add(fx.in(gridHolder, { from: 'scale', d: 0.7 }), 'b4~eighty-0.2');
+  // Takeaway band
+  const takeaway = S.takeaway('transistor: the single building block of all logic', {
+    tone: 'compute'
+  });
+
+  S.set([gridHolder, gpuBanner, bannerTitle, gpuStat, takeaway], { autoAlpha: 0 });
+  S.add(fx.in(gridHolder, { from: 'fade', d: 0.7 }), 'b4~eighty-0.2');
   S.add(gsap.fromTo(chipCells,
     { autoAlpha: 0, scale: 0.3, transformOrigin: '50% 50%' },
     { autoAlpha: 1, scale: 1, duration: 0.8, stagger: { each: 0.002, from: 'center' }, ease: 'power2.out' }
   ), 'b4~eighty-0.1');
 
-  S.add(fx.in([gpuBanner, gpuStat], { from: 'fade', d: 0.5 }), 'b4~modern');
-
-  // Takeaway pill
-  const takeaway = S.pill('transistor: the single building block of all logic', {
-    x: GX, y: 990, h: 48, tone: 'struct', size: 22, weight: 600, style: 'solid'
-  });
-  S.set(takeaway, { autoAlpha: 0 });
+  S.add(fx.in([gpuBanner, bannerTitle, gpuStat], { from: 'fade', d: 0.5 }), 'b4~modern');
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
 });
