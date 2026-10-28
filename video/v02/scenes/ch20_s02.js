@@ -6,44 +6,43 @@
 
 V.scene('ch20_s02', S => {
   const { fx } = S;
-  const GX = 960;
 
   // Heading
-  const heading = S.heading('What an interconnect link is', { y: 110 });
+  const heading = S.heading('what an interconnect link is', { y: 110 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Three tiers visual
-  const tt = ch20ThreeTiers(S, { cx: GX, cy: 510 });
+  // Interconnect link visual (Atlas Fig 110)
+  const lw = ch20LinkWires(S, { cx: 960, cy: 510 });
 
-  // Concluding Takeaway pill
-  const takeaway = S.pill('a GPU communicates across three tiers, each significantly slower than the last', {
-    x: GX, y: 990, h: 48, tone: 'struct', size: 22, weight: 600, style: 'solid'
+  // Concluding Takeaway band
+  const takeaway = S.takeaway('an interconnect link is a bundle of physical differential wires obeying bus arithmetic', {
+    tone: 'struct'
   });
 
   // Initial states
-  S.set([tt.card, tt.title, tt.footer], { autoAlpha: 0 });
-  tt.colEls.forEach(c => {
-    S.set(c.bc, { autoAlpha: 0 });
-    S.set([c.tn, c.td, c.tw, c.tb], { autoAlpha: 0 });
-  });
+  S.set([lw.bg, lw.title, lw.aBox, lw.aTitle, lw.aDie, lw.aDieLbl, lw.aDieSub, lw.aPhy, lw.aPhyLbl, lw.aSerdesLbl], { autoAlpha: 0 });
+  S.set([lw.bBox, lw.bTitle, lw.bDie, lw.bDieLbl, lw.bDieSub, lw.bPhy, lw.bPhyLbl, lw.bSerdesLbl], { autoAlpha: 0 });
+  lw.wireLines.forEach(l => S.set(l, { autoAlpha: 0 }));
+  S.set([lw.wirePill, lw.ruleBox, lw.ruleT1, lw.ruleT2], { autoAlpha: 0 });
   S.set(takeaway, { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: Interconnect link joins chips
-  S.add(fx.in([tt.card, tt.title], { from: 'scale', d: 0.5 }), 'b1~model-0.2');
+  S.add(fx.in([lw.bg, lw.title], { from: 'fade', d: 0.5 }), 'b1~model-0.2');
+  S.add(fx.in([lw.aBox, lw.aTitle, lw.aDie, lw.aDieLbl, lw.aDieSub], { from: 'fade', d: 0.4 }), 'b1~model');
 
-  // ---------------------------------------------------------------- b2: Width * frequency arithmetic
-  S.add(fx.in(tt.colEls[0].bc, { from: 'scale', d: 0.4 }), 'b2~bundle-0.2');
-  S.add(fx.in([tt.colEls[0].tn, tt.colEls[0].td, tt.colEls[0].tw, tt.colEls[0].tb], { from: 'fade', d: 0.4 }), 'b2~bundle');
+  // ---------------------------------------------------------------- b2: Width * frequency arithmetic & wire lanes
+  S.add(fx.in([lw.bBox, lw.bTitle, lw.bDie, lw.bDieLbl, lw.bDieSub], { from: 'fade', d: 0.4 }), 'b2~bundle-0.2');
+  S.add(fx.in([lw.aPhy, lw.aPhyLbl, lw.aSerdesLbl, lw.bPhy, lw.bPhyLbl, lw.bSerdesLbl], { from: 'fade', d: 0.4 }), 'b2~bundle');
+  lw.wireLines.forEach((l, idx) => {
+    S.add(fx.in(l, { from: 'fade', d: 0.35 }), `b2~bundle:-${0.2 - idx * 0.05}`);
+  });
+  S.add(fx.in(lw.wirePill, { from: 'up', d: 0.4 }), 'b2~bundle');
 
-  // ---------------------------------------------------------------- b3: Distance difference
-  S.add(fx.in(tt.colEls[1].bc, { from: 'scale', d: 0.4 }), 'b3~distance.-0.2');
-  S.add(fx.in([tt.colEls[1].tn, tt.colEls[1].td, tt.colEls[1].tw, tt.colEls[1].tb], { from: 'fade', d: 0.4 }), 'b3~distance.');
+  // ---------------------------------------------------------------- b3: Distance difference & energy penalty
+  S.add(fx.in([lw.ruleBox, lw.ruleT1], { from: 'fade', d: 0.4 }), 'b3~distance.-0.2');
+  S.add(fx.in(lw.ruleT2, { from: 'fade', d: 0.4 }), 'b3~distance.');
 
-  // ---------------------------------------------------------------- b4: Three tiers
-  S.add(fx.in(tt.colEls[2].bc, { from: 'scale', d: 0.4 }), 'b4~three-0.2');
-  S.add(fx.in([tt.colEls[2].tn, tt.colEls[2].td, tt.colEls[2].tw, tt.colEls[2].tb], { from: 'fade', d: 0.4 }), 'b4~three');
-  S.add(fx.pulse([tt.colEls[0].bc, tt.colEls[1].bc, tt.colEls[2].bc], { scale: 1.04, stagger: 0.1, d: 0.4 }), 'b4~slower');
-  S.add(fx.in(tt.footer, { from: 'up', d: 0.4 }), 'b4~last.');
-
+  // ---------------------------------------------------------------- b4: Three tiers and takeaway
+  S.add(fx.pulse([lw.aBox, lw.bBox, lw.wirePill], { scale: 1.02, d: 0.4 }), 'b4~slower');
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
 });
