@@ -1,180 +1,188 @@
-/* ch16_common.js · Shared visual components for Chapter 16 ("The ridge") */
+/* ch16_common.js · Visual components for Chapter 16 ("The ridge")
+   Figs 84, 85, 86, 87 from atlas:
+   - ch16Roofline: H100 Roofline model powered by libRoofline (Figs 84, 85, 86)
+   - ch16TwoOperations: Vector addition vs Matrix multiply illustrated figures (Fig 87)
+*/
 
 /**
- * Creates the H100 Roofline model plot
+ * Creates the H100 Roofline model plot using libRoofline
  */
-function ch16RooflinePlot(S, opts = {}) {
-  const g = S.g(null, opts.parent);
-  const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
-  const w = opts.w ?? 1360;
-  const h = opts.h ?? 480;
+function ch16Roofline(S, opts = {}, parent) {
+  const o = Object.assign({
+    x: 460, y: 165, w: 1120, h: 590,
+    peak: 989.4, bw: 3.352,
+    regionLabels: ['memory bound', 'compute bound'],
+    ridgeLabel: 'the ridge',
+    peakTag: ['peak arithmetic', '989.4 trillion/s'],
+    slopeLabel: 'bandwidth × intensity'
+  }, opts);
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
-  }, g);
-
-  const title = S.text('H100 ROOFLINE MODEL: ATTAINABLE PERFORMANCE AND THE RIDGE', {
-    x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
-  }, g);
-
-  // Plot area inside card
-  const plotX = cx - 560;
-  const plotY = cy - 140;
-  const plotW = 1120;
-  const plotH = 260;
-
-  // Background grid box
-  const gridBox = S.rect({
-    x: plotX, y: plotY, w: plotW, h: plotH, r: 6,
-    fill: S.tone('neutral', 0.1), stroke: S.tone('neutral', 0.4), sw: 1
-  }, g);
-
-  // Ridge coordinates inside plot area
-  // Log scale: X goes from 0.1 (plotX) to 10,000 (plotX + plotW)
-  // 0.1 -> 1 -> 10 -> 100 -> 295 -> 1000 -> 10000 (5 decades)
-  // log10(295) = 2.47; 0.1 is -1; range is 5 decades (-1 to 4).
-  // fraction = (2.47 - (-1)) / 5 = 3.47 / 5 = 0.694
-  const ridgeX = plotX + Math.round(plotW * 0.68); // ~760px from left
-  const ceilY = plotY + 45; // top horizontal ceiling
-  const roofStartY = plotY + plotH - 20; // bottom-left of slanted roof
-
-  // Slanted memory roof path
-  const slantedPath = S.path({
-    d: `M ${plotX + 30} ${roofStartY} L ${ridgeX} ${ceilY}`,
-    stroke: S.tone('bytes'), sw: 4
-  }, g);
-  slantedPath.setAttribute('data-audit', 'ignore');
-
-  // Flat compute ceiling path
-  const flatPath = S.path({
-    d: `M ${ridgeX} ${ceilY} L ${plotX + plotW - 30} ${ceilY}`,
-    stroke: S.tone('compute'), sw: 4
-  }, g);
-  flatPath.setAttribute('data-audit', 'ignore');
-
-  // Ceiling labels
-  const memRoofLbl = S.text('MEMORY-BOUND: RATE = 3.35 TB/s × INTENSITY', {
-    x: plotX + 40, y: plotY + 36, size: 20, anchor: 'start', weight: 700, color: 'bytes'
-  }, g);
-
-  const compRoofLbl = S.text('COMPUTE-BOUND: 989.4 TFLOP/s CEILING', {
-    x: plotX + plotW - 40, y: ceilY - 16, size: 20, anchor: 'end', weight: 700, color: 'compute'
-  }, g);
-
-  // Ridge vertical dashed line & label
-  const ridgeLine = S.line({
-    x1: ridgeX, y1: ceilY, x2: ridgeX, y2: plotY + plotH,
-    stroke: S.tone('struct', 0.9), sw: 2
-  }, g);
-  ridgeLine.setAttribute('stroke-dasharray', '5 5');
-  ridgeLine.setAttribute('data-audit', 'ignore');
-
-  const ridgeBadge = S.pill('RIDGE: 295 OP / BYTE', {
-    x: ridgeX, y: plotY + plotH + 28, h: 38, tone: 'struct', size: 18, weight: 700
-  }, g);
-  ridgeBadge.setAttribute('data-audit', 'ignore');
-
-  // Markers helper function
-  function createMarker(name, xPct, yPct, tone) {
-    const mx = plotX + Math.round(plotW * xPct);
-    const my = plotY + Math.round(plotH * yPct);
-    const dot = S.circle({ cx: mx, cy: my, r: 9, fill: S.tone(tone), stroke: '#fff', sw: 2 }, g);
-    const lbl = S.text(name, { x: mx, y: my + 24, size: 20, anchor: 'middle', weight: 700, color: tone }, g);
-    return { dot, lbl, mx, my };
-  }
-
-  // Pre-created markers
-  // Decode at 1 op/byte: fraction ~ (0 - (-1)) / 5 = 0.20 -> xPct: 0.22, yPct: 0.72
-  const decodeMarker = createMarker('Decode (1 op/B)', 0.22, 0.72, 'bytes');
-
-  // Prefill at 2,048 op/byte: fraction ~ (3.31 - (-1)) / 5 = 4.31 / 5 = 0.86 -> xPct: 0.86, yPct: 0.17
-  const prefillMarker = createMarker('Prefill (~2,000 op/B)', 0.86, 0.17, 'compute');
-
-  const footer = S.pill('BELOW 295 YOU WAIT ON MEMORY · ABOVE 295 YOU WAIT ON ARITHMETIC', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'struct', size: 20, weight: 700
-  }, g);
-
-  return {
-    group: g, card, title, gridBox, slantedPath, flatPath,
-    memRoofLbl, compRoofLbl, ridgeLine, ridgeBadge,
-    decodeMarker, prefillMarker, footer
-  };
+  const R = libRoofline(S, o, parent);
+  return R;
 }
 
 /**
- * Creates the Vector Add vs Matrix Multiply Comparison
+ * Creates the illustrated comparison between Vector Add and Matrix Multiply (Atlas Fig 87)
  */
-function ch16AlgorithmCards(S, opts = {}) {
+function ch16TwoOperations(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
-  const cardW = 630;
-  const cardH = 460;
-  const topY = cy - cardH / 2;
+  const cy = opts.cy ?? 485;
+  const panelW = 680;
+  const panelH = 430;
+  const topY = cy - 235;
 
-  // Left: Vector Addition
-  const leftX = cx - cardW - 25;
-  const leftCard = S.card({ x: leftX, y: topY, w: cardW, h: cardH, tone: 'bytes', title: '' }, g);
-  const leftTitle = S.text('VECTOR ADDITION: c[i] = a[i] + b[i]', {
-    x: leftX + cardW / 2, y: topY + 44, size: 22, anchor: 'middle', weight: 700, color: 'bytes'
-  }, g);
-  const leftSub = S.text('Deeply Memory-Bound (0.17 Operations / Byte)', {
-    x: leftX + cardW / 2, y: topY + 80, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+  // ---------------------------------------------------------------- Left: Vector Addition (0.17 op/byte)
+  const leftX = cx - panelW - 25;
+  const leftCard = S.rect({
+    x: leftX, y: topY, w: panelW, h: panelH, r: 12,
+    fill: '#151c2e', stroke: S.tone('bytes'), sw: 1.5
   }, g);
 
-  const leftDetails = [
-    { title: 'Data read:', desc: '2 input floats (8 bytes)', col: 'ink' },
-    { title: 'Data written:', desc: '1 output float (4 bytes)', col: 'ink' },
-    { title: 'Total memory traffic:', desc: '12 bytes (or 6 bytes at 16-bit)', col: 'bytes' },
-    { title: 'Arithmetic ops:', desc: '1 addition (0.17 ops / byte)', col: 'bytes' }
-  ];
-
-  const lElements = [];
-  leftDetails.forEach((d, idx) => {
-    const dy = topY + 120 + idx * 56;
-    const box = S.card({ x: leftX + 30, y: dy, w: cardW - 60, h: 48, tone: 'neutral', title: '' }, g);
-    const lt = S.text(`${d.title}  ${d.desc}`, { x: leftX + 45, y: dy + 31, size: 20, weight: 600, color: d.col }, g);
-    lElements.push({ box, lt });
-  });
-
-  const leftPill = S.pill('LANDS FAR LEFT OF THE RIDGE (0.17 OP/B) · WAITS ON HBM', {
-    x: leftX + cardW / 2, y: topY + cardH - 45, h: 42, tone: 'bytes', size: 20, weight: 700
+  const leftTitle = S.text('array addition · c[i] = a[i] + b[i]', {
+    x: leftX + panelW / 2, y: topY + 36, size: 22, anchor: 'middle', weight: 700, color: 'bytes'
   }, g);
 
-  // Right: Matrix Multiplication
+  // Illustrated Arrays A and B feeding Adder
+  const arrY = topY + 68;
+  const arrW = 500;
+  const arrX = leftX + (panelW - arrW) / 2;
+
+  // Array A
+  const arrABox = S.rect({
+    x: arrX, y: arrY, w: arrW, h: 46, r: 6,
+    fill: '#1b233a', stroke: S.tone('bytes'), sw: 1
+  }, g);
+  const arrALbl = S.text('input a[i]: 2 bytes (16-bit float)', {
+    x: arrX + arrW / 2, y: arrY + 30, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+  }, g);
+
+  // Array B
+  const arrBBox = S.rect({
+    x: arrX, y: arrY + 54, w: arrW, h: 46, r: 6,
+    fill: '#1b233a', stroke: S.tone('bytes'), sw: 1
+  }, g);
+  const arrBLbl = S.text('input b[i]: 2 bytes (16-bit float)', {
+    x: arrX + arrW / 2, y: arrY + 84, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+  }, g);
+
+  // Adder (+) node
+  const addCircle = S.circle({
+    cx: leftX + panelW / 2, cy: arrY + 130, r: 18,
+    fill: '#241a14', stroke: S.tone('compute'), sw: 2
+  }, g);
+  const addPlus = S.text('+', {
+    x: leftX + panelW / 2, y: arrY + 137, size: 22, anchor: 'middle', weight: 700, color: 'compute'
+  }, g);
+
+  // Array C (output)
+  const arrCBox = S.rect({
+    x: arrX, y: arrY + 160, w: arrW, h: 46, r: 6,
+    fill: '#1b233a', stroke: S.tone('bytes'), sw: 1
+  }, g);
+  const arrCLbl = S.text('output c[i]: 2 bytes written', {
+    x: arrX + arrW / 2, y: arrY + 190, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+  }, g);
+
+  // Accounting box
+  const leftAcc = S.rect({
+    x: leftX + 30, y: topY + 280, w: panelW - 60, h: 84, r: 8,
+    fill: '#101524', stroke: '#222f48', sw: 1
+  }, g);
+  const leftAccT1 = S.text('traffic: 2 reads (4 b) + 1 write (2 b) = 6 bytes', {
+    x: leftX + panelW / 2, y: topY + 310, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+  }, g);
+  const leftAccT2 = S.text('intensity: 1 op ÷ 6 bytes = 0.17 op/byte', {
+    x: leftX + panelW / 2, y: topY + 344, size: 22, anchor: 'middle', weight: 700, color: 'bytes'
+  }, g);
+
+  const leftPill = S.pill('1,735× below ridge · 99.9% waiting on hbm', {
+    x: leftX + panelW / 2, y: topY + panelH - 30, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+  }, g);
+
+  // ---------------------------------------------------------------- Right: Matrix Multiply (341 op/byte)
   const rightX = cx + 25;
-  const rightCard = S.card({ x: rightX, y: topY, w: cardW, h: cardH, tone: 'compute', title: '' }, g);
-  const rightTitle = S.text('MATRIX MULTIPLY: C = A × B (1,024 × 1,024)', {
-    x: rightX + cardW / 2, y: topY + 44, size: 22, anchor: 'middle', weight: 700, color: 'compute'
-  }, g);
-  const rightSub = S.text('Compute-Bound (341 Operations / Byte)', {
-    x: rightX + cardW / 2, y: topY + 80, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+  const rightCard = S.rect({
+    x: rightX, y: topY, w: panelW, h: panelH, r: 12,
+    fill: '#151c2e', stroke: S.tone('compute'), sw: 1.5
   }, g);
 
-  const rightDetails = [
-    { title: 'Data footprint:', desc: 'Three 1,024 × 1,024 matrices (6.29 MB)', col: 'ink' },
-    { title: 'Arithmetic ops:', desc: '2 × 1,024³ = 2.15 Billion operations', col: 'compute' },
-    { title: 'Intensity:', desc: '2.15B ops ÷ 6.29 MB = 341.3 op/B', col: 'compute' },
-    { title: 'Ridge position:', desc: 'Crosses 295 ridge (Compute-bound)', col: 'helps' }
-  ];
+  const rightTitle = S.text('matrix multiply · c = a × b (1,024 × 1,024)', {
+    x: rightX + panelW / 2, y: topY + 36, size: 22, anchor: 'middle', weight: 700, color: 'compute'
+  }, g);
 
-  const rElements = [];
-  rightDetails.forEach((d, idx) => {
-    const dy = topY + 120 + idx * 56;
-    const box = S.card({ x: rightX + 30, y: dy, w: cardW - 60, h: 48, tone: 'neutral', title: '' }, g);
-    const rt = S.text(`${d.title}  ${d.desc}`, { x: rightX + 45, y: dy + 31, size: 20, weight: 600, color: d.col }, g);
-    rElements.push({ box, rt });
-  });
+  // Illustrated 2D Matrices
+  const matY = topY + 68;
+  const matW = 520;
+  const matBox = S.rect({
+    x: rightX + (panelW - matW) / 2, y: matY, w: matW, h: 196, r: 8,
+    fill: '#181e30', stroke: S.tone('compute'), sw: 1
+  }, g);
 
-  const rightPill = S.pill('CROSSES RIGHT OF THE RIDGE (341 OP/B) · FULL TENSOR SPEED', {
-    x: rightX + cardW / 2, y: topY + cardH - 45, h: 42, tone: 'compute', size: 20, weight: 700
+  const matA = S.text('matrix a: 1,024 × 1,024 (2.097 mb)', {
+    x: rightX + panelW / 2, y: matY + 38, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+  }, g);
+  const matB = S.text('matrix b: 1,024 × 1,024 (2.097 mb)', {
+    x: rightX + panelW / 2, y: matY + 78, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+  }, g);
+  const matC = S.text('matrix c: 1,024 × 1,024 (2.097 mb)', {
+    x: rightX + panelW / 2, y: matY + 118, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+  }, g);
+  const matReuse = S.text('sram tiling: each weight reused 1,024×', {
+    x: rightX + panelW / 2, y: matY + 164, size: 20, anchor: 'middle', weight: 700, color: 'compute'
+  }, g);
+
+  // Accounting box
+  const rightAcc = S.rect({
+    x: rightX + 30, y: topY + 280, w: panelW - 60, h: 84, r: 8,
+    fill: '#101524', stroke: '#222f48', sw: 1
+  }, g);
+  const rightAccT1 = S.text('traffic: 3 matrices = 6.29 mb · math: 2.15b ops', {
+    x: rightX + panelW / 2, y: topY + 310, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+  }, g);
+  const rightAccT2 = S.text('intensity: 2.15b ops ÷ 6.29 mb = 341.3 op/byte', {
+    x: rightX + panelW / 2, y: topY + 344, size: 22, anchor: 'middle', weight: 700, color: 'compute'
+  }, g);
+
+  const rightPill = S.pill('crosses right of ridge · full tensor core speed', {
+    x: rightX + panelW / 2, y: topY + panelH - 30, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+  }, g);
+
+  // ---------------------------------------------------------------- Bottom Comparison Ruler
+  const rulerY = topY + panelH + 22;
+  const rulerW = 1260;
+  const rulerX = cx - rulerW / 2;
+
+  const rulerBg = S.rect({
+    x: rulerX, y: rulerY, w: rulerW, h: 82, r: 10,
+    fill: '#0f1422', stroke: '#222f48', sw: 1.5
+  }, g);
+
+  const rulerTitle = S.text('intensity comparison (log):', {
+    x: rulerX + 30, y: rulerY + 47, size: 20, weight: 700, color: 'muted'
+  }, g);
+
+  const addPt = S.pill('array add: 0.17', {
+    x: rulerX + 460, y: rulerY + 41, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+  }, g);
+
+  const ridgePt = S.pill('ridge: 295', {
+    x: rulerX + 780, y: rulerY + 41, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+  }, g);
+
+  const matPt = S.pill('matmul: 341', {
+    x: rulerX + 1100, y: rulerY + 41, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
     group: g,
-    leftCard, leftTitle, leftSub, lElements, leftPill,
-    rightCard, rightTitle, rightSub, rElements, rightPill
+    // Left
+    leftCard, leftTitle, arrABox, arrALbl, arrBBox, arrBLbl, addCircle, addPlus, arrCBox, arrCLbl,
+    leftAcc, leftAccT1, leftAccT2, leftPill,
+    // Right
+    rightCard, rightTitle, matBox, matA, matB, matC, matReuse,
+    rightAcc, rightAccT1, rightAccT2, rightPill,
+    // Ruler
+    rulerBg, rulerTitle, addPt, ridgePt, matPt
   };
 }

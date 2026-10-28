@@ -6,42 +6,48 @@
 
 V.scene('ch16_s02', S => {
   const { fx } = S;
-  const GX = 960;
 
   // Heading
-  const heading = S.heading('Prefill versus decode on the roofline', { y: 110 });
+  const heading = S.heading('prefill versus decode on the roofline', { y: 110 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
   // Roofline visual
-  const rf = ch16RooflinePlot(S, { cx: GX, cy: 510 });
+  const R = ch16Roofline(S, {
+    show: { roof: true, ceilings: false, regions: true, ridge: true, peakTag: false, slopeLabel: false },
+    regionLabels: ['', '']
+  });
 
-  // Concluding Takeaway pill
-  const takeaway = S.pill('decode lives far left of the ridge; prefill lives far to the right', {
-    x: GX, y: 990, h: 48, tone: 'struct', size: 22, weight: 600, style: 'solid'
+  // Decode point at 1 op/byte
+  const dec = R.point(1, { label: 'decode: 1 op/byte', tone: 'bytes', readout: false });
+
+  // Prefill point at ~2,000 op/byte
+  const pre = R.point(2000, { label: 'prefill: ~2,000 op/byte', tone: 'compute', labelSide: 'below' });
+
+  // Intensity span bracket
+  const br = R.bracket(1, 2000, { y: 730, label: '× 2,000 intensity span', tone: 'ink' });
+
+  // Concluding Takeaway band
+  const takeaway = S.takeaway('decode lives far left of the ridge; prefill lives far to the right', {
+    tone: 'struct'
   });
 
   // Initial states
-  S.set([rf.card, rf.title, rf.gridBox, rf.slantedPath, rf.flatPath, rf.memRoofLbl, rf.compRoofLbl, rf.ridgeLine, rf.ridgeBadge, rf.footer], { autoAlpha: 0 });
-  S.set([rf.decodeMarker.dot, rf.decodeMarker.lbl, rf.prefillMarker.dot, rf.prefillMarker.lbl], { autoAlpha: 0 });
-  S.set(takeaway, { autoAlpha: 0 });
+  S.set([takeaway], { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: Roofline in view
-  S.add(fx.in([rf.card, rf.title, rf.gridBox], { from: 'scale', d: 0.5 }), 'b1~phases-0.2');
-  S.add(fx.in([rf.slantedPath, rf.flatPath, rf.memRoofLbl, rf.compRoofLbl, rf.ridgeLine, rf.ridgeBadge], { from: 'fade', d: 0.4 }), 'b1~roofline.');
+  S.add(R.drawAxes({ d: 0.6 }), 'b1~place-0.2');
 
   // ---------------------------------------------------------------- b2: Decode lands at 1 op/byte
-  S.add(fx.in(rf.decodeMarker.dot, { from: 'scale', d: 0.4 }), 'b2~Decode-0.2');
-  S.add(fx.in(rf.decodeMarker.lbl, { from: 'fade', d: 0.4 }), 'b2~token');
-  S.add(fx.pulse([rf.decodeMarker.dot, rf.decodeMarker.lbl], { scale: 1.15, d: 0.4 }), 'b2~operation');
+  S.add(dec.in({ d: 0.7 }), 'b2~Decode-0.2');
+  S.add(fx.pulse(dec.dot, { scale: 1.2, d: 0.4 }), 'b2~operation');
 
   // ---------------------------------------------------------------- b3: Prefill lands at ~2,000 op/byte
-  S.add(fx.in(rf.prefillMarker.dot, { from: 'scale', d: 0.4 }), 'b3~Prefill-0.2');
-  S.add(fx.in(rf.prefillMarker.lbl, { from: 'fade', d: 0.4 }), 'b3~prompt');
-  S.add(fx.pulse([rf.prefillMarker.dot, rf.prefillMarker.lbl], { scale: 1.15, d: 0.4 }), 'b3~thousand');
+  S.add(pre.in({ d: 0.7 }), 'b3~Prefill-0.2');
+  S.add(fx.pulse(pre.dot, { scale: 1.2, d: 0.4 }), 'b3~thousand');
 
   // ---------------------------------------------------------------- b4: Opposite sides of the ridge
-  S.add(fx.pulse([rf.decodeMarker.dot, rf.prefillMarker.dot], { scale: 1.1, stagger: 0.1, d: 0.4 }), 'b4~opposite');
-  S.add(fx.in(rf.footer, { from: 'up', d: 0.4 }), 'b4~units.');
+  S.add(br.in({ d: 0.6 }), 'b4~opposite-0.2');
+  S.add(fx.pulse([dec.dot, pre.dot], { scale: 1.15, d: 0.4, stagger: 0.15 }), 'b4~saturates');
 
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
 });
