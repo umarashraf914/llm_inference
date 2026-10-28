@@ -1,104 +1,149 @@
 /* ch04_s04 · why slow threads win, and where the bet fails (figs 21, 22)
-   Movement 1 (b1): Parallel victory: 100,000 slow lanes crush 4 fast cores on 1B independent numbers.
-   Movement 2 (b2): The bet's failure mode: strict serial dependency chains idle 99.9% of lanes.
-   Movement 3 (b3): Single lane speed comparison: CPU core runs 5–10× faster than a single GPU lane.
-   Movement 4 (b4): LLM reality: sequential across tokens, but massively parallel inside each token. */
+   Movement 1 (b1): Fig 21: 100,000 slow lanes in parallel crush 4 fast CPU cores on 1B independent numbers.
+   Movement 2 (b2): Fig 22: Serial chain failure mode: step 1 → step 2 → step 3 forces 99,999 lanes idle.
+   Movement 3 (b3): Single-lane speed gap: 1 CPU core runs 5–10× faster than a single GPU lane on sequential code.
+   Movement 4 (b4): LLM Token synthesis: serial between tokens, but 16.7M parallel multiply-adds inside each token. */
 
 V.scene('ch04_s04', S => {
   const { fx } = S;
-  const GX = 960, GY = 520;
+  const GX = 960;
 
   // Heading
-  const heading = S.heading('Why slow threads win, and where the bet fails', { y: 120 });
+  const heading = S.heading('why slow threads win, and where the bet fails', { y: 110 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Top Section: Parallel speedup vs Handful of fast cores
-  const topCard = S.card({
-    x: GX - 630, y: 175, w: 1260, h: 215,
-    tone: 'compute', title: ''
-  });
-  const topTitle = S.text('INDEPENDENT WORKLOAD (1 BILLION NUMBERS) · PARALLEL LANES CRUSH FAST CORES', {
-    x: GX - 590, y: 212, size: 22, weight: 700, color: 'compute'
-  });
-
-  // CPU 4 cores row
-  const cpuRowY = 270;
-  const cpuBar = S.rect({ x: GX - 590, y: cpuRowY - 20, w: 1180, h: 38, r: 6, fill: '#1d2a45', stroke: S.tone('struct'), sw: 1.5 });
-  const cpuLbl = S.text('CPU: 4–16 Fast Cores', { x: GX - 565, y: cpuRowY + 5, size: 22, color: 'struct', weight: 700 });
-  const cpuTime = S.text('~1,200 ms (serial queue)', { x: GX + 100, y: cpuRowY + 5, size: 22, color: 'muted', weight: 600 });
-  const cpuPill = S.pill('1× Baseline', { x: GX + 470, y: cpuRowY - 2, h: 36, tone: 'struct', size: 22, weight: 700 });
-
-  // GPU 100k lanes row
-  const gpuRowY = 335;
-  const gpuBar = S.rect({ x: GX - 590, y: gpuRowY - 20, w: 1180, h: 38, r: 6, fill: S.tone('compute'), stroke: S.tone('compute'), sw: 1 });
-  const gpuLbl = S.text('GPU: 100,000+ Slow Lanes', { x: GX - 565, y: gpuRowY + 5, size: 22, color: '#0a0f1e', weight: 700 });
-  const gpuTime = S.text('~1.5 ms (all lanes active)', { x: GX + 100, y: gpuRowY + 5, size: 22, color: '#0a0f1e', weight: 700 });
-  const gpuPill = S.pill('800× FASTER', { x: GX + 470, y: gpuRowY - 2, h: 36, tone: 'compute', size: 22, weight: 700 });
-
-  // Middle Section: Where the bet loses (Serial dependency chain)
-  const midCard = S.card({
-    x: GX - 630, y: 415, w: 1260, h: 200,
-    tone: 'bytes', title: ''
-  });
-  const midTitle = S.text('WHERE THE BET LOSES: STRICT SERIAL DEPENDENCY CHAINS', {
-    x: GX - 590, y: 452, size: 22, weight: 700, color: 'bytes'
+  // ================================================================ TOP PANEL: Fig 21 Independent Workload
+  const topW = 1420, topH = 300;
+  const topY = 180;
+  const topBg = S.rect({
+    x: GX - topW / 2, y: topY, w: topW, h: topH, r: 16,
+    fill: '#0a0f1d', stroke: S.tone('compute'), sw: 1.5
   });
 
-  // Serial chain diagram: Step 1 -> Step 2 -> Step 3
-  const chainY = 530;
-  const s1 = S.pill('Step 1 (active)', { x: GX - 420, y: chainY, h: 42, tone: 'bytes', size: 22, weight: 700 });
-  const a1 = S.line({ x1: GX - 310, y1: chainY, x2: GX - 230, y2: chainY, stroke: S.tone('bytes'), sw: 3, arrow: true });
+  const topTitle = S.text('fig 21 · independent workload (1 billion numbers) · parallel lanes win', {
+    x: GX - topW / 2 + 32, y: topY + 40, size: 22, weight: 700, color: 'compute'
+  });
+
+  // CPU Row
+  const cpuY = topY + 80;
+  const cpuW = 1356, barH = 50;
+  const cpuBox = S.rect({
+    x: GX - cpuW / 2, y: cpuY, w: cpuW, h: barH, r: 8,
+    fill: '#15243d', stroke: S.tone('struct'), sw: 1.5
+  });
+  const cpuName = S.text('cpu: 4–16 fast cores', {
+    x: GX - cpuW / 2 + 24, y: cpuY + barH / 2, size: 22, weight: 700, color: 'struct'
+  });
+  const cpuDesc = S.text('serial queue · ~1,200 ms total time', {
+    x: GX - 40, y: cpuY + barH / 2, size: 22, anchor: 'middle', weight: 600, color: 'muted'
+  });
+  const cpuBadge = S.pill('1× baseline', {
+    x: GX + cpuW / 2 - 120, y: cpuY + barH / 2, h: 36, tone: 'struct', size: 20, weight: 700
+  });
+
+  // GPU Row
+  const gpuY = topY + 155;
+  const gpuBox = S.rect({
+    x: GX - cpuW / 2, y: gpuY, w: cpuW, h: barH + 40, r: 8,
+    fill: '#2b1c0a', stroke: S.tone('compute'), sw: 2
+  });
+  const gpuName = S.text('gpu: 100,000+ slow lanes', {
+    x: GX - cpuW / 2 + 24, y: gpuY + 30, size: 22, weight: 700, color: 'compute'
+  });
+  const gpuDesc = S.text('all lanes active · 1.5 ms total', {
+    x: GX - 40, y: gpuY + 30, size: 22, anchor: 'middle', weight: 600, color: 'ink'
+  });
+  const gpuBadge = S.pill('800× faster', {
+    x: GX + cpuW / 2 - 120, y: gpuY + 30, h: 36, tone: 'compute', size: 20, weight: 700
+  });
+
+  // Dense micro-grid of lanes inside GPU row
+  const laneDots = S.g();
+  const dStartX = GX - cpuW / 2 + 24;
+  const dY = gpuY + 58;
+  for (let i = 0; i < 48; i++) {
+    const dot = S.rect({
+      x: dStartX + i * 27.5, y: dY, w: 20, h: 18, r: 3,
+      fill: '#f59e0b', stroke: '#d97706', sw: 1
+    }, laneDots);
+    dot.setAttribute('data-audit', 'ignore');
+  }
+
+  // ================================================================ BOTTOM PANEL: Fig 22 Failure Mode & LLM Reality
+  const botW = 1420, botH = 340;
+  const botY = 510;
+  const botBg = S.rect({
+    x: GX - botW / 2, y: botY, w: botW, h: botH, r: 16,
+    fill: '#0a0f1d', stroke: S.tone('bytes'), sw: 1.5
+  });
+
+  const botTitle = S.text('fig 22 · where the bet loses: serial chains vs llm decode reality', {
+    x: GX - botW / 2 + 32, y: botY + 40, size: 22, weight: 700, color: 'bytes'
+  });
+
+  // Serial Chain Row: Step 1 -> Step 2 -> Step 3
+  const chainY = botY + 85;
+  const s1 = S.pill('step 1 (active)', { x: GX - 480, y: chainY, h: 42, tone: 'bytes', size: 20, weight: 700 });
+  const a1 = S.line({ x1: GX - 365, y1: chainY, x2: GX - 295, y2: chainY, stroke: S.tone('bytes'), sw: 2.5, arrow: true });
   a1.setAttribute('data-audit', 'ignore');
 
-  const s2 = S.pill('Step 2 (waiting)', { x: GX - 120, y: chainY, h: 42, tone: 'neutral', size: 22, weight: 700 });
-  const a2 = S.line({ x1: GX - 10, y1: chainY, x2: GX + 70, y2: chainY, stroke: '#405275', sw: 3, arrow: true });
+  const s2 = S.pill('step 2 (waiting)', { x: GX - 180, y: chainY, h: 42, tone: 'neutral', size: 20, weight: 600 });
+  const a2 = S.line({ x1: GX - 65, y1: chainY, x2: GX + 5, y2: chainY, stroke: '#475569', sw: 2.5, arrow: true });
   a2.setAttribute('data-audit', 'ignore');
 
-  const s3 = S.pill('Step 3 (waiting)', { x: GX + 170, y: chainY, h: 42, tone: 'neutral', size: 22, weight: 700 });
-  const idleBadge = S.pill('99,999 LANES FORCED IDLE', { x: GX + 460, y: chainY, h: 42, tone: 'bytes', size: 22, weight: 700 });
+  const s3 = S.pill('step 3 (waiting)', { x: GX + 120, y: chainY, h: 42, tone: 'neutral', size: 20, weight: 600 });
 
-  // Bottom Section: Token Generation Synthesis
-  const botCard = S.card({
-    x: GX - 630, y: 640, w: 1260, h: 205,
-    tone: 'helps', title: ''
-  });
-  const botTitle = S.text('LLM INFERENCE REALITY · SERIAL OUTSIDE, MASSIVELY PARALLEL INSIDE', {
-    x: GX - 590, y: 678, size: 22, weight: 700, color: 'helps'
+  const idleWarning = S.pill('99,999 lanes forced idle', {
+    x: GX + 460, y: chainY, h: 42, tone: 'bytes', size: 20, weight: 700
   });
 
-  const bTok1 = S.pill('Token N', { x: GX - 400, y: 755, h: 42, tone: 'struct', size: 22, weight: 700 });
-  const tokArrow = S.line({ x1: GX - 300, y1: 755, x2: GX - 210, y2: 755, stroke: S.tone('helps'), sw: 3, arrow: true });
+  // Single Lane Speed difference callout
+  const speedBoxY = botY + 155;
+  const speedBox = S.rect({
+    x: GX - botW / 2 + 24, y: speedBoxY, w: botW - 48, h: 54, r: 8,
+    fill: '#15243d', stroke: '#334155', sw: 1
+  });
+  const speedText = S.text('on strict sequential code, 1 cpu core outruns 1 gpu lane by 5× to 10×', {
+    x: GX, y: speedBoxY + 27, size: 22, anchor: 'middle', weight: 600, color: 'struct'
+  });
+
+  // LLM Token Generation Synthesis
+  const llmY = botY + 245;
+  const tok1 = S.pill('token n', { x: GX - 480, y: llmY, h: 42, tone: 'struct', size: 20, weight: 700 });
+  const tokArrow = S.line({ x1: GX - 395, y1: llmY, x2: GX - 325, y2: llmY, stroke: S.tone('helps'), sw: 2.5, arrow: true });
   tokArrow.setAttribute('data-audit', 'ignore');
-  const bTok2 = S.pill('Token N+1', { x: GX - 110, y: 755, h: 42, tone: 'struct', size: 22, weight: 700 });
 
-  const insideBadge = S.pill('INSIDE EACH TOKEN: 16.7M PARALLEL MULTIPLY-ADDS', {
-    x: GX + 290, y: 755, h: 44, tone: 'helps', size: 22, weight: 700
+  const tok2 = S.pill('token n+1', { x: GX - 210, y: llmY, h: 42, tone: 'struct', size: 20, weight: 700 });
+
+  const matPill = S.pill('inside each token: 16,777,216 parallel multiply-adds (lanes stay fed!)', {
+    x: GX + 260, y: llmY, h: 44, tone: 'helps', size: 20, weight: 700
   });
 
   // Initial visibility
-  S.set([topCard, topTitle, cpuBar, cpuLbl, cpuTime, cpuPill, gpuBar, gpuLbl, gpuTime, gpuPill], { autoAlpha: 0 });
-  S.set([midCard, midTitle, s1, a1, s2, a2, s3, idleBadge], { autoAlpha: 0 });
-  S.set([botCard, botTitle, bTok1, tokArrow, bTok2, insideBadge], { autoAlpha: 0 });
+  S.set([topBg, topTitle, cpuBox, cpuName, cpuDesc, cpuBadge, gpuBox, gpuName, gpuDesc, gpuBadge, laneDots], { autoAlpha: 0 });
+  S.set([botBg, botTitle, s1, s2, s3, idleWarning, speedBox, speedText, tok1, tok2, matPill], { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: Parallel victory
-  S.add(fx.in(topCard, { from: 'scale', d: 0.5 }), 'b1~workload-0.2');
-  S.add(fx.in([topTitle, cpuBar, cpuLbl, cpuTime, cpuPill, gpuBar, gpuLbl, gpuTime, gpuPill], { from: 'up', d: 0.5, stagger: 0.05 }), 'b1~workload');
-  S.add(fx.pulse([gpuBar, gpuPill], { scale: 1.05, d: 0.5 }), 'b1~thousand');
+  S.add(fx.in([topBg, topTitle], { from: 'fade', d: 0.5 }), 'b1~workload-0.2');
+  S.add(fx.in([cpuBox, cpuName, cpuDesc, cpuBadge], { from: 'fade', d: 0.4 }), 'b1~workload');
+  S.add(fx.in([gpuBox, gpuName, gpuDesc, gpuBadge, laneDots], { from: 'fade', d: 0.5 }), 'b1~thousand-0.1');
+  S.add(fx.pulse([gpuBox, gpuBadge], { scale: 1.04, d: 0.4 }), 'b1~thousand');
 
   // ---------------------------------------------------------------- b2: Serial chain failure
-  S.add(fx.in([midCard, midTitle, s1, a1, s2, a2, s3, idleBadge], { from: 'up', d: 0.5 }), 'b2~lose-0.2');
-  S.add(fx.pulse(idleBadge, { scale: 1.05, d: 0.5 }), 'b2~chain');
+  S.add(fx.in([botBg, botTitle, s1, s2, s3, idleWarning], { from: 'fade', d: 0.5 }), 'b2~lose-0.2');
+  S.add(fx.pulse(idleWarning, { scale: 1.06, d: 0.5 }), 'b2~chain');
 
-  // ---------------------------------------------------------------- b3: Speed difference
-  S.add(fx.pulse(s1, { scale: 1.05, d: 0.4 }), 'b3~lane');
+  // ---------------------------------------------------------------- b3: Single lane speed difference
+  S.add(fx.in([speedBox, speedText], { from: 'fade', d: 0.4 }), 'b3~lane-0.2');
+  S.add(fx.pulse([speedBox, speedText], { scale: 1.03, d: 0.4 }), 'b3~slower');
 
   // ---------------------------------------------------------------- b4: LLM Token synthesis
-  S.add(fx.in([botCard, botTitle, bTok1, tokArrow, bTok2, insideBadge], { from: 'up', d: 0.5 }), 'b4~tokens-0.2');
-  S.add(fx.pulse(insideBadge, { scale: 1.05, d: 0.5 }), 'b4~matrix');
+  S.add(fx.in([tok1, tok2, matPill], { from: 'fade', d: 0.5 }), 'b4~tokens-0.2');
+  S.add(fx.pulse(matPill, { scale: 1.05, d: 0.5 }), 'b4~matrix');
 
-  // Concluding Takeaway pill
-  const takeaway = S.pill('the workload has vast parallelism: the challenge is keeping the lanes fed', {
-    x: GX, y: 990, h: 48, tone: 'helps', size: 22, weight: 600, style: 'solid'
+  // Concluding Takeaway band
+  const takeaway = S.takeaway('the workload has vast parallelism; the challenge is keeping the lanes fed', {
+    tone: 'compute'
   });
   S.set(takeaway, { autoAlpha: 0 });
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
