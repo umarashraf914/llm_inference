@@ -1,235 +1,331 @@
 /* ch00_common.js · Shared visual components for Chapter 00 ("Cold open: a thousand trillion, waiting") */
 
 /**
- * Creates the Die Counter & 99% Waiting Timeline Visual
+ * Physical Silicon Compute Die
+ * Represents the 29 mm x 29 mm (814 mm²) H100 die with internal 132 SM micro-grid.
  */
-function ch00DieCounter(S, opts = {}) {
+function ch00Die(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
-  const w = opts.w ?? 1360;
-  const h = opts.h ?? 480;
+  const cy = opts.cy ?? 460;
+  const size = opts.size ?? 260; // 260x260 px square
+  const half = size / 2;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  // Substrate / carrier plate
+  const subPad = 26;
+  const subW = size + subPad * 2;
+  const subH = size + subPad * 2;
+  const substrate = S.rect({
+    x: cx - subW / 2, y: cy - subH / 2, w: subW, h: subH, r: 16,
+    fill: '#0d1527', stroke: '#223254', sw: 2, filter: 'url(#shadow)'
   }, g);
 
-  const title = S.text('SPECIFICATION VS REALITY: A THOUSAND TRILLION OPERATIONS, WAITING', {
-    x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
+  // Pin perimeter marks on substrate
+  const pinGroup = S.g(null, g);
+  const pinCount = 14;
+  const step = subW / (pinCount + 1);
+  for (let i = 1; i <= pinCount; i++) {
+    // Top & bottom edge gold pins
+    S.line({ x1: cx - subW / 2 + i * step, y1: cy - subH / 2 + 3, x2: cx - subW / 2 + i * step, y2: cy - subH / 2 + 12, stroke: '#d4af37', sw: 2, strokeOpacity: 0.7 }, pinGroup);
+    S.line({ x1: cx - subW / 2 + i * step, y1: cy + subH / 2 - 12, x2: cx - subW / 2 + i * step, y2: cy + subH / 2 - 3, stroke: '#d4af37', sw: 2, strokeOpacity: 0.7 }, pinGroup);
+    // Left & right edge pins
+    S.line({ x1: cx - subW / 2 + 3, y1: cy - subH / 2 + i * step, x2: cx - subW / 2 + 12, y2: cy - subH / 2 + i * step, stroke: '#d4af37', sw: 2, strokeOpacity: 0.7 }, pinGroup);
+    S.line({ x1: cx + subW / 2 - 12, y1: cy - subH / 2 + i * step, x2: cx + subW / 2 - 3, y2: cy - subH / 2 + i * step, stroke: '#d4af37', sw: 2, strokeOpacity: 0.7 }, pinGroup);
+  }
+
+  // Silicon die body
+  const dieBody = S.rect({
+    x: cx - half, y: cy - half, w: size, h: size, r: 8,
+    fill: '#15110a', stroke: S.tone('compute'), strokeOpacity: 0.9, sw: 2.5
   }, g);
 
-  // Left: Silicon Die Card (29mm x 29mm, 814 mm²)
-  const dieW = 480;
-  const dieH = 240;
-  const dieX = cx - w / 2 + 50;
-  const dieY = cy - 135;
+  // Pin 1 orientation dot (top-left)
+  const pin1 = S.circle({ cx: cx - half + 14, cy: cy - half + 14, r: 3.5, fill: '#d4af37' }, g);
 
-  const dieCard = S.card({ x: dieX, y: dieY, w: dieW, h: dieH, tone: 'compute', title: '' }, g);
-  const dieTitle = S.text('H100 COMPUTE DIE: 814 mm²', {
-    x: dieX + dieW / 2, y: dieY + 36, size: 22, anchor: 'middle', weight: 700, color: 'compute'
-  }, g);
-  const dieSub = S.text('29 mm × 29 mm · Postage Stamp Silicon Die', {
-    x: dieX + dieW / 2, y: dieY + 70, size: 20, anchor: 'middle', weight: 600, color: 'muted'
-  }, g);
-  dieSub.setAttribute('data-audit', 'ignore');
+  // Internal microscopic 11 x 12 SM grid (132 Streaming Multiprocessors)
+  const smGrid = S.g(null, g);
+  const rows = 11, cols = 12;
+  const pad = 12;
+  const gw = size - pad * 2;
+  const gh = size - pad * 2;
+  const cw = gw / cols;
+  const ch = gh / rows;
+  const smCells = [];
 
-  const dieStat1 = S.text('989.4 TRILLION OPS / SECOND', {
-    x: dieX + dieW / 2, y: dieY + 125, size: 24, anchor: 'middle', weight: 700, color: 'compute'
-  }, g);
-  const dieStat2 = S.text('16,896 CUDA Cores · 528 Tensor Cores', {
-    x: dieX + dieW / 2, y: dieY + 165, size: 20, anchor: 'middle', weight: 600, color: 'ink'
-  }, g);
-  dieStat2.setAttribute('data-audit', 'ignore');
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = S.rect({
+        x: cx - half + pad + c * cw + 1,
+        y: cy - half + pad + r * ch + 1,
+        w: cw - 2, h: ch - 2, r: 2,
+        fill: S.tone('compute'), fillOpacity: 0.12,
+        stroke: S.tone('compute'), strokeOpacity: 0.35, sw: 1
+      }, smGrid);
+      smCells.push(cell);
+    }
+  }
 
-  const diePill = S.pill('MASSIVE PARALLEL ARITHMETIC ENGINE', {
-    x: dieX + dieW / 2, y: dieY + dieH - 24, h: 36, tone: 'compute', size: 18, weight: 700
-  }, g);
-  diePill.setAttribute('data-audit', 'ignore');
+  // Cross channel bus lines inside die
+  const crossBus = S.g(null, g);
+  S.line({ x1: cx - half + pad, y1: cy, x2: cx + half - pad, y2: cy, stroke: S.tone('compute'), strokeOpacity: 0.7, sw: 2 }, crossBus);
+  S.line({ x1: cx, y1: cy - half + pad, x2: cx, y2: cy + half - pad, stroke: S.tone('compute'), strokeOpacity: 0.7, sw: 2 }, crossBus);
 
-  // Right: 30 ms Token Timeline Visual
-  const timeW = 730;
-  const timeH = 240;
-  const timeX = cx + w / 2 - timeW - 50;
-  const timeY = cy - 135;
-
-  const timeCard = S.card({ x: timeX, y: timeY, w: timeW, h: timeH, tone: 'bytes', title: '' }, g);
-  const timeTitle = S.text('ONE GENERATED TOKEN TIMELINE (≈ 30 MILLISECONDS)', {
-    x: timeX + timeW / 2, y: timeY + 36, size: 22, anchor: 'middle', weight: 700, color: 'bytes'
+  // Dimensions & Labels
+  const topBracket = S.bracket({
+    x1: cx - half, x2: cx + half, y: cy - half - 16,
+    label: '29 mm', up: true
   }, g);
 
-  // Timeline bar graphic
-  const barX = timeX + 35;
-  const barY = timeY + 80;
-  const barW = timeW - 70;
-  const barH = 50;
+  // Right edge bracket
+  const rightBracket = S.g(null, g);
+  const rbX = cx + half + 18;
+  S.line({ x1: rbX, y1: cy - half, x2: rbX + 8, y2: cy - half, stroke: S.tone('muted'), sw: 2 }, rightBracket);
+  S.line({ x1: rbX, y1: cy + half, x2: rbX + 8, y2: cy + half, stroke: S.tone('muted'), sw: 2 }, rightBracket);
+  S.line({ x1: rbX + 4, y1: cy - half, x2: rbX + 4, y2: cy + half, stroke: S.tone('muted'), sw: 2 }, rightBracket);
+  const sideLabel = S.text('29 mm', { x: rbX + 16, y: cy + 6, size: 22, anchor: 'start', color: 'muted', weight: 600, family: 'mono' }, rightBracket);
 
-  // Background full bar (waiting)
-  const waitBar = S.rect({ x: barX, y: barY, w: barW, h: barH, r: 6, fill: S.tone('bytes', 0.25), stroke: S.tone('bytes', 0.8), sw: 1.5 }, g);
-  // Tiny arithmetic sliver on left (under 1% -> visually ~15px wide)
-  const calcBar = S.rect({ x: barX, y: barY, w: 20, h: barH, r: 6, fill: S.tone('compute', 0.9), stroke: S.tone('compute', 1.0), sw: 1.5 }, g);
+  const areaPill = S.pill('814 mm²', {
+    x: cx, y: cy + half + 42, h: 36, tone: 'compute', size: 20, weight: 650, mono: true
+  });
+  g.appendChild(areaPill);
 
-  const calcLabel = S.text('CALCULATION: < 1% (≈ 0.1 ms)', {
-    x: barX + 25, y: barY - 10, size: 18, weight: 700, color: 'compute'
-  }, g);
-  calcLabel.setAttribute('data-audit', 'ignore');
-
-  const waitLabel = S.text('WAITING FOR DATA FROM MEMORY: > 99% (≈ 30 ms)', {
-    x: barX + barW / 2 + 20, y: barY + 32, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
-  }, g);
-  waitLabel.setAttribute('data-audit', 'ignore');
-
-  const timePill = S.pill('THE ENGINE SPENDS > 99% OF ITS TIME WAITING FOR BYTES', {
-    x: timeX + timeW / 2, y: timeY + timeH - 24, h: 36, tone: 'bytes', size: 18, weight: 700
-  }, g);
-  timePill.setAttribute('data-audit', 'ignore');
-
-  const footer = S.pill('THE VAST ENGINE OF ARITHMETIC SPENDS MORE THAN NINETY-NINE PERCENT OF ITS TIME WAITING', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'bytes', size: 20, weight: 700
+  const dieLabel = S.text('compute die', {
+    x: cx, y: cy + half + 84, size: 24, anchor: 'middle', color: 'compute', weight: 600
   }, g);
 
   return {
-    group: g, card, title,
-    dieCard, dieTitle, dieSub, dieStat1, dieStat2, diePill,
-    timeCard, timeTitle, waitBar, calcBar, calcLabel, waitLabel, timePill,
-    footer
+    group: g, cx, cy, size, half,
+    substrate, pinGroup, dieBody, pin1, smGrid, smCells, crossBus,
+    topBracket, rightBracket, areaPill, dieLabel
   };
 }
 
 /**
- * Creates the 5,120-Wire Package Bottle Visual
+ * Proportional 30 ms Token Execution Timeline
+ * Accurately contrasts < 1% arithmetic (~0.1 ms) against > 99% waiting (~30 ms).
  */
-function ch00FiveThousandWires(S, opts = {}) {
+function ch00ProportionalTimeline(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
-  const w = opts.w ?? 1360;
-  const h = opts.h ?? 480;
+  const cy = opts.cy ?? 740;
+  const w = opts.w ?? 1380;
+  const h = opts.h ?? 58;
+  const x0 = cx - w / 2;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  // Background track
+  const track = S.rect({
+    x: x0, y: cy - h / 2, w, h, r: 8,
+    fill: '#0b1222', stroke: '#1c2844', sw: 2
   }, g);
 
-  const title = S.text('THE FIVE-THOUSAND-WIRE BOTTLE: 3,352 GB/s SETS THE PACE', {
-    x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
-  }, g);
+  // Proportional calculation width: 0.1 ms of 30 ms is 0.33%, visually clamped to 14px
+  const calcW = Math.max(14, Math.round(w * (0.14 / 30)));
+  const waitW = w - calcW;
 
-  const colW = 390;
-  const colGap = 25;
-  const startX = cx - (3 * colW + 2 * colGap) / 2;
-  const colY = cy - 145;
-  const colH = 250;
+  // Diagonal hatch lines for waiting section
+  const hatchGroup = S.g(null, g);
+  const waitX = x0 + calcW;
+  const waitRect = S.rect({
+    x: waitX, y: cy - h / 2, w: waitW, h, r: 6,
+    fill: S.tone('bytes', 0.18), stroke: S.tone('bytes', 0.8), sw: 1.5
+  }, hatchGroup);
 
-  const cols = [
-    {
-      title: 'ARITHMETIC DURATION',
-      stat: '0.1 MILLISECOND',
-      sub: 'Time to compute one token',
-      desc: '140 billion operations run in ~0.1 ms on 989 TFLOP/s hardware',
-      tone: 'compute'
-    },
-    {
-      title: 'THE 5,120-WIRE BUS',
-      stat: '3,352 GB/s BANDWIDTH',
-      sub: '5 HBM3 Stacks × 1,024 Wires',
-      desc: 'Microscopic silicon interposer bus setting the hardware pace',
-      tone: 'helps'
-    },
-    {
-      title: 'DATA MOVED PER TOKEN',
-      stat: '140 GIGABYTES',
-      sub: 'Weights read every single token',
-      desc: 'The chip is not slow: it is physically starved for data',
-      tone: 'bytes'
+  // Fine diagonal lines inside waitRect
+  const linesG = S.g(null, hatchGroup);
+  const lineSpacing = 16;
+  const numLines = Math.floor((waitW + h) / lineSpacing);
+  for (let i = 0; i < numLines; i++) {
+    const lx1 = waitX + i * lineSpacing;
+    const ly1 = cy + h / 2;
+    const lx2 = lx1 + h;
+    const ly2 = cy - h / 2;
+    if (lx1 >= waitX && lx2 <= waitX + waitW) {
+      S.line({ x1: lx1, y1: ly1, x2: lx2, y2: ly2, stroke: S.tone('bytes'), strokeOpacity: 0.14, sw: 1.5 }, linesG);
     }
-  ];
+  }
 
-  const colEls = [];
-  cols.forEach((c, idx) => {
-    const lx = startX + idx * (colW + colGap);
-    const bc = S.card({ x: lx, y: colY, w: colW, h: colH, tone: c.tone, title: '' }, g);
-    const ct = S.text(c.title, { x: lx + colW / 2, y: colY + 36, size: 20, anchor: 'middle', weight: 700, color: c.tone }, g);
-    const cs = S.text(c.stat, { x: lx + colW / 2, y: colY + 80, size: 22, anchor: 'middle', weight: 700, color: 'ink' }, g);
-    const cb = S.text(c.sub, { x: lx + colW / 2, y: colY + 120, size: 19, anchor: 'middle', weight: 600, color: c.tone }, g);
-    cb.setAttribute('data-audit', 'ignore');
-    const cd = S.text(c.desc, { x: lx + colW / 2, y: colY + 175, size: 18, anchor: 'middle', weight: 600, color: 'muted' }, g);
-    cd.setAttribute('data-audit', 'ignore');
-    colEls.push({ bc, ct, cs, cb, cd });
-  });
-
-  const footer = S.pill('EVERY WEIGHT MUST CROSS THAT BRIDGE: THE CHIP IS NOT SLOW, IT IS STARVED FOR DATA', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'bytes', size: 20, weight: 700
+  // Arithmetic sliver (amber solid glow)
+  const calcRect = S.rect({
+    x: x0, y: cy - h / 2, w: calcW, h, r: 6,
+    fill: S.tone('compute'), stroke: S.tone('compute'), sw: 2,
+    filter: 'url(#glow-compute)'
   }, g);
 
-  return { group: g, card, title, colEls, footer };
+  // Top labels
+  const calcLeader = S.g(null, g);
+  S.line({ x1: x0 + calcW / 2, y1: cy - h / 2, x2: x0 + calcW / 2, y2: cy - h / 2 - 24, stroke: S.tone('compute'), sw: 1.5 }, calcLeader);
+  const calcLabel = S.text('arithmetic: < 1% (≈ 0.1 ms)', {
+    x: x0 + calcW / 2 + 8, y: cy - h / 2 - 34, size: 22, anchor: 'start', color: 'compute', weight: 650
+  }, calcLeader);
+
+  const waitLabel = S.text('waiting for data from memory: > 99% (≈ 30 ms)', {
+    x: waitX + waitW / 2, y: cy + 1, size: 22, anchor: 'middle', color: 'ink', weight: 650
+  }, hatchGroup);
+
+  // Bottom time bracket (0 ms to 30 ms)
+  const timeBracket = S.bracket({
+    x1: x0, x2: x0 + w, y: cy + h / 2 + 14,
+    label: 'one generated token: 30 ms', up: false
+  }, g);
+
+  return {
+    group: g, cx, cy, w, h, x0,
+    track, calcRect, calcLeader, calcLabel,
+    waitRect, linesG, waitLabel, timeBracket
+  };
 }
 
 /**
- * Creates the What Is Inside the Package & Grand Title Visual
+ * Complete H100 Package Graphic with 5 HBM3 Stacks & 5,120-Wire Interposer Bus
  */
-function ch00InsidePackage(S, opts = {}) {
+function ch00Package(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
   const cy = opts.cy ?? 510;
-  const w = opts.w ?? 1360;
-  const h = opts.h ?? 480;
+  const scale = opts.scale ?? 1;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  const pw = 840 * scale;
+  const ph = 460 * scale;
+
+  // Substrate
+  const substrate = S.rect({
+    x: cx - pw / 2, y: cy - ph / 2, w: pw, h: ph, r: 24 * scale,
+    fill: '#0c1424', stroke: '#1d2c4d', sw: 2.5, filter: 'url(#shadow)'
   }, g);
 
-  const title = S.text('INSIDE THE PACKAGE: TRANSISTORS, CLOCK CYCLES, AND ARCHITECTURE', {
-    x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
-  }, g);
+  // Central compute die
+  const dw = 260 * scale, dh = 260 * scale;
+  const dieGroup = S.g(null, g);
+  const dieRect = S.rect({
+    x: cx - dw / 2, y: cy - dh / 2, w: dw, h: dh, r: 10 * scale,
+    fill: '#18120a', stroke: S.tone('compute'), strokeOpacity: 0.9, sw: 2.5
+  }, dieGroup);
+  const dieGrid = S.rect({
+    x: cx - dw / 2 + 8 * scale, y: cy - dh / 2 + 8 * scale,
+    w: dw - 16 * scale, h: dh - 16 * scale, r: 6 * scale,
+    fill: 'url(#die-grid)'
+  }, dieGroup);
+  const dieLabel = S.text('compute die', {
+    x: cx, y: cy + dh / 2 + 30 * scale, size: 22 * scale, anchor: 'middle', color: 'compute', weight: 650
+  }, dieGroup);
 
-  const colW = 390;
-  const colGap = 25;
-  const startX = cx - (3 * colW + 2 * colGap) / 2;
-  const colY = cy - 145;
-  const colH = 250;
+  // Five HBM3 stacks: 3 on left, 2 on right (as on physical H100 with 5 populated stacks)
+  const sw = 110 * scale, sh = 88 * scale, gapY = 16 * scale;
+  const leftTotalH = 3 * sh + 2 * gapY;
+  const rightTotalH = 2 * sh + 1 * gapY;
 
-  const pillars = [
-    {
-      name: '132 MULTIPROCESSORS',
-      sub: 'Floor Plan of Identical SMs',
-      detail: '16,896 CUDA arithmetic lanes',
-      stat: '528 Fourth-Gen Tensor Cores',
-      tone: 'compute'
-    },
-    {
-      name: 'THE MEMORY LADDER',
-      sub: 'Latency Gap Across Levels',
-      detail: 'Register File: 1 clock tick',
-      stat: 'HBM Memory: ~479 clock ticks',
-      tone: 'bytes'
-    },
-    {
-      name: '64 WARPS LATENCY HIDING',
-      sub: 'Zero-Overhead Thread Swapping',
-      detail: 'Thousands of resident threads',
-      stat: 'Hardware switches instantly on stalls',
-      tone: 'helps'
+  const stacks = [];
+  const buses = [];
+
+  // Left 3 stacks
+  for (let i = 0; i < 3; i++) {
+    const sx = cx - pw / 2 + 38 * scale;
+    const sy = cy - leftTotalH / 2 + i * (sh + gapY);
+    // Left 3 stacks
+    const stG = S.g(null, g);
+    S.rect({ x: sx, y: sy, w: sw, h: sh, r: 8 * scale, fill: '#220e15', stroke: S.tone('bytes'), strokeOpacity: 0.85, sw: 2 }, stG);
+    // Layer lines in lower half
+    const lineY0 = sy + 36 * scale;
+    for (let k = 1; k < 4; k++) {
+      S.line({ x1: sx + 8 * scale, y1: lineY0 + k * 12 * scale, x2: sx + sw - 8 * scale, y2: lineY0 + k * 12 * scale, stroke: S.tone('bytes'), strokeOpacity: 0.35, sw: 1.5 }, stG);
     }
+    S.text('HBM3', { x: sx + sw / 2, y: sy + 22 * scale, size: 22 * scale, anchor: 'middle', color: 'bytes', weight: 650 }, stG);
+    stacks.push(stG);
+
+    // Bus path from stack to die
+    const bx1 = sx + sw, bx2 = cx - dw / 2;
+    const by = sy + sh / 2, dy = cy - dh / 2 + (i + 0.5) * (dh / 3);
+    const d = `M${bx1},${by} C${(bx1 + bx2) / 2},${by} ${(bx1 + bx2) / 2},${dy} ${bx2},${dy}`;
+    const bus = S.path({ d, stroke: S.tone('bytes'), sw: 6 * scale, strokeOpacity: 0.35 }, g);
+    bus.__d = d;
+    buses.push(bus);
+  }
+
+  // Right 2 stacks
+  for (let i = 0; i < 2; i++) {
+    const sx = cx + pw / 2 - 38 * scale - sw;
+    const sy = cy - rightTotalH / 2 + i * (sh + gapY);
+    // Left 3 stacks
+    const stG = S.g(null, g);
+    S.rect({ x: sx, y: sy, w: sw, h: sh, r: 8 * scale, fill: '#220e15', stroke: S.tone('bytes'), strokeOpacity: 0.85, sw: 2 }, stG);
+    // Layer lines in lower half
+    const lineY0 = sy + 36 * scale;
+    for (let k = 1; k < 4; k++) {
+      S.line({ x1: sx + 8 * scale, y1: lineY0 + k * 12 * scale, x2: sx + sw - 8 * scale, y2: lineY0 + k * 12 * scale, stroke: S.tone('bytes'), strokeOpacity: 0.35, sw: 1.5 }, stG);
+    }
+    S.text('HBM3', { x: sx + sw / 2, y: sy + 22 * scale, size: 22 * scale, anchor: 'middle', color: 'bytes', weight: 650 }, stG);
+    stacks.push(stG);
+
+    // Bus path from right stack to die
+    const bx1 = sx, bx2 = cx + dw / 2;
+    const by = sy + sh / 2, dy = cy - dh / 2 + (i + 0.5) * (dh / 2);
+    const d = `M${bx1},${by} C${(bx1 + bx2) / 2},${by} ${(bx1 + bx2) / 2},${dy} ${bx2},${dy}`;
+    const bus = S.path({ d, stroke: S.tone('bytes'), sw: 6 * scale, strokeOpacity: 0.35 }, g);
+    bus.__d = d;
+    buses.push(bus);
+  }
+
+  // Bus Bracket & Bandwidth tag
+  const busBadge = S.pill('5,120 wires · 3.35 TB/s', {
+    x: cx, y: cy - dh / 2 - 32 * scale, h: 40 * scale, tone: 'helps', size: 22 * scale, weight: 650, mono: true
+  });
+  g.appendChild(busBadge);
+
+  return {
+    group: g, cx, cy, pw, ph,
+    substrate, dieGroup, dieRect, dieGrid, dieLabel,
+    stacks, buses, busBadge
+  };
+}
+
+/**
+ * Memory Ladder Latency Comparison (1 tick to 479 ticks)
+ */
+function ch00MemoryLadder(S, opts = {}) {
+  const g = S.g(null, opts.parent);
+  const cx = opts.cx ?? 960;
+  const cy = opts.cy ?? 510;
+  const w = opts.w ?? 920;
+  const h = opts.h ?? 360;
+
+  const rungs = [
+    { name: 'registers', ticks: '1 tick', ns: '0.55 ns', tone: 'compute', frac: 0.02 },
+    { name: 'shared memory / L1', ticks: '≈ 20 ticks', ns: '11 ns', tone: 'helps', frac: 0.12 },
+    { name: 'L2 cache', ticks: '≈ 50 ticks', ns: '27 ns', tone: 'struct', frac: 0.25 },
+    { name: 'HBM3 main memory', ticks: '≈ 479 ticks', ns: '260 ns', tone: 'bytes', frac: 1.0 }
   ];
 
-  const colEls = [];
-  pillars.forEach((p, idx) => {
-    const lx = startX + idx * (colW + colGap);
-    const bc = S.card({ x: lx, y: colY, w: colW, h: colH, tone: p.tone, title: '' }, g);
-    const pn = S.text(p.name, { x: lx + colW / 2, y: colY + 36, size: 20, anchor: 'middle', weight: 700, color: p.tone }, g);
-    const ps = S.text(p.sub, { x: lx + colW / 2, y: colY + 75, size: 19, anchor: 'middle', weight: 600, color: 'ink' }, g);
-    ps.setAttribute('data-audit', 'ignore');
-    const pd = S.text(p.detail, { x: lx + colW / 2, y: colY + 125, size: 19, anchor: 'middle', weight: 600, color: 'muted' }, g);
-    pd.setAttribute('data-audit', 'ignore');
-    const pt = S.text(p.stat, { x: lx + colW / 2, y: colY + 185, size: 20, anchor: 'middle', weight: 700, color: p.tone }, g);
-    colEls.push({ bc, pn, ps, pd, pt });
+  const rungH = 52;
+  const rungGap = 24;
+  const startY = cy - ((rungs.length * rungH + (rungs.length - 1) * rungGap) / 2) + rungH / 2;
+
+  const rows = [];
+  rungs.forEach((r, idx) => {
+    const ry = startY + idx * (rungH + rungGap);
+    const rg = S.g(null, g);
+
+    // Label on left
+    const nameLabel = S.text(r.name, {
+      x: cx - w / 2, y: ry, size: 24, color: r.tone, weight: 650
+    }, rg);
+
+    // Horizontal bar
+    const barX = cx - w / 2 + 280;
+    const maxBarW = w - 460;
+    const barW = Math.max(14, maxBarW * r.frac);
+
+    const bar = S.rect({
+      x: barX, y: ry - rungH / 2 + 6, w: barW, h: rungH - 12, r: 6,
+      fill: S.tone(r.tone, 0.25), stroke: S.tone(r.tone), sw: 2
+    }, rg);
+
+    // Latency readout on right
+    const tickLabel = S.text(`${r.ticks} (${r.ns})`, {
+      x: barX + barW + 16, y: ry, size: 22, anchor: 'start', color: 'ink', weight: 600, family: 'mono'
+    }, rg);
+
+    rows.push({ group: rg, nameLabel, bar, tickLabel });
   });
 
-  const footer = S.pill('INSIDE THE GPU: THE ARCHITECTURE OF HIGH-THROUGHPUT INFERENCE', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'struct', size: 20, weight: 700
-  }, g);
-
-  return { group: g, card, title, colEls, footer };
+  return { group: g, rows };
 }

@@ -1,53 +1,99 @@
 /* ch00_s02 · the five-thousand-wire bottle (cold open)
-   Movement 1 (b1): Arithmetic takes ~0.1 ms; rest spent waiting for memory.
-   Movement 2 (b2): Bus of 5,120 tiny wires between memory and die sets the pace.
-   Movement 3 (b3): 140 GB moved per token: chip is not slow, it is starved for data. */
+   Movement 1 (b1): Stopwatch: 0.1 ms arithmetic vs 30 ms memory wait (300x slower).
+   Movement 2 (b2): The physical H100 package: compute die flanked by 5 HBM3 stacks and 5,120 wires.
+   Movement 3 (b3): 140 GB streaming across the bus every token: the chip is starved for data. */
 
 V.scene('ch00_s02', S => {
   const { fx } = S;
   const GX = 960;
 
-  // Heading
-  const heading = S.heading('The five-thousand-wire bottle', { y: 110 });
+  // Scene heading
+  const heading = S.heading('The five-thousand-wire bottle', { y: 130 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Five Thousand Wires Visual
-  const wires = ch00FiveThousandWires(S, { cx: GX, cy: 510 });
+  // ---------------------------------------------------------------- Movement 1 (b1): Stopwatch & ratio
+  const m1Group = S.g();
 
-  // Concluding Takeaway pill
-  const takeaway = S.pill('the chip is not slow; it is starved for data', {
-    x: GX, y: 990, h: 48, tone: 'bytes', size: 22, weight: 600, style: 'solid'
+  // Stopwatch on left
+  const sw = libStopwatch(S, {
+    x: 680, y: 460, size: 210, span: 30, value: 0,
+    tone: 'bytes', unit: 'ms', readout: 'below', readoutSize: 32
+  }, m1Group);
+
+  // Comparison pill stack on right
+  const compGroup = S.g(null, m1Group);
+  const compX = 1180, compY = 460;
+  const compCard = S.card({
+    x: compX - 220, y: compY - 120, w: 440, h: 240,
+    tone: 'neutral', title: ''
+  }, compGroup);
+
+  const compTitle = S.text('token generation time', {
+    x: compX, y: compY - 70, size: 22, anchor: 'middle', color: 'ink', weight: 650
+  }, compGroup);
+
+  const pArith = S.pill('arithmetic: ≈ 0.1 ms', {
+    x: compX, y: compY - 14, h: 42, tone: 'compute', size: 20, weight: 650, mono: true
+  });
+  compGroup.appendChild(pArith);
+
+  const pWait = S.pill('waiting for memory: ≈ 30 ms', {
+    x: compX, y: compY + 44, h: 42, tone: 'bytes', size: 20, weight: 650, mono: true
+  });
+  compGroup.appendChild(pWait);
+
+  const ratioLabel = S.text('300× time spent waiting', {
+    x: compX, y: compY + 98, size: 20, anchor: 'middle', color: 'muted', weight: 600
+  }, compGroup);
+
+  // ---------------------------------------------------------------- Movement 2 & 3 (b2-b3): Package & Flows
+  const pkg = ch00Package(S, { cx: GX, cy: 510, scale: 1.15 });
+
+  // Weight moved stat pill below package
+  const rateTag = S.pill('140 GB read every single token', {
+    x: GX, y: 795, h: 40, tone: 'bytes', size: 20, weight: 650, mono: true
+  });
+  pkg.group.appendChild(rateTag);
+
+  // Takeaway band
+  const takeaway = S.takeaway('the chip is not slow; it is starved for data', {
+    tone: 'bytes'
   });
 
-  // Initial states
-  S.set([wires.card, wires.title, wires.footer], { autoAlpha: 0 });
-  wires.colEls.forEach(col => {
-    S.set(col.bc, { autoAlpha: 0 });
-    S.set([col.ct, col.cs, col.cb, col.cd], { autoAlpha: 0 });
+  // Initial hidden states
+  S.set([m1Group, pkg.group, rateTag, takeaway], { autoAlpha: 0 });
+
+  // ---------------------------------------------------------------- b1: 0.1 ms arithmetic vs 30 ms wait
+  S.add(fx.in(m1Group, { from: 'fade', d: 0.5 }), 'b1');
+  S.add(sw.run(0, 30, { d: 2.2, ease: 'power2.out' }), 'b1~tenth-0.2');
+  S.add(fx.pulse(pWait, { scale: 1.06, d: 0.4 }), 'b1~waiting');
+
+  // ---------------------------------------------------------------- b2: The 5,120-wire bus & 5 HBM stacks
+  S.add(fx.out(m1Group, { d: 0.35 }), 'b2-0.2');
+  S.add(fx.in(pkg.group, { from: 'fade', d: 0.6 }), 'b2~stacks-0.2');
+  S.add(fx.pulse(pkg.buses, { scale: 1.05, stagger: 0.04, d: 0.45 }), 'b2~wires');
+
+  // ---------------------------------------------------------------- b3: 140 GB streaming across wires
+  S.add(fx.in(rateTag, { from: 'up', d: 0.4 }), 'b3~weight-0.2');
+
+  // Particle flows along each of the 5 buses from HBM to die
+  pkg.buses.forEach(b => {
+    S.flow({
+      d: b.__d,
+      from: 'b3~weight',
+      to: 'end-0.5',
+      speed: 380,
+      every: 0.18,
+      size: 7,
+      color: S.tone('bytes')
+    });
   });
-  S.set(takeaway, { autoAlpha: 0 });
 
-  // ---------------------------------------------------------------- b1: 0.1 ms arithmetic
-  S.add(fx.in([wires.card, wires.title], { from: 'scale', d: 0.5 }), 'b1~arithmetic-0.2');
-  const c1 = wires.colEls[0];
-  S.add(fx.in(c1.bc, { from: 'scale', d: 0.4 }), 'b1~token');
-  S.add(fx.in([c1.ct, c1.cs], { from: 'fade', d: 0.35 }), 'b1~token');
-  S.add(fx.in([c1.cb, c1.cd], { from: 'fade', d: 0.35 }), 'b1~memory.');
-
-  // ---------------------------------------------------------------- b2: 5,120 wires
-  const c2 = wires.colEls[1];
-  S.add(fx.in(c2.bc, { from: 'scale', d: 0.4 }), 'b2~stacks-0.2');
-  S.add(fx.in([c2.ct, c2.cs], { from: 'fade', d: 0.35 }), 'b2~stacks');
-  S.add(fx.in([c2.cb, c2.cd], { from: 'fade', d: 0.35 }), 'b2~pace.');
-  S.add(fx.pulse([c2.bc, c2.cs], { scale: 1.04, d: 0.4 }), 'b2~pace.');
-
-  // ---------------------------------------------------------------- b3: 140 GB moved per token & starved
-  const c3 = wires.colEls[2];
-  S.add(fx.in(c3.bc, { from: 'scale', d: 0.4 }), 'b3~weight-0.2');
-  S.add(fx.in([c3.ct, c3.cs], { from: 'fade', d: 0.35 }), 'b3~weight');
-  S.add(fx.in([c3.cb, c3.cd], { from: 'fade', d: 0.35 }), 'b3~data.');
-  S.add(fx.pulse([c3.bc, c3.cs], { scale: 1.04, d: 0.4 }), 'b3~data.');
-  S.add(fx.in(wires.footer, { from: 'up', d: 0.4 }), 'b3~data.');
+  // Die pulse as data strikes
+  S.add(gsap.to(pkg.dieRect, {
+    stroke: S.tone('compute'), strokeOpacity: 1,
+    fill: '#241a0e', repeat: 8, yoyo: true, duration: 0.35, ease: 'sine.inOut'
+  }), 'b3~token');
 
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b3>-0.8');
 });
