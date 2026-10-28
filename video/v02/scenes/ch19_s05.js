@@ -6,68 +6,41 @@
 
 V.scene('ch19_s05', S => {
   const { fx } = S;
-  const GX = 960, GY = 510;
+  const GX = 960;
 
   // Heading
-  const heading = S.heading('Multiplier area versus bit delivery', { y: 110 });
+  const heading = S.heading('multiplier area versus bit delivery', { y: 110 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Container card
-  const card = S.card({ x: GX - 680, y: GY - 240, w: 1360, h: 480, tone: 'neutral', title: '' });
-  const title = S.text('MULTIPLIER SILICON AREA VS OPERAND DELIVERY WIRES', {
-    x: GX, y: GY - 204, size: 24, anchor: 'middle', weight: 700, color: 'ink'
-  });
+  // Multiplier vs Delivery visual
+  const md = ch19MultiplierDelivery(S, { cx: GX, cy: 500 });
 
-  const colW = 580;
-  const colH = 260;
-  const colY = GY - 140;
-
-  // Left: Multiplier Area
-  const leftX = GX - colW - 20;
-  const lCard = S.card({ x: leftX, y: colY, w: colW, h: colH, tone: 'compute', title: '' });
-  const lTitle = S.text('SIGNIFICAND MULTIPLIER AREA (N²)', { x: leftX + colW / 2, y: colY + 36, size: 22, anchor: 'middle', weight: 700, color: 'compute' });
-  const lDesc1 = S.text('FP32: 24 × 24 = 576 AND Gates (Full 24-bit significand)', { x: leftX + colW / 2, y: colY + 85, size: 20, anchor: 'middle', weight: 600, color: 'ink' });
-  const lDesc2 = S.text('BF16: 8 × 8 = 64 AND Gates (1/9th the silicon of FP32!)', { x: leftX + colW / 2, y: colY + 130, size: 20, anchor: 'middle', weight: 700, color: 'helps' });
-  const lPill = S.pill('BF16 MULTIPLIER IS HALF THE SIZE OF FP16', { x: leftX + colW / 2, y: colY + 205, h: 42, tone: 'compute', size: 20, weight: 700 });
-
-  // Right: H100 Real Throughput
-  const rightX = GX + 20;
-  const rCard = S.card({ x: rightX, y: colY, w: colW, h: colH, tone: 'helps', title: '' });
-  const rTitle = S.text('H100 REAL TENSOR THROUGHPUT', { x: rightX + colW / 2, y: colY + 36, size: 22, anchor: 'middle', weight: 700, color: 'helps' });
-  const rDesc1 = S.text('FP16 Rate: 989.4 TFLOP/s (16-bit operands)', { x: rightX + colW / 2, y: colY + 85, size: 20, anchor: 'middle', weight: 600, color: 'ink' });
-  const rDesc2 = S.text('BF16 Rate: 989.4 TFLOP/s (EXACT SAME 989.4 TFLOP/s)', { x: rightX + colW / 2, y: colY + 130, size: 20, anchor: 'middle', weight: 700, color: 'compute' });
-  const rPill = S.pill('OPERAND DELIVERY BANDWIDTH CAPS THROUGHPUT', { x: rightX + colW / 2, y: colY + 205, h: 42, tone: 'helps', size: 20, weight: 700 });
-
-  const footer = S.pill('OPERAND DELIVERY BANDWIDTH, NOT MULTIPLIER AREA, GOVERNS SPEED', {
-    x: GX, y: GY + 204, h: 42, tone: 'struct', size: 20, weight: 700
-  });
-
-  // Concluding Takeaway pill
-  const takeaway = S.pill('operand delivery bandwidth, not multiplier area, governs tensor core speed', {
-    x: GX, y: 990, h: 48, tone: 'struct', size: 22, weight: 600, style: 'solid'
+  // Concluding Takeaway band
+  const takeaway = S.takeaway('operand delivery bandwidth, not multiplier area, governs tensor core speed', {
+    tone: 'struct'
   });
 
   // Initial states
-  S.set([card, title, lCard, lTitle, lDesc1, lDesc2, lPill, rCard, rTitle, rDesc1, rDesc2, rPill, footer], { autoAlpha: 0 });
-  S.set(takeaway, { autoAlpha: 0 });
+  S.set([md.lCard, md.lTitle, md.lBox, md.lDesc1, md.lDesc2, md.lDesc3, md.lDesc4, md.lPill], { autoAlpha: 0 });
+  S.set([md.rCard, md.rTitle, md.rBox, md.rDesc1, md.rDesc2, md.rDesc3, md.rDesc4, md.rPill, takeaway], { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: Exponents add, significands multiply
-  S.add(fx.in([card, title], { from: 'scale', d: 0.5 }), 'b1~multiplying-0.2');
+  S.add(fx.in([md.lCard, md.lTitle, md.lBox], { from: 'up', d: 0.5 }), 'b1~multiplying-0.2');
 
   // ---------------------------------------------------------------- b2: Multiplier area (1/9th size)
-  S.add(fx.in([lCard, lTitle], { from: 'scale', d: 0.5 }), 'b2~eight-by-eight-0.2');
-  S.add(fx.in([lDesc1, lDesc2], { from: 'fade', d: 0.4 }), 'b2~sixty-four');
-  S.add(fx.in(lPill, { from: 'up', d: 0.4 }), 'b2~size');
+  S.add(fx.in([md.lDesc1, md.lDesc2, md.lDesc3, md.lDesc4], { from: 'fade', d: 0.4 }), 'b2~eight-by-eight-0.2');
+  S.add(fx.pulse([md.lCard, md.lDesc3], { scale: 1.03, d: 0.4 }), 'b2~sixty-four');
+  S.add(fx.in(md.lPill, { from: 'fade', d: 0.4 }), 'b2~size');
 
-  // ---------------------------------------------------------------- b3: Identical 989.4 TFLOP/s throughput
-  S.add(fx.in([rCard, rTitle], { from: 'scale', d: 0.5 }), 'b3~exact-0.2');
-  S.add(fx.in([rDesc1, rDesc2], { from: 'fade', d: 0.4 }), 'b3~nine');
-  S.add(fx.pulse([rCard, rDesc2], { scale: 1.05, d: 0.4 }), 'b3~trillion');
+  // ---------------------------------------------------------------- b3: H100 identical throughput (989.4 TFLOP/s)
+  S.add(fx.in([md.rCard, md.rTitle, md.rBox], { from: 'up', d: 0.5 }), 'b3~Yet-0.2');
+  S.add(fx.in([md.rDesc1, md.rDesc2], { from: 'fade', d: 0.4 }), 'b3~runs');
+  S.add(fx.pulse([md.rCard, md.rDesc2], { scale: 1.03, d: 0.4 }), 'b3~exact');
 
-  // ---------------------------------------------------------------- b4: Delivery wires govern speed
-  S.add(fx.in(rPill, { from: 'up', d: 0.4 }), 'b4~determines-0.2');
-  S.add(fx.in(footer, { from: 'up', d: 0.4 }), 'b4~tick.');
-  S.add(fx.pulse(footer, { scale: 1.05, d: 0.4 }), 'b4~tick.');
+  // ---------------------------------------------------------------- b4: Operand delivery bottleneck
+  S.add(fx.in([md.rDesc3, md.rDesc4], { from: 'fade', d: 0.4 }), 'b4~Silicon-0.2');
+  S.add(fx.in(md.rPill, { from: 'fade', d: 0.4 }), 'b4~wires');
+  S.add(fx.pulse(md.rPill, { scale: 1.03, d: 0.4 }), 'b4~tick.');
 
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
 });
