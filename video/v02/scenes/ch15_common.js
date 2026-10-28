@@ -1,29 +1,35 @@
-/* ch15_common.js · Shared visual components for Chapter 15 ("The memory wall") */
+/* ch15_common.js · Visual components for Chapter 15 ("The memory wall")
+   Figs 76, 77, 78, 79, 80, 81, 82, 83 from atlas:
+   - ch15GenTimeline: Four GPU generations (V100 -> A100 -> H100 -> B200) & diverging curves (Figs 76, 77, 78)
+   - ch15WireScales: Three connection scales across distance (package -> board -> cable) (Fig 79)
+   - ch15NarrowRidge: Narrow precision 8.1× ridge acceleration (139 -> 153 -> 590 -> 1,125 op/B) (Fig 80)
+   - ch15H200Proof: H100 vs H200 controlled experiment proof (+43% bandwidth = +43% tokens) (Figs 81, 82, 83)
+*/
 
 /**
- * Creates the four-generation scaling timeline (V100 -> A100 -> H100 -> B200)
+ * Creates the four-generation scaling timeline (Atlas Figs 76, 77, 78)
  */
 function ch15GenTimeline(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
+  const cy = opts.cy ?? 500;
   const w = opts.w ?? 1360;
   const h = opts.h ?? 480;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  const bg = S.rect({
+    x: cx - w / 2, y: cy - h / 2, w, h, r: 14,
+    fill: '#0f1422', stroke: '#222f48', sw: 1.5
   }, g);
 
-  const title = S.text('SEVEN YEARS OF ARCHITECTURES: THE WIDENING MEMORY WALL', {
+  const title = S.text('seven years of gpu architectures · the widening memory wall', {
     x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
   }, g);
 
   const gens = [
-    { name: 'V100 (2017)', proc: '12 nm', flop: '125 TFLOP/s', bw: '0.9 TB/s', ridge: '139 op/B' },
-    { name: 'A100 (2020)', proc: '7 nm', flop: '312 TFLOP/s', bw: '2.0 TB/s', ridge: '153 op/B' },
-    { name: 'H100 (2022)', proc: '4 nm', flop: '989 TFLOP/s', bw: '3.35 TB/s', ridge: '295 op/B' },
-    { name: 'B200 (2024)', proc: '4NP', flop: '2,250 TFLOP/s', bw: '8.0 TB/s', ridge: '281 op/B' }
+    { name: 'v100 (2017)', proc: '12 nm process', flop: '125 tflop/s', bw: '0.9 tb/s', ridge: '139 op/b', tone: 'helps' },
+    { name: 'a100 (2020)', proc: '7 nm process', flop: '312 tflop/s', bw: '2.0 tb/s', ridge: '153 op/b', tone: 'helps' },
+    { name: 'h100 (2022)', proc: '4 nm process', flop: '989 tflop/s', bw: '3.35 tb/s', ridge: '295 op/b', tone: 'compute' },
+    { name: 'b200 (2024)', proc: '4np process', flop: '2,250 tflop/s', bw: '8.0 tb/s', ridge: '281 op/b', tone: 'bytes' }
   ];
 
   const colW = 295;
@@ -35,68 +41,89 @@ function ch15GenTimeline(S, opts = {}) {
   const colEls = [];
   gens.forEach((gn, idx) => {
     const lx = startX + idx * (colW + colGap);
-    const bc = S.card({ x: lx, y: colY, w: colW, h: colH, tone: 'neutral', title: '' }, g);
-    const gnText = S.text(gn.name, { x: lx + colW / 2, y: colY + 36, size: 22, anchor: 'middle', weight: 700, color: 'ink' }, g);
-    const procText = S.text(gn.proc, { x: lx + colW / 2, y: colY + 68, size: 18, anchor: 'middle', weight: 600, color: 'muted' }, g);
+    const bc = S.rect({
+      x: lx, y: colY, w: colW, h: colH, r: 10,
+      fill: '#151c2e', stroke: S.tone(gn.tone), sw: 1.5
+    }, g);
+
+    const gnText = S.text(gn.name, {
+      x: lx + colW / 2, y: colY + 36, size: 22, anchor: 'middle', weight: 700, color: 'ink'
+    }, g);
+
+    const procText = S.text(gn.proc, {
+      x: lx + colW / 2, y: colY + 68, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+    }, g);
     procText.setAttribute('data-audit', 'ignore');
 
-    const flopBox = S.rect({ x: lx + 15, y: colY + 95, w: colW - 30, h: 42, r: 4, fill: S.tone('compute', 0.2), stroke: 'transparent' }, g);
-    const flopVal = S.text(gn.flop, { x: lx + colW / 2, y: colY + 122, size: 20, anchor: 'middle', weight: 700, color: 'compute' }, g);
+    const flopBox = S.rect({
+      x: lx + 15, y: colY + 95, w: colW - 30, h: 42, r: 6,
+      fill: '#241a14', stroke: S.tone('compute'), sw: 1
+    }, g);
+    const flopVal = S.text(gn.flop, {
+      x: lx + colW / 2, y: colY + 124, size: 20, anchor: 'middle', weight: 700, color: 'compute'
+    }, g);
 
-    const bwBox = S.rect({ x: lx + 15, y: colY + 145, w: colW - 30, h: 42, r: 4, fill: S.tone('bytes', 0.2), stroke: 'transparent' }, g);
-    const bwVal = S.text(gn.bw, { x: lx + colW / 2, y: colY + 172, size: 20, anchor: 'middle', weight: 700, color: 'bytes' }, g);
+    const bwBox = S.rect({
+      x: lx + 15, y: colY + 145, w: colW - 30, h: 42, r: 6,
+      fill: '#291418', stroke: S.tone('bytes'), sw: 1
+    }, g);
+    const bwVal = S.text(gn.bw, {
+      x: lx + colW / 2, y: colY + 174, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
+    }, g);
 
-    const ridgeVal = S.text(`Ridge: ${gn.ridge}`, { x: lx + colW / 2, y: colY + 224, size: 20, anchor: 'middle', weight: 700, color: 'struct' }, g);
+    const ridgeVal = S.text(`ridge: ${gn.ridge}`, {
+      x: lx + colW / 2, y: colY + 224, size: 20, anchor: 'middle', weight: 700, color: 'struct'
+    }, g);
 
-    colEls.push({ bc, gnText, flopBox, flopVal, bwBox, bwVal, ridgeVal });
+    colEls.push({ bc, gnText, procText, flopBox, flopVal, bwBox, bwVal, ridgeVal });
   });
 
-  const footer = S.pill('COMPUTE GREW 18× WHILE BANDWIDTH GREW ONLY 9× · RIDGE DOUBLED', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'bytes', size: 20, weight: 700
+  const footer = S.pill('compute grew 18× while bandwidth grew only 9× · ridge doubled to ~300 op/b', {
+    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
-  return { group: g, card, title, colEls, footer };
+  return { group: g, bg, title, colEls, footer };
 }
 
 /**
- * Creates the Wire vs Transistor Physical Constraints Visual
+ * Creates the Wire vs Transistor Physical Constraints Visual (Atlas Fig 79)
  */
 function ch15WireScales(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
+  const cy = opts.cy ?? 500;
   const w = opts.w ?? 1360;
   const h = opts.h ?? 480;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  const bg = S.rect({
+    x: cx - w / 2, y: cy - h / 2, w, h, r: 14,
+    fill: '#0f1422', stroke: '#222f48', sw: 1.5
   }, g);
 
-  const title = S.text('WHY WIRES CANNOT KEEP PACE WITH TRANSISTORS', {
+  const title = S.text('why wires cannot keep pace with shrinking transistors', {
     x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
   }, g);
 
   const scales = [
     {
-      title: 'ON PACKAGE (INTERPOSER)',
-      dist: 'Distance: Millimetres',
-      wires: '~1,024 Parallel Wires',
-      desc: 'Microscopic microbumps connect HBM stacks to die',
+      title: 'on package (interposer)',
+      dist: 'distance: millimetres',
+      wires: '~1,024 parallel wires',
+      desc: 'microscopic microbumps connect hbm die',
       tone: 'helps'
     },
     {
-      title: 'ACROSS BOARD (PCB)',
-      dist: 'Distance: Centimetres',
-      wires: '~64 Copper Traces',
-      desc: 'Traces crowd motherboard layers; physical spacing required',
+      title: 'across board (pcb)',
+      dist: 'distance: centimetres',
+      wires: '~64 copper traces',
+      desc: 'copper traces crowd board layers',
       tone: 'compute'
     },
     {
-      title: 'ACROSS ROOM (CABLE)',
-      dist: 'Distance: Metres',
-      wires: '4 High-Speed Pairs',
-      desc: 'Serial transceiver links; strict signal integrity physics',
+      title: 'across room (cable)',
+      dist: 'distance: metres',
+      wires: '4 high-speed pairs',
+      desc: 'serial transceiver differential links',
       tone: 'bytes'
     }
   ];
@@ -110,49 +137,62 @@ function ch15WireScales(S, opts = {}) {
   const scaleEls = [];
   scales.forEach((s, idx) => {
     const lx = startX + idx * (colW + colGap);
-    const bc = S.card({ x: lx, y: colY, w: colW, h: colH, tone: s.tone, title: '' }, g);
-    const st = S.text(s.title, { x: lx + colW / 2, y: colY + 36, size: 20, anchor: 'middle', weight: 700, color: s.tone }, g);
-    const sd = S.text(s.dist, { x: lx + colW / 2, y: colY + 75, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
-    const sw = S.text(s.wires, { x: lx + colW / 2, y: colY + 125, size: 24, anchor: 'middle', weight: 700, color: s.tone }, g);
+    const bc = S.rect({
+      x: lx, y: colY, w: colW, h: colH, r: 10,
+      fill: '#151c2e', stroke: S.tone(s.tone), sw: 1.5
+    }, g);
 
-    const descWords = s.desc.split('; ');
-    const sDesc = S.text(descWords[0], { x: lx + colW / 2, y: colY + 185, size: 18, anchor: 'middle', weight: 600, color: 'muted' }, g);
+    const st = S.text(s.title, {
+      x: lx + colW / 2, y: colY + 36, size: 20, anchor: 'middle', weight: 700, color: s.tone
+    }, g);
+
+    const sd = S.text(s.dist, {
+      x: lx + colW / 2, y: colY + 76, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+    }, g);
+
+    const sw = S.text(s.wires, {
+      x: lx + colW / 2, y: colY + 128, size: 24, anchor: 'middle', weight: 700, color: s.tone
+    }, g);
+
+    const sDesc = S.text(s.desc, {
+      x: lx + colW / 2, y: colY + 185, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+    }, g);
     sDesc.setAttribute('data-audit', 'ignore');
 
     scaleEls.push({ bc, st, sd, sw, sDesc });
   });
 
-  const footer = S.pill('LITHOGRAPHY SHRINKS TRANSISTORS · CONNECTION GEOMETRY CAPS WIRES', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'struct', size: 20, weight: 700
+  const footer = S.pill('lithography shrinks transistors · physical geometry caps wires', {
+    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
-  return { group: g, card, title, scaleEls, footer };
+  return { group: g, bg, title, scaleEls, footer };
 }
 
 /**
- * Creates the Narrow Precision Ridge Climb Visual
+ * Creates the Narrow Precision Ridge Climb Visual (Atlas Fig 80)
  */
 function ch15NarrowRidge(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
+  const cy = opts.cy ?? 500;
   const w = opts.w ?? 1360;
   const h = opts.h ?? 480;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  const bg = S.rect({
+    x: cx - w / 2, y: cy - h / 2, w, h, r: 14,
+    fill: '#0f1422', stroke: '#222f48', sw: 1.5
   }, g);
 
-  const title = S.text('NARROW PRECISION AND THE 8-FOLD RIDGE ACCELERATION', {
+  const title = S.text('narrow precision and the 8-fold ridge acceleration', {
     x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
   }, g);
 
   const formats = [
-    { gen: 'V100 (2017)', fmt: 'FP16 (16-bit)', ridge: '139 op / Byte', ratio: '1.0× Baseline', tone: 'helps', pct: 0.12 },
-    { gen: 'A100 (2020)', fmt: 'BF16 (16-bit)', ridge: '153 op / Byte', ratio: '1.1× Baseline', tone: 'helps', pct: 0.14 },
-    { gen: 'H100 (2022)', fmt: 'FP8 (8-bit)', ridge: '590 op / Byte', ratio: '4.2× Surge', tone: 'compute', pct: 0.52 },
-    { gen: 'B200 (2024)', fmt: 'FP4 (4-bit)', ridge: '1,125 op / Byte', ratio: '8.1× CLIMB', tone: 'bytes', pct: 1.00 }
+    { gen: 'v100 (2017)', fmt: 'fp16 (16-bit)', ridge: '139 op/b', ratio: '1.0× baseline', tone: 'helps', wPct: 0.12 },
+    { gen: 'a100 (2020)', fmt: 'bf16 (16-bit)', ridge: '153 op/b', ratio: '1.1× baseline', tone: 'helps', wPct: 0.14 },
+    { gen: 'h100 (2022)', fmt: 'fp8 (8-bit)', ridge: '590 op/b', ratio: '4.2× surge', tone: 'compute', wPct: 0.52 },
+    { gen: 'b200 (2024)', fmt: 'fp4 (4-bit)', ridge: '1,125 op/b', ratio: '8.1× climb', tone: 'bytes', wPct: 1.00 }
   ];
 
   const rowX0 = cx - 580;
@@ -162,65 +202,103 @@ function ch15NarrowRidge(S, opts = {}) {
 
   formats.forEach((f, idx) => {
     const ry = startY + idx * 65;
-    const rc = S.card({ x: rowX0, y: ry, w: rowW, h: 56, tone: f.tone, title: '' }, g);
-    const fg = S.text(f.gen, { x: rowX0 + 24, y: ry + 36, size: 20, weight: 700, color: 'ink' }, g);
-    const ff = S.text(f.fmt, { x: rowX0 + 320, y: ry + 36, size: 20, weight: 600, color: 'ink' }, g);
-    const fr = S.text(f.ridge, { x: rowX0 + 640, y: ry + 36, size: 20, weight: 700, color: f.tone }, g);
-    const fa = S.text(f.ratio, { x: rowX0 + rowW - 24, y: ry + 36, size: 20, anchor: 'end', weight: 700, color: f.tone }, g);
+    const rc = S.rect({
+      x: rowX0, y: ry, w: rowW, h: 56, r: 6,
+      fill: '#151c2e', stroke: S.tone(f.tone), sw: 1.5
+    }, g);
+
+    const fg = S.text(f.gen, {
+      x: rowX0 + 24, y: ry + 36, size: 20, weight: 700, color: 'ink'
+    }, g);
+
+    const ff = S.text(f.fmt, {
+      x: rowX0 + 280, y: ry + 36, size: 20, weight: 600, color: 'ink'
+    }, g);
+
+    const fr = S.text(f.ridge, {
+      x: rowX0 + 560, y: ry + 36, size: 20, weight: 700, color: f.tone
+    }, g);
+
+    const fa = S.text(f.ratio, {
+      x: rowX0 + rowW - 24, y: ry + 36, size: 20, anchor: 'end', weight: 700, color: f.tone
+    }, g);
+
     rowEls.push({ rc, fg, ff, fr, fa });
   });
 
-  const footer = S.pill('HALVING BITS DOUBLES COMPUTE ON SAME SILICON · RIDGE REACHES 1,125 OP/B', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'bytes', size: 20, weight: 700
+  const footer = S.pill('halving bits doubles compute on same silicon · ridge reaches 1,125 op/byte', {
+    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
-  return { group: g, card, title, rowEls, footer };
+  return { group: g, bg, title, rowEls, footer };
 }
 
 /**
- * Creates the H100 vs H200 Controlled Experiment Proof
+ * Creates the H100 vs H200 Controlled Experiment Proof (Atlas Figs 81, 82, 83)
  */
 function ch15H200Proof(S, opts = {}) {
   const g = S.g(null, opts.parent);
   const cx = opts.cx ?? 960;
-  const cy = opts.cy ?? 510;
+  const cy = opts.cy ?? 500;
   const w = opts.w ?? 1360;
   const h = opts.h ?? 480;
 
-  const card = S.card({
-    x: cx - w / 2, y: cy - h / 2, w, h,
-    tone: 'neutral', title: ''
+  const bg = S.rect({
+    x: cx - w / 2, y: cy - h / 2, w, h, r: 14,
+    fill: '#0f1422', stroke: '#222f48', sw: 1.5
   }, g);
 
-  const title = S.text('THE CONTROLLED EXPERIMENT: H100 VS H200 INFERENCE PROOF', {
+  const title = S.text('the controlled experiment · h100 vs h200 inference proof', {
     x: cx, y: cy - h / 2 + 36, size: 24, anchor: 'middle', weight: 700, color: 'ink'
   }, g);
 
-  const chipW = 580;
-  const chipH = 220;
+  const chipW = 590;
+  const chipH = 240;
   const chipY = cy - 150;
 
   // H100 Card
-  const h1Card = S.card({ x: cx - chipW - 20, y: chipY, w: chipW, h: chipH, tone: 'neutral', title: '' }, g);
-  const h1Title = S.text('H100 (STANDARD)', { x: cx - chipW / 2 - 20, y: chipY + 36, size: 22, anchor: 'middle', weight: 700, color: 'ink' }, g);
-  const h1Flop = S.text('Compute: 989.4 TFLOP/s (16-bit)', { x: cx - chipW / 2 - 20, y: chipY + 80, size: 20, anchor: 'middle', weight: 600, color: 'compute' }, g);
-  const h1Bw = S.text('Memory: 3.35 TB/s HBM3', { x: cx - chipW / 2 - 20, y: chipY + 120, size: 20, anchor: 'middle', weight: 700, color: 'bytes' }, g);
-  const h1Tok = S.text('70B Model: 47.9 Tokens / Sec', { x: cx - chipW / 2 - 20, y: chipY + 175, size: 22, anchor: 'middle', weight: 700, color: 'ink' }, g);
+  const h1Card = S.rect({
+    x: cx - chipW - 20, y: chipY, w: chipW, h: chipH, r: 10,
+    fill: '#151c2e', stroke: S.tone('struct'), sw: 1.5
+  }, g);
+  const h1Title = S.text('h100 (standard)', {
+    x: cx - chipW / 2 - 20, y: chipY + 38, size: 22, anchor: 'middle', weight: 700, color: 'struct'
+  }, g);
+  const h1Flop = S.text('compute: 989.4 tflop/s (16-bit)', {
+    x: cx - chipW / 2 - 20, y: chipY + 85, size: 20, anchor: 'middle', weight: 600, color: 'compute'
+  }, g);
+  const h1Bw = S.text('memory: 3.35 tb/s hbm3', {
+    x: cx - chipW / 2 - 20, y: chipY + 128, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
+  }, g);
+  const h1Tok = S.text('70b model: 47.9 tokens / sec', {
+    x: cx - chipW / 2 - 20, y: chipY + 185, size: 22, anchor: 'middle', weight: 700, color: 'ink'
+  }, g);
 
   // H200 Card
-  const h2Card = S.card({ x: cx + 20, y: chipY, w: chipW, h: chipH, tone: 'helps', title: '' }, g);
-  const h2Title = S.text('H200 (MEMORY UPGRADE)', { x: cx + chipW / 2 + 20, y: chipY + 36, size: 22, anchor: 'middle', weight: 700, color: 'helps' }, g);
-  const h2Flop = S.text('Compute: 989.4 TFLOP/s (Identical Die!)', { x: cx + chipW / 2 + 20, y: chipY + 80, size: 20, anchor: 'middle', weight: 600, color: 'compute' }, g);
-  const h2Bw = S.text('Memory: 4.80 TB/s HBM3e (+43%)', { x: cx + chipW / 2 + 20, y: chipY + 120, size: 20, anchor: 'middle', weight: 700, color: 'helps' }, g);
-  const h2Tok = S.text('70B Model: 68.6 Tokens / Sec (+43%)', { x: cx + chipW / 2 + 20, y: chipY + 175, size: 22, anchor: 'middle', weight: 700, color: 'helps' }, g);
+  const h2Card = S.rect({
+    x: cx + 20, y: chipY, w: chipW, h: chipH, r: 10,
+    fill: '#101c18', stroke: S.tone('helps'), sw: 1.5
+  }, g);
+  const h2Title = S.text('h200 (memory upgrade)', {
+    x: cx + chipW / 2 + 20, y: chipY + 38, size: 22, anchor: 'middle', weight: 700, color: 'helps'
+  }, g);
+  const h2Flop = S.text('compute: 989.4 tflop/s (identical die!)', {
+    x: cx + chipW / 2 + 20, y: chipY + 85, size: 20, anchor: 'middle', weight: 600, color: 'compute'
+  }, g);
+  const h2Bw = S.text('memory: 4.80 tb/s hbm3e (+43%)', {
+    x: cx + chipW / 2 + 20, y: chipY + 128, size: 20, anchor: 'middle', weight: 700, color: 'helps'
+  }, g);
+  const h2Tok = S.text('70b model: 68.6 tokens / sec (+43%)', {
+    x: cx + chipW / 2 + 20, y: chipY + 185, size: 22, anchor: 'middle', weight: 700, color: 'helps'
+  }, g);
 
   // Three attacks pill
-  const footer = S.pill('PROOF: ZERO EXTRA COMPUTE YIELDS +43% SPEEDUP · INFERENCE IS MEMORY-BOUND', {
-    x: cx, y: cy + h / 2 - 36, h: 42, tone: 'helps', size: 20, weight: 700
+  const footer = S.pill('zero extra arithmetic yields +43% speedup · inference is bandwidth-bound', {
+    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
-    group: g, card, title,
+    group: g, bg, title,
     h1Card, h1Title, h1Flop, h1Bw, h1Tok,
     h2Card, h2Title, h2Flop, h2Bw, h2Tok, footer
   };
