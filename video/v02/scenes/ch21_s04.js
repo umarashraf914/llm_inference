@@ -7,61 +7,59 @@
 
 V.scene('ch21_s04', S => {
   const { fx } = S;
-  const GX = 960;
 
   // Heading
-  const heading = S.heading('The three questions answered', { y: 110 });
+  const heading = S.heading('the three questions answered', { y: 110 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
-  // Three Answers Visual
-  const syn = ch21ThreeAnswers(S, { cx: GX, cy: 510 });
+  // Three Answers Visual (Atlas Fig 123)
+  const syn = ch21ThreeAnswers(S, { cx: 960, cy: 510 });
 
-  // Concluding Takeaway / Next Film pill
-  const takeaway = S.pill('NEXT FILM: INSIDE GPU KERNELS · HOW SOFTWARE COMMANDS SILICON', {
-    x: GX, y: 990, h: 48, tone: 'struct', size: 22, weight: 700, style: 'solid'
+  // Concluding Takeaway / Next Film band
+  const takeaway = S.takeaway('next film: inside gpu kernels · how software commands silicon', {
+    tone: 'struct'
   });
 
   // Initial states
-  S.set([syn.card, syn.title, syn.footer], { autoAlpha: 0 });
+  S.set([syn.bg, syn.title, syn.footer], { autoAlpha: 0 });
   syn.colEls.forEach(col => {
-    S.set(col.bc, { autoAlpha: 0 });
-    S.set([col.qn, col.sb], { autoAlpha: 0 });
-    col.ptEls.forEach(pt => S.set(pt, { autoAlpha: 0 }));
+    S.set([col.bc, col.qn, col.sb, col.cp], { autoAlpha: 0 });
+    col.ptEls.forEach(pt => S.set([pt.ptBox, pt.ptText], { autoAlpha: 0 }));
   });
   S.set(takeaway, { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: Three questions return
-  S.add(fx.in([syn.card, syn.title], { from: 'scale', d: 0.5 }), 'b1~answer-0.2');
+  S.add(fx.in([syn.bg, syn.title], { from: 'fade', d: 0.5 }), 'b1~answer-0.2');
 
   // ---------------------------------------------------------------- b2: Answer 1 (parallel lanes vs CPU)
   const c1 = syn.colEls[0];
-  S.add(fx.in(c1.bc, { from: 'scale', d: 0.4 }), 'b2~different-0.2');
-  S.add(fx.in([c1.qn, c1.sb], { from: 'fade', d: 0.35 }), 'b2~different');
+  S.add(fx.in([c1.bc, c1.qn, c1.sb], { from: 'fade', d: 0.4 }), 'b2~different-0.2');
   c1.ptEls.forEach((pt, idx) => {
-    S.add(fx.in(pt, { from: 'fade', d: 0.35 }), `b2~foundational:-${0.2 - idx * 0.1}`);
+    S.add(fx.in([pt.ptBox, pt.ptText], { from: 'fade', d: 0.35 }), `b2~foundational:-${0.2 - idx * 0.08}`);
   });
-  S.add(fx.pulse(c1.bc, { scale: 1.03, d: 0.4 }), 'b2~die.');
+  S.add(fx.in(c1.cp, { from: 'up', d: 0.4 }), 'b2~die.');
+  S.add(fx.pulse([c1.bc, c1.cp], { scale: 1.02, d: 0.4 }), 'b2~die.');
 
   // ---------------------------------------------------------------- b3: Answer 2 (DRAM physics & ridge)
   const c2 = syn.colEls[1];
-  S.add(fx.in(c2.bc, { from: 'scale', d: 0.4 }), 'b3~expensive-0.2');
-  S.add(fx.in([c2.qn, c2.sb], { from: 'fade', d: 0.35 }), 'b3~expensive');
+  S.add(fx.in([c2.bc, c2.qn, c2.sb], { from: 'fade', d: 0.4 }), 'b3~expensive-0.2');
   c2.ptEls.forEach((pt, idx) => {
-    S.add(fx.in(pt, { from: 'fade', d: 0.35 }), `b3~physics.:-${0.2 - idx * 0.1}`);
+    S.add(fx.in([pt.ptBox, pt.ptText], { from: 'fade', d: 0.35 }), `b3~physics.:-${0.2 - idx * 0.08}`);
   });
-  S.add(fx.pulse(c2.bc, { scale: 1.03, d: 0.4 }), 'b3~delivery.');
+  S.add(fx.in(c2.cp, { from: 'up', d: 0.4 }), 'b3~delivery.');
+  S.add(fx.pulse([c2.bc, c2.cp], { scale: 1.02, d: 0.4 }), 'b3~delivery.');
 
   // ---------------------------------------------------------------- b4: Answer 3 (architectural defences)
   const c3 = syn.colEls[2];
-  S.add(fx.in(c3.bc, { from: 'scale', d: 0.4 }), 'b4~fight-0.2');
-  S.add(fx.in([c3.qn, c3.sb], { from: 'fade', d: 0.35 }), 'b4~fight');
+  S.add(fx.in([c3.bc, c3.qn, c3.sb], { from: 'fade', d: 0.4 }), 'b4~fight-0.2');
   c3.ptEls.forEach((pt, idx) => {
-    S.add(fx.in(pt, { from: 'fade', d: 0.35 }), `b4~resident:-${0.2 - idx * 0.1}`);
+    S.add(fx.in([pt.ptBox, pt.ptText], { from: 'fade', d: 0.35 }), `b4~resident:-${0.2 - idx * 0.08}`);
   });
-  S.add(fx.pulse(c3.bc, { scale: 1.03, d: 0.4 }), 'b4~domains.');
+  S.add(fx.in(c3.cp, { from: 'up', d: 0.4 }), 'b4~domains.');
+  S.add(fx.pulse([c3.bc, c3.cp], { scale: 1.02, d: 0.4 }), 'b4~domains.');
 
   // ---------------------------------------------------------------- b5: Next film transition
   S.add(fx.in(syn.footer, { from: 'up', d: 0.45 }), 'b5~unlocks-0.2');
-  S.add(fx.pulse(syn.footer, { scale: 1.05, d: 0.5 }), 'b5~kernels.');
+  S.add(fx.pulse(syn.footer, { scale: 1.03, d: 0.5 }), 'b5~kernels.');
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b5>-0.8');
 });
