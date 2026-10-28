@@ -9,17 +9,17 @@ V.scene('ch02_s04', S => {
   const GX = 960, GY = 520;
 
   // Heading
-  const heading = S.heading('Deriving the 3.35 terabytes', { y: 120 });
+  const heading = S.heading('Deriving the 3.35 terabytes', { y: 130 });
   S.add(fx.in(heading.titleEl, { from: 'up', d: 0.5 }), 'b1');
 
   // Left side: Miniature Hopper package schematic
   const pGroup = S.g();
-  const pkgCX = 500, pkgCY = GY + 10;
-  const pkg = ch02Package(S, { cx: pkgCX, cy: pkgCY, pw: 560, ph: 500, dieSize: 220, parent: pGroup });
+  const pkgCX = 420, pkgCY = GY + 10;
+  const pkg = ch02Package(S, { cx: pkgCX, cy: pkgCY, pw: 540, ph: 480, dieSize: 200, parent: pGroup });
 
   // Right side: Derivation cards
   const dX = 1260;
-  const cardW = 620, stepH = 100;
+  const cardW = 700, stepH = 100;
 
   // Step 1: Wire count card
   const c1Y = GY - 130;
@@ -27,7 +27,7 @@ V.scene('ch02_s04', S => {
     x: dX - cardW / 2, y: c1Y - stepH / 2, w: cardW, h: stepH,
     tone: 'struct', title: ''
   });
-  const s1Title = S.text('1 · TOTAL DATA WIRES', { x: dX - cardW / 2 + 28, y: c1Y - 18, size: 22, color: 'struct', weight: 700 });
+  const s1Title = S.text('1 · total data wires', { x: dX - cardW / 2 + 28, y: c1Y - 18, size: 22, color: 'struct', weight: 650 });
   const s1Eq = S.text('5 stacks × 1,024 wires = 5,120 wires', { x: dX - cardW / 2 + 28, y: c1Y + 18, size: 24, family: 'mono', color: 'ink', weight: 600 });
 
   // Step 2: Bit rate per wire card
@@ -36,7 +36,7 @@ V.scene('ch02_s04', S => {
     x: dX - cardW / 2, y: c2Y - stepH / 2, w: cardW, h: stepH,
     tone: 'compute', title: ''
   });
-  const s2Title = S.text('2 · BIT RATE PER WIRE (DOUBLE DATA RATE)', { x: dX - cardW / 2 + 28, y: c2Y - 18, size: 22, color: 'compute', weight: 700 });
+  const s2Title = S.text('2 · bit rate per wire (double data rate)', { x: dX - cardW / 2 + 28, y: c2Y - 18, size: 22, color: 'compute', weight: 650 });
   const s2Eq = S.text('2,619 MHz × 2 bits/cycle = 5.238 Gb/s', { x: dX - cardW / 2 + 28, y: c2Y + 18, size: 24, family: 'mono', color: 'ink', weight: 600 });
 
   // Step 3: Total bandwidth product card
@@ -45,14 +45,19 @@ V.scene('ch02_s04', S => {
     x: dX - cardW / 2, y: c3Y - 65, w: cardW, h: 130,
     tone: 'bytes', title: ''
   });
-  const s3Title = S.text('3 · TOTAL BANDWIDTH', { x: dX - cardW / 2 + 28, y: c3Y - 26, size: 22, color: 'bytes', weight: 700 });
-  const s3Badge = S.pill('3.35 TB/s spec', { x: dX + cardW / 2 - 110, y: c3Y - 26, h: 40, tone: 'bytes', size: 22, weight: 700 });
+  const s3Title = S.text('3 · total bandwidth', { x: dX - cardW / 2 + 28, y: c3Y - 26, size: 22, color: 'bytes', weight: 650 });
+  const s3Badge = S.pill('3.35 TB/s spec', { x: dX + cardW / 2 - 110, y: c3Y - 26, h: 40, tone: 'bytes', size: 22, weight: 650 });
   const s3Eq = S.text('5,120 wires × 5.238 Gb/s ÷ 8 = 3,352 GB/s', { x: dX - cardW / 2 + 28, y: c3Y + 26, size: 24, family: 'mono', color: 'bytes', weight: 700 });
 
-  S.set([pGroup, step1Card, s1Title, s1Eq, step2Card, s2Title, s2Eq, step3Card, s3Title, s3Eq, s3Badge], { autoAlpha: 0 });
+  // Concluding Takeaway
+  const takeaway = S.takeaway('5,120 wires running at double data rate deliver 3.35 TB/s', {
+    tone: 'bytes'
+  });
+
+  S.set([pGroup, step1Card, s1Title, s1Eq, step2Card, s2Title, s2Eq, step3Card, s3Title, s3Eq, s3Badge, takeaway], { autoAlpha: 0 });
 
   // ---------------------------------------------------------------- b1: 5 HBM3 memory stacks
-  S.add(fx.in(pGroup, { from: 'scale', d: 0.6 }), 'b1~stacks-0.2');
+  S.add(fx.in(pGroup, { from: 'fade', d: 0.6 }), 'b1~stacks-0.2');
 
   // ---------------------------------------------------------------- b2: 1,024 wires per stack = 5,120 wires
   S.add(fx.in([step1Card, s1Title, s1Eq], { from: 'right', d: 0.5 }), 'b2~wires-0.2');
@@ -64,10 +69,5 @@ V.scene('ch02_s04', S => {
   S.add(fx.in([step3Card, s3Title, s3Eq, s3Badge], { from: 'up', d: 0.5 }), 'b4~Multiply-0.2');
   S.add(fx.pulse([step3Card, s3Badge], { scale: 1.05, d: 0.5 }), 'b4~terabytes');
 
-  // Takeaway pill
-  const takeaway = S.pill('5,120 wires running at double data rate deliver 3.35 TB/s', {
-    x: GX, y: 990, h: 48, tone: 'bytes', size: 22, weight: 600, style: 'solid'
-  });
-  S.set(takeaway, { autoAlpha: 0 });
   S.add(fx.in(takeaway, { from: 'up', d: 0.5 }), 'b4>-0.8');
 });

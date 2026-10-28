@@ -1,4 +1,4 @@
-/* Shared builders for chapter 2 (Two numbers and the words around them). Loaded before every ch02 scene. */
+/* ch02_common.js · Shared visual components for Chapter 02 ("Two numbers and the words around them") */
 
 /**
  * Logarithmic time axis from 0.1 ns (10^-10 s) to 100 ms (10^-1 s), spanning 9 orders of magnitude (Fig 9).
@@ -36,51 +36,94 @@ function ch02LogTimeAxis(S, o = {}) {
 }
 
 /**
- * Bus trace comparison: RTX 4090 vs H100 (Fig 7)
- * - RTX 4090: 384 wires, 21.0 Gb/s, 1,008 GB/s
- * - H100: 5,120 wires (13.3× wider), 5.24 Gb/s, 3,352 GB/s
+ * Physical Bus Trace Comparison: RTX 4090 vs H100 (Fig 7)
+ * Draws wire bundles to scale:
+ * - RTX 4090: narrow 24 px ribbon (384 fast wires @ 21.0 Gb/s = 1,008 GB/s)
+ * - H100: wide 180 px ribbon (5,120 wires @ 5.24 Gb/s = 3,352 GB/s; 13.3x more wires)
  */
 function ch02BusDiagram(S, o = {}) {
   const g = o.parent || S.g();
   const cx = o.cx ?? 960, cy = o.cy ?? 520;
+  const bw = 1100;
+  const bx0 = cx - bw / 2;
 
-  // RTX 4090 bar (top)
+  // RTX 4090: Top bundle
   const topY = cy - 130;
-  const topCard = S.card({
-    x: cx - 520, y: topY - 70, w: 1040, h: 120,
-    tone: 'struct', title: ''
-  }, g);
-  const topTitle = S.text('RTX 4090 · GAMING BUS', { x: cx - 490, y: topY - 32, size: 22, color: 'struct', weight: 700 }, g);
-  const topWires = S.text('384 wires @ 21.0 Gb/s', { x: cx - 490, y: topY + 8, size: 24, family: 'mono', color: 'ink', weight: 600 }, g);
-  const topBw = S.pill('1,008 GB/s', { x: cx + 410, y: topY - 10, h: 44, tone: 'struct', size: 24, weight: 700 }, g);
+  const topH = 26; // narrow wire bundle
+  const topGroup = S.g(null, g);
 
-  // H100 bar (bottom - 13.3× wider footprint representation)
-  const btmY = cy + 110;
-  const btmCard = S.card({
-    x: cx - 520, y: btmY - 90, w: 1040, h: 180,
-    tone: 'bytes', title: ''
-  }, g);
-  const btmTitle = S.text('H100 · HIGH BANDWIDTH MEMORY BUS', { x: cx - 490, y: btmY - 50, size: 22, color: 'bytes', weight: 700 }, g);
-  const btmWires = S.text('5,120 wires @ 5.24 Gb/s (13.3× more wires!)', { x: cx - 490, y: btmY - 8, size: 24, family: 'mono', color: 'ink', weight: 600 }, g);
-  const btmSub = S.text('4× slower clock, yet 3.3× higher total bandwidth', { x: cx - 490, y: btmY + 36, size: 22, color: 'muted', weight: 550 }, g);
-  const btmBw = S.pill('3,352 GB/s', { x: cx + 410, y: btmY - 8, h: 50, tone: 'bytes', size: 26, weight: 700 }, g);
+  const topTrack = S.rect({
+    x: bx0, y: topY - topH / 2, w: bw, h: topH, r: 4,
+    fill: '#0f1a30', stroke: S.tone('struct'), sw: 1.5
+  }, topGroup);
+
+  // 4 rapid wire lines inside
+  for (let i = 1; i < 4; i++) {
+    S.line({
+      x1: bx0 + 6, y1: topY - topH / 2 + i * (topH / 4),
+      x2: bx0 + bw - 6, y2: topY - topH / 2 + i * (topH / 4),
+      stroke: S.tone('struct'), sw: 2, strokeOpacity: 0.7, dash: '8 4'
+    }, topGroup);
+  }
+
+  const topTitle = S.text('RTX 4090 · 384 wires @ 21.0 Gb/s', {
+    x: bx0, y: topY - 30, size: 22, color: 'struct', weight: 650, family: 'mono'
+  }, topGroup);
+
+  const topBw = S.pill('1,008 GB/s bandwidth', {
+    x: bx0 + bw - 140, y: topY - 30, h: 36, tone: 'struct', size: 20, weight: 650, mono: true
+  });
+  topGroup.appendChild(topBw);
+
+  // H100: Bottom bundle (13.3x wider wire bundle representation)
+  const btmY = cy + 120;
+  const btmH = 180;
+  const btmGroup = S.g(null, g);
+
+  const btmTrack = S.rect({
+    x: bx0, y: btmY - btmH / 2, w: bw, h: btmH, r: 8,
+    fill: '#1c0e14', stroke: S.tone('bytes'), sw: 2
+  }, btmGroup);
+
+  // Dense parallel wire traces
+  const wireCount = 14;
+  for (let i = 1; i < wireCount; i++) {
+    S.line({
+      x1: bx0 + 8, y1: btmY - btmH / 2 + i * (btmH / wireCount),
+      x2: bx0 + bw - 8, y2: btmY - btmH / 2 + i * (btmH / wireCount),
+      stroke: S.tone('bytes'), sw: 2, strokeOpacity: 0.5, dash: '4 4'
+    }, btmGroup);
+  }
+
+  const btmTitle = S.text('H100 · 5,120 wires @ 5.24 Gb/s (13.3× more wires)', {
+    x: bx0, y: btmY - btmH / 2 - 20, size: 22, color: 'bytes', weight: 650, family: 'mono'
+  }, btmGroup);
+
+  const btmBw = S.pill('3,352 GB/s (3.35 TB/s)', {
+    x: bx0 + bw - 150, y: btmY - btmH / 2 - 20, h: 38, tone: 'bytes', size: 20, weight: 700, mono: true
+  });
+  btmGroup.appendChild(btmBw);
+
+  const btmSub = S.text('4× slower clock, yet 3.3× higher total bandwidth', {
+    x: cx, y: btmY + btmH / 2 + 34, size: 22, anchor: 'middle', color: 'muted', weight: 550
+  }, btmGroup);
 
   return {
-    g, topCard, topTitle, topWires, topBw,
-    btmCard, btmTitle, btmWires, btmSub, btmBw, cx, cy
+    g, topGroup, topTrack, topTitle, topBw,
+    btmGroup, btmTrack, btmTitle, btmBw, btmSub, cx, cy
   };
 }
 
 /**
- * Compact physical package builder for chapter 2 (Fig 8):
+ * Miniature physical package builder for Chapter 02 (Fig 8):
  * - Central compute die
  * - 5 active HBM3 stacks surrounding it
  */
 function ch02Package(S, o = {}) {
   const g = o.parent || S.g();
   const cx = o.cx ?? 500, cy = o.cy ?? 530;
-  const pw = o.pw ?? 560, ph = o.ph ?? 500;
-  const dieSize = o.dieSize ?? 220;
+  const pw = o.pw ?? 580, ph = o.ph ?? 500;
+  const dieSize = o.dieSize ?? 180;
 
   const pkg = S.g(null, g);
   S.rect({
@@ -92,24 +135,28 @@ function ch02Package(S, o = {}) {
   const die = S.g(null, pkg);
   S.rect({
     x: cx - dieSize / 2, y: cy - dieSize / 2, w: dieSize, h: dieSize, r: 6,
-    fill: 'url(#card-compute)', stroke: S.tone('compute'), sw: 2.5
+    fill: '#15100a', stroke: S.tone('compute'), sw: 2.5
   }, die);
-  S.text('COMPUTE DIE', {
-    x: cx, y: cy - 10, size: 22, anchor: 'middle', weight: 700, family: 'mono', color: 'compute'
+  S.rect({
+    x: cx - dieSize / 2 + 8, y: cy - dieSize / 2 + 8, w: dieSize - 16, h: dieSize - 16, r: 4,
+    fill: 'url(#die-grid)'
   }, die);
-  S.text('H100 Silicon', {
-    x: cx, y: cy + 20, size: 22, anchor: 'middle', weight: 500, color: 'ink'
+  S.text('compute die', {
+    x: cx, y: cy - 10, size: 22, anchor: 'middle', weight: 650, family: 'mono', color: 'compute'
+  }, die);
+  S.text('H100 silicon', {
+    x: cx, y: cy + 22, size: 20, anchor: 'middle', weight: 550, color: 'ink'
   }, die);
 
-  // 5 HBM3 stacks
-  const stackW = 76, stackH = 95;
-  const spacing = 110;
+  // 5 active HBM3 memory stacks
+  const stackW = 132, stackH = 96;
+  const stackSpacing = 110;
   const stackCoords = [
-    { x: cx - dieSize / 2 - stackW - 20, y: cy - spacing },
-    { x: cx - dieSize / 2 - stackW - 20, y: cy },
-    { x: cx - dieSize / 2 - stackW - 20, y: cy + spacing },
-    { x: cx + dieSize / 2 + 20, y: cy - spacing },
-    { x: cx + dieSize / 2 + 20, y: cy },
+    { x: cx - dieSize / 2 - stackW - 16, y: cy - stackSpacing },
+    { x: cx - dieSize / 2 - stackW - 16, y: cy },
+    { x: cx - dieSize / 2 - stackW - 16, y: cy + stackSpacing },
+    { x: cx + dieSize / 2 + 16, y: cy - stackSpacing / 2 },
+    { x: cx + dieSize / 2 + 16, y: cy + stackSpacing / 2 },
   ];
 
   const stacks = stackCoords.map((pos, i) => {
@@ -123,17 +170,16 @@ function ch02Package(S, o = {}) {
     }, sg);
     S.rect({
       x: pos.x, y: pos.y - stackH / 2, w: stackW, h: stackH, r: 6,
-      fill: 'url(#card-bytes)', stroke: S.tone('bytes'), sw: 2
+      fill: '#220e15', stroke: S.tone('bytes'), sw: 2
     }, sg);
     S.text('HBM3', {
-      x: pos.x + stackW / 2, y: pos.y - 8, size: 18, anchor: 'middle', weight: 700, family: 'mono', color: 'bytes'
+      x: pos.x + stackW / 2, y: pos.y - 12, size: 20, anchor: 'middle', weight: 650, family: 'mono', color: 'bytes'
     }, sg);
     S.text('1,024 wires', {
-      x: pos.x + stackW / 2, y: pos.y + 16, size: 14, anchor: 'middle', weight: 600, color: 'ink'
+      x: pos.x + stackW / 2, y: pos.y + 18, size: 20, anchor: 'middle', weight: 550, color: 'ink'
     }, sg);
-    sg.setAttribute('data-audit', 'ignore');
     return sg;
   });
 
-  return { g: pkg, cx, cy };
+  return { pkg, die, stacks, cx, cy, pw, ph, dieSize };
 }
