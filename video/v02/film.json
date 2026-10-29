@@ -19,6 +19,12 @@
       "date": "2026-10-29",
       "commit": "4f5f755e47eb2521666cfaf8646a83a62786dfb7",
       "notes": "Version 2: full illustrated figures, center-out composition, and icon library"
+    },
+    {
+      "version": 3,
+      "date": "2026-10-29",
+      "commit": "052ac091aec9094045bf7153880bd87ab7f4bcc9",
+      "notes": "Version 3: perfect box padding, zero text overflows, and spacious layout margins"
     }
   ]
 }
