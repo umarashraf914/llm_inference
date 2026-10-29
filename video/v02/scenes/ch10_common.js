@@ -310,19 +310,19 @@ function ch10TwoSinsDiagram(S, opts = {}) {
   }, g);
 
   const lPass1 = S.rect({
-    x: leftX + 70, y: lForkY + 60, w: colW - 140, h: 46, r: 6,
+    x: leftX + 70, y: lForkY + 56, w: colW - 140, h: 52, r: 6,
     fill: S.tone('compute'), stroke: S.tone('compute'), sw: 1
   }, g);
   const lPass1Txt = S.text('pass 1: if-path (16 active, 16 masked)', {
-    x: leftX + colW / 2, y: lForkY + 90, size: 20, anchor: 'middle', color: '#0a0f1e', weight: 700
+    x: leftX + colW / 2, y: lForkY + 88, size: 20, anchor: 'middle', color: '#0a0f1e', weight: 700
   }, g);
 
   const lPass2 = S.rect({
-    x: leftX + 70, y: lForkY + 120, w: colW - 140, h: 46, r: 6,
+    x: leftX + 70, y: lForkY + 120, w: colW - 140, h: 52, r: 6,
     fill: S.tone('violet'), stroke: S.tone('violet'), sw: 1
   }, g);
   const lPass2Txt = S.text('pass 2: else-path (16 masked, 16 active)', {
-    x: leftX + colW / 2, y: lForkY + 150, size: 20, anchor: 'middle', color: '#0a0f1e', weight: 700
+    x: leftX + colW / 2, y: lForkY + 152, size: 20, anchor: 'middle', color: '#0a0f1e', weight: 700
   }, g);
 
   const lWastedPill = S.pill('wastes arithmetic issue slots (compute is cheap)', {
@@ -357,19 +357,19 @@ function ch10TwoSinsDiagram(S, opts = {}) {
 
   // 4 separate DRAM burst lines
   const rBurst1 = S.rect({
-    x: rightX + 70, y: rDramY + 60, w: colW - 140, h: 46, r: 6,
+    x: rightX + 70, y: rDramY + 56, w: colW - 140, h: 52, r: 6,
     fill: S.tone('bytes'), stroke: S.tone('bytes'), sw: 1
   }, g);
   const rBurst1Txt = S.text('burst 1: 32 bytes fetched (only 4 b used)', {
-    x: rightX + colW / 2, y: rDramY + 90, size: 20, anchor: 'middle', color: '#0a0f1e', weight: 700
+    x: rightX + colW / 2, y: rDramY + 88, size: 20, anchor: 'middle', color: '#0a0f1e', weight: 700
   }, g);
 
   const rBurst2 = S.rect({
-    x: rightX + 70, y: rDramY + 120, w: colW - 140, h: 46, r: 6,
+    x: rightX + 70, y: rDramY + 120, w: colW - 140, h: 52, r: 6,
     fill: '#b83b3b', stroke: S.tone('bytes'), sw: 1
   }, g);
   const rBurst2Txt = S.text('burst 2..32: separate 32-byte bus cycles', {
-    x: rightX + colW / 2, y: rDramY + 150, size: 20, anchor: 'middle', color: '#fff', weight: 700
+    x: rightX + colW / 2, y: rDramY + 152, size: 20, anchor: 'middle', color: '#fff', weight: 700
   }, g);
 
   const rWastedPill = S.pill('wastes memory bandwidth (bandwidth is scarce)', {

@@ -68,7 +68,7 @@ function ch06RegisterPath(S, opts = {}) {
   // Off-chip Memory on the right
   const memX = cx + 430;
   const memBox = S.rect({
-    x: memX - 130, y: cy - 15, w: 260, h: 54, r: 8,
+    x: memX - 165, y: cy - 15, w: 330, h: 54, r: 8,
     fill: '#38161e', stroke: S.tone('bytes'), sw: 1.5
   }, g);
   memBox.setAttribute('data-audit', 'ignore');
@@ -78,7 +78,7 @@ function ch06RegisterPath(S, opts = {}) {
 
   // Legal flow arrows: Memory -> Register -> Math ALU
   const arr1 = S.line({
-    x1: memX - 140, y1: cy + 12, x2: regCX + regW / 2 + 10, y2: cy + 12,
+    x1: memX - 175, y1: cy + 12, x2: regCX + regW / 2 + 10, y2: cy + 12,
     stroke: S.tone('struct'), sw: 2.5, arrow: true
   }, g);
   arr1.setAttribute('data-audit', 'ignore');
@@ -91,13 +91,13 @@ function ch06RegisterPath(S, opts = {}) {
 
   // Illegal direct path (Memory -> ALU) with prohibition cross
   const badLine = S.line({
-    x1: memX - 140, y1: cy + 58, x2: aluX + 120, y2: cy + 58,
+    x1: memX - 175, y1: cy + 58, x2: aluX + 120, y2: cy + 58,
     stroke: '#ef4444', sw: 2, strokeDasharray: '6 4'
   }, g);
   badLine.setAttribute('data-audit', 'ignore');
 
   const noDirectPill = S.pill('no direct memory access in hardware', {
-    x: cx - 20, y: cy + 58, h: 36, tone: 'bytes', size: 20, weight: 700
+    x: cx - 20, y: cy + 58, h: 42, tone: 'bytes', size: 20, weight: 700
   }, g);
 
   return {

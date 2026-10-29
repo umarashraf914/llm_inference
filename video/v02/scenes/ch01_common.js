@@ -195,10 +195,10 @@ function ch01Transistor(S, o = {}) {
 
   // Status badges: 0 · off vs 1 · on
   const badgeOff = S.pill('0 · off (blocking)', {
-    x: cx, y: cy + 115, h: 42, tone: 'violet', size: 22, weight: 650
+    x: cx, y: cy + 115, w: 260, h: 42, tone: 'violet', size: 20, weight: 650
   }, g);
   const badgeOn = S.pill('1 · on (conducting)', {
-    x: cx, y: cy + 115, h: 42, tone: 'helps', size: 22, weight: 650
+    x: cx, y: cy + 115, w: 260, h: 42, tone: 'helps', size: 20, weight: 650
   }, g);
   S.set(badgeOn, { autoAlpha: 0 });
 

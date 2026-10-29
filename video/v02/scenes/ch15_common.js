@@ -56,19 +56,19 @@ function ch15GenTimeline(S, opts = {}) {
     procText.setAttribute('data-audit', 'ignore');
 
     const flopBox = S.rect({
-      x: lx + 15, y: colY + 95, w: colW - 30, h: 42, r: 6,
+      x: lx + 15, y: colY + 92, w: colW - 30, h: 48, r: 6,
       fill: '#241a14', stroke: S.tone('compute'), sw: 1
     }, g);
     const flopVal = S.text(gn.flop, {
-      x: lx + colW / 2, y: colY + 124, size: 20, anchor: 'middle', weight: 700, color: 'compute'
+      x: lx + colW / 2, y: colY + 122, size: 20, anchor: 'middle', weight: 700, color: 'compute'
     }, g);
 
     const bwBox = S.rect({
-      x: lx + 15, y: colY + 145, w: colW - 30, h: 42, r: 6,
+      x: lx + 15, y: colY + 148, w: colW - 30, h: 48, r: 6,
       fill: '#291418', stroke: S.tone('bytes'), sw: 1
     }, g);
     const bwVal = S.text(gn.bw, {
-      x: lx + colW / 2, y: colY + 174, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
+      x: lx + colW / 2, y: colY + 178, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
     }, g);
 
     const ridgeVal = S.text(`ridge: ${gn.ridge}`, {
@@ -79,7 +79,7 @@ function ch15GenTimeline(S, opts = {}) {
   });
 
   const footer = S.pill('compute grew 18× while bandwidth grew only 9× · ridge doubled to ~300 op/b', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, colEls, footer };
@@ -163,7 +163,7 @@ function ch15WireScales(S, opts = {}) {
   });
 
   const footer = S.pill('lithography shrinks transistors · physical geometry caps wires', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, scaleEls, footer };
@@ -227,7 +227,7 @@ function ch15NarrowRidge(S, opts = {}) {
   });
 
   const footer = S.pill('halving bits doubles compute on same silicon · ridge reaches 1,125 op/byte', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, rowEls, footer };
@@ -294,7 +294,7 @@ function ch15H200Proof(S, opts = {}) {
 
   // Three attacks pill
   const footer = S.pill('zero extra arithmetic yields +43% speedup · inference is bandwidth-bound', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {

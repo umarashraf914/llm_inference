@@ -67,7 +67,7 @@ function ch19BitFields(S, opts = {}) {
   }, g);
 
   const footer = S.pill('an implicit leading one gives 24 significant bits from 23 stored bits', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -130,7 +130,7 @@ function ch19FormatComparison(S, opts = {}) {
   });
 
   const footer = S.pill('bf16 preserves all 8 exponent bits: fp32 range traded for coarser precision', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, rowEls, footer };
@@ -183,7 +183,7 @@ function ch19PiDissection(S, opts = {}) {
   }, g);
 
   const footer = S.pill('seven fraction bits represent π to within 0.031% accuracy', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -242,7 +242,7 @@ function ch19RangePrecision(S, opts = {}) {
   }, g);
 
   const footer = S.pill('bf16 trades 8× coarser precision for 33 orders of magnitude in dynamic range', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -287,7 +287,7 @@ function ch19MultiplierDelivery(S, opts = {}) {
   }, g);
 
   const lPill = S.pill('bf16 multiplier circuit is 1/9th the area of fp32', {
-    x: leftX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: leftX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // Right: H100 Real Throughput
@@ -315,7 +315,7 @@ function ch19MultiplierDelivery(S, opts = {}) {
   }, g);
 
   const rPill = S.pill('operand delivery bandwidth caps throughput', {
-    x: rightX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: rightX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -384,7 +384,7 @@ function ch19FreezeGraph(S, opts = {}) {
   });
 
   const footer = S.pill('low-precision multiplies accumulate in fp32 to prevent running totals from freezing', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, colEls, footer };
@@ -425,7 +425,7 @@ function ch19MarketingDecomp(S, opts = {}) {
   const colH = 190;
 
   const factors = [
-    { name: '1. narrow precision', mult: '2.0× multiplier', desc: 'fp16 to fp8 doubles theoretical math', tone: 'compute' },
+    { name: '1. narrow precision', mult: '2.0× multiplier', desc: 'fp16 to fp8 doubles math rate', tone: 'compute' },
     { name: '2. 2:4 sparsity', mult: '2.0× multiplier', desc: 'assumes half of weights are zero', tone: 'compute' },
     { name: '3. cluster fabric', mult: '2.25× multiplier', desc: 'combines multiple dies and clocks', tone: 'struct' }
   ];
@@ -441,7 +441,7 @@ function ch19MarketingDecomp(S, opts = {}) {
   });
 
   const footer = S.pill('on dense same-precision workloads: real silicon delivers 2× to 4× per generation', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, headBox, headText, fElements, footer };

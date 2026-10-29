@@ -44,7 +44,7 @@ V.scene('ch08_s04', S => {
   const lPill = S.pill('32 separate decode circuits per cycle', {
     x: c1X, y: colY + 36, h: 40, tone: 'bytes', size: 20, weight: 700
   });
-  const lRow2 = S.text('redundant decoders consume silicon area that could be alus', {
+  const lRow2 = S.text('redundant decoders waste silicon area needed for alus', {
     x: c1X, y: colY + 90, size: 20, anchor: 'middle', color: 'muted'
   });
 

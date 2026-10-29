@@ -88,7 +88,7 @@ function ch12LadderRows(S, opts = {}) {
   });
 
   const footer = S.pill('to exchange data, threads must meet at a level they both see', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, rows, footer };
@@ -161,7 +161,7 @@ function ch12ModelScale(S, opts = {}) {
   });
 
   const takeawayPill = S.pill('l2 holds 1 part in 2,600 · every token must stream 140 gb from hbm', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -210,16 +210,16 @@ function ch12DualMetrics(S, opts = {}) {
   const lElements = [];
   latRows.forEach((r, idx) => {
     const ry = cy - 90 + idx * 56;
-    const barW = Math.round(r.wPct * 180);
+    const barW = Math.round(r.wPct * 160);
 
     const lbl = S.text(r.name, { x: leftX + 24, y: ry + 24, size: 20, weight: 600, color: 'ink' }, g);
 
     const bar = S.rect({
-      x: leftX + 175, y: ry, w: barW, h: 32, r: 4,
+      x: leftX + 205, y: ry, w: barW, h: 32, r: 4,
       fill: S.tone(r.col), stroke: S.tone(r.col), sw: 1
     }, g);
 
-    const val = S.text(r.ticks, { x: leftX + 175 + barW + 12, y: ry + 24, size: 20, weight: 700, color: r.col }, g);
+    const val = S.text(r.ticks, { x: leftX + 205 + barW + 12, y: ry + 24, size: 20, weight: 700, color: r.col }, g);
     bar.setAttribute('data-audit', 'ignore');
     lElements.push({ lbl, bar, val });
   });
@@ -244,22 +244,22 @@ function ch12DualMetrics(S, opts = {}) {
   const rElements = [];
   bwRows.forEach((r, idx) => {
     const ry = cy - 90 + idx * 56;
-    const barW = Math.round(r.wPct * 180);
+    const barW = Math.round(r.wPct * 160);
 
     const lbl = S.text(r.name, { x: rightX + 24, y: ry + 24, size: 20, weight: 600, color: 'ink' }, g);
 
     const bar = S.rect({
-      x: rightX + 175, y: ry, w: barW, h: 32, r: 4,
+      x: rightX + 205, y: ry, w: barW, h: 32, r: 4,
       fill: S.tone(r.col), stroke: S.tone(r.col), sw: 1
     }, g);
 
-    const val = S.text(r.bw, { x: rightX + 175 + barW + 12, y: ry + 24, size: 20, weight: 700, color: r.col }, g);
+    const val = S.text(r.bw, { x: rightX + 205 + barW + 12, y: ry + 24, size: 20, weight: 700, color: r.col }, g);
     bar.setAttribute('data-audit', 'ignore');
     rElements.push({ lbl, bar, val });
   });
 
   const takeawayPill = S.pill('latency grows 500× and bandwidth drops 120×: stage data upward', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {

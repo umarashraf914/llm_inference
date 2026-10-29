@@ -101,7 +101,7 @@ function ch14LineSectors(S, opts = {}) {
   }, g);
 
   const footer = S.pill('contiguous access uses 100% of fetched bytes · scattered access wastes 7/8ths', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -172,7 +172,7 @@ function ch14RowColStride(S, opts = {}) {
   }, g);
 
   const footer = S.pill('loop indexing order is a hardware bandwidth decision · not a matter of style', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -236,7 +236,7 @@ function ch14StrideCliff(S, opts = {}) {
   });
 
   const footer = S.pill('coalescing ensures every fetched byte counts · strides throw 87.5% away', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, rowEls, footer };

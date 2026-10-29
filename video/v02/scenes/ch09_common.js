@@ -75,7 +75,7 @@ function ch09WarpGrid(S, opts = {}) {
 
   // Occupancy badge
   const occBadge = S.pill('occupancy 100% · 64 of 64 slots filled', {
-    x: cx, y: cy + h / 2 - 28, h: 36, tone: 'struct', size: 20, weight: 700
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'struct', size: 20, weight: 700
   }, g);
 
   return { group: g, bg, title, schedG, rowLabels, warpSlots, warp0Slots, occBadge };
@@ -270,7 +270,7 @@ function ch09HbmPipeline(S, opts = {}) {
   const dieX = cx - 470;
   const dieY = cy - 15;
   const dieBox = S.rect({
-    x: dieX - 110, y: dieY - 45, w: 220, h: 90, r: 8,
+    x: dieX - 120, y: dieY - 45, w: 240, h: 90, r: 8,
     fill: '#1d273d', stroke: S.tone('compute'), sw: 1.5
   }, g);
   const dieLbl1 = S.text('h100 compute die', {
@@ -284,7 +284,7 @@ function ch09HbmPipeline(S, opts = {}) {
   const hbmX = cx + 470;
   const hbmY = cy - 15;
   const hbmBox = S.rect({
-    x: hbmX - 110, y: hbmY - 45, w: 220, h: 90, r: 8,
+    x: hbmX - 120, y: hbmY - 45, w: 240, h: 90, r: 8,
     fill: '#1d273d', stroke: S.tone('bytes'), sw: 1.5
   }, g);
   const hbmLbl1 = S.text('hbm3 memory', {

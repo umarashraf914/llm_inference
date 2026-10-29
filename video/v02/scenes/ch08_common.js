@@ -246,7 +246,7 @@ function ch08HierarchyDiagram(S, opts = {}) {
   const c1R2 = S.rect({ x: c1X - colW / 2 + 20, y: colY - 36, w: colW - 40, h: 100, r: 6, fill: '#1e293b', stroke: '#334155', sw: 1 }, g);
   c1R2.setAttribute('data-audit', 'ignore');
   const c1T2 = S.text('dispatched across all 132 sms', { x: c1X, y: colY - 6, size: 20, anchor: 'middle', color: 'ink' }, g);
-  const c1S2 = S.text('each SM claims blocks as space frees', { x: c1X, y: colY + 24, size: 20, anchor: 'middle', color: 'muted' }, g);
+  const c1S2 = S.text('SMs claim blocks as space frees', { x: c1X, y: colY + 24, size: 20, anchor: 'middle', color: 'muted' }, g);
 
   const c1Pill = S.pill('full problem scope', { x: c1X, y: colY + 140, h: 40, tone: 'struct', size: 20, weight: 700 }, g);
 
@@ -290,7 +290,7 @@ function ch08HierarchyDiagram(S, opts = {}) {
   const c3R2 = S.rect({ x: c3X - colW / 2 + 20, y: colY - 36, w: colW - 40, h: 100, r: 6, fill: '#064e3b', stroke: S.tone('helps'), sw: 1.5 }, g);
   c3R2.setAttribute('data-audit', 'ignore');
   const c3T2 = S.text('shared memory boundary', { x: c3X, y: colY - 6, size: 22, anchor: 'middle', weight: 700, color: 'helps' }, g);
-  const c3S2 = S.text('shared scratchpad belongs strictly to the block', { x: c3X, y: colY + 24, size: 20, anchor: 'middle', color: 'ink' }, g);
+  const c3S2 = S.text('scratchpad private to each block', { x: c3X, y: colY + 24, size: 20, anchor: 'middle', color: 'ink' }, g);
 
   const c3Pill = S.pill('boundary of cooperation', { x: c3X, y: colY + 140, h: 40, tone: 'helps', size: 20, weight: 700 }, g);
 

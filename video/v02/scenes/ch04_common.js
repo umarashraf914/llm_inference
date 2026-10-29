@@ -27,7 +27,7 @@ function ch04CpuCoreArea(S, opts = {}) {
 
   // Uncertainty banner at top of core
   const qBox = S.rect({
-    x: cx - w / 2 + 24, y: cy - h / 2 + 56, w: w - 48, h: 44, r: 8,
+    x: cx - w / 2 + 24, y: cy - h / 2 + 54, w: w - 48, h: 48, r: 8,
     fill: '#15243d', stroke: S.tone('struct'), sw: 1.5
   }, g);
   const qLbl = S.text('incoming: add · branch · load · or jump?', {
@@ -111,7 +111,7 @@ function ch04GpuSmArea(S, opts = {}) {
 
   // Latency hiding warp swap panel inside SM at top
   const swapBox = S.rect({
-    x: cx - w / 2 + 24, y: cy - h / 2 + 56, w: w - 48, h: 44, r: 8,
+    x: cx - w / 2 + 24, y: cy - h / 2 + 54, w: w - 48, h: 48, r: 8,
     fill: '#15243d', stroke: S.tone('helps'), sw: 1.5
   }, g);
   const swapTextA = S.text('warp 0: stalled', {
@@ -349,7 +349,7 @@ function ch04Die132Grid(S, opts = {}) {
   }, g);
 
   const title = S.text('814 mm² die · one design stamped 132 times', {
-    x: cx, y: cy - h / 2 + 38, size: 22, anchor: 'middle', weight: 700, color: 'compute'
+    x: cx, y: cy - h / 2 + 32, size: 22, anchor: 'middle', weight: 700, color: 'compute'
   }, g);
 
   // 12 columns × 11 rows = 132 SM tiles
@@ -359,7 +359,7 @@ function ch04Die132Grid(S, opts = {}) {
   const gridW = cols * tileW + (cols - 1) * gapX;
   const gridH = rows * tileH + (rows - 1) * gapY;
   const startX = cx - gridW / 2;
-  const startY = cy - gridH / 2 + 20;
+  const startY = cy - gridH / 2 + 28;
 
   const tiles = [];
   let highlightedTile = null;
@@ -387,7 +387,7 @@ function ch04Die132Grid(S, opts = {}) {
 
   // Label pointing to highlighted SM
   const calloutPill = S.pill('the 1 sm we inspect', {
-    x: cx - 180, y: startY - 26, h: 36, tone: 'compute', size: 20, weight: 700
+    x: cx - 180, y: startY - 24, h: 42, tone: 'compute', size: 20, weight: 700
   }, g);
 
   // Chip-wide thread calculation summary

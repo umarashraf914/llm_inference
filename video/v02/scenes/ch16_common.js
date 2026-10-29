@@ -18,6 +18,11 @@ function ch16Roofline(S, opts = {}, parent) {
   }, opts);
 
   const R = libRoofline(S, o, parent);
+  if (R.ridgeEl && R.ridgeEl.tagBg) {
+    const curY = parseFloat(R.ridgeEl.tagBg.getAttribute('y') || '0');
+    R.ridgeEl.tagBg.setAttribute('height', '42');
+    R.ridgeEl.tagBg.setAttribute('y', String(curY - 2));
+  }
   return R;
 }
 
@@ -44,44 +49,44 @@ function ch16TwoOperations(S, opts = {}) {
   }, g);
 
   // Illustrated Arrays A and B feeding Adder
-  const arrY = topY + 68;
+  const arrY = topY + 65;
   const arrW = 500;
   const arrX = leftX + (panelW - arrW) / 2;
 
   // Array A
   const arrABox = S.rect({
-    x: arrX, y: arrY, w: arrW, h: 46, r: 6,
+    x: arrX, y: arrY, w: arrW, h: 50, r: 6,
     fill: '#1b233a', stroke: S.tone('bytes'), sw: 1
   }, g);
   const arrALbl = S.text('input a[i]: 2 bytes (16-bit float)', {
-    x: arrX + arrW / 2, y: arrY + 30, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+    x: arrX + arrW / 2, y: arrY + 32, size: 20, anchor: 'middle', weight: 600, color: 'ink'
   }, g);
 
   // Array B
   const arrBBox = S.rect({
-    x: arrX, y: arrY + 54, w: arrW, h: 46, r: 6,
+    x: arrX, y: arrY + 56, w: arrW, h: 50, r: 6,
     fill: '#1b233a', stroke: S.tone('bytes'), sw: 1
   }, g);
   const arrBLbl = S.text('input b[i]: 2 bytes (16-bit float)', {
-    x: arrX + arrW / 2, y: arrY + 84, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+    x: arrX + arrW / 2, y: arrY + 88, size: 20, anchor: 'middle', weight: 600, color: 'ink'
   }, g);
 
   // Adder (+) node
   const addCircle = S.circle({
-    cx: leftX + panelW / 2, cy: arrY + 130, r: 18,
+    cx: leftX + panelW / 2, cy: arrY + 134, r: 18,
     fill: '#241a14', stroke: S.tone('compute'), sw: 2
   }, g);
   const addPlus = S.text('+', {
-    x: leftX + panelW / 2, y: arrY + 137, size: 22, anchor: 'middle', weight: 700, color: 'compute'
+    x: leftX + panelW / 2, y: arrY + 141, size: 22, anchor: 'middle', weight: 700, color: 'compute'
   }, g);
 
   // Array C (output)
   const arrCBox = S.rect({
-    x: arrX, y: arrY + 160, w: arrW, h: 46, r: 6,
+    x: arrX, y: arrY + 162, w: arrW, h: 50, r: 6,
     fill: '#1b233a', stroke: S.tone('bytes'), sw: 1
   }, g);
   const arrCLbl = S.text('output c[i]: 2 bytes written', {
-    x: arrX + arrW / 2, y: arrY + 190, size: 20, anchor: 'middle', weight: 600, color: 'ink'
+    x: arrX + arrW / 2, y: arrY + 194, size: 20, anchor: 'middle', weight: 600, color: 'ink'
   }, g);
 
   // Accounting box
@@ -97,7 +102,7 @@ function ch16TwoOperations(S, opts = {}) {
   }, g);
 
   const leftPill = S.pill('1,735× below ridge · 99.9% waiting on hbm', {
-    x: leftX + panelW / 2, y: topY + panelH - 30, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: leftX + panelW / 2, y: topY + panelH - 30, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // ---------------------------------------------------------------- Right: Matrix Multiply (341 op/byte)
@@ -145,7 +150,7 @@ function ch16TwoOperations(S, opts = {}) {
   }, g);
 
   const rightPill = S.pill('crosses right of ridge · full tensor core speed', {
-    x: rightX + panelW / 2, y: topY + panelH - 30, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: rightX + panelW / 2, y: topY + panelH - 30, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // ---------------------------------------------------------------- Bottom Comparison Ruler
@@ -163,15 +168,15 @@ function ch16TwoOperations(S, opts = {}) {
   }, g);
 
   const addPt = S.pill('array add: 0.17', {
-    x: rulerX + 460, y: rulerY + 41, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: rulerX + 460, y: rulerY + 41, h: 40, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   const ridgePt = S.pill('ridge: 295', {
-    x: rulerX + 780, y: rulerY + 41, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: rulerX + 780, y: rulerY + 41, h: 40, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   const matPt = S.pill('matmul: 341', {
-    x: rulerX + 1100, y: rulerY + 41, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: rulerX + 1100, y: rulerY + 41, h: 40, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {

@@ -335,28 +335,28 @@ function ch05DerivationLayout(S, opts = {}) {
   // Tensor Core Bar: 4,096 ops
   const tcBarY = botY + 45;
   const tcBar = S.rect({
-    x: barStartX, y: tcBarY, w: barMaxW, h: 42, r: 6,
+    x: barStartX, y: tcBarY, w: barMaxW, h: 52, r: 6,
     fill: '#f59e0b', stroke: '#ffffff', sw: 1.5
   }, g);
   const tcLbl = S.text('4 tensor cores', {
-    x: barStartX - 20, y: tcBarY + 26, size: 22, anchor: 'end', weight: 700, color: 'compute'
+    x: barStartX - 20, y: tcBarY + 32, size: 22, anchor: 'end', weight: 700, color: 'compute'
   }, g);
   const tcVal = S.text('4,096 operations', {
-    x: barStartX + barMaxW - 20, y: tcBarY + 26, size: 22, anchor: 'end', weight: 700, color: '#0a0f1e'
+    x: barStartX + barMaxW - 20, y: tcBarY + 32, size: 20, anchor: 'end', weight: 700, color: '#0a0f1e'
   }, g);
 
   // CUDA Core Bar: 256 ops (1/16th width!)
-  const cudaBarY = tcBarY + 60;
+  const cudaBarY = tcBarY + 66;
   const cudaW = barMaxW * (256 / 4096); // ~60 px
   const cudaBar = S.rect({
-    x: barStartX, y: cudaBarY, w: cudaW, h: 42, r: 6,
+    x: barStartX, y: cudaBarY, w: cudaW, h: 52, r: 6,
     fill: '#1e293b', stroke: S.tone('struct'), sw: 1.5
   }, g);
   const cudaLbl = S.text('128 cuda cores', {
-    x: barStartX - 20, y: cudaBarY + 26, size: 22, anchor: 'end', weight: 700, color: 'struct'
+    x: barStartX - 20, y: cudaBarY + 32, size: 22, anchor: 'end', weight: 700, color: 'struct'
   }, g);
   const cudaVal = S.text('256 operations (32-bit) · 1/16th of tensor cores', {
-    x: barStartX + cudaW + 20, y: cudaBarY + 26, size: 20, weight: 600, color: 'muted'
+    x: barStartX + cudaW + 20, y: cudaBarY + 32, size: 20, weight: 600, color: 'muted'
   }, g);
 
   return {

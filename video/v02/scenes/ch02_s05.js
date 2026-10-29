@@ -42,7 +42,7 @@ V.scene('ch02_s05', S => {
   const m2Line = S.line({ x1: m2X, y1: axis.y - 140, x2: m2X, y2: axis.y, stroke: S.tone('bytes'), sw: 3.5 }, m2Group);
   const m2Dot = S.circle({ x: m2X, y: axis.y, r: 8, fill: S.tone('bytes') }, m2Group);
   const m2Card = S.card({
-    x: m2X - 150, y: axis.y - 230, w: 300, h: 90,
+    x: m2X - 165, y: axis.y - 230, w: 330, h: 90,
     tone: 'bytes', title: ''
   }, m2Group);
   const m2Title = S.text('2 · HBM memory load', { x: m2X, y: axis.y - 195, size: 22, anchor: 'middle', color: 'bytes', weight: 650 }, m2Group);

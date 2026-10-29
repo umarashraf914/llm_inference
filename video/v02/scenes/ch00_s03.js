@@ -55,12 +55,12 @@ V.scene('ch00_s03', S => {
     }, m3Group);
 
     const pActive = S.pill('active warp', {
-      x: 580, y: wy, h: 36, tone: 'compute', size: 20, weight: 650
+      x: 580, y: wy, h: 42, tone: 'compute', size: 20, weight: 650
     });
     m3Group.appendChild(pActive);
 
     const pReady = S.pill('15 ready warps', {
-      x: 770, y: wy, h: 36, tone: 'struct', size: 20, weight: 600
+      x: 770, y: wy, h: 42, tone: 'struct', size: 20, weight: 600
     });
     m3Group.appendChild(pReady);
 

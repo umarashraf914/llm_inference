@@ -182,9 +182,9 @@ function ch20LinkWires(S, opts = {}) {
   const aDie = S.rect({ x: aX + 25, y: chipY + 54, w: chipW - 50, h: 105, r: 8, fill: '#1d273a', stroke: '#364765', sw: 1.5 }, g);
   const aDieLbl = S.text('gpu silicon die', { x: aX + chipW / 2, y: chipY + 95, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
   const aDieSub = S.text('tensor cores', { x: aX + chipW / 2, y: chipY + 128, size: 20, anchor: 'middle', weight: 600, color: 'muted' }, g);
-  const aPhy = S.rect({ x: aX + chipW - 60, y: chipY + 172, w: 50, h: 72, r: 6, fill: S.tone('compute', 0.4), stroke: S.tone('compute'), sw: 1.5 }, g);
-  const aPhyLbl = S.text('phy', { x: aX + chipW - 35, y: chipY + 215, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
-  const aSerdesLbl = S.text('serdes transmitter', { x: aX + 104, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'compute' }, g);
+  const aPhy = S.rect({ x: aX + chipW - 74, y: chipY + 172, w: 64, h: 72, r: 6, fill: S.tone('compute', 0.4), stroke: S.tone('compute'), sw: 1.5 }, g);
+  const aPhyLbl = S.text('phy', { x: aX + chipW - 42, y: chipY + 215, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
+  const aSerdesLbl = S.text('serdes tx', { x: aX + 96, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'compute' }, g);
 
   const bX = cx + 280;
   const bBox = S.rect({ x: bX, y: chipY, w: chipW, h: chipH, r: 12, fill: '#141d2c', stroke: S.tone('helps'), sw: 2 }, g);
@@ -192,9 +192,9 @@ function ch20LinkWires(S, opts = {}) {
   const bDie = S.rect({ x: bX + 25, y: chipY + 54, w: chipW - 50, h: 105, r: 8, fill: '#1d273a', stroke: '#364765', sw: 1.5 }, g);
   const bDieLbl = S.text('gpu silicon die', { x: bX + chipW / 2, y: chipY + 95, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
   const bDieSub = S.text('tensor cores', { x: bX + chipW / 2, y: chipY + 128, size: 20, anchor: 'middle', weight: 600, color: 'muted' }, g);
-  const bPhy = S.rect({ x: bX + 10, y: chipY + 172, w: 50, h: 72, r: 6, fill: S.tone('helps', 0.4), stroke: S.tone('helps'), sw: 1.5 }, g);
-  const bPhyLbl = S.text('phy', { x: bX + 35, y: chipY + 215, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
-  const bSerdesLbl = S.text('serdes receiver', { x: bX + chipW - 104, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'helps' }, g);
+  const bPhy = S.rect({ x: bX + 10, y: chipY + 172, w: 64, h: 72, r: 6, fill: S.tone('helps', 0.4), stroke: S.tone('helps'), sw: 1.5 }, g);
+  const bPhyLbl = S.text('phy', { x: bX + 42, y: chipY + 215, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
+  const bSerdesLbl = S.text('serdes rx', { x: bX + chipW - 96, y: chipY + 215, size: 20, anchor: 'middle', weight: 600, color: 'helps' }, g);
 
   // High-Speed Differential Wire Bundle in between
   const wireX1 = aX + chipW - 10;
@@ -261,27 +261,27 @@ function ch20ScaleUpVsOut(S, opts = {}) {
 
   // Draw 8 GPU boxes in 2 rows of 4
   const gW = 86;
-  const gH = 44;
-  const gRow1Y = diagY + 20;
-  const gRow2Y = diagY + diagH - 20 - gH;
+  const gH = 50;
+  const gRow1Y = diagY + 16;
+  const gRow2Y = diagY + diagH - 16 - gH;
   const lGpus = [];
   for (let r = 0; r < 2; r++) {
     const gy = r === 0 ? gRow1Y : gRow2Y;
     for (let c = 0; c < 4; c++) {
       const gx = leftX + 55 + c * (gW + 56);
       const gb = S.rect({ x: gx, y: gy, w: gW, h: gH, r: 6, fill: S.tone('compute', 0.35), stroke: S.tone('compute'), sw: 1.5 }, g);
-      const gl = S.text(`gpu ${r * 4 + c + 1}`, { x: gx + gW / 2, y: gy + 28, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
+      const gl = S.text(`gpu ${r * 4 + c + 1}`, { x: gx + gW / 2, y: gy + 32, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
       lGpus.push({ gb, gl });
     }
   }
 
   // Central NVSwitch Chip
   const swW = 240;
-  const swH = 46;
+  const swH = 50;
   const swX = leftX + cardW / 2 - swW / 2;
   const swY = diagY + diagH / 2 - swH / 2;
   const swBox = S.rect({ x: swX, y: swY, w: swW, h: swH, r: 8, fill: S.tone('compute', 0.6), stroke: S.tone('compute'), sw: 2 }, g);
-  const swLbl = S.text('nvswitch crossbar', { x: leftX + cardW / 2, y: swY + 30, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
+  const swLbl = S.text('nvswitch crossbar', { x: leftX + cardW / 2, y: swY + 32, size: 20, anchor: 'middle', weight: 700, color: 'ink' }, g);
 
   // Features list
   const fBoxY = diagY + diagH + 16;
@@ -335,7 +335,7 @@ function ch20ScaleUpVsOut(S, opts = {}) {
     stroke: S.tone('bytes'), sw: 3, dash: '6 4'
   }, cableL);
   const cableTag = S.pill('9× bandwidth drop', {
-    x: rightX + cardW / 2, y: boxAY + boxAH / 2, h: 36, tone: 'bytes', size: 20, weight: 700
+    x: rightX + cardW / 2, y: boxAY + boxAH / 2, h: 42, tone: 'bytes', size: 20, weight: 700
   }, g);
 
   // Features list
@@ -483,7 +483,7 @@ function ch20TopologyCompare(S, opts = {}) {
   const bPanel2 = S.rect({ x: rightX + 30, y: botPanelY, w: cardW - 60, h: botPanelH, r: 10, fill: '#172538', stroke: '#2e496b', sw: 1 }, g);
   const s1 = S.text('• connections scale linearly: exactly 8 links for 8 gpus', { x: rightX + 50, y: botPanelY + 34, size: 20, weight: 600, color: 'ink' }, g);
   const s2 = S.text('• dgx h100 connects 8 gpus through 4 nvswitch chips', { x: rightX + 50, y: botPanelY + 70, size: 20, weight: 600, color: 'ink' }, g);
-  const s3 = S.text('• all 18 links dedicated: any pair connects at full 450 gb/s', { x: rightX + 50, y: botPanelY + 104, size: 20, weight: 700, color: 'helps' }, g);
+  const s3 = S.text('• all 18 links dedicated: any pair reaches full 450 gb/s', { x: rightX + 50, y: botPanelY + 104, size: 20, weight: 700, color: 'helps' }, g);
   const s4 = S.text('• connections scale with gpu count, not pairs of gpus', { x: rightX + 50, y: botPanelY + 136, size: 20, weight: 600, color: 'muted' }, g);
 
   const rightPill = S.pill('nvswitch delivers all-to-all communication at full link rate', {
@@ -568,7 +568,7 @@ function ch20GenerationalGap(S, opts = {}) {
     }, g);
 
     const ratioPill = S.pill(gn.ratio, {
-      x: rowStartX + 1180, y: ry + 32, h: 36, tone: 'bytes', size: 20, weight: 700
+      x: rowStartX + 1180, y: ry + 32, h: 42, tone: 'bytes', size: 20, weight: 700
     }, g);
 
     // HBM Bar
@@ -640,7 +640,7 @@ function ch20GeometryTiers(S, opts = {}) {
     },
     {
       title: 'tier 2 · off package',
-      dist: 'printed circuit board (~20 cm distance)',
+      dist: 'circuit board (~20 cm distance)',
       wires: '72 differential wire pairs',
       calc: '18 links × 2 pairs × 100 gb/s ÷ 8',
       bw: '450 gb/s (7.4× drop)',
@@ -648,7 +648,7 @@ function ch20GeometryTiers(S, opts = {}) {
     },
     {
       title: 'tier 3 · across the room',
-      dist: 'optical network cable (~10 m distance)',
+      dist: 'network cable (~10 m distance)',
       wires: 'serial transceiver fiber',
       calc: 'one 400 gb/s port per gpu ÷ 8',
       bw: '50 gb/s (9.0× drop again)',
@@ -834,9 +834,9 @@ function ch20ExpandingDomain(S, opts = {}) {
   const diagBg1 = S.rect({ x: leftX + 30, y: diagY, w: cardW - 60, h: diagH, r: 10, fill: '#140f16', stroke: '#3a2638', sw: 1 }, g);
 
   // 8 GPU cards in chassis
-  const gW = 60;
+  const gW = 68;
   const gH = 115;
-  const gGap = 12;
+  const gGap = 8;
   const gStartX1 = leftX + 30 + (cardW - 60 - (8 * gW + 7 * gGap)) / 2;
   const gY1 = diagY + 45;
   const lGpus = [];

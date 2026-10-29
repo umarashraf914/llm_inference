@@ -68,7 +68,7 @@ function ch18DualLever(S, opts = {}) {
   }, g);
 
   const footer = S.pill('lower precision accelerates arithmetic while cutting memory traffic in half', {
-    x: cx, y: cy + h / 2 - 32, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 32, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -128,7 +128,7 @@ function ch18BinaryLongMul(S, opts = {}) {
   });
 
   const leftPill = S.pill('each bit pair uses 1 AND gate · 4 × 4 = 16 gates', {
-    x: leftX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: leftX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // ---------------------------------------------------------------- Right: Circuit Area Square Law
@@ -165,7 +165,7 @@ function ch18BinaryLongMul(S, opts = {}) {
   });
 
   const rightPill = S.pill('halving bit width shrinks multiplier circuit to 1/4th', {
-    x: rightX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: rightX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -235,7 +235,7 @@ function ch18AreaVsDelivery(S, opts = {}) {
   }, g);
 
   const lPill = S.pill('silicon area budget allows a 4× density increase', {
-    x: leftX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: leftX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // ---------------------------------------------------------------- Right: Operand Delivery (Limits to 2x)
@@ -266,12 +266,12 @@ function ch18AreaVsDelivery(S, opts = {}) {
   const wireT3 = S.text('h100 8-bit rate: 1,978.9 tflop/s (exactly 2×)', {
     x: rightX + cardW / 2, y: topY + 230, size: 22, anchor: 'middle', weight: 700, color: 'compute'
   }, g);
-  const wireT4 = S.text('wire bandwidth bounds throughput to 2× rather than 4×', {
+  const wireT4 = S.text('wire bandwidth limits throughput to 2× instead of 4×', {
     x: rightX + cardW / 2, y: topY + 275, size: 20, anchor: 'middle', weight: 600, color: 'bytes'
   }, g);
 
   const rPill = S.pill('delivery bandwidth caps throughput to 2×', {
-    x: rightX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: rightX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -340,7 +340,7 @@ function ch18FormatLadder(S, opts = {}) {
   });
 
   const footer = S.pill('shrinking precision compounds with architecture for 72× dense throughput', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, mElements, footer };

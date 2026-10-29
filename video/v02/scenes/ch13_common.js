@@ -38,7 +38,7 @@ function ch13KitchenWarpScheduler(S, opts = {}) {
   const kDesc1 = S.text('idle cook: stands watching the oven bake for 45 minutes → 45 minutes wasted', {
     x: cx - 590, y: kY + 76, size: 20, weight: 600, color: 'bytes'
   }, g);
-  const kDesc2 = S.text('smart cook: chops vegetables while dish bakes → oven takes same time, zero idle time', {
+  const kDesc2 = S.text('smart cook: chops vegetables while dish bakes → zero idle time', {
     x: cx - 590, y: kY + 114, size: 20, weight: 700, color: 'helps'
   }, g);
 
@@ -82,7 +82,7 @@ function ch13KitchenWarpScheduler(S, opts = {}) {
   }, g);
 
   const footer = S.pill('each warp waits the full latency · the multiprocessor never waits', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -226,7 +226,7 @@ function ch13LatencyHidingFormula(S, opts = {}) {
   const leftMath = S.text('⌈ (32 + 479) ÷ 32 ⌉  =  16 warps needed', {
     x: cx - caseW / 2 - 20, y: caseY + 85, size: 24, anchor: 'middle', weight: 700, color: 'compute'
   }, g);
-  const leftResult = S.text('all 16 scheduler slots filled · 100% saturation · 0 idle cycles', {
+  const leftResult = S.text('16 slots filled · 100% saturation · zero idle cycles', {
     x: cx - caseW / 2 - 20, y: caseY + 135, size: 20, anchor: 'middle', weight: 600, color: 'ink'
   }, g);
 
@@ -246,7 +246,7 @@ function ch13LatencyHidingFormula(S, opts = {}) {
   }, g);
 
   const footer = S.pill('insufficient arithmetic between loads causes unavoidable stalls', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -276,14 +276,14 @@ function ch13OccupancyCaps(S, opts = {}) {
   }, g);
 
   const limits = [
-    { name: '1 · registers', cap: '256 kb limit', d1: '65,536 registers per sm', d2: 'more regs/thread = fewer warps', tone: 'struct' },
-    { name: '2 · shared memory', cap: '228 kb limit', d1: 'configurable sram per sm', d2: 'more bytes/block = fewer blocks', tone: 'helps' },
-    { name: '3 · max warps', cap: '64 warps', d1: '2,048 resident threads', d2: 'hardware ceiling per sm', tone: 'compute' },
-    { name: '4 · max blocks', cap: '32 blocks', d1: 'max active blocks', d2: 'blocks placed whole on sm', tone: 'bytes' }
+    { name: '1 · registers', cap: '256 kb limit', d1: '65,536 registers per sm', d2: 'regs cap warp count', tone: 'struct' },
+    { name: '2 · shared memory', cap: '228 kb limit', d1: 'configurable sram per sm', d2: 'sram caps block count', tone: 'helps' },
+    { name: '3 · max warps', cap: '64 warps', d1: '2,048 resident threads', d2: 'hardware limit per sm', tone: 'compute' },
+    { name: '4 · max blocks', cap: '32 blocks', d1: 'max active blocks', d2: 'blocks placed whole', tone: 'bytes' }
   ];
 
-  const colW = 295;
-  const colGap = 20;
+  const colW = 305;
+  const colGap = 15;
   const startX = cx - (4 * colW + 3 * colGap) / 2;
   const colY = cy - 140;
   const colH = 240;
@@ -307,14 +307,12 @@ function ch13OccupancyCaps(S, opts = {}) {
     const ld2 = S.text(l.d2, {
       x: lx + colW / 2, y: colY + 180, size: 20, anchor: 'middle', weight: 600, color: 'muted'
     }, g);
-    ld1.setAttribute('data-audit', 'ignore');
-    ld2.setAttribute('data-audit', 'ignore');
 
     colEls.push({ bc, ln, lc, ld1, ld2 });
   });
 
   const footer = S.pill('the goal is enough warps to hide latency · not maximum occupancy', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, colEls, footer };

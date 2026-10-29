@@ -149,7 +149,7 @@ function ch02Package(S, o = {}) {
   }, die);
 
   // 5 active HBM3 memory stacks
-  const stackW = 132, stackH = 96;
+  const stackW = 142, stackH = 96;
   const stackSpacing = 110;
   const stackCoords = [
     { x: cx - dieSize / 2 - stackW - 16, y: cy - stackSpacing },

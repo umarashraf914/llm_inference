@@ -129,25 +129,24 @@ function ch03ParallelTimeline(S, opts = {}) {
 
   // Parallel block container
   const pCard = S.card({
-    x: cx - 600, y: 445, w: 1200, h: 160,
+    x: cx - 600, y: 430, w: 1200, h: 220,
     tone: 'helps', title: ''
   }, g);
   const pTitle = S.text('parallel execution: 4 workers · 1 time unit', {
-    x: cx - 560, y: 526, size: 22, weight: 650, color: 'helps'
+    x: cx - 560, y: 535, size: 22, weight: 650, color: 'helps'
   }, g);
 
   // Parallel jobs: 4 simultaneous rows
   const pJobs = [];
   const pX0 = cx - 30;
   for (let j = 0; j < 4; j++) {
-    const jy = 465 + j * 32;
+    const jy = 445 + j * 50;
     const box = S.rect({
-      x: pX0, y: jy, w: 260, h: 26, r: 6,
+      x: pX0 - 10, y: jy, w: 280, h: 46, r: 6,
       fill: S.tone('helps', 0.25), stroke: S.tone('helps'), sw: 1.5
     }, g);
-    box.setAttribute('data-audit', 'ignore');
     const lbl = S.text(`worker ${j + 1}: job ${j + 1}`, {
-      x: pX0 + 130, y: jy + 18, size: 20, anchor: 'middle', weight: 650, color: 'ink'
+      x: pX0 + 130, y: jy + 29, size: 20, anchor: 'middle', weight: 650, color: 'ink'
     }, g);
     pJobs.push({ box, lbl });
   }

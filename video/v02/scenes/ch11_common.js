@@ -86,22 +86,22 @@ function ch11CellComparison(S, opts = {}) {
 
   // 1 Transistor block + 1 Capacitor plate
   const dramT = S.rect({
-    x: rightX + 65, y: topY + 145, w: 210, h: 80, r: 6,
+    x: rightX + 60, y: topY + 145, w: 200, h: 80, r: 6,
     fill: '#1a2233', stroke: S.tone('struct'), sw: 1.5
   }, g);
   const dramTLbl = S.text('access gate (1t)', {
-    x: rightX + 170, y: topY + 192, size: 20, anchor: 'middle', weight: 700, color: 'struct'
+    x: rightX + 160, y: topY + 192, size: 20, anchor: 'middle', weight: 700, color: 'struct'
   }, g);
 
   const dramCap = S.rect({
-    x: rightX + 300, y: topY + 135, w: 275, h: 100, r: 6,
+    x: rightX + 280, y: topY + 135, w: 310, h: 100, r: 6,
     fill: '#331a20', stroke: S.tone('bytes'), sw: 1.5
   }, g);
   const dramCapLbl = S.text('trench capacitor (c)', {
-    x: rightX + 437, y: topY + 175, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
+    x: rightX + 435, y: topY + 175, size: 20, anchor: 'middle', weight: 700, color: 'bytes'
   }, g);
   const dramCharge = S.text('microscopic ~30 ff charge', {
-    x: rightX + 437, y: topY + 210, size: 20, anchor: 'middle', weight: 600, color: 'muted'
+    x: rightX + 435, y: topY + 210, size: 20, anchor: 'middle', weight: 600, color: 'muted'
   }, g);
 
   // Leak curve line across bottom of DRAM box
@@ -214,7 +214,7 @@ function ch11DestructiveCycle(S, opts = {}) {
   }, g);
 
   const summaryPill = S.pill('dram physics sets latency · wire count sets bandwidth', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -297,7 +297,7 @@ function ch11LatencyBreakdown(S, opts = {}) {
   });
 
   const takeawayBadge = S.pill('wider buses increase throughput, but signals cannot travel faster across silicon', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'bytes', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'bytes', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -385,7 +385,7 @@ function ch11TradeoffPlot(S, opts = {}) {
   }, g);
 
   const ladderPill = S.pill('speed requires proximity · capacity requires area · memory must be a ladder', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {

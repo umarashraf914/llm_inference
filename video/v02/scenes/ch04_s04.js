@@ -38,7 +38,7 @@ V.scene('ch04_s04', S => {
     x: GX - 40, y: cpuY + barH / 2, size: 22, anchor: 'middle', weight: 600, color: 'muted'
   });
   const cpuBadge = S.pill('1× baseline', {
-    x: GX + cpuW / 2 - 120, y: cpuY + barH / 2, h: 36, tone: 'struct', size: 20, weight: 700
+    x: GX + cpuW / 2 - 120, y: cpuY + barH / 2, h: 42, tone: 'struct', size: 20, weight: 700
   });
 
   // GPU Row
@@ -54,7 +54,7 @@ V.scene('ch04_s04', S => {
     x: GX - 40, y: gpuY + 30, size: 22, anchor: 'middle', weight: 600, color: 'ink'
   });
   const gpuBadge = S.pill('800× faster', {
-    x: GX + cpuW / 2 - 120, y: gpuY + 30, h: 36, tone: 'compute', size: 20, weight: 700
+    x: GX + cpuW / 2 - 120, y: gpuY + 30, h: 42, tone: 'compute', size: 20, weight: 700
   });
 
   // Dense micro-grid of lanes inside GPU row

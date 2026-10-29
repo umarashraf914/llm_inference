@@ -91,22 +91,22 @@ function ch17MatMulSteps(S, opts = {}) {
   }, g);
 
   // Decode vs Prefill Comparison Panels below
-  const panW = 590;
+  const panW = 620;
   const panH = 92;
   const panY = cy + 96;
 
   // Decode panel
-  const decCard = S.rect({ x: cx - panW - 20, y: panY, w: panW, h: panH, r: 8, fill: '#181216', stroke: S.tone('bytes'), sw: 1.5 }, g);
-  const decTitle = S.text('decode: matrix × vector (1 column)', { x: cx - panW / 2 - 20, y: panY + 34, size: 20, anchor: 'middle', weight: 700, color: 'bytes' }, g);
-  const decDesc = S.text('1 column of tokens: each weight read once (zero reuse)', { x: cx - panW / 2 - 20, y: panY + 68, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
+  const decCard = S.rect({ x: cx - panW - 15, y: panY, w: panW, h: panH, r: 8, fill: '#181216', stroke: S.tone('bytes'), sw: 1.5 }, g);
+  const decTitle = S.text('decode: matrix × vector (1 column)', { x: cx - panW / 2 - 15, y: panY + 34, size: 20, anchor: 'middle', weight: 700, color: 'bytes' }, g);
+  const decDesc = S.text('1 token column: each weight read once (zero reuse)', { x: cx - panW / 2 - 15, y: panY + 68, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
 
   // Prefill panel
-  const preCard = S.rect({ x: cx + 20, y: panY, w: panW, h: panH, r: 8, fill: '#10201a', stroke: S.tone('helps'), sw: 1.5 }, g);
-  const preTitle = S.text('prefill: matrix × matrix (n columns)', { x: cx + panW / 2 + 20, y: panY + 34, size: 20, anchor: 'middle', weight: 700, color: 'helps' }, g);
-  const preDesc = S.text('2,048 prompt tokens: each weight reused 2,048 times', { x: cx + panW / 2 + 20, y: panY + 68, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
+  const preCard = S.rect({ x: cx + 15, y: panY, w: panW, h: panH, r: 8, fill: '#10201a', stroke: S.tone('helps'), sw: 1.5 }, g);
+  const preTitle = S.text('prefill: matrix × matrix (n columns)', { x: cx + panW / 2 + 15, y: panY + 34, size: 20, anchor: 'middle', weight: 700, color: 'helps' }, g);
+  const preDesc = S.text('2,048 prompt tokens: each weight reused 2,048 times', { x: cx + panW / 2 + 15, y: panY + 68, size: 20, anchor: 'middle', weight: 600, color: 'ink' }, g);
 
   const footer = S.pill('matrix multiplication brings data reuse · matrix-vector multiplication does not', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -173,7 +173,7 @@ function ch17CudaVsTensor(S, opts = {}) {
   }, g);
 
   const leftPill = S.pill('1 output per cycle · general-purpose arithmetic', {
-    x: leftX + cardW / 2, y: topY + cardH - 36, h: 38, tone: 'struct', size: 20, weight: 700, style: 'solid'
+    x: leftX + cardW / 2, y: topY + cardH - 36, h: 42, tone: 'struct', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // ---------------------------------------------------------------- Right: Hopper Tensor Core
@@ -217,7 +217,7 @@ function ch17CudaVsTensor(S, opts = {}) {
   }, g);
 
   const rightPill = S.pill('1,024 ops per cycle · specialized matrix hardware', {
-    x: rightX + cardW / 2, y: topY + cardH - 36, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: rightX + cardW / 2, y: topY + cardH - 36, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {
@@ -281,7 +281,7 @@ function ch17TileScaling(S, opts = {}) {
   });
 
   const footer = S.pill('data reuse grows with tile width · turns memory-bound jobs into compute-bound', {
-    x: cx, y: cy + h / 2 - 28, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: cx, y: cy + h / 2 - 28, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return { group: g, bg, title, rowEls, footer };
@@ -349,7 +349,7 @@ function ch17TransformerPie(S, opts = {}) {
   });
 
   const leftPill = S.pill('over 90% is matrix multiply · specialized silicon bet', {
-    x: leftX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'compute', size: 20, weight: 700, style: 'solid'
+    x: leftX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'compute', size: 20, weight: 700, style: 'solid'
   }, g);
 
   // ---------------------------------------------------------------- Right: Peak vs Sustained
@@ -391,7 +391,7 @@ function ch17TransformerPie(S, opts = {}) {
   });
 
   const rightPill = S.pill('peak is a ceiling · software is sustained fraction', {
-    x: rightX + cardW / 2, y: topY + cardH - 32, h: 38, tone: 'helps', size: 20, weight: 700, style: 'solid'
+    x: rightX + cardW / 2, y: topY + cardH - 32, h: 42, tone: 'helps', size: 20, weight: 700, style: 'solid'
   }, g);
 
   return {

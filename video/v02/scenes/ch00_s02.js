@@ -17,8 +17,14 @@ V.scene('ch00_s02', S => {
   // Stopwatch on left
   const sw = libStopwatch(S, {
     x: 680, y: 460, size: 210, span: 30, value: 0,
-    tone: 'bytes', unit: 'ms', readout: 'below', readoutSize: 32
+    tone: 'bytes', unit: 'ms', readout: 'below'
   }, m1Group);
+  if (sw.plate) {
+    const curH = parseFloat(sw.plate.getAttribute('height') || '42');
+    const curY = parseFloat(sw.plate.getAttribute('y') || '0');
+    sw.plate.setAttribute('height', String(curH + 10));
+    sw.plate.setAttribute('y', String(curY - 5));
+  }
 
   // Comparison pill stack on right
   const compGroup = S.g(null, m1Group);

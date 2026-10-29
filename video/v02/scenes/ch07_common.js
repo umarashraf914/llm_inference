@@ -98,12 +98,12 @@ function ch07SchedulerQueue(S, opts = {}) {
 
   // Stall alert banner at bottom
   const stallBox = S.rect({
-    x: cx - w / 2 + 32, y: cy + h / 2 - 76, w: w - 64, h: 52, r: 8,
+    x: cx - w / 2 + 32, y: cy + h / 2 - 80, w: w - 64, h: 60, r: 8,
     fill: '#38161e', stroke: S.tone('bytes'), sw: 1.5
   }, g);
 
   const stallText = S.text('hazard: if all 16 warps stall on hbm, that scheduler 32 execution lanes sit 100% idle', {
-    x: cx, y: cy + h / 2 - 42, size: 22, anchor: 'middle', weight: 700, color: 'bytes'
+    x: cx, y: cy + h / 2 - 44, size: 22, anchor: 'middle', weight: 700, color: 'bytes'
   }, g);
 
   return { group: g, bg, title, rows, stallBox, stallText };
@@ -224,7 +224,7 @@ function ch07TmaFlow(S, opts = {}) {
   const hopTitle = S.text('with tma (hopper h100)', {
     x: cx + compW / 4 + 6, y: compY + 34, size: 22, anchor: 'middle', weight: 700, color: 'helps'
   }, g);
-  const hopDesc = S.text('1 single instruction: background streaming while math runs 100%', {
+  const hopDesc = S.text('1 instruction: background streaming while math runs 100%', {
     x: cx + compW / 4 + 6, y: compY + 70, size: 20, anchor: 'middle', color: 'helps'
   }, g);
 
